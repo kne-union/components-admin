@@ -1,0 +1,25 @@
+.layout-row {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  background: var(--primary-color);
+}
+
+.layout-inner {
+  background: #fff;
+  border-radius: 5px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.layout-inner-wrapper {
+  position: relative;
+}
+
+.language {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+}

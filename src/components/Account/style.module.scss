@@ -1,0 +1,37 @@
+.out-container {
+  background: #ffffff;
+  width: 1000px;
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+  --out-inner-height: 90vh;
+  --max-height: 640px;
+  //max-height: var(--max-height);
+}
+
+.title {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.back-link {
+  position: absolute;
+  top: 18px;
+  left: 12px;
+  padding: 0;
+  font-size: 12px;
+  color: rgba($color: #000000, $alpha: 0.65);
+}
+
+.reset-new-desc {
+  font-size: 12px;
+  color: var(--font-color-grey-1);
+  font-weight: 400;
+}
+
+.form-inner {
+  width: 420px !important;
+  margin: 80px auto;
+}

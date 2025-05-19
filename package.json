@@ -4,7 +4,7 @@
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
-    "start": "cross-env PORT=3010 COMPONENTS_NAME=components-admin MODULES_DEV_PUBLIC_URL=/ craco start",
+    "start": "cross-env PORT=3016 COMPONENTS_NAME=components-admin MODULES_DEV_PUBLIC_URL=/ craco start",
     "build": "cross-env COMPONENTS_NAME=components-admin MODULES_DEV_PUBLIC_URL=components-admin craco build",
     "create": "modules-dev-create",
     "test": "craco test --coverage",
@@ -64,10 +64,10 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
+    "@kne/modules-dev": "^2.1.11",
     "@kne/react-fetch": "^1.4.3",
     "@kne/remote-loader": "^1.2.3",
     "@testing-library/jest-dom": "^6.4.2",
-    "@kne/modules-dev": "^2.0.14",
     "antd": "^5.14.2",
     "axios": "^1.6.7",
     "classnames": "^2.5.1",
@@ -75,10 +75,17 @@
     "http-proxy-middleware": "^2.0.6",
     "husky": "^9.0.11",
     "lodash": "^4.17.21",
-    "sass": "^1.75.0",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.2"
+    "react-router-dom": "^6.22.2",
+    "sass": "^1.75.0"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.0.0",
+    "@kne/captcha-button": "^1.0.1",
+    "@kne/token-storage": "^1.0.0",
+    "@kne/use-refer-navigate": "^1.0.0",
+    "md5": "^2.3.0"
   }
 }

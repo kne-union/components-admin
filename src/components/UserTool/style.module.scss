@@ -1,0 +1,110 @@
+.icon {
+  display: block;
+  transform: scale(0.67);
+}
+
+.content {
+  width: 300px !important;
+  padding: 16px 0;
+}
+
+.overlay {
+  background: #ffffff;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
+  0 3px 6px -4px rgba(0, 0, 0, 0.12),
+  0 9px 28px 8px rgba(0, 0, 0, 0.05);
+
+  :global {
+    .ant-popover-inner {
+      padding: 0;
+    }
+  }
+}
+
+.info {
+  padding: 0 16px;
+}
+
+.tenant {
+  background: var(--primary-color-1);
+  border: 1px solid var(--primary-color-2);
+  border-radius: 2px;
+  margin: 0 16px;
+  padding: 10px 12px;
+}
+
+.user-tool {
+  cursor: pointer;
+}
+
+.divider {
+  margin: 0;
+}
+
+.options-list {
+  color: var(--font-color-grey);
+}
+
+.options-list-item {
+  padding: 10px 16px !important;
+  cursor: pointer;
+
+  &:hover {
+    background: #f8f8f8;
+    color: #222;
+  }
+}
+
+.org {
+  color: var(--font-color-grey);
+}
+
+.tenant-item {
+  border: 1px solid #eee !important;
+  border-radius: 2px !important;
+  cursor: pointer;
+  padding: 24px 16px !important;
+
+  &:not(:last-child) {
+    margin-bottom: 16px;
+  }
+
+  border-block-end: 1px solid #eee !important;
+
+  .current-sign {
+    visibility: hidden;
+    color: var(--primary-color);
+  }
+
+  &.current-tenant {
+    background: var(--primary-color-1);
+    border: 1px solid var(--primary-color-4) !important;
+    border-bottom-color: var(--primary-color-4) !important;
+    border-block-end: 1px solid var(--primary-color-4) !important;
+
+    .current-sign {
+      visibility: visible;
+    }
+  }
+}
+
+.user-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.company {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

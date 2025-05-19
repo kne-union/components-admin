@@ -1,0 +1,27 @@
+.out-left {
+  background: url('./account_bg.jpg') no-repeat;
+  background-size: cover;
+  width: 500px;
+  height: var(--out-inner-height);
+  max-height: var(--max-height);
+}
+
+.out-right {
+  padding: 50px 25px 24px 25px;
+  position: relative;
+  height: var(--out-inner-height);
+  max-height: var(--max-height);
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.out-right-inner {
+  width: 100%;
+  margin: auto;
+  padding: 0 25px;
+  max-height: calc(var(--out-inner-height) - 50px - 26px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}

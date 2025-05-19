@@ -1,0 +1,80 @@
+{
+  "isFull": true,
+  "list": [
+    {
+      "title": "Login",
+      "description": "登录",
+      "code": "./login.js",
+      "scope": [
+        {
+          "name": "_Account",
+          "packageName": "@components/Account"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "Register",
+      "description": "注册",
+      "code": "./register.js",
+      "scope": [
+        {
+          "name": "_Account",
+          "packageName": "@components/Account"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "Modify",
+      "description": "修改密码",
+      "code": "./modify.js",
+      "scope": [
+        {
+          "name": "_Account",
+          "packageName": "@components/Account"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "ForgetByEmail",
+      "description": "忘记密码（邮箱）",
+      "code": "./forget-by-email.js",
+      "scope": [
+        {
+          "name": "_Account",
+          "packageName": "@components/Account"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "ResetPassword",
+      "description": "重置密码",
+      "code": "./reset-password.js",
+      "scope": [
+        {
+          "name": "_Account",
+          "packageName": "@components/Account"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    }
+  ]
+}
