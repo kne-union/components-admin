@@ -12,6 +12,10 @@ const getApis = options => {
         url: `${prefix}/user/getUserInfo`,
         method: 'GET',
         cache: 'get-user-info'
+      },
+      saveUserInfo: {
+        url: `${prefix}/user/saveUserInfo`,
+        method: 'POST',
       }
     },
     account: {
