@@ -66,6 +66,7 @@
     "@craco/craco": "^7.1.0",
     "@kne/modules-dev": "^2.1.11",
     "@kne/react-fetch": "^1.4.3",
+    "@kne/react-form-antd": "^4.0.2",
     "@kne/remote-loader": "^1.2.3",
     "@testing-library/jest-dom": "^6.4.2",
     "antd": "^5.14.2",
