@@ -23,11 +23,11 @@ export const UserInfo = createWithRemoteLoader({
   const { apis } = usePreset();
   return (
     <Fetch
-      {...Object.assign({}, apis.account.getUserInfo)}
-      render={({ data }) => {
+      {...Object.assign({}, apis.user.getUserInfo)}
+      render={({ data, reload }) => {
         return (
           <CheckAccountIsInit baseUrl={baseUrl} data={data}>
-            <SetGlobal globalKey="userInfo" value={data} needReady>
+            <SetGlobal globalKey="userInfo" value={{ value: data.userInfo, reload }} needReady>
               {children}
             </SetGlobal>
           </CheckAccountIsInit>
@@ -46,9 +46,9 @@ export const SuperAdminInfo = createWithRemoteLoader({
     <Fetch
       cache="super-admin-info"
       {...Object.assign({}, apis.admin.getSuperAdminInfo)}
-      render={({ data }) => {
+      render={({ data, reload }) => {
         return (
-          <SetGlobal globalKey="userInfo" value={data} needReady>
+          <SetGlobal globalKey="userInfo" value={{ value: data.userInfo, reload }} needReady>
             {children}
           </SetGlobal>
         );
