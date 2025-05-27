@@ -21,7 +21,7 @@ const Layout = () => {
 
 const Account = ({className, ...p}) => {
   const {baseUrl, ...props} = merge({}, {
-    baseUrl: '/',
+    baseUrl: '',
     accountType: 'email',
     loginTitle: '登录',
     registerTitle: '注册',
