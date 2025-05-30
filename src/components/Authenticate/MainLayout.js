@@ -1,6 +1,7 @@
-import { createWithRemoteLoader } from '@kne/remote-loader';
+import RemoteLoader, { createWithRemoteLoader } from '@kne/remote-loader';
 import { Outlet } from 'react-router-dom';
 import { SuperAdminInfo, UserInfo } from './Authenticate';
+import UserTool from '@components/UserTool';
 
 const MainLayout = createWithRemoteLoader({
   modules: ['components-core:Layout']
@@ -20,11 +21,11 @@ const MainLayout = createWithRemoteLoader({
 
 export const AfterUserLoginLayout = ({ baseUrl, ...props }) => {
   return (
-    <MainLayout {...props}>
-      <UserInfo baseUrl={baseUrl || '/account'}>
+    <UserInfo baseUrl={baseUrl || '/account'}>
+      <MainLayout {...props}>
         <Outlet />
-      </UserInfo>
-    </MainLayout>
+      </MainLayout>
+    </UserInfo>
   );
 };
 
@@ -36,13 +37,26 @@ export const AfterUserLogin = ({ baseUrl, ...props }) => {
   );
 };
 
-export const AfterAdminUserLoginLayout = props => {
+export const AfterAdminUserLoginLayout = ({ navigation, ...props }) => {
   return (
-    <MainLayout {...props}>
-      <SuperAdminInfo>
+    <SuperAdminInfo>
+      <MainLayout
+        {...props}
+        navigation={Object.assign({}, navigation, {
+          rightOptions: (
+            <RemoteLoader module="components-core:Global@GetGlobal" globalKey="userInfo">
+              {({ value }) => {
+                const { nickname, avatar, email } = Object.assign({}, value?.value);
+                console.log('>>>>', value?.value);
+                return <UserTool name={nickname} email={email} avatar={avatar} />;
+              }}
+            </RemoteLoader>
+          )
+        })}
+      >
         <Outlet />
-      </SuperAdminInfo>
-    </MainLayout>
+      </MainLayout>
+    </SuperAdminInfo>
   );
 };
 
