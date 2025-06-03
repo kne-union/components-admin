@@ -15,7 +15,7 @@ const getApis = options => {
       },
       saveUserInfo: {
         url: `${prefix}/user/saveUserInfo`,
-        method: 'POST',
+        method: 'POST'
       }
     },
     account: {
@@ -33,6 +33,30 @@ const getApis = options => {
       },
       login: {
         url: `${prefix}/account/login`,
+        method: 'POST'
+      },
+      modifyPassword: {
+        url: `${prefix}/account/modifyPassword`,
+        method: 'POST'
+      },
+      forgetPwd: {
+        url: `${prefix}/account/forgetPwd`,
+        method: 'POST'
+      },
+      parseResetToken: {
+        url: `${prefix}/account/parseResetToken`,
+        method: 'POST'
+      },
+      resetPassword: {
+        url: `${prefix}/account/resetPassword`,
+        method: 'POST'
+      },
+      validateCode: {
+        url: `${prefix}/account/validateCode`,
+        method: 'POST'
+      },
+      accountIsExists: {
+        url: `${prefix}/account/accountIsExists`,
         method: 'POST'
       }
     },
