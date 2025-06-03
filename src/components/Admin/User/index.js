@@ -87,7 +87,7 @@ const User = createWithRemoteLoader({
                   });
                 }
               },
-              get(item, 'adminRole.isSuperAdmin') === true
+              get(item, 'isSuperAdmin') === true
                 ? {
                     children: '取消超管',
                     message: '确定要取消账号的超管权限吗？',
