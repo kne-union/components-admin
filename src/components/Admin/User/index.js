@@ -89,13 +89,13 @@ const User = createWithRemoteLoader({
               },
               get(item, 'adminRole.isSuperAdmin') === true
                 ? {
-                    children: '设置超管',
-                    message: '确定要设置账号为超管吗？',
+                    children: '取消超管',
+                    message: '确定要取消账号的超管权限吗？',
                     isDelete: false,
                     onClick: async () => {
                       const { data: resData } = await ajax(
                         Object.assign({}, apis.admin.setSuperAdmin, {
-                          data: { status: true, userId: item.id }
+                          data: { status: false, userId: item.id }
                         })
                       );
                       if (resData.code !== 0) {
@@ -106,13 +106,13 @@ const User = createWithRemoteLoader({
                     }
                   }
                 : {
-                    children: '取消超管',
-                    message: '确定要取消账号的超管权限吗？',
+                    children: '设置超管',
+                    message: '确定要设置账号为超管吗？',
                     isDelete: false,
                     onClick: async () => {
                       const { data: resData } = await ajax(
                         Object.assign({}, apis.admin.setSuperAdmin, {
-                          data: { status: false, userId: item.id }
+                          data: { status: true, userId: item.id }
                         })
                       );
                       if (resData.code !== 0) {
@@ -132,7 +132,7 @@ const User = createWithRemoteLoader({
                     isDelete: false,
                     onClick: async () => {
                       const { data: resData } = await ajax(
-                        Object.assign({}, apis.admin.openUser, {
+                        Object.assign({}, apis.admin.setUserNormal, {
                           data: {
                             id: item.id
                           }
@@ -155,7 +155,7 @@ const User = createWithRemoteLoader({
                     okText: '确认',
                     onClick: async () => {
                       const { data: resData } = await ajax(
-                        Object.assign({}, apis.admin.closeUser, {
+                        Object.assign({}, apis.admin.setUserClose, {
                           data: {
                             id: item.id
                           }
