@@ -30,8 +30,9 @@ const UserTool = createWithRemoteLoader({
                 Object.values(storeKeys).forEach(tokenKey => {
                   removeToken(tokenKey, domain);
                 });
-                ajax(Object.assign({}, apis.account.getUserInfo));
-              }}>
+                window.location.reload();
+              }}
+            >
               <Space>
                 <Icon type="icon-tuichudenglu" />
                 <span>退出登录</span>
@@ -41,7 +42,8 @@ const UserTool = createWithRemoteLoader({
         </Space>
       )}
       arrow={false}
-      transitionName={'ant-slide-up'}>
+      transitionName={'ant-slide-up'}
+    >
       <Space className={style['user-tool']}>
         <Image.Avatar id={avatar} size={32} />
         <div className={style['user-name']}>{name || '未命名'}</div>
