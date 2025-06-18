@@ -22,7 +22,19 @@ const MainLayout = createWithRemoteLoader({
 export const AfterUserLoginLayout = ({ baseUrl, ...props }) => {
   return (
     <UserInfo baseUrl={baseUrl || '/account'}>
-      <MainLayout {...props}>
+      <MainLayout
+        {...props}
+        navigation={Object.assign({}, navigation, {
+          rightOptions: (
+            <RemoteLoader module="components-core:Global@GetGlobal" globalKey="userInfo">
+              {({ value }) => {
+                const { nickname, avatar, email } = Object.assign({}, value?.value);
+                return <UserTool name={nickname} email={email} avatar={avatar} />;
+              }}
+            </RemoteLoader>
+          )
+        })}
+      >
         <Outlet />
       </MainLayout>
     </UserInfo>
@@ -47,7 +59,6 @@ export const AfterAdminUserLoginLayout = ({ navigation, ...props }) => {
             <RemoteLoader module="components-core:Global@GetGlobal" globalKey="userInfo">
               {({ value }) => {
                 const { nickname, avatar, email } = Object.assign({}, value?.value);
-                console.log('>>>>', value?.value);
                 return <UserTool name={nickname} email={email} avatar={avatar} />;
               }}
             </RemoteLoader>
