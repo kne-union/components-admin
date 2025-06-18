@@ -19,7 +19,7 @@ const MainLayout = createWithRemoteLoader({
   );
 });
 
-export const AfterUserLoginLayout = ({ baseUrl, ...props }) => {
+export const AfterUserLoginLayout = ({ baseUrl, navigation, ...props }) => {
   return (
     <UserInfo baseUrl={baseUrl || '/account'}>
       <MainLayout
