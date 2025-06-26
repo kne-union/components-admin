@@ -108,8 +108,7 @@ export const globalInit = async () => {
   return {
     ajax,
     themeToken: {
-      colorPrimary: '#4F185A',
-      colorPrimaryHover: '#702280'
+      colorPrimary: '#4183F0'
     }
   };
 };
