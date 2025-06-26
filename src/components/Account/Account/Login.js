@@ -4,14 +4,15 @@ import { useProps } from './context';
 import LoginComponent from '../Login';
 
 const Login = () => {
-  const { loginTitle, registerUrl, forgetUrl, accountType, afterLogin } = useProps();
+  const { loginTitle, systemName, systemLogo, registerUrl, forgetUrl, accountType, afterLogin } = useProps();
   return (
-    <LoginOuterContainer>
+    <LoginOuterContainer title={systemName} logo={systemLogo}>
       <DoLogin>
         {({ login }) => {
           return (
             <LoginComponent
               title={loginTitle}
+              systemName={systemName}
               registerUrl={registerUrl}
               forgetUrl={forgetUrl}
               afterLogin={afterLogin}

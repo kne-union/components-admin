@@ -97,6 +97,28 @@ const getApis = options => {
         url: `${prefix}/admin/setUserNormal`,
         method: 'POST'
       }
+    },
+    signature: {
+      list: {
+        method: 'GET',
+        url: `${prefix}/signature/list`
+      },
+      create: {
+        method: 'POST',
+        url: `${prefix}/signature/create`
+      },
+      update: {
+        method: 'POST',
+        url: `${prefix}/signature/update`
+      },
+      remove: {
+        method: 'POST',
+        url: `${prefix}/signature/remove`
+      },
+      verify: {
+        method: 'POST',
+        url: `${prefix}/signature/verify`
+      }
     }
   };
 };

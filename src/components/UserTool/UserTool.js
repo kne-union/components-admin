@@ -4,11 +4,9 @@ import { removeToken } from '@kne/token-storage';
 import style from './style.module.scss';
 
 const UserTool = createWithRemoteLoader({
-  modules: ['components-core:Image', 'components-core:Icon', 'components-core:Global@usePreset']
-})(({ remoteModules, avatar, name, email, orgName, storeKeys = { token: 'X-User-Token' }, domain }) => {
-  const [Image, Icon, usePreset] = remoteModules;
-  const { ajax, apis } = usePreset();
-
+  modules: ['components-core:Image', 'components-core:Icon']
+})(({ remoteModules, avatar, name, email, storeKeys = { token: 'X-User-Token' }, domain }) => {
+  const [Image, Icon] = remoteModules;
   return (
     <Dropdown
       trigger="click"
