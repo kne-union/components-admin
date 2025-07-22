@@ -119,6 +119,32 @@ const getApis = options => {
         method: 'POST',
         url: `${prefix}/signature/verify`
       }
+    },
+    webhook: {
+      list: {
+        url: `${prefix}/webhook/list`,
+        method: 'GET'
+      },
+      create: {
+        url: `${prefix}/webhook/create`,
+        method: 'POST'
+      },
+      setStatus: {
+        url: `${prefix}/webhook/set-status`,
+        method: 'POST'
+      },
+      invoke: {
+        url: `${prefix}/webhook/invoke`,
+        method: 'POST'
+      },
+      invokeRecord: {
+        url: `${prefix}/webhook/invoke-record`,
+        method: 'GET'
+      },
+      remove: {
+        url: `${prefix}/webhook/remove`,
+        method: 'POST'
+      }
     }
   };
 };
