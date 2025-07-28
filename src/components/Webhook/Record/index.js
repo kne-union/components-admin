@@ -3,13 +3,13 @@ import getColumns from './getColumns';
 
 const Record = createWithRemoteLoader({
   modules: ['components-core:Table@TablePage', 'components-core:Global@usePreset']
-})(({ remoteModules, id }) => {
+})(({ remoteModules, id, type }) => {
   const [TablePage, usePreset] = remoteModules;
   const { apis } = usePreset();
   return (
     <TablePage
       {...Object.assign({}, apis.webhook.invokeRecord, {
-        params: { id }
+        params: { id, type }
       })}
       columns={[...getColumns()]}
     />
