@@ -34,6 +34,13 @@ const getColumns = ({ renderCopyInvokeUrl, renderCopySignature }) => {
     {
       name: 'inputLocation',
       title: '输入位置'
+    },
+    {
+      name: 'shouldEncryptVerify',
+      title: '是否验证完整性',
+      valueOf: item => {
+        return item.shouldEncryptVerify ? '是' : '否';
+      }
     }
   ];
 };
