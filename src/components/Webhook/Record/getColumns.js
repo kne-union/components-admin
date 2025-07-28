@@ -20,6 +20,8 @@ const getColumns = () => {
     {
       name: 'input',
       title: '调用参数',
+      type: 'description',
+      ellipsis: true,
       valueOf: item => {
         return item.input && JSON.stringify(item.input);
       }
@@ -38,6 +40,8 @@ const getColumns = () => {
     {
       name: 'result',
       title: '执行结果',
+      type: 'description',
+      ellipsis: true,
       valueOf: item => {
         return item.result && JSON.stringify(item.result);
       }

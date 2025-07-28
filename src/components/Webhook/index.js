@@ -1,7 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
 import { useState } from 'react';
-import { Button, App } from 'antd';
+import { Button, App, Flex } from 'antd';
 import getColumns from './getColumns';
 import FormInner from './FormInner';
 import Record from './Record';
@@ -118,37 +118,50 @@ const Webhook = createWithRemoteLoader({
               ),
               title: 'Webhook',
               titleExtra: (
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    formModal({
-                      title: '添加Webhook调用端',
-                      size: 'small',
-                      autoClose: true,
-                      formProps: {
-                        onSubmit: async formData => {
-                          const { data: resData } = await ajax(
-                            Object.assign({}, apis.webhook.create, {
-                              data: Object.assign({}, formData, {
-                                type: current
+                <Flex gap={8}>
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      formModal({
+                        title: '添加Webhook调用端',
+                        size: 'small',
+                        autoClose: true,
+                        formProps: {
+                          onSubmit: async formData => {
+                            const { data: resData } = await ajax(
+                              Object.assign({}, apis.webhook.create, {
+                                data: Object.assign({}, formData, {
+                                  type: current
+                                })
                               })
-                            })
-                          );
+                            );
 
-                          if (resData.code !== 0) {
-                            return false;
+                            if (resData.code !== 0) {
+                              return false;
+                            }
+
+                            message.success('添加成功');
+                            reload();
                           }
-
-                          message.success('添加成功');
-                          reload();
-                        }
-                      },
-                      children: <FormInner />
-                    });
-                  }}
-                >
-                  添加
-                </Button>
+                        },
+                        children: <FormInner />
+                      });
+                    }}
+                  >
+                    添加
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      modal({
+                        title: '失败记录',
+                        footer: null,
+                        children: <Record />
+                      });
+                    }}
+                  >
+                    失败记录
+                  </Button>
+                </Flex>
               )
             }}
           />
