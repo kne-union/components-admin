@@ -155,7 +155,7 @@ const Webhook = createWithRemoteLoader({
                       modal({
                         title: '失败记录',
                         footer: null,
-                        children: <Record />
+                        children: <Record type={current} />
                       });
                     }}
                   >
