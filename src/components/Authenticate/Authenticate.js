@@ -16,14 +16,14 @@ const CheckAccountIsInit = ({ data, baseUrl, children }) => {
   return children;
 };
 
-export const UserInfo = createWithRemoteLoader({
-  modules: ['components-core:Global@SetGlobal', 'components-core:Global@usePreset']
-})(({ remoteModules, baseUrl, children }) => {
-  const [SetGlobal, usePreset] = remoteModules;
-  const { apis } = usePreset();
+export const CustomUserInfo = createWithRemoteLoader({
+  modules: ['components-core:Global@SetGlobal']
+})(({ remoteModules, cache, baseUrl, children, api }) => {
+  const [SetGlobal] = remoteModules;
   return (
     <Fetch
-      {...Object.assign({}, apis.user.getUserInfo)}
+      cache={cache}
+      {...Object.assign({}, api)}
       render={({ data, reload }) => {
         return (
           <CheckAccountIsInit baseUrl={baseUrl} data={data}>
@@ -35,6 +35,14 @@ export const UserInfo = createWithRemoteLoader({
       }}
     />
   );
+});
+
+export const UserInfo = createWithRemoteLoader({
+  modules: ['components-core:Global@usePreset']
+})(({ remoteModules, ...props }) => {
+  const [usePreset] = remoteModules;
+  const { apis } = usePreset();
+  return <CustomUserInfo {...props} api={apis.user.getUserInfo} cache="user-info" />;
 });
 
 export const SuperAdminInfo = createWithRemoteLoader({
