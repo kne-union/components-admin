@@ -16,9 +16,9 @@
 - _Task(@components/Task)
 
 ```jsx
-const {default:Task} = _Task;
-const BaseExample = ()=>{
-    return <Task />;
+const { default: Task } = _Task;
+const BaseExample = () => {
+  return <Task />;
 };
 
 render(<BaseExample />);
