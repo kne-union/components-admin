@@ -145,6 +145,24 @@ const getApis = options => {
         url: `${prefix}/webhook/remove`,
         method: 'POST'
       }
+    },
+    task: {
+      complete: {
+        url: `${prefix}/task/complete`,
+        method: 'POST'
+      },
+      cancel: {
+        url: `${prefix}/task/cancel`,
+        method: 'POST'
+      },
+      list: {
+        url: `${prefix}/task/list`,
+        method: 'GET'
+      },
+      retry: {
+        url: `${prefix}/task/retry`,
+        method: 'POST'
+      }
     }
   };
 };
