@@ -1,11 +1,11 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Divider, List, Dropdown, Space } from 'antd';
+import { Divider, List, Dropdown, Space, Flex } from 'antd';
 import { removeToken } from '@kne/token-storage';
 import style from './style.module.scss';
 
 const UserTool = createWithRemoteLoader({
   modules: ['components-core:Image', 'components-core:Icon']
-})(({ remoteModules, avatar, name, email, storeKeys = { token: 'X-User-Token' }, domain }) => {
+})(({ remoteModules, avatar, name, email, storeKeys = { token: 'X-User-Token' }, domain, list, children = null }) => {
   const [Image, Icon] = remoteModules;
   return (
     <Dropdown
@@ -21,7 +21,20 @@ const UserTool = createWithRemoteLoader({
             </div>
           </Space>
           <Divider className={style['divider']} />
+          {children}
           <List className={style['options-list']}>
+            {list &&
+              list.length > 0 &&
+              list.map((item, index) => {
+                return (
+                  <List.Item key={index} className={style['options-list-item']} onClick={item.onClick}>
+                    <Flex gap={8} flex={1}>
+                      {item.iconType && <Icon type={item.iconType} />}
+                      <Flex flex={1}>{item.label}</Flex>
+                    </Flex>
+                  </List.Item>
+                );
+              })}
             <List.Item
               className={style['options-list-item']}
               onClick={() => {
@@ -31,10 +44,10 @@ const UserTool = createWithRemoteLoader({
                 window.location.reload();
               }}
             >
-              <Space>
+              <Flex gap={8} flex={1}>
                 <Icon type="icon-tuichudenglu" />
                 <span>退出登录</span>
-              </Space>
+              </Flex>
             </List.Item>
           </List>
         </Space>
