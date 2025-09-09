@@ -194,7 +194,7 @@ const User = createWithRemoteLoader({
                         { label: '正常', value: 0 },
                         {
                           label: '初始化未激活',
-                          value: 1
+                          value: 10
                         },
                         { label: '已关闭', value: 12 }
                       ]
