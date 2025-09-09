@@ -1,9 +1,9 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { App } from 'antd';
 
-const CancelTask = createWithRemoteLoader({
+const RetryTask = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:ConfirmButton']
-})(({ remoteModules, data, onSuccess, ...props }) => {
+})(({ remoteModules, taskIds, data, onSuccess, ...props }) => {
   const [usePreset, ConfirmButton] = remoteModules;
   const { apis, ajax } = usePreset();
   const { message } = App.useApp();
@@ -15,7 +15,7 @@ const CancelTask = createWithRemoteLoader({
       onClick={async () => {
         const { data: resData } = await ajax(
           Object.assign({}, apis.task.retry, {
-            data: { id: data.id }
+            data: { id: data?.id, taskIds }
           })
         );
         if (resData.code !== 0) {
@@ -28,4 +28,4 @@ const CancelTask = createWithRemoteLoader({
   );
 });
 
-export default CancelTask;
+export default RetryTask;
