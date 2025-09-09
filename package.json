@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",

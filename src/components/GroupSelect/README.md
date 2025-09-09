@@ -4,7 +4,7 @@
 
 ### 概述
 
-用于给对象添加一个分组标签
+用于选择一个分组标签
 
 
 ### 示例
@@ -16,9 +16,9 @@
 - _GroupSelect(@components/GroupSelect)
 
 ```jsx
-const { default: GroupSelect } = _GroupSelect;
-const BaseExample = () => {
-  return <GroupSelect />;
+const {default:GroupSelect} = _GroupSelect;
+const BaseExample = ()=>{
+    return <GroupSelect />;
 };
 
 render(<BaseExample />);

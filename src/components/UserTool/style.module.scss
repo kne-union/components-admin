@@ -10,9 +10,11 @@
 
 .overlay {
   background: #ffffff;
-  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
-  0 3px 6px -4px rgba(0, 0, 0, 0.12),
-  0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08),
+    0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-default, 2px);
 
   :global {
     .ant-popover-inner {
@@ -28,7 +30,7 @@
 .tenant {
   background: var(--primary-color-1);
   border: 1px solid var(--primary-color-2);
-  border-radius: 2px;
+  border-radius: var(--radius-default, 2px);
   margin: 0 16px;
   padding: 10px 12px;
 }
@@ -61,7 +63,7 @@
 
 .tenant-item {
   border: 1px solid #eee !important;
-  border-radius: 2px !important;
+  border-radius: var(--radius-default, 2px) !important;
   cursor: pointer;
   padding: 24px 16px !important;
 
