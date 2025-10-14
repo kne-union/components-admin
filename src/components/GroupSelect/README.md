@@ -16,9 +16,9 @@
 - _GroupSelect(@components/GroupSelect)
 
 ```jsx
-const {default:GroupSelect} = _GroupSelect;
-const BaseExample = ()=>{
-    return <GroupSelect />;
+const { default: GroupSelect } = _GroupSelect;
+const BaseExample = () => {
+  return <GroupSelect />;
 };
 
 render(<BaseExample />);

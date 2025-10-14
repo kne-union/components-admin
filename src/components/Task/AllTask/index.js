@@ -26,12 +26,11 @@ const AllTask = createWithRemoteLoader({
           fixed: 'right',
           valueOf: item => {
             return {
-              children: ({ more, buttonProps }) => (
+              children: (
                 <Actions
                   getManualTaskAction={getManualTaskAction}
-                  buttonProps={buttonProps}
                   data={item}
-                  more={more}
+                  type="link"
                   onSuccess={() => {
                     ref.current.reload();
                   }}
