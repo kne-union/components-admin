@@ -6,7 +6,7 @@ import ResultDetail from './ResultDetail';
 
 const Actions = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
-})(({ remoteModules, children, data, buttonProps, getManualTaskAction, more, onSuccess }) => {
+})(({ remoteModules, children, data, getManualTaskAction, onSuccess, moreType = 'link', itemClassName, ...props }) => {
   const [ButtonGroup] = remoteModules;
   const list = [];
 
@@ -15,7 +15,7 @@ const Actions = createWithRemoteLoader({
       const buttonComponent = getManualTaskAction(data);
       buttonComponent &&
         list.push({
-          ...buttonProps,
+          ...props,
           data,
           buttonComponent,
           children: '完成',
@@ -26,7 +26,7 @@ const Actions = createWithRemoteLoader({
 
   if (['pending', 'running'].indexOf(data.status) > -1) {
     list.push({
-      ...buttonProps,
+      ...props,
       buttonComponent: CancelTask,
       data,
       children: '取消',
@@ -34,28 +34,29 @@ const Actions = createWithRemoteLoader({
     });
   }
 
+  if (['canceled', 'failed'].indexOf(data.status) > -1) {
+    list.push({
+      ...props,
+      buttonComponent: RetryTask,
+      data,
+      children: '重试',
+      onSuccess
+    });
+  }
+
   if (['failed'].indexOf(data.status) > -1) {
-    list.push(
-      {
-        ...buttonProps,
-        buttonComponent: RetryTask,
-        data,
-        children: '重试',
-        onSuccess
-      },
-      {
-        ...buttonProps,
-        buttonComponent: ErrorDetail,
-        data,
-        children: '错误详情',
-        onSuccess
-      }
-    );
+    list.push({
+      ...props,
+      buttonComponent: ErrorDetail,
+      data,
+      children: '错误详情',
+      onSuccess
+    });
   }
 
   if (['success'].indexOf(data.status) > -1) {
     list.push({
-      ...buttonProps,
+      ...props,
       buttonComponent: ResultDetail,
       data,
       children: '查看结果',
@@ -67,7 +68,7 @@ const Actions = createWithRemoteLoader({
     return children({ list });
   }
 
-  return <ButtonGroup list={list} more={more} />;
+  return <ButtonGroup itemClassName={itemClassName} list={list} moreType={moreType} />;
 });
 
 export default Actions;
