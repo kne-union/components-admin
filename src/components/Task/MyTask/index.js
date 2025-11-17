@@ -1,29 +1,75 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import Menu from '../Menu';
+import { useRef, useState } from 'react';
+import { transform } from 'lodash';
+
 import getColumns from '../getColumns';
-import { useRef } from 'react';
+import Menu from '../Menu';
 import Actions from '../Actions';
+import RetryTask from '../Actions/RetryTask';
 
 const MyTask = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset']
+  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Tooltip']
 })(({ remoteModules, baseUrl, getManualTaskAction }) => {
-  const [TablePage, usePreset] = remoteModules;
-  const { apis } = usePreset();
+  const [TablePage, usePreset, Filter, Tooltip] = remoteModules;
+  const { apis, enums } = usePreset();
+  const { SearchInput, getFilterValue, fields: filterFields } = Filter;
+  const { InputFilterItem, AdvancedSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
   const ref = useRef(null);
+  const [filter, setFilter] = useState([
+    {
+      name: "status",
+      label: "状态",
+      value: {
+        value: "running",
+        label: "执行中"
+      }
+    }
+  ]);
+  const [sort, setSortChange] = useState([]);
+  const [selected, setSelected] = useState({
+    selectedRowKeys: [],
+    selectedRows: []
+  });
+
+  const filterValue = getFilterValue(filter);
+
+  const onSelectChange = (selectedRowKeys, selectedRows) => {
+    setSelected({ selectedRowKeys, selectedRows });
+  };
 
   return (
     <TablePage
       {...Object.assign({}, apis.task.list, {
         params: {
-          filter: {
-            status: 'pending',
+          filter: Object.assign({}, filterValue, {
+            createdAt: filterValue.createdAt
+              ? {
+                  startTime: filterValue.createdAt.value[0],
+                  endTime: filterValue.createdAt.value[1]
+                }
+              : null,
+            completedAt: filterValue.completedAt
+              ? {
+                  startTime: filterValue.completedAt.value[0],
+                  endTime: filterValue.completedAt.value[1]
+                }
+              : null,
             runnerType: 'manual'
-          }
+          }),
+          sort: transform(
+            sort,
+            (result, value) => {
+              result[value.name] = value.sort;
+            },
+            {}
+          )
         }
       })}
       ref={ref}
       pagination={{ paramsType: 'params' }}
       name="admin-task-my-list"
+      sort={sort}
+      onSortChange={setSortChange}
       columns={[
         ...getColumns(),
         {
@@ -35,9 +81,9 @@ const MyTask = createWithRemoteLoader({
             return {
               children: (
                 <Actions
-                  type="link"
-                  data={item}
                   getManualTaskAction={getManualTaskAction}
+                  data={item}
+                  type="link"
                   onSuccess={() => {
                     ref.current.reload();
                   }}
@@ -47,7 +93,76 @@ const MyTask = createWithRemoteLoader({
           }
         }
       ]}
+      rowSelection={{
+        type: 'checkbox',
+        hideSelectAll: true,
+        selectedRowKeys: selected.selectedRowKeys,
+        onChange: onSelectChange,
+        getCheckboxProps: record => {
+          return {
+            disabled: record.status !== 'failed' // Column configuration not to be checked
+          };
+        }
+      }}
+      topArea={
+        <>
+          已选：{selected.selectedRowKeys?.length}
+          <Tooltip placement="topLeft" content="请选择要批量重试的任务，只能选择失败的任务">
+            <RetryTask
+              size="small"
+              type="link"
+              disabled={!selected.selectedRows?.length}
+              taskIds={selected.selectedRowKeys}
+              onSuccess={() => {
+                setSelected({
+                  selectedRowKeys: [],
+                  selectedRows: []
+                });
+                ref.current?.reload?.();
+              }}>
+              批量重试
+            </RetryTask>
+          </Tooltip>
+        </>
+      }
       page={{
+        filter: {
+          value: filter,
+          onChange: setFilter,
+          list: [
+            [
+              <InputFilterItem label="任务ID" name="id" />,
+              <InputFilterItem label="目标ID" name="targetId" />,
+              <AdvancedSelectFilterItem
+                label="类型"
+                name="type"
+                single
+                api={{
+                  loader: () => {
+                    return {
+                      pageData: enums.taskType().map(item => ({ value: item.value, label: item.description }))
+                    };
+                  }
+                }}
+              />,
+              <AdvancedSelectFilterItem
+                label="状态"
+                name="status"
+                single
+                api={{
+                  loader: () => {
+                    return {
+                      pageData: enums.taskStatus().map(item => ({ value: item.value, label: item.description }))
+                    };
+                  }
+                }}
+              />,
+              <TypeDateRangePickerFilterItem label="创建时间排序" name="createdAt" allowEmpty={[true, true]} />,
+              <TypeDateRangePickerFilterItem label="完成时间排序" name="completedAt" allowEmpty={[true, true]} />
+            ]
+          ]
+        },
+        titleExtra: <SearchInput name="targetName" label="目标名称" />,
         menu: <Menu baseUrl={baseUrl} />
       }}
     />
