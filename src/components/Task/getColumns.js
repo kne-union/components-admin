@@ -50,12 +50,14 @@ const getColumns = () => {
     {
       name: 'completedAt',
       title: '完成时间',
-      type: 'datetime'
+      type: 'datetime',
+      sort: true
     },
     {
       name: 'updatedAt',
       title: '更新时间',
-      type: 'datetime'
+      type: 'datetime',
+      sort: true
     }
   ];
 };
