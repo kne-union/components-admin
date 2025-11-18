@@ -17,11 +17,11 @@ const MyTask = createWithRemoteLoader({
   const ref = useRef(null);
   const [filter, setFilter] = useState([
     {
-      name: "status",
-      label: "状态",
+      name: 'status',
+      label: '状态',
       value: {
-        value: "running",
-        label: "执行中"
+        value: 'pending',
+        label: '等待执行'
       }
     }
   ]);
@@ -104,27 +104,6 @@ const MyTask = createWithRemoteLoader({
           };
         }
       }}
-      topArea={
-        <>
-          已选：{selected.selectedRowKeys?.length}
-          <Tooltip placement="topLeft" content="请选择要批量重试的任务，只能选择失败的任务">
-            <RetryTask
-              size="small"
-              type="link"
-              disabled={!selected.selectedRows?.length}
-              taskIds={selected.selectedRowKeys}
-              onSuccess={() => {
-                setSelected({
-                  selectedRowKeys: [],
-                  selectedRows: []
-                });
-                ref.current?.reload?.();
-              }}>
-              批量重试
-            </RetryTask>
-          </Tooltip>
-        </>
-      }
       page={{
         filter: {
           value: filter,
@@ -157,8 +136,8 @@ const MyTask = createWithRemoteLoader({
                   }
                 }}
               />,
-              <TypeDateRangePickerFilterItem label="创建时间排序" name="createdAt" allowEmpty={[true, true]} />,
-              <TypeDateRangePickerFilterItem label="完成时间排序" name="completedAt" allowEmpty={[true, true]} />
+              <TypeDateRangePickerFilterItem label="创建时间" name="createdAt" allowEmpty={[true, true]} />,
+              <TypeDateRangePickerFilterItem label="完成时间" name="completedAt" allowEmpty={[true, true]} />
             ]
           ]
         },
