@@ -178,8 +178,8 @@ const AllTask = createWithRemoteLoader({
                   }
                 }}
               />,
-              <TypeDateRangePickerFilterItem label="创建时间排序" name="createdAt" allowEmpty={[true, true]} />,
-              <TypeDateRangePickerFilterItem label="完成时间排序" name="completedAt" allowEmpty={[true, true]} />
+              <TypeDateRangePickerFilterItem label="创建时间" name="createdAt" allowEmpty={[true, true]} />,
+              <TypeDateRangePickerFilterItem label="完成时间" name="completedAt" allowEmpty={[true, true]} />
             ]
           ]
         },
