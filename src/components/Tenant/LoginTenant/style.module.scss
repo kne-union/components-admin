@@ -1,0 +1,30 @@
+.card {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tenant-item {
+  cursor: pointer;
+
+  &:global(.ant-list-item) {
+    padding: 12px;
+    border-radius: 4px;
+  }
+
+  :global(.ant-ribbon-wrapper) {
+    flex: 1;
+  }
+
+  :global(.ant-ribbon) {
+    transform: translate(12px, -12px);
+  }
+
+  &.is-selected {
+    background: var(--primary-color-1);
+  }
+}
+
+.tenant-avatar {
+  border-radius: 4px;
+}

@@ -1,0 +1,30 @@
+import { createWithRemoteLoader } from '@kne/remote-loader';
+import { App } from 'antd';
+
+const Remove = createWithRemoteLoader({
+  modules: ['components-core:ConfirmButton', 'components-core:Global@usePreset']
+})(({ remoteModules, data, onSuccess, ...props }) => {
+  const [ConfirmButton, usePreset] = remoteModules;
+  const { apis, ajax } = usePreset();
+  const { message } = App.useApp();
+  return (
+    <ConfirmButton
+      {...props}
+      onClick={async () => {
+        const { data: resData } = await ajax(
+          Object.assign({}, apis.tenantAdmin.remove, {
+            data: { id: data.id }
+          })
+        );
+
+        if (resData.code !== 0) {
+          return;
+        }
+        message.success('删除租户成功');
+        onSuccess && onSuccess();
+      }}
+    />
+  );
+});
+
+export default Remove;
