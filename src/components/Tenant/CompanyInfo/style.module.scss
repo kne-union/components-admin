@@ -1,0 +1,82 @@
+.company-info {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.section {
+  width: 100%;
+  line-height: 2;
+}
+
+.sectionTitle {
+  text-align: center;
+  margin-bottom: 40px !important;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: var(--primary-color);
+    margin: 16px auto 0;
+  }
+}
+
+.timeline {
+  margin: 0 auto;
+  padding: 40px 20px;
+
+  :global(.ant-timeline-item-content) {
+    font-size: 16px;
+  }
+}
+
+.form-section {
+  margin: 0 auto;
+}
+
+.images {
+  width: 400px;
+  margin: 0 auto 24px;
+}
+
+.image-item {
+  width: 400px;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 20px;
+
+  img {
+    object-fit: cover;
+  }
+}
+
+.team-card {
+  height: 100%;
+  text-align: center;
+  padding: 32px 24px;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .member-avatar {
+    margin-bottom: 24px;
+
+    :global(.ant-avatar) {
+      border: 4px solid #f0f0f0;
+    }
+  }
+
+  h4 {
+    margin-bottom: 8px;
+  }
+
+  h5 {
+    margin-bottom: 16px;
+  }
+}
