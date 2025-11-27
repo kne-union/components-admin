@@ -163,6 +163,192 @@ const getApis = options => {
         url: `${prefix}/task/retry`,
         method: 'POST'
       }
+    },
+    tenantAdmin: {
+      create: {
+        url: `${prefix}/tenant/admin/create`,
+        method: 'POST'
+      },
+      list: {
+        url: `${prefix}/tenant/admin/list`,
+        method: 'GET'
+      },
+      save: {
+        url: `${prefix}/tenant/admin/save`,
+        method: 'POST'
+      },
+      setStatus: {
+        url: `${prefix}/tenant/admin/set-status`,
+        method: 'POST'
+      },
+      remove: {
+        url: `${prefix}/tenant/admin/remove`,
+        method: 'POST'
+      },
+      detail: {
+        url: `${prefix}/tenant/admin/detail`,
+        method: 'GET'
+      },
+      companyDetail: {
+        url: `${prefix}/tenant/admin/company-detail`,
+        method: 'GET'
+      },
+      companySave: {
+        url: `${prefix}/tenant/admin/company-save`,
+        method: 'POST'
+      },
+      orgList: {
+        url: `${prefix}/tenant/admin/org-list`,
+        method: 'GET'
+      },
+      orgCreate: {
+        url: `${prefix}/tenant/admin/org-create`,
+        method: 'POST'
+      },
+      orgSave: {
+        url: `${prefix}/tenant/admin/org-save`,
+        method: 'POST'
+      },
+      orgRemove: {
+        url: `${prefix}/tenant/admin/org-remove`,
+        method: 'POST'
+      },
+      userList: {
+        url: `${prefix}/tenant/admin/user-list`,
+        method: 'GET'
+      },
+      userCreate: {
+        url: `${prefix}/tenant/admin/user-create`,
+        method: 'POST'
+      },
+      userSetStatus: {
+        url: `${prefix}/tenant/admin/user-set-status`,
+        method: 'POST'
+      },
+      userSave: {
+        url: `${prefix}/tenant/admin/user-save`,
+        method: 'POST'
+      },
+      userRemove: {
+        url: `${prefix}/tenant/admin/user-remove`,
+        method: 'POST'
+      },
+      userInviteToken: {
+        url: `${prefix}/tenant/admin/user-invite-token`,
+        method: 'GET'
+      },
+      userInviteMessage: {
+        url: `${prefix}/tenant/admin/send-invite-message`,
+        method: 'POST'
+      },
+      appendArgs: {
+        url: `${prefix}/tenant/admin/append-args`,
+        method: 'POST'
+      },
+      removeArg: {
+        url: `${prefix}/tenant/admin/remove-arg`,
+        method: 'POST'
+      },
+      digital: {
+        getList: {
+          url: `${prefix}/admin/digital/getList`,
+          method: 'GET'
+        },
+        list: {
+          url: `${prefix}/admin/digital/getList`,
+          method: 'GET'
+        },
+        add: {
+          url: `${prefix}/admin/digital/add`,
+          method: 'POST'
+        },
+        save: {
+          url: `${prefix}/admin/digital/save`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${prefix}/admin/digital/remove`,
+          method: 'POST'
+        }
+      }
+    },
+    tenant: {
+      statistics: {
+        url: `${prefix}/tenant/statistics`,
+        method: 'GET'
+      },
+      parseJoinToken: {
+        url: `${prefix}/tenant/parse-join-token`,
+        method: 'POST'
+      },
+      join: {
+        url: `${prefix}/tenant/join`,
+        method: 'POST'
+      },
+      availableList: {
+        url: `${prefix}/tenant/available-list`,
+        method: 'GET'
+      },
+      switchDefaultTenant: {
+        url: `${prefix}/tenant/switch-default-tenant`,
+        method: 'POST'
+      },
+      getUserInfo: {
+        url: `${prefix}/tenant/getUserInfo`,
+        method: 'GET'
+      },
+      companyDetail: {
+        url: `${prefix}/tenant/company-detail`,
+        method: 'GET'
+      },
+      companySave: {
+        url: `${prefix}/tenant/company-save`,
+        method: 'POST'
+      },
+      orgList: {
+        url: `${prefix}/tenant/org-list`,
+        method: 'GET'
+      },
+      orgCreate: {
+        url: `${prefix}/tenant/org-create`,
+        method: 'POST'
+      },
+      orgSave: {
+        url: `${prefix}/tenant/org-save`,
+        method: 'POST'
+      },
+      orgRemove: {
+        url: `${prefix}/tenant/org-remove`,
+        method: 'POST'
+      },
+      userList: {
+        url: `${prefix}/tenant/user-list`,
+        method: 'GET'
+      },
+      userCreate: {
+        url: `${prefix}/tenant/user-create`,
+        method: 'POST'
+      },
+      userSetStatus: {
+        url: `${prefix}/tenant/user-set-status`,
+        method: 'POST'
+      },
+      userSave: {
+        url: `${prefix}/tenant/user-save`,
+        method: 'POST'
+      },
+      userRemove: {
+        url: `${prefix}/tenant/user-remove`,
+        method: 'POST'
+      },
+      userInviteToken: {
+        url: `${prefix}/tenant/user-invite-token`,
+        method: 'GET'
+      },
+      userInviteMessage: {
+        url: `${prefix}/tenant/send-invite-message`,
+        method: 'POST'
+      }
     }
   };
 };
