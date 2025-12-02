@@ -249,34 +249,36 @@ const getApis = options => {
         url: `${prefix}/tenant/admin/remove-arg`,
         method: 'POST'
       },
-      digital: {
-        getList: {
-          url: `${prefix}/admin/digital/getList`,
-          method: 'GET'
-        },
-        list: {
-          url: `${prefix}/admin/digital/getList`,
-          method: 'GET'
-        },
-        add: {
-          url: `${prefix}/admin/digital/add`,
+      role: {
+        create: {
+          url: `${prefix}/tenant/admin/role/create`,
           method: 'POST'
         },
+        list: {
+          url: `${prefix}/tenant/admin/role/list`,
+          method: 'GET'
+        },
         save: {
-          url: `${prefix}/admin/digital/save`,
+          url: `${prefix}/tenant/admin/role/save`,
+          method: 'POST'
+        },
+        setStatus: {
+          url: `${prefix}/tenant/admin/role/set-status`,
           method: 'POST'
         },
         remove: {
-          url: `${prefix}/admin/digital/remove`,
+          url: `${prefix}/tenant/admin/role/remove`,
           method: 'POST'
+        }
+      },
+      permission: {
+        list: {
+          url: `${prefix}/tenant/admin/permission/list`,
+          method: 'GET'
         }
       }
     },
     tenant: {
-      statistics: {
-        url: `${prefix}/tenant/statistics`,
-        method: 'GET'
-      },
       parseJoinToken: {
         url: `${prefix}/tenant/parse-join-token`,
         method: 'POST'

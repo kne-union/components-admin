@@ -1,6 +1,8 @@
 export { default as CompanyInfo } from './CompanyInfo';
 export { default as OrgInfo } from './OrgInfo';
 export { default as UserList } from './UserList';
+export { default as Role } from './Role';
+export { default as Permission } from './Permission';
 export { default as JoinInvitation } from './JoinInvitation';
 export { default as LoginTenant } from './LoginTenant';
 export { default as Authenticate } from './Authenticate';
