@@ -4,7 +4,7 @@ import AfterTenantLoginLayout from './AfterTenantLoginLayout';
 
 const Tenant = createWithRemoteLoader({
   modules: ['components-admin:Authenticate@AfterUserLoginLayout']
-})(({ remoteModules, baseUrl, navigation = {}, list = [], ...props }) => {
+})(({ remoteModules, baseUrl, navigation = {}, list = [], children, ...props }) => {
   const [AfterUserLoginLayout] = remoteModules;
   return (
     <AppChildrenRouter
@@ -15,8 +15,6 @@ const Tenant = createWithRemoteLoader({
           path: 'tenant/*',
           element: (
             <AppChildrenRouter
-              errorPage
-              notFoundPage
               baseUrl={`${baseUrl}/tenant`}
               element={
                 <AfterTenantLoginLayout
@@ -49,8 +47,6 @@ const Tenant = createWithRemoteLoader({
           path: '*',
           element: (
             <AppChildrenRouter
-              errorPage
-              notFoundPage
               baseUrl={baseUrl}
               element={<AfterUserLoginLayout />}
               list={[
@@ -65,8 +61,9 @@ const Tenant = createWithRemoteLoader({
                   },
                   loader: () => import('./LoginTenant')
                 }
-              ]}
-            />
+              ]}>
+              {children}
+            </AppChildrenRouter>
           )
         }
       ]}

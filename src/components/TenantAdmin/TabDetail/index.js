@@ -6,17 +6,26 @@ import dayjs from 'dayjs';
 import Company from './Company';
 import Org from './Org';
 import User from './User';
+import Permission from './Permission';
 import Setting from './Setting';
 
 const contentMap = {
   company: Company,
   org: Org,
   user: User,
+  permission: Permission,
   setting: Setting
 };
 
 const TabDetail = createWithRemoteLoader({
-  modules: ['components-core:Layout@StateBarPage', 'components-core:Global@usePreset', 'components-core:Layout@PageHeader', 'components-core:StateTag', 'components-core:InfoPage', 'components-core:Descriptions']
+  modules: [
+    'components-core:Layout@StateBarPage',
+    'components-core:Global@usePreset',
+    'components-core:Layout@PageHeader',
+    'components-core:StateTag',
+    'components-core:InfoPage',
+    'components-core:Descriptions'
+  ]
 })(({ remoteModules, ...props }) => {
   const [StateBarPage, usePreset, PageHeader, StateTag] = remoteModules;
   const { apis } = usePreset();
@@ -59,14 +68,14 @@ const TabDetail = createWithRemoteLoader({
               stateOption: [
                 { tab: '公司信息', key: 'company' },
                 { tab: '组织架构', key: 'org' },
+                { tab: '权限管理', key: 'permission' },
                 { tab: '用户管理', key: 'user' },
                 {
                   tab: '设置',
                   key: 'setting'
                 }
               ]
-            }}
-          >
+            }}>
             <ContentComponent tenant={data} reload={reload} />
           </StateBarPage>
         );
