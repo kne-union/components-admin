@@ -7,9 +7,9 @@ import Actions from './Actions';
 import Create from './Actions/Create';
 
 const UserList = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Table@TablePage', 'components-core:Filter']
+  modules: ['components-core:Table@TablePage', 'components-core:Filter']
 })(({ remoteModules, apis, topOptionsSize, children }) => {
-  const [usePreset, TablePage, Filter] = remoteModules;
+  const [TablePage, Filter] = remoteModules;
   const ref = useRef();
   const { SearchInput, FilterProvider, getFilterValue } = Filter;
   const [filter, setFilter] = useState([]);

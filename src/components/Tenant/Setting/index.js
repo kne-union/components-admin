@@ -11,7 +11,6 @@ const Setting = createWithRemoteLoader({
   const baseUrl = `${originalBaseUrl}/setting`;
   const [usePreset, Menu] = remoteModules;
   const { apis } = usePreset();
-
   const menu = (
     <Menu
       items={[

@@ -1,0 +1,42 @@
+.tenant-permission {
+  margin-top: 12px;
+}
+
+.modules-menu {
+  min-width: 200px;
+  padding: 0 12px;
+  border-inline-end: none !important;
+}
+
+.permission-panel {
+  padding: 0 12px;
+  min-width: 400px;
+}
+
+.permission-panel-checkbox {
+  padding: 12px 16px 24px;
+}
+
+.permission-panel-wrapper {
+
+}
+
+.permission-panel-col {
+  padding: 12px 0;
+  border-right: 1px solid #f0f0f0;
+
+  &:last-child {
+    flex: 1;
+    border-right: none;
+  }
+}
+
+.empty {
+  padding: 24px;
+  width: 100%;
+}
+
+.permission-panel-scroller {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}

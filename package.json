@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
@@ -90,6 +90,7 @@
     "@kne/is-empty": "^1.0.1",
     "@kne/react-org-chart": "^0.1.6",
     "@kne/token-storage": "^1.0.0",
+    "@kne/use-control-value": "^0.1.9",
     "@kne/use-refer-navigate": "^1.0.0",
     "md5": "^2.3.0"
   }
