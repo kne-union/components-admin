@@ -10,7 +10,7 @@ const Setting = createWithRemoteLoader({
   const { Input, Switch } = FormInfo.fields;
   const formModal = useFormModal();
   const { message } = App.useApp();
-  const formInner = <TableList name="args" minLength={1} column={1} list={[<Input name="key" label="键" rule="REQ LEN-0-100" />, <Input name="value" label="值" rule="REQ LEN-0-500" />, <Switch name="secret" label="是否密钥" />]} />;
+  const formInner = <TableList title="环境变量" name="args" minLength={1} column={1} list={[<Input name="key" label="键" rule="REQ LEN-0-100" />, <Input name="value" label="值" rule="REQ LEN-0-500" />, <Switch name="secret" label="是否密钥" />]} />;
   const args = tenant.tenantSetting?.args || [];
   return (
     <Flex vertical gap={8}>

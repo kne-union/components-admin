@@ -30,7 +30,7 @@ const Forget = createWithRemoteLoader({
                 <div className={commonStyle['title']}>{title}</div>
                 <div className={style['success-info']}>
                     <div>重置链接已发送至{resultEmail}的邮箱中，</div>
-                    <div>请在24小时内完成密码重置，若链接失效请重新申请。</div>
+                    <div>请在3分钟内完成密码重置，若链接失效请重新申请。</div>
                 </div>
             </Space>
         </>
