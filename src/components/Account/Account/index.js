@@ -44,8 +44,6 @@ const Account = ({ className, ...p }) => {
     p
   );
 
-  console.log(p);
-
   return (
     <Provider
       value={{
@@ -64,7 +62,7 @@ const Account = ({ className, ...p }) => {
             <Route path={props.registerPath} element={<Register />} />
             <Route path={props.forgetPath} element={<Forget />} />
             <Route path={`${props.resetPasswordPath}/:token`} element={<ResetPassword />} />
-            <Route path={`${props.modifyPath}modify/:account`} element={<Modify />} />
+            <Route path={`${props.modifyPath}/:account`} element={<Modify />} />
           </Route>
         </Routes>
       </div>

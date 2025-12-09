@@ -6,7 +6,22 @@ const FormInner = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [FormInfo] = remoteModules;
   const { Upload } = FormInfo.fields;
-  return <FormInfo className={style['form-section']} list={[<Upload name="banners" label="Banner" interceptor="photo-string-list" block />]} />;
+  return (
+    <FormInfo
+      className={style['form-section']}
+      list={[
+        <Upload
+          name="banners"
+          label="Banner"
+          interceptor="photo-string-list"
+          block
+          getPermission={type => {
+            return ['preview', 'delete'].indexOf(type) > -1;
+          }}
+        />
+      ]}
+    />
+  );
 });
 
 export default FormInner;
