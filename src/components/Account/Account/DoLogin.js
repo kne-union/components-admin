@@ -27,14 +27,28 @@ const DoLogin = createWithRemoteLoader({
           }
         })
       );
+
       if (resData.code !== 0) {
         return;
       }
-      let refererHref = targetUrl || '/';
 
-      Object.keys(storeKeys).forEach(key => {
-        resData.data[key] && setToken(storeKeys[key], resData.data[key], domain);
-      });
+      if (resData.data.status === 10) {
+        message.warning('账号没有初始化，请设置一个新的密码后重新登录');
+        navigate(`/account/modify/${formData.email || formData.phone}${referer ? `?referer=${referer}` : ''}`);
+        return;
+      }
+
+      if (resData.data.status === 11) {
+        message.warning('账号被禁用，请联系管理员');
+        return;
+      }
+
+      if (resData.data.status === 12) {
+        message.warning('账号被关闭，请联系管理员');
+        return;
+      }
+
+      let refererHref = targetUrl || '/';
 
       if (referer) {
         const _referer = decodeURIComponent(referer);
@@ -43,6 +57,10 @@ const DoLogin = createWithRemoteLoader({
         Object.values(resData.data).forEach(key => key && obj.searchParams.delete(key.toUpperCase()));
         refererHref = obj.pathname + obj.search;
       }
+
+      Object.keys(storeKeys).forEach(key => {
+        resData.data[key] && setToken(storeKeys[key], resData.data[key], domain);
+      });
 
       if (afterLogin) {
         const data = await afterLogin({ referer: refererHref });
