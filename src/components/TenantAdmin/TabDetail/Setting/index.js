@@ -10,8 +10,21 @@ const Setting = createWithRemoteLoader({
   const { Input, Switch } = FormInfo.fields;
   const formModal = useFormModal();
   const { message } = App.useApp();
-  const formInner = <TableList title="环境变量" name="args" minLength={1} column={1} list={[<Input name="key" label="键" rule="REQ LEN-0-100" />, <Input name="value" label="值" rule="REQ LEN-0-500" />, <Switch name="secret" label="是否密钥" />]} />;
+  const formInner = (
+    <TableList
+      title="环境变量"
+      name="args"
+      minLength={1}
+      column={1}
+      list={[
+        <Input name="key" label="键" rule="REQ LEN-0-100" />,
+        <Input name="value" label="值" rule="REQ LEN-0-500" />,
+        <Switch name="secret" label="是否密钥" />
+      ]}
+    />
+  );
   const args = tenant.tenantSetting?.args || [];
+  const customComponents = tenant.tenantSetting?.customComponents || [];
   return (
     <Flex vertical gap={8}>
       <Flex justify="space-between">
@@ -41,8 +54,7 @@ const Setting = createWithRemoteLoader({
                   }
                 }
               });
-            }}
-          >
+            }}>
             添加环境变量
           </Button>
         </Flex>
@@ -96,6 +108,16 @@ const Setting = createWithRemoteLoader({
           }
         ]}
       />
+      {/*<Flex justify="space-between">
+        <div></div>
+        <Flex gap={8}>
+          <Button type="primary" onClick={() => {
+
+          }}>
+            添加自定义组件
+          </Button>
+        </Flex>
+      </Flex>*/}
     </Flex>
   );
 });
