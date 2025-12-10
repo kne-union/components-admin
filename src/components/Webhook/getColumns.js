@@ -1,5 +1,3 @@
-import { Button } from 'antd';
-
 const getColumns = ({ renderCopyInvokeUrl, renderCopySignature }) => {
   return [
     {

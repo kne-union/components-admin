@@ -1,5 +1,5 @@
 import ModifyComponent from '../Modify';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useProps } from './context';
 import useNavigate from '@kne/use-refer-navigate';
 import { createWithRemoteLoader } from '@kne/remote-loader';
@@ -14,6 +14,8 @@ const Modify = createWithRemoteLoader({
   const { apis: presetApis, ajax } = usePreset();
   const { apis, loginUrl, accountType } = useProps();
   const { account: accountValue } = useParams();
+  const [searchParams] = useSearchParams();
+  const referer = searchParams.get('referer');
   const navigate = useNavigate();
   const { message } = App.useApp();
   const account = Object.assign({}, presetApis.account, apis);
@@ -37,7 +39,7 @@ const Modify = createWithRemoteLoader({
           return;
         }
         message.success('重置密码成功');
-        navigate(loginUrl);
+        navigate(`${loginUrl}${referer ? `?referer=${encodeURIComponent(referer)}` : ''}`);
       }}
     />
   );
