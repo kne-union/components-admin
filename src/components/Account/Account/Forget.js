@@ -11,6 +11,7 @@ const Forget = createWithRemoteLoader({
   const { apis: presetApis, ajax } = usePreset();
   const { apis, loginUrl } = useProps();
   const account = merge({}, presetApis.account, apis);
+  const referer = new URLSearchParams(window.location.search).get('referer');
   return (
     <LoginOuterContainer>
       <ForgetByEmailComponent
@@ -18,7 +19,7 @@ const Forget = createWithRemoteLoader({
         onSubmit={(formData, success) => {
           return ajax(
             merge({}, account.forgetPwd, {
-              data: { email: formData.email }
+              data: { email: formData.email, referer }
             })
           ).then(({ data }) => {
             if (data.code === 0) {
