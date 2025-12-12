@@ -245,6 +245,26 @@ const getApis = options => {
         url: `${prefix}/tenant/admin/append-args`,
         method: 'POST'
       },
+      appendCustomComponent: {
+        url: `${prefix}/tenant/admin/append-custom-component`,
+        method: 'POST'
+      },
+      removeCustomComponent: {
+        url: `${prefix}/tenant/admin/remove-custom-component`,
+        method: 'POST'
+      },
+      saveCustomComponent: {
+        url: `${prefix}/tenant/admin/save-custom-component`,
+        method: 'POST'
+      },
+      copyCustomComponent: {
+        url: `${prefix}/tenant/admin/copy-custom-component`,
+        method: 'POST'
+      },
+      customComponentDetail: {
+        url: `${prefix}/tenant/admin/custom-component-detail`,
+        method: 'GET'
+      },
       removeArg: {
         url: `${prefix}/tenant/admin/remove-arg`,
         method: 'POST'
@@ -350,7 +370,11 @@ const getApis = options => {
       userInviteMessage: {
         url: `${prefix}/tenant/send-invite-message`,
         method: 'POST'
-      }
+      },
+      customComponentDetail: {
+        url: `${prefix}/tenant/custom-component-detail`,
+        method: 'GET'
+      },
     }
   };
 };
