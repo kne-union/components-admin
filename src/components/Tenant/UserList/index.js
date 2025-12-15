@@ -1,7 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useState, useRef } from 'react';
 import merge from 'lodash/merge';
-import { Flex, Button } from 'antd';
+import { Flex } from 'antd';
 import getColumns from './getColumns';
 import Actions from './Actions';
 import Create from './Actions/Create';

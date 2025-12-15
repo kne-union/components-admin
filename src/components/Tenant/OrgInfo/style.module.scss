@@ -1,5 +1,9 @@
 .org {
   padding: 24px;
+
+  :global(.ant-tree-node-content-wrapper):hover {
+    background: var(--primary-color-1);
+  }
 }
 
 .tree-node-options {
@@ -9,6 +13,8 @@
 }
 
 .tree-node {
+  padding: 4px;
+
   &:hover {
     .tree-node-options {
       visibility: visible;
@@ -28,18 +34,46 @@
 
 .org-chart-outer {
   min-height: 600px;
+  max-width: 100%;
+  overflow: auto;
   box-sizing: border-box;
   background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+');
 }
 
 .org-chart {
   padding: 24px;
-  --tree-line-color: var(--font-color-grey-2) !important;
+  --tree-line-color: var(--primary-color) !important;
 }
 
 .org-card {
   width: 250px;
   position: relative;
+  border-color: var(--primary-color);
+
+  &:hover {
+    border-color: var(--primary-color);
+  }
+
+  .tree-node-title {
+    padding: 12px 0;
+    font-size: 16px;
+  }
+
+  .tree-node-description {
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--primary-color-1);
+  }
+
+  :global {
+    .ant-card-head {
+      background-color: var(--primary-color);
+
+      .ant-btn-color-link {
+        color: #FFFFFF;
+      }
+    }
+  }
 }
 
 .org-btn {
