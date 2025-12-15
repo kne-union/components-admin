@@ -1,6 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Flex, Tree, App, Card, Button } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import OrgChart from '@kne/react-org-chart';
 import merge from 'lodash/merge';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
@@ -114,13 +114,19 @@ const GraphOrg = createWithRemoteLoader({
   modules: ['components-core:Common@SimpleBar']
 })(({ remoteModules, data, apis, onSuccess }) => {
   const [SimpleBar] = remoteModules;
+  const ref = useRef(null);
   const [expandIds, setExpandIds] = useState([]);
   const renderNode = data => {
     return data.map(node => {
       const card = (
-        <Card type="inner" hoverable size="small" className={style['org-card']} extra={<OrgOptions data={node} apis={apis} onSuccess={onSuccess} showLength={0} />}>
+        <Card
+          type="inner"
+          hoverable
+          size="small"
+          className={style['org-card']}
+          extra={<OrgOptions data={node} apis={apis} onSuccess={onSuccess} showLength={0} />}>
           <div className={style['tree-node-title']}>{node.name}</div>
-          <div className={style['tree-node-description']}>{node.description}</div>
+          {node.description && <div className={style['tree-node-description']}>{node.description}</div>}
           {node.children && node.children.length > 0 && (
             <Button
               icon={expandIds.indexOf(node.id) === -1 ? <MinusCircleOutlined /> : <PlusCircleOutlined />}
@@ -159,9 +165,9 @@ const GraphOrg = createWithRemoteLoader({
     });
   };
   return (
-    <SimpleBar className={style['org-chart-outer']} autoHide={false}>
+    <div className={style['org-chart-outer']} ref={ref}>
       {renderNode(data)}
-    </SimpleBar>
+    </div>
   );
 });
 
