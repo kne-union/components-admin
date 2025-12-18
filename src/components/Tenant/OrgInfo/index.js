@@ -24,6 +24,7 @@ const OrgOptions = createWithRemoteLoader({
           icon: <Icon type="tianjia" />,
           type: 'link',
           children: '新增子级组织',
+          hidden: !apis.create,
           onClick: async () => {
             formModal({
               title: '新增子级组织',
@@ -58,7 +59,7 @@ const OrgOptions = createWithRemoteLoader({
           icon: <Icon type="bianji" />,
           type: 'link',
           children: '编辑',
-          hidden: !(data.id && data.id !== 'root'),
+          hidden: !(data.id && data.id !== 'root') || !apis.save,
           onClick: async () => {
             formModal({
               title: '编辑组织节点',
@@ -89,7 +90,7 @@ const OrgOptions = createWithRemoteLoader({
           icon: <Icon type="shanchu" />,
           type: 'link',
           children: '删除',
-          hidden: !(data.id && data.id !== 'root'),
+          hidden: !(data.id && data.id !== 'root') || !apis.remove,
           confirm: true,
           disabled: data.children && data.children.length > 0,
           onClick: async () => {

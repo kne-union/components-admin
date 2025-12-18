@@ -26,7 +26,8 @@ const Tenant = createWithRemoteLoader({
                       {
                         key: 'setting',
                         title: '系统设置',
-                        path: `${baseUrl}/tenant/setting`
+                        path: `${baseUrl}/tenant/setting`,
+                        permission: 'setting'
                       }
                     ]
                   }}

@@ -3,30 +3,41 @@ import OrgInfo from '../OrgInfo';
 import Fetch from '@kne/react-fetch';
 
 const Org = createWithRemoteLoader({
-  modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:Global@useGlobalContext']
+  modules: [
+    'components-core:Layout@Page',
+    'components-core:Global@usePreset',
+    'components-core:Global@useGlobalContext',
+    'components-core:Permissions',
+    'components-core:Permissions@usePermissionsPass'
+  ]
 })(({ remoteModules, menu }) => {
-  const [Page, usePreset, useGlobalContext] = remoteModules;
+  const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass] = remoteModules;
   const { apis } = usePreset();
   const { global } = useGlobalContext('userInfo');
+  const allowCreate = usePermissionsPass({ request: ['setting:org:create'] });
+  const allowSave = usePermissionsPass({ request: ['setting:org:edit'] });
+  const allowRemove = usePermissionsPass({ request: ['setting:org:remove'] });
   return (
     <Page title="组织架构" menu={menu}>
-      <Fetch
-        {...Object.assign({}, apis.tenant.orgList)}
-        render={({ data, reload }) => {
-          return (
-            <OrgInfo
-              data={data}
-              companyName={global.tenant?.tenantCompany?.name || global.tenant.name}
-              onSuccess={reload}
-              apis={{
-                create: Object.assign({}, apis.tenant.orgCreate),
-                save: Object.assign({}, apis.tenant.orgSave),
-                remove: Object.assign({}, apis.tenant.orgRemove)
-              }}
-            />
-          );
-        }}
-      />
+      <Permissions request={['setting:org:view']} type="error">
+        <Fetch
+          {...Object.assign({}, apis.tenant.orgList)}
+          render={({ data, reload }) => {
+            return (
+              <OrgInfo
+                data={data}
+                companyName={global.tenant?.tenantCompany?.name || global.tenant.name}
+                onSuccess={reload}
+                apis={{
+                  create: allowCreate && Object.assign({}, apis.tenant.orgCreate),
+                  save: allowSave && Object.assign({}, apis.tenant.orgSave),
+                  remove: allowRemove && Object.assign({}, apis.tenant.orgRemove)
+                }}
+              />
+            );
+          }}
+        />
+      </Permissions>
     </Page>
   );
 });
