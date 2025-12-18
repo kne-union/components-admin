@@ -289,12 +289,24 @@ const getApis = options => {
         remove: {
           url: `${prefix}/tenant/admin/role/remove`,
           method: 'POST'
+        },
+        permissionList: {
+          url: `${prefix}/tenant/admin/role/permission-list`,
+          method: 'GET'
+        },
+        permissionSave: {
+          url: `${prefix}/tenant/admin/role/save-permission`,
+          method: 'POST'
         }
       },
       permission: {
         list: {
           url: `${prefix}/tenant/admin/permission/list`,
           method: 'GET'
+        },
+        save: {
+          url: `${prefix}/tenant/admin/permission/save`,
+          method: 'POST'
         }
       }
     },
@@ -375,6 +387,42 @@ const getApis = options => {
         url: `${prefix}/tenant/custom-component-detail`,
         method: 'GET'
       },
+      role: {
+        create: {
+          url: `${prefix}/tenant/role/create`,
+          method: 'POST'
+        },
+        list: {
+          url: `${prefix}/tenant/role/list`,
+          method: 'GET'
+        },
+        save: {
+          url: `${prefix}/tenant/role/save`,
+          method: 'POST'
+        },
+        setStatus: {
+          url: `${prefix}/tenant/role/set-status`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${prefix}/tenant/role/remove`,
+          method: 'POST'
+        },
+        permissionList: {
+          url: `${prefix}/tenant/role/permission-list`,
+          method: 'GET'
+        },
+        permissionSave: {
+          url: `${prefix}/tenant/role/save-permission`,
+          method: 'POST'
+        }
+      },
+      permission: {
+        list: {
+          url: `${prefix}/tenant/permission/list`,
+          method: 'GET'
+        }
+      }
     }
   };
 };

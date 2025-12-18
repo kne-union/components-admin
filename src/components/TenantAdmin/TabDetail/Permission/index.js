@@ -35,11 +35,26 @@ const Permission = createWithRemoteLoader({
             data: {
               tenantId: tenant.id
             }
+          }),
+          permissionList: merge({}, apis.tenantAdmin.role.permissionList, {
+            params: {
+              tenantId: tenant.id
+            }
+          }),
+          permissionSave: merge({}, apis.tenantAdmin.role.permissionSave, {
+            data: {
+              tenantId: tenant.id
+            }
           })
         },
         permission: {
           list: merge({}, apis.tenantAdmin.permission.list, {
             params: {
+              tenantId: tenant.id
+            }
+          }),
+          save: merge({}, apis.tenantAdmin.permission.save, {
+            data: {
               tenantId: tenant.id
             }
           })

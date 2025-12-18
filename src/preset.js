@@ -95,7 +95,7 @@ export const globalInit = async () => {
         //url: 'http://localhost:3010',
         //tpl: '{{url}}',
         remote: 'components-thirdparty',
-        defaultVersion: '0.1.2'
+        defaultVersion: '0.1.4'
       },
       'components-admin':
         process.env.NODE_ENV === 'development'

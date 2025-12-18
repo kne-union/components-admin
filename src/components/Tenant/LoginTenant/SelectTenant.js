@@ -17,6 +17,7 @@ const SelectTenant = createWithRemoteLoader({
       <Fetch
         {...Object.assign({}, apis.tenant.availableList)}
         render={({ data, reload }) => {
+          const currentTenantUser = data.list.find(item => item.tenantId === data.defaultTenantId);
           return (
             <Flex vertical gap={60}>
               <List
@@ -49,7 +50,7 @@ const SelectTenant = createWithRemoteLoader({
                     <List.Item
                       key={item.id}
                       onClick={async () => {
-                        if (isSelected) {
+                        if (isSelected || item.status !== 'open') {
                           return;
                         }
                         setLoading(true);
@@ -67,10 +68,22 @@ const SelectTenant = createWithRemoteLoader({
                         setLoading(false);
                       }}
                       className={classnames(style['tenant-item'], {
-                        [style['is-selected']]: isSelected
-                      })}
-                    >
-                      {isSelected ? <Badge.Ribbon text="当前租户">{itemInner}</Badge.Ribbon> : itemInner}
+                        [style['is-selected']]: isSelected,
+                        [style['is-disabled']]: item.status !== 'open'
+                      })}>
+                      {(() => {
+                        if (item.status !== 'open') {
+                          return (
+                            <Badge.Ribbon text="租户用户不能使用" color="#CCCCCC">
+                              {itemInner}
+                            </Badge.Ribbon>
+                          );
+                        }
+                        if (isSelected) {
+                          return <Badge.Ribbon text="当前租户">{itemInner}</Badge.Ribbon>;
+                        }
+                        return itemInner;
+                      })()}
                     </List.Item>
                   );
                 }}
@@ -78,12 +91,12 @@ const SelectTenant = createWithRemoteLoader({
               {data.list.length > 0 && (
                 <Flex justify="center">
                   <Button
+                    disabled={!(currentTenantUser && currentTenantUser.status === 'open')}
                     type="primary"
                     size="large"
                     onClick={() => {
                       window.location.href = tenantPath;
-                    }}
-                  >
+                    }}>
                     进入租户
                     <Icon type="fasongduihua" />
                   </Button>

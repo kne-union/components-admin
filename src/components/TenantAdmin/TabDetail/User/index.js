@@ -12,6 +12,7 @@ const User = createWithRemoteLoader({
       apis={{
         list: Object.assign({}, apis.tenantAdmin.userList, { params: { tenantId: tenant.id } }),
         orgList: Object.assign({}, apis.tenantAdmin.orgList, { params: { tenantId: tenant.id } }),
+        roleList: Object.assign({}, apis.tenantAdmin.role.list, { params: { tenantId: tenant.id } }),
         create: Object.assign({}, apis.tenantAdmin.userCreate, { data: { tenantId: tenant.id } }),
         save: Object.assign({}, apis.tenantAdmin.userSave, { data: { tenantId: tenant.id } }),
         remove: Object.assign({}, apis.tenant.userRemove, { data: { tenantId: tenant.id } }),

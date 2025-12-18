@@ -1,6 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
-import { App } from 'antd';
+import { App, Result, Button, Flex } from 'antd';
 import dayjs from 'dayjs';
 
 const TenantUserInfo = createWithRemoteLoader({
@@ -13,6 +13,25 @@ const TenantUserInfo = createWithRemoteLoader({
     <Fetch
       cache="tenant-user-info"
       {...Object.assign({}, apis.tenant.getUserInfo)}
+      error={error => {
+        const referer = encodeURIComponent(window.location.pathname + window.location.search);
+        return (
+          <Result status="500" title={error || '用户信息获取失败'} subTitle={'请联系管理员，或者进行以下操作'}>
+            <Flex gap={8} justify="center">
+              <Button
+                type="primary"
+                onClick={() => {
+                  window.location.href = `/account/login?referer=${referer}`;
+                }}>
+                登录其他账号
+              </Button>
+              <Button onClick={()=>{
+                window.location.href = `/login-tenant?referer=${referer}`
+              }}>切换其他租户</Button>
+            </Flex>
+          </Result>
+        );
+      }}
       render={({ data, reload }) => {
         const { serviceStartTime, serviceEndTime } = data.tenant;
         if (!(dayjs().isAfter(dayjs(serviceStartTime)) && dayjs().isBefore(dayjs(serviceEndTime).endOf('day')))) {

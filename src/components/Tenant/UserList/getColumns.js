@@ -31,6 +31,13 @@ const getColumns = () => {
       type: 'other'
     },
     {
+      name: 'roles',
+      title: '角色',
+      valueOf: item => {
+        return item.roles.map(item => item.name).join(',') || '默认角色';
+      }
+    },
+    {
       name: 'tenantOrg',
       title: '部门',
       valueOf: item => {
