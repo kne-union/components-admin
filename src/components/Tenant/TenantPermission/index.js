@@ -1,13 +1,14 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import useControlValue from '@kne/use-control-value';
 import Fetch from '@kne/react-fetch';
-import { Menu, Checkbox, Flex, Divider, Empty, Button } from 'antd';
+import { Menu, Checkbox, Flex, Divider, Empty, Button, Spin } from 'antd';
 import flattenPermissions from './flattenPermissions';
 import { useState } from 'react';
 import get from 'lodash/get';
+import merge from 'lodash/merge';
 import style from './style.module.scss';
 
-const PermissionPanel = createWithRemoteLoader({
+export const PermissionPanel = createWithRemoteLoader({
   modules: ['components-core:Common@SimpleBar']
 })(({ remoteModules, settings, ...props }) => {
   const [value, onChange] = useControlValue(props);
@@ -141,17 +142,37 @@ const PermissionPanel = createWithRemoteLoader({
 });
 
 const TenantPermission = createWithRemoteLoader({
-  modules: ['components-core:Common@SimpleBar']
+  modules: ['components-core:Global@usePreset']
 })(({ remoteModules, apis, children }) => {
-  const [SimpleBar] = remoteModules;
-
+  const [usePreset] = remoteModules;
+  const [saving, setSaving] = useState(false);
+  const { ajax } = usePreset();
   const target = (
     <div className={style['tenant-permission']}>
       <Fetch
         {...Object.assign({}, apis.list)}
-        render={({ data }) => {
-          const { permissions, tenantPermissions } = data;
-          return <PermissionPanel settings={permissions} defaultValue={tenantPermissions || []} />;
+        render={({ data, reload }) => {
+          const { permissions, codes } = data;
+          return (
+            <Flex vertical gap={8}>
+              <PermissionPanel
+                settings={permissions}
+                defaultValue={codes || []}
+                onChange={codes => {
+                  setSaving(true);
+                  ajax(
+                    merge({}, apis.save, {
+                      data: {
+                        permissions: codes
+                      }
+                    })
+                  ).finally(() => {
+                    setSaving(false);
+                  });
+                }}
+              />
+            </Flex>
+          );
         }}
       />
     </div>

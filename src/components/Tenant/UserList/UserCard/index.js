@@ -30,6 +30,13 @@ const UserCard = createWithRemoteLoader({
           {
             name: 'email',
             title: '邮箱'
+          },
+          {
+            name: 'roleDetails',
+            title: '角色',
+            render: item => {
+              return item.map(item => item.name).join(',') || '默认角色';
+            }
           }
         ]}
       />

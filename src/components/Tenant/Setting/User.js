@@ -17,7 +17,8 @@ const Org = createWithRemoteLoader({
           remove: Object.assign({}, apis.tenant.userRemove),
           setStatus: Object.assign({}, apis.tenant.userSetStatus),
           inviteToken: Object.assign({}, apis.tenant.userInviteToken),
-          userInviteMessage: Object.assign({}, apis.tenant.userInviteMessage)
+          userInviteMessage: Object.assign({}, apis.tenant.userInviteMessage),
+          roleList: Object.assign({}, apis.tenant.role.list)
         }}
       />
     </Page>
