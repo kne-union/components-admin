@@ -61,7 +61,7 @@ const Actions = createWithRemoteLoader({
       if (item.name) {
         const existItem = actionList.find(target => target.name === item.name);
         if (existItem) {
-          Object.assign(existItem, item);
+          Object.assign(existItem, typeof item === 'function' ? item(existItem) : item);
           return;
         }
       }

@@ -3,9 +3,10 @@ import getColumns from './getColumns';
 import FormInner from './FormInner';
 import SetRolePermission from './Actions/SetRolePermission';
 
-const Role = ({ apis }) => {
+const Role = ({ apis, ...props }) => {
   return (
     <BizUnit
+      {...props}
       apis={apis}
       getColumns={getColumns}
       getFormInner={props => {
@@ -14,7 +15,7 @@ const Role = ({ apis }) => {
       getActionList={({ data, ...props }) => {
         return ['remove', 'setStatusOpen', 'setStatusClose', 'save']
           .map(name => {
-            return { name, hidden: data.type === 'system' };
+            return ({ hidden }) => ({ name, hidden: hidden || data.type === 'system' });
           })
           .concat([
             {
@@ -22,7 +23,7 @@ const Role = ({ apis }) => {
               buttonComponent: SetRolePermission,
               data,
               children: '设置权限',
-              hidden: data.code === 'admin'
+              hidden: data.code === 'admin' || !apis.permissionSave
             }
           ]);
       }}

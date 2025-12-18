@@ -12,6 +12,7 @@ const Actions = createWithRemoteLoader({
     {
       ...props,
       children: '编辑',
+      hidden: !props.apis.save,
       buttonComponent: Edit
     },
     {
@@ -24,13 +25,13 @@ const Actions = createWithRemoteLoader({
       ...props,
       children: '开启',
       buttonComponent: SetStatus,
-      hidden: props.data?.status === 'open'
+      hidden: props.data?.status === 'open' || !props.apis.save
     },
     {
       ...props,
       children: '关闭',
       buttonComponent: SetStatus,
-      hidden: props.data?.status === 'closed',
+      hidden: props.data?.status === 'closed' || !props.apis.save,
       message: '确定要关闭用户吗？关闭后他将不能使用当前租户',
       isDelete: false
     },
@@ -38,6 +39,7 @@ const Actions = createWithRemoteLoader({
       ...props,
       children: '删除',
       buttonComponent: Remove,
+      hidden: !props.apis.delete,
       message: '确定要删除用户吗？删除后他将不能使用当前租户'
     }
   ];
