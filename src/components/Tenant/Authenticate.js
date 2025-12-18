@@ -25,9 +25,12 @@ const TenantUserInfo = createWithRemoteLoader({
                 }}>
                 登录其他账号
               </Button>
-              <Button onClick={()=>{
-                window.location.href = `/login-tenant?referer=${referer}`
-              }}>切换其他租户</Button>
+              <Button
+                onClick={() => {
+                  window.location.href = `/login-tenant?referer=${referer}`;
+                }}>
+                切换其他租户
+              </Button>
             </Flex>
           </Result>
         );
@@ -43,17 +46,19 @@ const TenantUserInfo = createWithRemoteLoader({
         return (
           <>
             <SetGlobal globalKey="themeToken" value={{ colorPrimary: data.tenant.themeColor }} />
-            <SetGlobal
-              globalKey="userInfo"
-              value={{
-                tenantUserInfo: data.tenantUserInfo,
-                company: data.company,
-                tenant: data.tenant,
-                userInfo: data.userInfo,
-                reload
-              }}
-              needReady>
-              {children}
+            <SetGlobal globalKey="permissions" value={data.tenantUserInfo?.permissions} needReady>
+              <SetGlobal
+                globalKey="userInfo"
+                value={{
+                  tenantUserInfo: data.tenantUserInfo,
+                  company: data.company,
+                  tenant: data.tenant,
+                  userInfo: data.userInfo,
+                  reload
+                }}
+                needReady>
+                {children}
+              </SetGlobal>
             </SetGlobal>
           </>
         );

@@ -31,7 +31,7 @@ const CompanyDetail = createWithRemoteLoader({
 
 const CompanyInfo = createWithRemoteLoader({
   modules: ['components-core:InfoPage', 'components-core:FormInfo']
-})(({ remoteModules, data, onSubmit, apis }) => {
+})(({ remoteModules, data, onSubmit, hasEdit = true, apis }) => {
   const [InfoPage, FormInfo] = remoteModules;
   const [isEdit, setIsEdit] = useState(false);
 
@@ -39,7 +39,8 @@ const CompanyInfo = createWithRemoteLoader({
 
   if (isEdit) {
     return (
-      <Form className={style['company-info']}
+      <Form
+        className={style['company-info']}
         type="default"
         data={data}
         onSubmit={async formData => {
@@ -47,8 +48,7 @@ const CompanyInfo = createWithRemoteLoader({
             return;
           }
           setIsEdit(false);
-        }}
-      >
+        }}>
         <InfoPage.Part title="公司信息" className={style['section']}>
           <Flex gap={24} vertical>
             <InfoPage.Part>
@@ -68,8 +68,7 @@ const CompanyInfo = createWithRemoteLoader({
               <CancelButton
                 onClick={() => {
                   setIsEdit(false);
-                }}
-              >
+                }}>
                 取消
               </CancelButton>
             </Flex>
@@ -85,17 +84,17 @@ const CompanyInfo = createWithRemoteLoader({
         className={style['section']}
         title="公司信息"
         extra={
-          <Button
-            type="link"
-            icon={<FormOutlined />}
-            onClick={() => {
-              setIsEdit(true);
-            }}
-          >
-            编辑
-          </Button>
-        }
-      >
+          hasEdit && (
+            <Button
+              type="link"
+              icon={<FormOutlined />}
+              onClick={() => {
+                setIsEdit(true);
+              }}>
+              编辑
+            </Button>
+          )
+        }>
         <CompanyDetail data={data} />
       </InfoPage.Part>
     </InfoPage>

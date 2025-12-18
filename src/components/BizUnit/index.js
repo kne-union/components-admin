@@ -1,6 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Flex } from 'antd';
+import useRefCallback from '@kne/use-ref-callback';
 import merge from 'lodash/merge';
 import Actions from './Actions';
 import Create from './Actions/Create';
@@ -18,6 +19,7 @@ const BizUnit = createWithRemoteLoader({
   filterList = [],
   getActionList,
   allowKeywordSearch = true,
+  onMount,
   options
 }) => {
   options = merge(
@@ -106,9 +108,17 @@ const BizUnit = createWithRemoteLoader({
     }
   );
 
+  const handlerMount = useRefCallback(() => {
+    onMount && onMount({ filter: { value: filter, onChange: setFilter }, topOptions, tableOptions });
+  });
+
+  useEffect(() => {
+    handlerMount();
+  }, [handlerMount]);
+
   if (typeof children === 'function') {
     return children({
-      filter,
+      filter: { value: filter, onChange: setFilter },
       topOptions,
       tableOptions
     });
