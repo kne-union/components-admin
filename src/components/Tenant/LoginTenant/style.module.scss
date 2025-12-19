@@ -23,6 +23,20 @@
   &.is-selected {
     background: var(--primary-color-1);
   }
+
+  &.is-disabled {
+    background: var(--bg-color-grey-1);
+
+    img {
+      filter: grayscale(100%);
+    }
+
+    :global {
+      .ant-list-item-meta-title {
+        color: var(--font-color-grey-1) !important;
+      }
+    }
+  }
 }
 
 .tenant-avatar {

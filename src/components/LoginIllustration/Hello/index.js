@@ -1,20 +1,14 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import Fetch from '@kne/react-fetch';
+import hello from '../lottieData/hello.json';
+import style from './style.module.scss';
+
 const Hello = createWithRemoteLoader({
   modules: ['components-thirdparty:LottiePlayer']
 })(({ remoteModules }) => {
   const [LottiePlayer] = remoteModules;
-  return (
-    <Fetch
-      loader={async () => {
-        return import('../lottieData/hello.json').then(module => module.default);
-      }}
-      render={({ data }) => {
-        console.log(data);
-        return <div></div>;
-      }}
-    />
-  );
+  return <div className={style['hello-container']}>
+    <LottiePlayer renderer="svg" animationData={hello} className={style['animation']}/>
+  </div>;
 });
 
 export default Hello;

@@ -20,17 +20,17 @@ export const MainLayout = createWithRemoteLoader({
 });
 
 export const RightOptions = createWithRemoteLoader({
-  modules: ['components-core:Global@GetGlobal']
+  modules: ['components-core:Global@GlobalValue']
 })(({ remoteModules }) => {
-  const [GetGlobal] = remoteModules;
+  const [GlobalValue] = remoteModules;
 
   return (
-    <GetGlobal globalKey="userInfo">
+    <GlobalValue globalKey="userInfo">
       {({ value }) => {
         const { nickname, avatar, email } = Object.assign({}, value?.value);
         return <UserTool name={nickname} email={email} avatar={avatar} />;
       }}
-    </GetGlobal>
+    </GlobalValue>
   );
 });
 

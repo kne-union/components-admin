@@ -1,5 +1,5 @@
 .org {
-  padding: 24px;
+  padding: 12px;
 
   :global(.ant-tree-node-content-wrapper):hover {
     background: var(--primary-color-1);
@@ -33,15 +33,27 @@
 }
 
 .org-chart-outer {
+  box-sizing: border-box;
+  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+');
+  border-radius: 12px;
+  border: 1px solid var(--font-color-grey-3);
+  position: relative;
+}
+
+.org-chart-inner{
   min-height: 600px;
   max-width: 100%;
   overflow: auto;
-  box-sizing: border-box;
-  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+');
+  padding: 24px;
+}
+
+.control-panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 .org-chart {
-  padding: 24px;
   --tree-line-color: var(--primary-color) !important;
 }
 
