@@ -1,9 +1,9 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Tree, App, Card, Button } from 'antd';
+import { Flex, Tree, App, Card, Button, Space } from 'antd';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import OrgChart from '@kne/react-org-chart';
 import merge from 'lodash/merge';
-import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, MinusCircleOutlined, ExpandOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import FormInner from './FormInner';
 import style from './style.module.scss';
 import '@kne/react-org-chart/dist/index.css';
@@ -111,12 +111,38 @@ const OrgOptions = createWithRemoteLoader({
   );
 });
 
+const ControlPanel = ({ value, onChange }) => {
+  return (
+    <Space.Compact className={style['control-panel']}>
+      <Button
+        icon={<ExpandOutlined />}
+        onClick={() => {
+          onChange(1);
+        }}
+      />
+      <Button
+        icon={<PlusOutlined />}
+        onClick={() => {
+          onChange(value * 1.2);
+        }}
+      />
+      <Button
+        icon={<MinusOutlined />}
+        onClick={() => {
+          onChange(value * 0.8);
+        }}
+      />
+    </Space.Compact>
+  );
+};
+
 const GraphOrg = createWithRemoteLoader({
   modules: ['components-core:Common@SimpleBar']
 })(({ remoteModules, data, apis, onSuccess }) => {
   const [SimpleBar] = remoteModules;
   const ref = useRef(null);
   const [expandIds, setExpandIds] = useState([]);
+  const [scale, setScale] = useState(1);
   const renderNode = data => {
     return data.map(node => {
       const card = (
@@ -167,7 +193,16 @@ const GraphOrg = createWithRemoteLoader({
   };
   return (
     <div className={style['org-chart-outer']} ref={ref}>
-      {renderNode(data)}
+      <ControlPanel value={scale} onChange={setScale} />
+      <div className={style['org-chart-inner']}>
+        <div
+          style={{
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left'
+          }}>
+          {renderNode(data)}
+        </div>
+      </div>
     </div>
   );
 });

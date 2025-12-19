@@ -72,14 +72,16 @@ export const globalInit = async () => {
     }
   });
   const registry = {
-    url: 'https://uc.fatalent.cn',
-    tpl: '{{url}}/packages/@kne-components/{{remote}}/{{version}}/build'
+    //url: 'https://uc.fatalent.cn',
+    //tpl: '{{url}}/packages/@kne-components/{{remote}}/{{version}}/build'
+    url: 'https://cdn.leapin-ai.com',
+    tpl: '{{url}}/components/@kne-components/{{remote}}/{{version}}/build'
   };
 
   const componentsCoreRemote = {
     ...registry,
     remote: 'components-core',
-    defaultVersion: '0.3.18'
+    defaultVersion: '0.4.42'
   };
   remoteLoaderPreset({
     remotes: {
@@ -95,7 +97,7 @@ export const globalInit = async () => {
         //url: 'http://localhost:3010',
         //tpl: '{{url}}',
         remote: 'components-thirdparty',
-        defaultVersion: '0.1.4'
+        defaultVersion: '0.1.6'
       },
       'components-admin':
         process.env.NODE_ENV === 'development'

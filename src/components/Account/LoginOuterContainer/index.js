@@ -12,8 +12,8 @@ const LoginOuterContainer = ({ className, title, logo, leftInner, children }) =>
             <Flex gap={16} align="center" className={classnames(style['container-left-content'], 'container-left-content')}>
               {logo && <img className={classnames(style['container-left-logo'], 'container-left-logo')} src={logo} alt="logo" />}
               {title && <div className={classnames(style['container-left-title'], 'container-left-title')}>{title}</div>}
-              {leftInner && <div className={classnames(style['container-left-inner'], 'container-left-inner')}>{leftInner}</div>}
             </Flex>
+            {leftInner && <div className={classnames(style['container-left-inner'], 'container-left-inner')}>{leftInner}</div>}
           </Col>
           <Col className={classnames(style['out-right'], 'container-right')} flex={1}>
             <div className={classnames(style['out-right-inner'], 'container-right-inner')}>{children}</div>
