@@ -2,11 +2,11 @@ import {createWithRemoteLoader} from '@kne/remote-loader';
 import UserTool from './UserTool';
 
 const RightOptions = createWithRemoteLoader({
-    modules: ['components-core:Global@GetGlobal']
+    modules: ['components-core:Global@GlobalValue']
 })(({remoteModules}) => {
-    const [GetGlobal] = remoteModules;
+    const [GlobalValue] = remoteModules;
 
-    return (<GetGlobal globalKey="userInfo">
+    return (<GlobalValue globalKey="userInfo">
         {({value}) => {
             if (!value) {
                 return null;
@@ -20,7 +20,7 @@ const RightOptions = createWithRemoteLoader({
                 orgName={tenantUser && (tenantUser?.tenantOrgs || []).map(item => item.name).join(',')}
             />);
         }}
-    </GetGlobal>);
+    </GlobalValue>);
 });
 
 export default RightOptions;

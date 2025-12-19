@@ -9,11 +9,11 @@ const Forget = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [usePreset] = remoteModules;
   const { apis: presetApis, ajax } = usePreset();
-  const { apis, loginUrl } = useProps();
+  const { apis, loginUrl, loginLeftInner } = useProps();
   const account = merge({}, presetApis.account, apis);
   const referer = new URLSearchParams(window.location.search).get('referer');
   return (
-    <LoginOuterContainer>
+    <LoginOuterContainer leftInner={loginLeftInner}>
       <ForgetByEmailComponent
         loginUrl={loginUrl}
         onSubmit={(formData, success) => {
