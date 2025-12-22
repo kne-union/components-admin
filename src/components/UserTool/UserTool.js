@@ -1,12 +1,13 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Divider, List, Dropdown, Space, Flex } from 'antd';
-import { removeToken } from '@kne/token-storage';
+import { useLogout } from '@components/Account';
 import style from './style.module.scss';
 
 const UserTool = createWithRemoteLoader({
   modules: ['components-core:Image', 'components-core:Icon']
 })(({ remoteModules, avatar, name, email, storeKeys = { token: 'X-User-Token' }, domain, list, children = null }) => {
   const [Image, Icon] = remoteModules;
+  const logout = useLogout({ storeKeys, domain });
   return (
     <Dropdown
       trigger="click"
@@ -37,13 +38,7 @@ const UserTool = createWithRemoteLoader({
               })}
             <List.Item
               className={style['options-list-item']}
-              onClick={() => {
-                Object.values(storeKeys).forEach(tokenKey => {
-                  removeToken(tokenKey, domain);
-                });
-                window.location.reload();
-              }}
-            >
+              onClick={logout}>
               <Flex gap={8} flex={1}>
                 <Icon type="icon-tuichudenglu" />
                 <span>退出登录</span>
@@ -53,8 +48,7 @@ const UserTool = createWithRemoteLoader({
         </Space>
       )}
       arrow={false}
-      transitionName={'ant-slide-up'}
-    >
+      transitionName={'ant-slide-up'}>
       <Space className={style['user-tool']}>
         <Image.Avatar id={avatar} size={32} />
         <div className={style['user-name']}>{name || '未命名'}</div>
