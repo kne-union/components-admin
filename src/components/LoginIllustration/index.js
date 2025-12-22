@@ -8,7 +8,7 @@ const resource = {
 
 const LoginIllustration = ({ type, className, ...props }) => {
   return (
-    <div className={style['login-illustration']}>
+    <div className={classnames(style['login-illustration'], className)}>
       <Fetch
         loader={({ params }) => (resource[params.type] || resource.hello)()}
         params={{ type }}

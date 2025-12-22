@@ -23,7 +23,7 @@ const ResetPassword = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [usePreset] = remoteModules;
   const { apis: presetApis, ajax } = usePreset();
-  const { apis, accountType, loginUrl } = useProps();
+  const { apis, accountType, loginUrl, loginLeftInner, systemName } = useProps();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const referer = searchParams.get('referer');
@@ -43,6 +43,8 @@ const ResetPassword = createWithRemoteLoader({
             loginUrl={loginUrl}
             type={accountType}
             account={name}
+            topBanner={loginLeftInner}
+            systemName={systemName}
             onSubmit={async formData => {
               const newPwd = md5(formData.newPwd);
               const { data: resData } = await ajax(

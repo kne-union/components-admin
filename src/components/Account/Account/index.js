@@ -1,6 +1,7 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import classnames from 'classnames';
 import merge from 'lodash/merge';
+import LoginIllustration from '@components/LoginIllustration';
 import { Provider } from './context';
 import Login from './Login';
 import Register from './Register';
@@ -8,6 +9,8 @@ import Forget from './Forget';
 import ResetPassword from './ResetPassword';
 import Modify from './Modify';
 import style from './style.module.scss';
+
+const defaultLeftInner = <LoginIllustration />;
 
 const Layout = () => {
   return (
@@ -31,6 +34,7 @@ const Account = ({ className, ...p }) => {
       systemName: 'Kne Union SaaS System',
       loginTitle: '登录',
       registerTitle: '注册',
+      loginLeftInner: defaultLeftInner,
       loginPath: 'login',
       registerPath: 'register',
       forgetPath: 'forget',
@@ -52,8 +56,7 @@ const Account = ({ className, ...p }) => {
         loginUrl: `${baseUrl}/${props.loginPath}`,
         registerUrl: `${baseUrl}/${props.registerPath}`,
         forgetUrl: `${baseUrl}/${props.forgetPath}`
-      }}
-    >
+      }}>
       <div className={className}>
         <Routes>
           <Route element={<Layout />}>
