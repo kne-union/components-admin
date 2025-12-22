@@ -1,7 +1,8 @@
-export {default as LoginOuterContainer} from './LoginOuterContainer';
-export {default as Login} from './Login';
-export {default as Register} from './Register';
-export {default as Modify} from './Modify';
-export {default as ForgetByEmail} from './ForgetByEmail';
-export {default as ResetPassword} from './ResetPassword';
-export {default} from './Account';
+export { default as LoginOuterContainer } from './LoginOuterContainer';
+export { default as Login } from './Login';
+export { default as Register } from './Register';
+export { default as Modify } from './Modify';
+export { default as ForgetByEmail } from './ForgetByEmail';
+export { default as ResetPassword } from './ResetPassword';
+export { default as Logout, useLogout } from './Logout';
+export { default } from './Account';

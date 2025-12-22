@@ -1,5 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import AppChildrenRouter from '@kne/app-children-router';
 import Company from './Company';
 import Org from './Org';
@@ -7,11 +7,10 @@ import User from './User';
 import Permission from './Permission';
 
 const Setting = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Layout@Menu']
+  modules: ['components-core:Layout@Menu']
 })(({ remoteModules, baseUrl: originalBaseUrl }) => {
   const baseUrl = `${originalBaseUrl}/setting`;
-  const [usePreset, Menu] = remoteModules;
-  const { apis } = usePreset();
+  const [Menu] = remoteModules;
   const menu = (
     <Menu
       items={[
@@ -66,5 +65,10 @@ const Setting = createWithRemoteLoader({
     />
   );
 });
+
+Setting.Company = Company;
+Setting.Org = Org;
+Setting.User = User;
+Setting.Permission = Permission;
 
 export default Setting;

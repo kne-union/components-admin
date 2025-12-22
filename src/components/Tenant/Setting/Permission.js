@@ -13,7 +13,7 @@ const Permission = createWithRemoteLoader({
     'components-core:Table@TablePage',
     'components-core:StateBar'
   ]
-})(({ remoteModules, menu }) => {
+})(({ remoteModules, menu, children }) => {
   const [Page, usePreset, Permissions, usePermissionsPass, FilterProvider, TablePage, StateBar] = remoteModules;
   const { apis } = usePreset();
   const [target, setTarget] = useState({});
@@ -34,42 +34,54 @@ const Permission = createWithRemoteLoader({
     permissionSave: allowRoleEdit,
     remove: allowRoleRemove
   };
-  return (
-    <Page menu={menu} title="权限管理" filter={filter} titleExtra={<FilterProvider {...filter}>{target.topOptions}</FilterProvider>}>
-      <Permissions request={['setting:permission:role', 'setting:permission:shared-group']}>
-        <div style={{ marginBottom: 8 }}>
-          <StateBar
-            activeKey={activeKey}
-            onChange={setActiveKey}
-            type={'radio'}
-            stateOption={[
-              { tab: '角色', key: 'role' },
-              { tab: '共享组', key: 'sharedGroup' }
-            ].filter(item => {
-              return (item.key === 'role' && allowRole) || (item.key === 'sharedGroup' && allowSharedGroup);
-            })}
-          />
-        </div>
-      </Permissions>
-      {activeKey === 'role' && (
-        <Permissions request={['setting:permission:role:view']} type="error">
-          <Role
-            apis={transform(
-              apis.tenant.role,
-              (result, value, key) => {
-                if (rolePermissions[key] !== false) {
-                  result[key] = value;
-                }
-              },
-              {}
-            )}
-            onMount={setTarget}>
-            {({ tableOptions }) => <TablePage {...tableOptions} />}
-          </Role>
+  const pageProps = {
+    menu,
+    title: '权限管理',
+    filter,
+    titleExtra: <FilterProvider {...filter}>{target.topOptions}</FilterProvider>,
+    children: (
+      <>
+        <Permissions request={['setting:permission:role', 'setting:permission:shared-group']}>
+          <div style={{ marginBottom: 8 }}>
+            <StateBar
+              activeKey={activeKey}
+              onChange={setActiveKey}
+              type={'radio'}
+              stateOption={[
+                { tab: '角色', key: 'role' },
+                { tab: '共享组', key: 'sharedGroup' }
+              ].filter(item => {
+                return (item.key === 'role' && allowRole) || (item.key === 'sharedGroup' && allowSharedGroup);
+              })}
+            />
+          </div>
         </Permissions>
-      )}
-    </Page>
-  );
+        {activeKey === 'role' && (
+          <Permissions request={['setting:permission:role:view']} type="error">
+            <Role
+              apis={transform(
+                apis.tenant.role,
+                (result, value, key) => {
+                  if (rolePermissions[key] !== false) {
+                    result[key] = value;
+                  }
+                },
+                {}
+              )}
+              onMount={setTarget}>
+              {({ tableOptions }) => <TablePage {...tableOptions} />}
+            </Role>
+          </Permissions>
+        )}
+      </>
+    )
+  };
+
+  if (typeof children === 'function') {
+    return children(pageProps);
+  }
+
+  return <Page {...pageProps} />;
 });
 
 export default Permission;

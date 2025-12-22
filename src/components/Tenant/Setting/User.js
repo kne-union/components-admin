@@ -11,7 +11,7 @@ const Org = createWithRemoteLoader({
     'components-core:Table@TablePage',
     'components-core:Filter@FilterProvider'
   ]
-})(({ remoteModules, menu }) => {
+})(({ remoteModules, menu, children }) => {
   const [Page, usePreset, Permissions, usePermissionsPass, TablePage, FilterProvider] = remoteModules;
   const { apis } = usePreset();
   const [target, setTarget] = useState({});
@@ -20,8 +20,13 @@ const Org = createWithRemoteLoader({
   const allowSave = usePermissionsPass({ request: ['setting:user-manager:edit'] });
   const allowRemove = usePermissionsPass({ request: ['setting:user-manager:remove'] });
   const allowInvite = usePermissionsPass({ request: ['setting:user-manager:invite'] });
-  return (
-    <Page title="用户管理" menu={menu} filter={filter} titleExtra={<FilterProvider {...filter}>{target.topOptions}</FilterProvider>}>
+
+  const pageProps = {
+    menu,
+    title: '用户管理',
+    filter,
+    titleExtra: <FilterProvider {...filter}>{target.topOptions}</FilterProvider>,
+    children: (
       <Permissions request={['setting:user-manager:view']} type="error">
         <UserList
           onMount={setTarget}
@@ -39,8 +44,14 @@ const Org = createWithRemoteLoader({
           {({ tableOptions }) => <TablePage {...tableOptions} />}
         </UserList>
       </Permissions>
-    </Page>
-  );
+    )
+  };
+
+  if (typeof children === 'function') {
+    return children(pageProps);
+  }
+
+  return <Page {...pageProps} />;
 });
 
 export default Org;

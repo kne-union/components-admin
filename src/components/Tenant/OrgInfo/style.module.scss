@@ -40,7 +40,7 @@
   position: relative;
 }
 
-.org-chart-inner{
+.org-chart-inner {
   min-height: 600px;
   max-width: 100%;
   overflow: auto;
@@ -61,6 +61,12 @@
   width: 250px;
   position: relative;
   border-color: var(--primary-color);
+
+  :global {
+    .ant-card-body {
+      background: #FFFFFF;
+    }
+  }
 
   &:hover {
     border-color: var(--primary-color);
