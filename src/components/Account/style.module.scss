@@ -4,9 +4,14 @@
   position: relative;
   overflow: hidden;
   margin: 0 auto;
+  border-radius: 12px;
   --out-inner-height: 90vh;
   --max-height: 640px;
   //max-height: var(--max-height);
+}
+
+.top-banner {
+  display: none;
 }
 
 .title {
@@ -34,4 +39,54 @@
 .form-inner {
   width: 420px !important;
   margin: 80px auto;
+}
+
+@media (max-width: 1024px) {
+  .out-container {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .top-banner {
+    display: block;
+    position: relative;
+    height: 200px;
+
+    :global {
+      .animation {
+        width: 80%;
+        left: 70%;
+        max-width: 400px;
+      }
+    }
+  }
+
+  .top-banner-inner {
+    position: absolute;
+    top: 40px;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .out-inner {
+    background: #FFFFFF;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    min-height: calc(100% - 180px);
+    border-radius: 12px 12px 0 0;
+  }
+
+  .form-inner {
+    width: 100% !important;
+    max-width: 600px;
+    padding: 0 24px;
+    box-sizing: border-box;
+  }
 }

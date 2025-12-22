@@ -3,10 +3,14 @@ import classnames from 'classnames';
 import style from './style.module.scss';
 import commonStyle from '../style.module.scss';
 
-const LoginOuterContainer = ({ className, title, logo, leftInner, children }) => {
+const LoginOuterContainer = ({ className, title, logo, leftInner , children }) => {
   return (
     <div className={classnames(className, commonStyle['out-container'], 'account-box')}>
-      <div className={style['out-inner']}>
+      <div className={commonStyle['top-banner']}>
+        <div className={commonStyle['top-banner-inner']}>{title}</div>
+        {leftInner}
+      </div>
+      <div className={commonStyle['out-inner']}>
         <Row wrap={false}>
           <Col className={classnames(style['out-left'], 'container-left')}>
             <Flex gap={16} align="center" className={classnames(style['container-left-content'], 'container-left-content')}>

@@ -5,11 +5,11 @@ import useNavigate from '@kne/use-refer-navigate';
 import { LeftOutlined } from '@ant-design/icons';
 
 const ResetPassword = p => {
-  const { type, loginUrl, title, ...props } = Object.assign(
+  const { type, loginUrl, title, systemName, ...props } = Object.assign(
     {},
     {
       type: 'email',
-      title: '您正在重置登录密码，请设置您的新密码',
+      title: '重置登录密码',
       loginUrl: ''
     },
     p
@@ -20,6 +20,7 @@ const ResetPassword = p => {
       {...props}
       type={type}
       title={title}
+      systemName={systemName}
       isReset
       header={
         <Button
@@ -29,8 +30,7 @@ const ResetPassword = p => {
           icon={<LeftOutlined />}
           onClick={() => {
             navigate(loginUrl);
-          }}
-        >
+          }}>
           已有账户，去登录
         </Button>
       }
