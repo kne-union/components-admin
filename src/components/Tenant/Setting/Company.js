@@ -5,12 +5,15 @@ import { App } from 'antd';
 
 const Company = createWithRemoteLoader({
   modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:Permissions']
-})(({ remoteModules, menu }) => {
+})(({ remoteModules, menu, children }) => {
   const [Page, usePreset, Permissions] = remoteModules;
   const { ajax, apis } = usePreset();
   const { message } = App.useApp();
-  return (
-    <Page menu={menu} title="公司信息">
+
+  const pageProps = {
+    menu,
+    title: '公司信息',
+    children: (
       <Permissions request={['setting:company-setting:view']} type="error">
         <Fetch
           {...Object.assign({}, apis.tenant.companyDetail)}
@@ -42,8 +45,13 @@ const Company = createWithRemoteLoader({
           }}
         />
       </Permissions>
-    </Page>
-  );
+    )
+  };
+
+  if (typeof children === 'function') {
+    return children(pageProps);
+  }
+  return <Page {...pageProps} />;
 });
 
 export default Company;

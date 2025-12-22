@@ -10,15 +10,18 @@ const Org = createWithRemoteLoader({
     'components-core:Permissions',
     'components-core:Permissions@usePermissionsPass'
   ]
-})(({ remoteModules, menu }) => {
+})(({ remoteModules, menu, children }) => {
   const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass] = remoteModules;
   const { apis } = usePreset();
   const { global } = useGlobalContext('userInfo');
   const allowCreate = usePermissionsPass({ request: ['setting:org:create'] });
   const allowSave = usePermissionsPass({ request: ['setting:org:edit'] });
   const allowRemove = usePermissionsPass({ request: ['setting:org:remove'] });
-  return (
-    <Page title="组织架构" menu={menu}>
+
+  const pageProps = {
+    menu,
+    title: '组织架构',
+    children: (
       <Permissions request={['setting:org:view']} type="error">
         <Fetch
           {...Object.assign({}, apis.tenant.orgList)}
@@ -38,8 +41,14 @@ const Org = createWithRemoteLoader({
           }}
         />
       </Permissions>
-    </Page>
-  );
+    )
+  };
+
+  if (typeof children === 'function') {
+    return children(pageProps);
+  }
+
+  return <Page {...pageProps} />;
 });
 
 export default Org;

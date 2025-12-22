@@ -1,7 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import useControlValue from '@kne/use-control-value';
 import Fetch from '@kne/react-fetch';
-import { Menu, Checkbox, Flex, Divider, Empty, Button, Spin } from 'antd';
+import { Menu, Checkbox, Flex, Divider, Empty, Button } from 'antd';
 import flattenPermissions from './flattenPermissions';
 import { useState } from 'react';
 import get from 'lodash/get';
