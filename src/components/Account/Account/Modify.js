@@ -12,7 +12,7 @@ const Modify = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [usePreset] = remoteModules;
   const { apis: presetApis, ajax } = usePreset();
-  const { apis, loginUrl, accountType } = useProps();
+  const { apis, loginUrl, accountType, loginLeftInner, systemName } = useProps();
   const { account: accountValue } = useParams();
   const [searchParams] = useSearchParams();
   const referer = searchParams.get('referer');
@@ -23,6 +23,8 @@ const Modify = createWithRemoteLoader({
     <ModifyComponent
       type={accountType}
       account={accountValue}
+      topBanner={loginLeftInner}
+      systemName={systemName}
       onSubmit={async formData => {
         const newPwd = md5(formData.newPwd);
         const { data: resData } = await ajax(
