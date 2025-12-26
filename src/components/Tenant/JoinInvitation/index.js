@@ -10,7 +10,7 @@ import style from './style.module.scss';
 
 const JoinInvitation = createWithRemoteLoader({
   modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:InfoPage', 'components-core:LoadingButton']
-})(({ remoteModules, baseUrl = '' }) => {
+})(({ remoteModules, baseUrl = '', children }) => {
   const [Page, usePreset, InfoPage, LoadingButton] = remoteModules;
   const [current, setCurrent] = useState(0);
   const { apis, ajax } = usePreset();
@@ -19,12 +19,15 @@ const JoinInvitation = createWithRemoteLoader({
 
   const token = searchParams.get('token');
 
-  return (
-    <Page backgroundColor="transparent">
+  const pageProps = {
+    children: (
       <Fetch
         {...Object.assign({}, apis.tenant.parseJoinToken, {
           data: { token }
         })}
+        error={error => {
+          return <Result status="error" title={error || '邀请链接已失效'} subTitle="请联系管理员解决此问题" />;
+        }}
         render={({ data }) => {
           const { tenant, tenantUser } = data;
           if (!(tenant && tenant.status === 'open' && tenantUser && tenantUser.status === 'open')) {
@@ -59,8 +62,7 @@ const JoinInvitation = createWithRemoteLoader({
                         size="large"
                         onClick={() => {
                           setCurrent(1);
-                        }}
-                      >
+                        }}>
                         确认公司信息
                       </Button>
                     </Flex>
@@ -86,8 +88,7 @@ const JoinInvitation = createWithRemoteLoader({
                             return;
                           }
                           setCurrent(2);
-                        }}
-                      >
+                        }}>
                         确认员工信息
                       </LoadingButton>
                     </Flex>
@@ -116,8 +117,7 @@ const JoinInvitation = createWithRemoteLoader({
                           size="large"
                           onClick={() => {
                             window.location.href = `${baseUrl}/tenant`;
-                          }}
-                        >
+                          }}>
                           直接进入
                         </Button>
                       }
@@ -129,8 +129,14 @@ const JoinInvitation = createWithRemoteLoader({
           );
         }}
       />
-    </Page>
-  );
+    )
+  };
+
+  if (typeof children === 'function') {
+    return children(pageProps);
+  }
+
+  return <Page backgroundColor="transparent" {...pageProps} />;
 });
 
 export default JoinInvitation;

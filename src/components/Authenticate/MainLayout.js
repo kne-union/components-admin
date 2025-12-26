@@ -12,8 +12,7 @@ export const MainLayout = createWithRemoteLoader({
       navigation={{
         defaultTitle: title,
         ...Object.assign({}, navigation)
-      }}
-    >
+      }}>
       {children}
     </Layout>
   );
@@ -34,7 +33,7 @@ export const RightOptions = createWithRemoteLoader({
   );
 });
 
-export const AfterCustomUserLoginLayout = ({ baseUrl, navigation, api, ...props }) => {
+export const AfterCustomUserLoginLayout = ({ baseUrl, navigation, api, children, ...props }) => {
   return (
     <CustomUserInfo baseUrl={baseUrl || '/account'} api={api}>
       <MainLayout
@@ -45,23 +44,22 @@ export const AfterCustomUserLoginLayout = ({ baseUrl, navigation, api, ...props 
             rightOptions: <RightOptions />
           },
           navigation
-        )}
-      >
-        <Outlet />
+        )}>
+        {children || <Outlet />}
       </MainLayout>
     </CustomUserInfo>
   );
 };
 
-export const AfterCustomUserLogin = ({ baseUrl, api, ...props }) => {
+export const AfterCustomUserLogin = ({ baseUrl, api, children, ...props }) => {
   return (
     <CustomUserInfo baseUrl={baseUrl || '/account'} api={api}>
-      <Outlet />
+      {children || <Outlet />}
     </CustomUserInfo>
   );
 };
 
-export const AfterUserLoginLayout = ({ baseUrl, navigation, ...props }) => {
+export const AfterUserLoginLayout = ({ baseUrl, navigation, children, ...props }) => {
   return (
     <UserInfo baseUrl={baseUrl || '/account'}>
       <MainLayout
@@ -72,23 +70,18 @@ export const AfterUserLoginLayout = ({ baseUrl, navigation, ...props }) => {
             rightOptions: <RightOptions />
           },
           navigation
-        )}
-      >
-        <Outlet />
+        )}>
+        {children || <Outlet />}
       </MainLayout>
     </UserInfo>
   );
 };
 
-export const AfterUserLogin = ({ baseUrl, ...props }) => {
-  return (
-    <UserInfo baseUrl={baseUrl || '/account'}>
-      <Outlet />
-    </UserInfo>
-  );
+export const AfterUserLogin = ({ baseUrl, children, ...props }) => {
+  return <UserInfo baseUrl={baseUrl || '/account'}>{children || <Outlet />}</UserInfo>;
 };
 
-export const AfterAdminUserLoginLayout = ({ navigation, ...props }) => {
+export const AfterAdminUserLoginLayout = ({ navigation, children, ...props }) => {
   return (
     <SuperAdminInfo>
       <MainLayout
@@ -99,18 +92,13 @@ export const AfterAdminUserLoginLayout = ({ navigation, ...props }) => {
             rightOptions: <RightOptions />
           },
           navigation
-        )}
-      >
-        <Outlet />
+        )}>
+        {children || <Outlet />}
       </MainLayout>
     </SuperAdminInfo>
   );
 };
 
-export const BeforeLoginLayout = props => {
-  return (
-    <>
-      <Outlet />
-    </>
-  );
+export const BeforeLoginLayout = ({ children, ...props }) => {
+  return <>{children || <Outlet />}</>;
 };
