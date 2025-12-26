@@ -5,7 +5,7 @@ import Authenticate from './Authenticate';
 
 const AfterTenantLoginLayout = createWithRemoteLoader({
   modules: ['components-admin:Authenticate@MainLayout', 'components-admin:UserTool']
-})(({ remoteModules, navigation, switchTenantPath, ...props }) => {
+})(({ remoteModules, navigation, switchTenantPath, children, ...props }) => {
   const [MainLayout, UserTool] = remoteModules;
   const navigate = useNavigate();
   return (
@@ -51,7 +51,7 @@ const AfterTenantLoginLayout = createWithRemoteLoader({
               },
               navigation
             )}>
-            <Outlet />
+            {children || <Outlet />}
           </MainLayout>
         );
       }}

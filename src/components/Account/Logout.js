@@ -1,13 +1,14 @@
 import { removeToken } from '@kne/token-storage';
+import merge from 'lodash/merge';
 import { Button } from 'antd';
 
 export const useLogout = props => {
-  const { storeKeys, domain } = Object.assign({}, { storeKeys: { token: 'X-User-Token' } }, props);
+  const { storeKeys, domain, loginUrl } = merge({}, { storeKeys: { token: 'X-User-Token' }, loginUrl: '/account/login' }, props);
   return () => {
     Object.values(storeKeys).forEach(tokenKey => {
       removeToken(tokenKey, domain);
     });
-    window.location.reload();
+    window.location.href = `${loginUrl}?referer=${encodeURIComponent(window.location.href)}`;
   };
 };
 

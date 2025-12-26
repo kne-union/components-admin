@@ -4,15 +4,19 @@ import style from './style.module.scss';
 
 const LoginTenant = createWithRemoteLoader({
   modules: ['components-core:Layout@Page']
-})(({ remoteModules, ...props }) => {
+})(({ remoteModules, children, ...props }) => {
   const [Page] = remoteModules;
-  return (
-    <Page backgroundColor="transparent">
+  const pageProps = {
+    children: (
       <div className={style['card']}>
         <SelectTenant {...props} />
       </div>
-    </Page>
-  );
+    )
+  };
+  if (typeof children === 'function') {
+    return children(pageProps);
+  }
+  return <Page backgroundColor="transparent" {...pageProps} />;
 });
 
 export default LoginTenant;
