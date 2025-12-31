@@ -1,18 +1,21 @@
 import style from './style.module.scss';
-import { Checkbox, Col, Row, Space, Button } from 'antd';
+import { Checkbox, Col, Row, Space, Button, Flex } from 'antd';
 import { useState } from 'react';
 import useNavigate from '@kne/use-refer-navigate';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import commonStyle from '../style.module.scss';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
 export const LOGIN_REMEMBER_ACCOUNT = 'LOGIN_REMEMBER_ACCOUNT';
-const Login = createWithRemoteLoader({
+const LoginInner = createWithRemoteLoader({
   modules: ['component-core:FormInfo']
 })(({ remoteModules, ...p }) => {
+  const { formatMessage } = useIntl();
   const { title, registerUrl, forgetUrl, type, onSubmit } = Object.assign(
     {},
     {
-      title: '登录',
+      title: formatMessage({ id: 'Login' }),
       type: 'email',
       registerUrl: '',
       forgetUrl: ''
@@ -40,14 +43,14 @@ const Login = createWithRemoteLoader({
       <Space className="space-full" size={38} direction="vertical">
         <div className={commonStyle['title']}>{title}</div>
         <div>
-          {type === 'email' && <Input name="email" label="邮箱" rule="REQ EMAIL" />}
-          {type === 'phone' && <Input name="phone" label="手机" rule="REQ TEL" />}
-          <Input.Password type="password" name="password" label="密码" rule="REQ LEN-6-50" />
+          {type === 'email' && <Input name="email" label={formatMessage({ id: 'Email' })} rule="REQ EMAIL" />}
+          {type === 'phone' && <Input name="phone" label={formatMessage({ id: 'Phone' })} rule="REQ TEL" />}
+          <Input.Password type="password" name="password" label={formatMessage({ id: 'Password' })} rule="REQ LEN-6-50" />
         </div>
       </Space>
       <Space className="space-full" size={10} direction="vertical">
         <SubmitButton block size="large">
-          登录
+          {formatMessage({ id: 'Login' })}
         </SubmitButton>
         <Row justify="space-between">
           <Col>
@@ -56,32 +59,34 @@ const Login = createWithRemoteLoader({
               onChange={e => {
                 setRememberUser(e.target.checked);
               }}>
-              记住账号
+              {formatMessage({ id: 'RememberAccount' })}
             </Checkbox>
           </Col>
           <Col>
-            {registerUrl && (
-              <Button
-                className={style['forget-button']}
-                type="link"
-                size="small"
-                onClick={() => {
-                  navigate(registerUrl);
-                }}>
-                注册
-              </Button>
-            )}
-            {forgetUrl && (
-              <Button
-                className={style['forget-button']}
-                type="link"
-                size="small"
-                onClick={() => {
-                  navigate(forgetUrl);
-                }}>
-                忘记密码
-              </Button>
-            )}
+            <Flex gap={8}>
+              {registerUrl && (
+                <Button
+                  className={style['forget-button']}
+                  type="link"
+                  size="small"
+                  onClick={() => {
+                    navigate(registerUrl);
+                  }}>
+                  {formatMessage({ id: 'RegisterBtn' })}
+                </Button>
+              )}
+              {forgetUrl && (
+                <Button
+                  className={style['forget-button']}
+                  type="link"
+                  size="small"
+                  onClick={() => {
+                    navigate(forgetUrl);
+                  }}>
+                  {formatMessage({ id: 'ForgetPassword' })}
+                </Button>
+              )}
+            </Flex>
           </Col>
         </Row>
       </Space>
@@ -89,4 +94,4 @@ const Login = createWithRemoteLoader({
   );
 });
 
-export default Login;
+export default withLocale(LoginInner);

@@ -1,7 +1,9 @@
-import RemoteLoader, { createWithRemoteLoader } from '@kne/remote-loader';
+import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Outlet } from 'react-router-dom';
 import { SuperAdminInfo, UserInfo, CustomUserInfo } from './Authenticate';
 import UserTool from '@components/UserTool';
+import Language from '@components/Account/Language';
+import { Flex } from 'antd';
 
 export const MainLayout = createWithRemoteLoader({
   modules: ['components-core:Layout']
@@ -24,12 +26,15 @@ export const RightOptions = createWithRemoteLoader({
   const [GlobalValue] = remoteModules;
 
   return (
-    <GlobalValue globalKey="userInfo">
-      {({ value }) => {
-        const { nickname, avatar, email } = Object.assign({}, value?.value);
-        return <UserTool name={nickname} email={email} avatar={avatar} />;
-      }}
-    </GlobalValue>
+    <Flex gap={8}>
+      <Language />
+      <GlobalValue globalKey="userInfo">
+        {({ value }) => {
+          const { nickname, avatar, email } = Object.assign({}, value?.value);
+          return <UserTool name={nickname} email={email} avatar={avatar} />;
+        }}
+      </GlobalValue>
+    </Flex>
   );
 });
 

@@ -1,21 +1,24 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Tabs } from 'antd';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
-const RightOptions = createWithRemoteLoader({
+const RightOptionsInner = createWithRemoteLoader({
   modules: []
 })(({ remoteModules }) => {
   const [] = remoteModules;
+  const { formatMessage } = useIntl();
   return (
     <Tabs
       items={[
         {
           key: '1',
-          label: '状态一',
+          label: formatMessage({ id: 'Status' }) + '一',
           children: ''
         },
         {
           key: '2',
-          label: '状态二',
+          label: formatMessage({ id: 'Status' }) + '二',
           children: ''
         }
       ]}
@@ -23,4 +26,4 @@ const RightOptions = createWithRemoteLoader({
   );
 });
 
-export default RightOptions;
+export default withLocale(RightOptionsInner);

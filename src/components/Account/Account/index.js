@@ -9,6 +9,8 @@ import Forget from './Forget';
 import ResetPassword from './ResetPassword';
 import Modify from './Modify';
 import style from './style.module.scss';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
 const defaultLeftInner = <LoginIllustration />;
 
@@ -24,16 +26,17 @@ const Layout = () => {
   );
 };
 
-const Account = ({ className, ...p }) => {
+const AccountInner = ({ className, ...p }) => {
+  const { formatMessage } = useIntl();
   const { baseUrl, ...props } = merge(
     {},
     {
       baseUrl: '',
       accountType: 'email',
       systemLogo: null,
-      systemName: 'Kne Union SaaS System',
-      loginTitle: '登录',
-      registerTitle: '注册',
+      systemName: formatMessage({ id: 'SystemName' }),
+      loginTitle: formatMessage({ id: 'Login' }),
+      registerTitle: formatMessage({ id: 'Register' }),
       loginLeftInner: defaultLeftInner,
       loginPath: 'login',
       registerPath: 'register',
@@ -73,4 +76,4 @@ const Account = ({ className, ...p }) => {
   );
 };
 
-export default Account;
+export default withLocale(AccountInner);

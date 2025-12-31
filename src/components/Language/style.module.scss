@@ -1,0 +1,47 @@
+.language {
+  display: flex;
+  align-items: center;
+  &.is-colorful {
+    .icon {
+      color: #ffffff;
+    }
+
+    .item {
+      color: #ffffff;
+      opacity: 0.4;
+
+      &.is-active,
+      &:hover {
+        opacity: 1;
+      }
+
+      &:hover {
+        color: #ffffff;
+      }
+    }
+
+    :global {
+      .ant-divider {
+        opacity: 0.4;
+        border-inline-start-color: #ffffff;
+      }
+    }
+  }
+}
+
+.icon {
+  margin-right: 6px;
+  color: var(--font-color);
+}
+
+.item {
+  color: var(--font-color-grey-2);
+
+  &.is-active {
+    color: var(--font-color);
+
+    &:hover {
+      color: var(--font-color);
+    }
+  }
+}

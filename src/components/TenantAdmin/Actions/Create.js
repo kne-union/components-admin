@@ -1,21 +1,24 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { App, Button } from 'antd';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 import FormInner from '../FormInner';
 
-const Create = createWithRemoteLoader({
+const CreateInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
 })(({ remoteModules, onSuccess, ...props }) => {
   const [useFormModal, usePreset] = remoteModules;
   const formModal = useFormModal();
   const { ajax, apis } = usePreset();
   const { message } = App.useApp();
+  const { formatMessage } = useIntl();
 
   return (
     <Button
       {...props}
       onClick={() => {
         formModal({
-          title: '添加租户',
+          title: formatMessage({ id: 'AddTenant' }),
           size: 'small',
           formProps: {
             onSubmit: async formData => {
@@ -30,7 +33,7 @@ const Create = createWithRemoteLoader({
               if (resData.code !== 0) {
                 return false;
               }
-              message.success('添加成功');
+              message.success(formatMessage({ id: 'AddSuccess' }));
               onSuccess && onSuccess();
             }
           },
@@ -41,4 +44,4 @@ const Create = createWithRemoteLoader({
   );
 });
 
-export default Create;
+export default withLocale(CreateInner);

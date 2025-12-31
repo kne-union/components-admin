@@ -2,13 +2,17 @@ import BizUnit from '@components/BizUnit';
 import getColumns from './getColumns';
 import FormInner from './FormInner';
 import SetRolePermission from './Actions/SetRolePermission';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const Role = ({ apis, ...props }) => {
+  const { formatMessage } = useIntl();
+  const columns = getColumns({ formatMessage });
   return (
     <BizUnit
       {...props}
       apis={apis}
-      getColumns={getColumns}
+      getColumns={() => columns}
       getFormInner={props => {
         return <FormInner {...props} />;
       }}
@@ -22,17 +26,17 @@ const Role = ({ apis, ...props }) => {
               ...props,
               buttonComponent: SetRolePermission,
               data,
-              children: '设置权限',
+              children: formatMessage({ id: 'SetPermission' }),
               hidden: data.code === 'admin' || !apis.permissionSave
             }
           ]);
       }}
       name="role-list"
       options={{
-        bizName: '角色'
+        bizName: formatMessage({ id: 'Role' })
       }}
     />
   );
 };
 
-export default Role;
+export default withLocale(Role);

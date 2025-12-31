@@ -5,11 +5,14 @@ import { App } from 'antd';
 import md5 from 'md5';
 import { useProps } from './context';
 import { setToken } from '@kne/token-storage';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
-const DoLogin = createWithRemoteLoader({
+const DoLoginInner = createWithRemoteLoader({
   modules: ['component-core:Global@usePreset']
 })(({ remoteModules, children }) => {
   const [usePreset] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis: presetApis, ajax } = usePreset();
   const { apis, targetUrl, storeKeys, domain, afterLogin } = useProps();
   const account = Object.assign({}, presetApis.account, apis);
@@ -33,18 +36,18 @@ const DoLogin = createWithRemoteLoader({
       }
 
       if (resData.data.status === 10) {
-        message.warning('账号没有初始化，请设置一个新的密码后重新登录');
+        message.warning(formatMessage({ id: 'AccountNotInitialized' }));
         navigate(`/account/modify/${formData.email || formData.phone}${referer ? `?referer=${referer}` : ''}`);
         return;
       }
 
       if (resData.data.status === 11) {
-        message.warning('账号被禁用，请联系管理员');
+        message.warning(formatMessage({ id: 'AccountDisabled' }));
         return;
       }
 
       if (resData.data.status === 12) {
-        message.warning('账号被关闭，请联系管理员');
+        message.warning(formatMessage({ id: 'AccountClosed' }));
         return;
       }
 
@@ -68,10 +71,10 @@ const DoLogin = createWithRemoteLoader({
           return;
         }
       }
-      message.success('登录成功');
+      message.success(formatMessage({ id: 'LoginSuccess' }));
       navigate(refererHref);
     }
   });
 });
 
-export default DoLogin;
+export default withLocale(DoLoginInner);

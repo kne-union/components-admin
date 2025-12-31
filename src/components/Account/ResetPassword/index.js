@@ -3,13 +3,16 @@ import commonStyle from '../style.module.scss';
 import { Button } from 'antd';
 import useNavigate from '@kne/use-refer-navigate';
 import { LeftOutlined } from '@ant-design/icons';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
-const ResetPassword = p => {
+const ResetPasswordInner = p => {
+  const { formatMessage } = useIntl();
   const { type, loginUrl, title, systemName, ...props } = Object.assign(
     {},
     {
       type: 'email',
-      title: '重置登录密码',
+      title: formatMessage({ id: 'ResetLoginPassword' }),
       loginUrl: ''
     },
     p
@@ -31,11 +34,11 @@ const ResetPassword = p => {
           onClick={() => {
             navigate(loginUrl);
           }}>
-          已有账户，去登录
+          {formatMessage({ id: 'HasAccountLogin2' })}
         </Button>
       }
     />
   );
 };
 
-export default ResetPassword;
+export default withLocale(ResetPasswordInner);

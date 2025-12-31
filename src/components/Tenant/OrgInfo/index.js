@@ -5,6 +5,8 @@ import OrgChart from '@kne/react-org-chart';
 import merge from 'lodash/merge';
 import { PlusCircleOutlined, MinusCircleOutlined, ExpandOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import FormInner from './FormInner';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 import '@kne/react-org-chart/dist/index.css';
 
@@ -14,6 +16,7 @@ const OrgOptions = createWithRemoteLoader({
   const [usePreset, ButtonGroup, Icon, useFormModal] = remoteModules;
   const { ajax } = usePreset();
   const formModal = useFormModal();
+  const { formatMessage } = useIntl();
   const { message } = App.useApp();
   return (
     <ButtonGroup
@@ -23,11 +26,11 @@ const OrgOptions = createWithRemoteLoader({
         {
           icon: <Icon type="tianjia" />,
           type: 'link',
-          children: '新增子级组织',
+          children: formatMessage({ id: 'AddSubOrg' }),
           hidden: !apis.create,
           onClick: async () => {
             formModal({
-              title: '新增子级组织',
+              title: formatMessage({ id: 'AddSubOrg' }),
               size: 'small',
               formProps: {
                 onSubmit: async formData => {
@@ -47,7 +50,7 @@ const OrgOptions = createWithRemoteLoader({
                   if (resData.code !== 0) {
                     return false;
                   }
-                  message.success('添加成功');
+                  message.success(formatMessage({ id: 'AddSuccess' }));
                   onSuccess && onSuccess();
                 }
               },
@@ -58,11 +61,11 @@ const OrgOptions = createWithRemoteLoader({
         {
           icon: <Icon type="bianji" />,
           type: 'link',
-          children: '编辑',
+          children: formatMessage({ id: 'Edit' }),
           hidden: !(data.id && data.id !== 'root') || !apis.save,
           onClick: async () => {
             formModal({
-              title: '编辑组织节点',
+              title: formatMessage({ id: 'EditOrgNode' }),
               size: 'small',
               formProps: {
                 data: Object.assign({}, data),
@@ -78,7 +81,7 @@ const OrgOptions = createWithRemoteLoader({
                   if (resData.code !== 0) {
                     return false;
                   }
-                  message.success('保存成功');
+                  message.success(formatMessage({ id: 'SaveSuccess' }));
                   onSuccess && onSuccess();
                 }
               },
@@ -89,7 +92,7 @@ const OrgOptions = createWithRemoteLoader({
         {
           icon: <Icon type="shanchu" />,
           type: 'link',
-          children: '删除',
+          children: formatMessage({ id: 'Delete' }),
           hidden: !(data.id && data.id !== 'root') || !apis.remove,
           confirm: true,
           disabled: data.children && data.children.length > 0,
@@ -102,7 +105,7 @@ const OrgOptions = createWithRemoteLoader({
             if (resData.code !== 0) {
               return;
             }
-            message.success('删除成功');
+            message.success(formatMessage({ id: 'DeleteSuccess' }));
             onSuccess && onSuccess();
           }
         }
@@ -139,7 +142,6 @@ const ControlPanel = ({ value, onChange }) => {
 const GraphOrg = createWithRemoteLoader({
   modules: ['components-core:Common@SimpleBar']
 })(({ remoteModules, data, apis, onSuccess }) => {
-  const [SimpleBar] = remoteModules;
   const ref = useRef(null);
   const [expandIds, setExpandIds] = useState([]);
   const [scale, setScale] = useState(1);
@@ -245,11 +247,12 @@ const OrgInfo = createWithRemoteLoader({
 })(({ remoteModules, data, companyName, apis, onSuccess }) => {
   const [StateBar] = remoteModules;
   const [activeKey, setActiveKey] = useState('tree');
+  const { formatMessage } = useIntl();
   const { treeData, ids } = useMemo(() => {
     const output = [
       {
         id: 'root',
-        name: companyName || '未命名公司'
+        name: companyName || formatMessage({ id: 'UnnamedCompany' })
       }
     ];
 
@@ -269,7 +272,7 @@ const OrgInfo = createWithRemoteLoader({
       treeData: parseTree(output),
       ids: data.map(item => item.id)
     };
-  }, [data, companyName]);
+  }, [data, companyName, formatMessage]);
   return (
     <Flex vertical>
       <StateBar
@@ -277,8 +280,8 @@ const OrgInfo = createWithRemoteLoader({
         onChange={setActiveKey}
         type="radio"
         stateOption={[
-          { tab: '树形', key: 'tree' },
-          { tab: '图形', key: 'graph' }
+          { tab: formatMessage({ id: 'Tree' }), key: 'tree' },
+          { tab: formatMessage({ id: 'Graph' }), key: 'graph' }
         ]}
       />
       <div className={style['org']}>
@@ -289,4 +292,4 @@ const OrgInfo = createWithRemoteLoader({
   );
 });
 
-export default OrgInfo;
+export default withLocale(OrgInfo);

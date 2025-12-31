@@ -1,9 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Typography, Empty } from 'antd';
+import { Typography } from 'antd';
 import style from '../style.module.scss';
-import dayjs from 'dayjs';
-
-const { Title, Paragraph } = Typography;
 
 const Basic = createWithRemoteLoader({
   modules: ['components-core:InfoPage@Content']

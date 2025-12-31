@@ -6,8 +6,10 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import merge from 'lodash/merge';
 import md5 from 'md5';
 import { App } from 'antd';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
-const Modify = createWithRemoteLoader({
+const ModifyInner = createWithRemoteLoader({
   modules: ['component-core:Global@usePreset']
 })(({ remoteModules }) => {
   const [usePreset] = remoteModules;
@@ -18,6 +20,7 @@ const Modify = createWithRemoteLoader({
   const referer = searchParams.get('referer');
   const navigate = useNavigate();
   const { message } = App.useApp();
+  const { formatMessage } = useIntl();
   const account = Object.assign({}, presetApis.account, apis);
   return (
     <ModifyComponent
@@ -40,11 +43,11 @@ const Modify = createWithRemoteLoader({
         if (resData.code !== 0) {
           return;
         }
-        message.success('重置密码成功');
+        message.success(formatMessage({ id: 'ResetPasswordSuccess' }));
         navigate(`${loginUrl}${referer ? `?referer=${encodeURIComponent(referer)}` : ''}`);
       }}
     />
   );
 });
 
-export default Modify;
+export default withLocale(ModifyInner);

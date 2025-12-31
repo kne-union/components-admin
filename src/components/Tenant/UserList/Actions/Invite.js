@@ -1,13 +1,16 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import merge from 'lodash/merge';
 import { Flex, App } from 'antd';
+import withLocale from '../../withLocale';
+import { useIntl } from '@kne/react-intl';
 
-const Invite = createWithRemoteLoader({
+const InviteInner = createWithRemoteLoader({
   modules: ['components-core:LoadingButton', 'components-core:Modal@useModal', 'components-core:Global@usePreset', 'components-core:InfoPage@CentralContent']
 })(({ remoteModules, data, apis, onSuccess, ...props }) => {
   const [LoadingButton, useModal, usePreset, CentralContent] = remoteModules;
   const { ajax } = usePreset();
   const modal = useModal();
+  const { formatMessage } = useIntl();
   const { message } = App.useApp();
   return (
     <LoadingButton
@@ -22,7 +25,7 @@ const Invite = createWithRemoteLoader({
           return;
         }
         modal({
-          title: '邀请用户',
+          title: formatMessage({ id: 'InviteUser' }),
           footer: null,
           children: (
             <Flex vertical gap={40}>
@@ -38,11 +41,11 @@ const Invite = createWithRemoteLoader({
                     },
                     {
                       name: 'name',
-                      title: '姓名'
+                      title: formatMessage({ id: 'Name' })
                     },
                     {
                       name: 'token',
-                      title: '邀请链接',
+                      title: formatMessage({ id: 'InviteLink' }),
                       block: true,
                       render: value => {
                         return `${window.location.origin}/join-tenant?token=${value}`;
@@ -63,18 +66,18 @@ const Invite = createWithRemoteLoader({
                     if (resData.code !== 0) {
                       return;
                     }
-                    message.success('发送成功');
+                    message.success(formatMessage({ id: 'SendSuccess' }));
                   }}
                 >
-                  发送邀请邮件
+                  {formatMessage({ id: 'SendInviteEmail' })}
                 </LoadingButton>
                 <LoadingButton
                   onClick={async () => {
                     await navigator.clipboard.writeText(`${window.location.origin}/join-tenant?token=${resData.data.token}`);
-                    message.success('复制成功');
+                    message.success(formatMessage({ id: 'CopySuccess' }));
                   }}
                 >
-                  复制邀请链接
+                  {formatMessage({ id: 'CopyInviteLink' })}
                 </LoadingButton>
               </Flex>
             </Flex>
@@ -85,4 +88,4 @@ const Invite = createWithRemoteLoader({
   );
 });
 
-export default Invite;
+export default withLocale(InviteInner);

@@ -1,11 +1,14 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Button } from 'antd';
 import style from '../style.module.scss';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const ResultDetail = createWithRemoteLoader({
   modules: ['components-core:Modal@useModal', 'components-core:InfoPage']
-})(({ remoteModules, data, ...props }) => {
+})(withLocale(({ remoteModules, data, ...props }) => {
   const [useModal, InfoPage] = remoteModules;
+  const { formatMessage } = useIntl();
   const modal = useModal();
 
   return (
@@ -13,16 +16,16 @@ const ResultDetail = createWithRemoteLoader({
       {...props}
       onClick={() => {
         modal({
-          title: '任务结果',
+          title: formatMessage({ id: 'TaskResultTitle' }),
           footer: null,
           children: (
             <InfoPage>
-              <InfoPage.Part title="输入参数">
+              <InfoPage.Part title={formatMessage({ id: 'InputParams' })}>
                 <div className={style['error-box']}>
                   <pre>{JSON.stringify(data.input, null, 2)}</pre>
                 </div>
               </InfoPage.Part>
-              <InfoPage.Part title="输出结果">
+              <InfoPage.Part title={formatMessage({ id: 'OutputResult' })}>
                 <div className={style['error-box']}>
                   <pre>{JSON.stringify(data.output, null, 2)}</pre>
                 </div>
@@ -33,6 +36,6 @@ const ResultDetail = createWithRemoteLoader({
       }}
     />
   );
-});
+}));
 
 export default ResultDetail;

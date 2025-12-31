@@ -2,8 +2,10 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import Role from '../Role';
 import { useState } from 'react';
 import transform from 'lodash/transform';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
-const Permission = createWithRemoteLoader({
+const PermissionInner = createWithRemoteLoader({
   modules: [
     'components-core:Layout@Page',
     'components-core:Global@usePreset',
@@ -15,6 +17,7 @@ const Permission = createWithRemoteLoader({
   ]
 })(({ remoteModules, menu, children }) => {
   const [Page, usePreset, Permissions, usePermissionsPass, FilterProvider, TablePage, StateBar] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis } = usePreset();
   const [target, setTarget] = useState({});
   const filter = Object.assign({}, { value: [] }, target.filter);
@@ -36,7 +39,7 @@ const Permission = createWithRemoteLoader({
   };
   const pageProps = {
     menu,
-    title: '权限管理',
+    title: formatMessage({ id: 'PermissionManagement' }),
     filter,
     titleExtra: <FilterProvider {...filter}>{target.topOptions}</FilterProvider>,
     children: (
@@ -48,8 +51,8 @@ const Permission = createWithRemoteLoader({
               onChange={setActiveKey}
               type={'radio'}
               stateOption={[
-                { tab: '角色', key: 'role' },
-                { tab: '共享组', key: 'sharedGroup' }
+                { tab: formatMessage({ id: 'Role' }), key: 'role' },
+                { tab: formatMessage({ id: 'SharedGroup' }), key: 'sharedGroup' }
               ].filter(item => {
                 return (item.key === 'role' && allowRole) || (item.key === 'sharedGroup' && allowSharedGroup);
               })}
@@ -84,4 +87,4 @@ const Permission = createWithRemoteLoader({
   return <Page {...pageProps} />;
 });
 
-export default Permission;
+export default withLocale(PermissionInner);

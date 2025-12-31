@@ -2,14 +2,17 @@ import commonStyle from '../style.module.scss';
 import classnames from 'classnames';
 import { Space } from 'antd';
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
-const Modify = createWithRemoteLoader({
+const ModifyInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
 })(({ remoteModules, ...p }) => {
+  const { formatMessage } = useIntl();
   const { className, title, systemName, isReset, account, onSubmit, type, header, topBanner } = Object.assign(
     {},
     {
-      title: '修改密码',
+      title: formatMessage({ id: 'Modify' }),
       type: 'email',
       header: null
     },
@@ -33,14 +36,14 @@ const Modify = createWithRemoteLoader({
           <Space className={classnames(commonStyle['form-inner'])} size={38} direction="vertical">
             <div className={commonStyle['title']}>{title}</div>
             <div>
-              {type === 'email' && <Input name="email" label="邮箱账号" disabled defaultValue={account && decodeURIComponent(account)} />}
-              {type === 'phone' && <Input name="phone" label="手机账号" disabled defaultValue={account && decodeURIComponent(account)} />}
-              {isReset ? null : <Input.Password name="oldPwd" label="原密码" rule="REQ LEN-6-50" />}
-              <Input.Password name="newPwd" label="新密码" rule="REQ LEN-6-50" />
-              <Input.Password name="repeatNewPwd" label="重复密码" rule="REQ LEN-6-50 REPEAT-newPwd" />
+              {type === 'email' && <Input name="email" label={formatMessage({ id: 'EmailAccount' })} disabled defaultValue={account && decodeURIComponent(account)} />}
+              {type === 'phone' && <Input name="phone" label={formatMessage({ id: 'PhoneAccount' })} disabled defaultValue={account && decodeURIComponent(account)} />}
+              {isReset ? null : <Input.Password name="oldPwd" label={formatMessage({ id: 'OldPassword' })} rule="REQ LEN-6-50" />}
+              <Input.Password name="newPwd" label={formatMessage({ id: 'NewPassword' })} rule="REQ LEN-6-50" />
+              <Input.Password name="repeatNewPwd" label={formatMessage({ id: 'RepeatNewPassword' })} rule="REQ LEN-6-50 REPEAT-newPwd" />
             </div>
             <SubmitButton block size="large">
-              提交
+              {formatMessage({ id: 'Submit' })}
             </SubmitButton>
           </Space>
         </Form>
@@ -49,4 +52,4 @@ const Modify = createWithRemoteLoader({
   );
 });
 
-export default Modify;
+export default withLocale(ModifyInner);

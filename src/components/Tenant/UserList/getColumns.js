@@ -1,4 +1,4 @@
-const getColumns = () => {
+const getColumns = ({formatMessage}) => {
   return [
     {
       name: 'id',
@@ -9,37 +9,37 @@ const getColumns = () => {
     },
     {
       name: 'avatar',
-      title: '头像',
+      title: formatMessage({ id: 'Avatar' }),
       type: 'avatar',
       valueOf: (item, { name }) => Object.assign({}, { id: item[name] })
     },
     {
       name: 'name',
-      title: '姓名',
+      title: formatMessage({ id: 'UserName' }),
       type: 'mainInfo',
       primary: false,
       hover: false
     },
     {
       name: 'phone',
-      title: '电话',
+      title: formatMessage({ id: 'PhoneTitle' }),
       type: 'other'
     },
     {
       name: 'email',
-      title: '邮箱',
+      title: formatMessage({ id: 'Email' }),
       type: 'other'
     },
     {
       name: 'roles',
-      title: '角色',
+      title: formatMessage({ id: 'UserRole' }),
       valueOf: item => {
-        return item.roles.map(item => item.name).join(',') || '默认角色';
+        return item.roles.map(item => item.name).join(',') || formatMessage({ id: 'DefaultRole' });
       }
     },
     {
       name: 'tenantOrg',
-      title: '部门',
+      title: formatMessage({ id: 'Department' }),
       valueOf: item => {
         return item.tenantOrg?.name;
       }
@@ -47,7 +47,7 @@ const getColumns = () => {
     {
       name: 'description',
       type: 'description',
-      title: '描述',
+      title: formatMessage({ id: 'UserDescription' }),
       ellipsis: true
     }
   ];

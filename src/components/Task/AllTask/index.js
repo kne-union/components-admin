@@ -1,6 +1,8 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState } from 'react';
 import { transform } from 'lodash';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
 import getColumns from '../getColumns';
 import Menu from '../Menu';
@@ -9,8 +11,9 @@ import RetryTask from '../Actions/RetryTask';
 
 const AllTask = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Tooltip']
-})(({ remoteModules, baseUrl, getManualTaskAction }) => {
+})(withLocale(({ remoteModules, baseUrl, getManualTaskAction }) => {
   const [TablePage, usePreset, Filter, Tooltip] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis, enums } = usePreset();
   const { SearchInput, getFilterValue, fields: filterFields } = Filter;
   const { InputFilterItem, AdvancedSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
@@ -61,10 +64,10 @@ const AllTask = createWithRemoteLoader({
       sort={sort}
       onSortChange={setSortChange}
       columns={[
-        ...getColumns(),
+        ...getColumns({ formatMessage }),
         {
           name: 'options',
-          title: '操作',
+          title: formatMessage({ id: 'Operation' }),
           type: 'options',
           fixed: 'right',
           valueOf: item => {
@@ -96,8 +99,8 @@ const AllTask = createWithRemoteLoader({
       }}
       topArea={
         <>
-          已选：{selected.selectedRowKeys?.length}
-          <Tooltip placement="topLeft" content="请选择要批量重试的任务，只能选择失败的任务">
+          {formatMessage({ id: 'Selected' })}{selected.selectedRowKeys?.length}
+          <Tooltip placement="topLeft" content={formatMessage({ id: 'BatchRetryTooltip' })}>
             <RetryTask
               size="small"
               type="link"
@@ -110,7 +113,7 @@ const AllTask = createWithRemoteLoader({
                 });
                 ref.current?.reload?.();
               }}>
-              批量重试
+              {formatMessage({ id: 'BatchRetry' })}
             </RetryTask>
             {/*<AddDigitalTask
               size="small"
@@ -137,10 +140,10 @@ const AllTask = createWithRemoteLoader({
           onChange: setFilter,
           list: [
             [
-              <InputFilterItem label="任务ID" name="id" />,
-              <InputFilterItem label="目标ID" name="targetId" />,
+              <InputFilterItem label={formatMessage({ id: 'TaskID' })} name="id" />,
+              <InputFilterItem label={formatMessage({ id: 'TargetID' })} name="targetId" />,
               <AdvancedSelectFilterItem
-                label="类型"
+                label={formatMessage({ id: 'Type' })}
                 name="type"
                 single
                 api={{
@@ -152,7 +155,7 @@ const AllTask = createWithRemoteLoader({
                 }}
               />,
               <AdvancedSelectFilterItem
-                label="状态"
+                label={formatMessage({ id: 'Status' })}
                 name="status"
                 single
                 api={{
@@ -164,30 +167,30 @@ const AllTask = createWithRemoteLoader({
                 }}
               />,
               <AdvancedSelectFilterItem
-                label="执行方式"
+                label={formatMessage({ id: 'ExecutionMode' })}
                 name="runnerType"
                 single
                 api={{
                   loader: () => {
                     return {
                       pageData: [
-                        { label: '手动执行', value: 'manual' },
-                        { label: '自动执行', value: 'system' }
+                        { label: formatMessage({ id: 'ManualExecution' }), value: 'manual' },
+                        { label: formatMessage({ id: 'AutomaticExecution' }), value: 'system' }
                       ]
                     };
                   }
                 }}
               />,
-              <TypeDateRangePickerFilterItem label="创建时间" name="createdAt" allowEmpty={[true, true]} />,
-              <TypeDateRangePickerFilterItem label="完成时间" name="completedAt" allowEmpty={[true, true]} />
+              <TypeDateRangePickerFilterItem label={formatMessage({ id: 'CreatedAt' })} name="createdAt" allowEmpty={[true, true]} />,
+              <TypeDateRangePickerFilterItem label={formatMessage({ id: 'CompletedAt' })} name="completedAt" allowEmpty={[true, true]} />
             ]
           ]
         },
-        titleExtra: <SearchInput name="targetName" label="目标名称" />,
+        titleExtra: <SearchInput name="targetName" label={formatMessage({ id: 'TargetName' })} />,
         menu: <Menu baseUrl={baseUrl} />
       }}
     />
   );
-});
+}));
 
 export default AllTask;
