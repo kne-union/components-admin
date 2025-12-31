@@ -1,12 +1,15 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { App } from 'antd';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
-const SetStatus = createWithRemoteLoader({
+const SetStatusInner = createWithRemoteLoader({
   modules: ['components-core:ConfirmButton', 'components-core:Global@usePreset']
 })(({ remoteModules, data, status, onSuccess, ...props }) => {
   const [ConfirmButton, usePreset] = remoteModules;
   const { apis, ajax } = usePreset();
   const { message } = App.useApp();
+  const { formatMessage } = useIntl();
   return (
     <ConfirmButton
       {...props}
@@ -19,11 +22,11 @@ const SetStatus = createWithRemoteLoader({
         if (resData.code !== 0) {
           return;
         }
-        message.success('设置成功');
+        message.success(formatMessage({ id: 'SetStatusSuccess' }));
         onSuccess && onSuccess();
       }}
     />
   );
 });
 
-export default SetStatus;
+export default withLocale(SetStatusInner);

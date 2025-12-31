@@ -2,17 +2,20 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import CompanyInfo from '../CompanyInfo';
 import Fetch from '@kne/react-fetch';
 import { App } from 'antd';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
-const Company = createWithRemoteLoader({
+const CompanyInner = createWithRemoteLoader({
   modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:Permissions']
 })(({ remoteModules, menu, children }) => {
   const [Page, usePreset, Permissions] = remoteModules;
+  const { formatMessage } = useIntl();
   const { ajax, apis } = usePreset();
   const { message } = App.useApp();
 
   const pageProps = {
     menu,
-    title: '公司信息',
+    title: formatMessage({ id: 'CompanyInfoPage' }),
     children: (
       <Permissions request={['setting:company-setting:view']} type="error">
         <Fetch
@@ -34,7 +37,7 @@ const Company = createWithRemoteLoader({
                         if (resData.code !== 0) {
                           return false;
                         }
-                        message.success('公司信息保存成功');
+                        message.success(formatMessage({ id: 'CompanyInfoSaveSuccess' }));
                         reload();
                       }}
                     />
@@ -54,4 +57,4 @@ const Company = createWithRemoteLoader({
   return <Page {...pageProps} />;
 });
 
-export default Company;
+export default withLocale(CompanyInner);

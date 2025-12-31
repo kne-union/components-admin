@@ -1,16 +1,19 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { App } from 'antd';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const RetryTask = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:ConfirmButton']
-})(({ remoteModules, taskIds, data, onSuccess, ...props }) => {
+})(withLocale(({ remoteModules, taskIds, data, onSuccess, ...props }) => {
   const [usePreset, ConfirmButton] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis, ajax } = usePreset();
   const { message } = App.useApp();
   return (
     <ConfirmButton
       {...props}
-      message="确定要重试任务吗?"
+      message={formatMessage({ id: 'ConfirmRetryTask' })}
       isDelete={false}
       onClick={async () => {
         const { data: resData } = await ajax(
@@ -21,11 +24,11 @@ const RetryTask = createWithRemoteLoader({
         if (resData.code !== 0) {
           return;
         }
-        message.success('任务已修改为待执行');
+        message.success(formatMessage({ id: 'TaskModifiedToPending' }));
         onSuccess && onSuccess();
       }}
     />
   );
-});
+}));
 
 export default RetryTask;

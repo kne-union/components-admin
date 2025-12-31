@@ -8,14 +8,17 @@ import commonStyle from '../style.module.scss';
 import { LeftOutlined } from '@ant-design/icons';
 import useNavigate from '@kne/use-refer-navigate';
 import style from './style.module.scss';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
-const Register = createWithRemoteLoader({
+const RegisterInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
 })(({ remoteModules, ...p }) => {
+  const { formatMessage } = useIntl();
   const { onSubmit, title, systemName, type, sendVerificationCode, loginUrl, topBanner, className } = Object.assign(
     {},
     {
-      title: '注册',
+      title: formatMessage({ id: 'Register' }),
       type: 'email',
       loginUrl: '',
       sendVerificationCode: () => {
@@ -47,16 +50,16 @@ const Register = createWithRemoteLoader({
             onClick={() => {
               navigate(loginUrl);
             }}>
-            已有账户，去登录
+            {formatMessage({ id: 'HasAccountLogin' })}
           </Button>
           <Space className={classnames(commonStyle['form-inner'])} size={38} direction="vertical">
             <div className={commonStyle['title']}>{title}</div>
             <div>
-              {type === 'phone' && <PhoneNumber name="phone" label="手机" rule="REQ" codeType="code" realtime interceptor="phone-number-string" />}
-              {type === 'email' && <Input name="email" label="邮箱" rule="REQ EMAIL" realtime />}
+              {type === 'phone' && <PhoneNumber name="phone" label={formatMessage({ id: 'PhoneCode' })} rule="REQ" codeType="code" realtime interceptor="phone-number-string" />}
+              {type === 'email' && <Input name="email" label={formatMessage({ id: 'Email' })} rule="REQ EMAIL" realtime />}
               <Row align={'bottom'} justify={'space-between'}>
                 <Col className={style['code-field']}>
-                  <Input name="code" label="验证码" rule="REQ LEN-6 VALIDATE_CODE" />
+                  <Input name="code" label={formatMessage({ id: 'VerificationCode' })} rule="REQ LEN-6 VALIDATE_CODE" />
                 </Col>
                 <Col>
                   <CaptchaButton
@@ -64,15 +67,15 @@ const Register = createWithRemoteLoader({
                     type={'link'}
                     target={{ name: type }}
                     onClick={() => sendVerificationCode({ type, data: get(formRef.current.data, type) })}>
-                    发送验证码
+                    {formatMessage({ id: 'SendCode' })}
                   </CaptchaButton>
                 </Col>
               </Row>
-              <Input.Password name="password" label="密码" rule="REQ LEN-6-50" />
-              <Input.Password name="repeatPwd" label="重复密码" rule="REQ LEN-6-50 REPEAT-password" />
+              <Input.Password name="password" label={formatMessage({ id: 'Password' })} rule="REQ LEN-6-50" />
+              <Input.Password name="repeatPwd" label={formatMessage({ id: 'RepeatPassword' })} rule="REQ LEN-6-50 REPEAT-password" />
             </div>
             <SubmitButton block size="large">
-              注册
+              {formatMessage({ id: 'Register' })}
             </SubmitButton>
           </Space>
         </Form>
@@ -81,4 +84,4 @@ const Register = createWithRemoteLoader({
   );
 });
 
-export default Register;
+export default withLocale(RegisterInner);

@@ -1,12 +1,15 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { App } from 'antd';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
-const Remove = createWithRemoteLoader({
+const RemoveInner = createWithRemoteLoader({
   modules: ['components-core:ConfirmButton', 'components-core:Global@usePreset']
 })(({ remoteModules, data, onSuccess, ...props }) => {
   const [ConfirmButton, usePreset] = remoteModules;
   const { apis, ajax } = usePreset();
   const { message } = App.useApp();
+  const { formatMessage } = useIntl();
   return (
     <ConfirmButton
       {...props}
@@ -20,11 +23,11 @@ const Remove = createWithRemoteLoader({
         if (resData.code !== 0) {
           return;
         }
-        message.success('删除租户成功');
+        message.success(formatMessage({ id: 'RemoveTenantSuccess' }));
         onSuccess && onSuccess();
       }}
     />
   );
 });
 
-export default Remove;
+export default withLocale(RemoveInner);

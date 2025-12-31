@@ -1,22 +1,25 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import withLocale from './withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const Menu = createWithRemoteLoader({
   modules: ['components-core:Menu']
-})(({ remoteModules, baseUrl }) => {
+})(withLocale(({ remoteModules, baseUrl }) => {
   const [Menu] = remoteModules;
+  const { formatMessage } = useIntl();
 
   return (
     <Menu
       items={[
-        { label: '我的任务', key: 'myTask', path: `${baseUrl}/task` },
+        { label: formatMessage({ id: 'MyTask' }), key: 'myTask', path: `${baseUrl}/task` },
         {
-          label: '全部任务',
+          label: formatMessage({ id: 'AllTask' }),
           key: 'task',
           path: `${baseUrl}/task/all`
         }
       ]}
     />
   );
-});
+}));
 
 export default Menu;

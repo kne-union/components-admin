@@ -1,13 +1,16 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 import CancelTask from './CancelTask';
 import RetryTask from './RetryTask';
 import ErrorDetail from './ErrorDetail';
 import ResultDetail from './ResultDetail';
 
-const Actions = createWithRemoteLoader({
+const ActionsInner = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
 })(({ remoteModules, children, data, getManualTaskAction, onSuccess, moreType = 'link', itemClassName, ...props }) => {
   const [ButtonGroup] = remoteModules;
+  const { formatMessage } = useIntl();
   const list = [];
 
   if (data.runnerType === 'manual' && data.status === 'pending') {
@@ -18,7 +21,7 @@ const Actions = createWithRemoteLoader({
           ...props,
           data,
           buttonComponent,
-          children: '完成',
+          children: formatMessage({ id: 'Complete' }),
           onSuccess
         });
     }
@@ -29,7 +32,7 @@ const Actions = createWithRemoteLoader({
       ...props,
       buttonComponent: CancelTask,
       data,
-      children: '取消',
+      children: formatMessage({ id: 'Cancel' }),
       onSuccess
     });
   }
@@ -39,7 +42,7 @@ const Actions = createWithRemoteLoader({
       ...props,
       buttonComponent: RetryTask,
       data,
-      children: '重试',
+      children: formatMessage({ id: 'Retry' }),
       onSuccess
     });
   }
@@ -49,7 +52,7 @@ const Actions = createWithRemoteLoader({
       ...props,
       buttonComponent: ErrorDetail,
       data,
-      children: '错误详情',
+      children: formatMessage({ id: 'ErrorDetail' }),
       onSuccess
     });
   }
@@ -59,7 +62,7 @@ const Actions = createWithRemoteLoader({
       ...props,
       buttonComponent: ResultDetail,
       data,
-      children: '查看结果',
+      children: formatMessage({ id: 'ViewResult' }),
       onSuccess
     });
   }
@@ -71,4 +74,5 @@ const Actions = createWithRemoteLoader({
   return <ButtonGroup itemClassName={itemClassName} list={list} moreType={moreType} />;
 });
 
+const Actions = withLocale(ActionsInner);
 export default Actions;

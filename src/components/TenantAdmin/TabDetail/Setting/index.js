@@ -1,6 +1,8 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Flex, Button, App } from 'antd';
 import { useState, forwardRef, useImperativeHandle } from 'react';
+import withLocale from '../../withLocale';
+import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 
 const LiveComponent = createWithRemoteLoader({
@@ -24,8 +26,9 @@ const LiveComponent = createWithRemoteLoader({
 
 const CustomComponentFormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
-})(({ remoteModules, isEdit }) => {
+})(withLocale(({ remoteModules, isEdit }) => {
   const [FormInfo] = remoteModules;
+  const { formatMessage } = useIntl();
   const { Input, TextArea } = FormInfo.fields;
 
   return (
@@ -33,13 +36,13 @@ const CustomComponentFormInner = createWithRemoteLoader({
       column={1}
       list={[
         <Input name="key" label="KEY" rule="REQ LEN-0-100" disabled={isEdit}/>,
-        <Input name="name" label="名称" rule="REQ LEN-0-100" />,
-        <Input name="type" label="类型" rule="REQ LEN-0-100" />,
-        <TextArea name="description" label="描述" rule="LEN-0-500" />
+        <Input name="name" label={formatMessage({ id: 'Name' })} rule="REQ LEN-0-100" />,
+        <Input name="type" label={formatMessage({ id: 'Type' })} rule="REQ LEN-0-100" />,
+        <TextArea name="description" label={formatMessage({ id: 'Description' })} rule="LEN-0-500" />
       ]}
     />
   );
-});
+}));
 
 const Setting = createWithRemoteLoader({
   modules: [
@@ -50,8 +53,9 @@ const Setting = createWithRemoteLoader({
     'components-core:Modal@ModalButton',
     'components-thirdparty:LiveComponentView'
   ]
-})(({ remoteModules, tenant, reload }) => {
+})(withLocale(({ remoteModules, tenant, reload }) => {
   const [usePreset, Table, FormInfo, useModal, ModalButton, LiveComponentView] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis, ajax } = usePreset();
   const { useFormModal, TableList, Form } = FormInfo;
   const { Input, Switch } = FormInfo.fields;
@@ -60,14 +64,14 @@ const Setting = createWithRemoteLoader({
   const modal = useModal();
   const formInner = (
     <TableList
-      title="环境变量"
+      title={formatMessage({ id: 'EnvironmentVariables' })}
       name="args"
       minLength={1}
       column={1}
       list={[
-        <Input name="key" label="键" rule="REQ LEN-0-100" />,
-        <Input name="value" label="值" rule="REQ LEN-0-500" />,
-        <Switch name="secret" label="是否密钥" />
+        <Input name="key" label={formatMessage({ id: 'Key' })} rule="REQ LEN-0-100" />,
+        <Input name="value" label={formatMessage({ id: 'Value' })} rule="REQ LEN-0-500" />,
+        <Switch name="secret" label={formatMessage({ id: 'IsSecret' })} />
       ]}
     />
   );
@@ -82,7 +86,7 @@ const Setting = createWithRemoteLoader({
             type="primary"
             onClick={() => {
               formModal({
-                title: '添加环境变量',
+                title: formatMessage({ id: 'AddEnvironmentVariable' }),
                 size: 'small',
                 children: formInner,
                 formProps: {
@@ -97,13 +101,13 @@ const Setting = createWithRemoteLoader({
                     if (resData.code !== 0) {
                       return false;
                     }
-                    message.success('添加成功');
+                    message.success(formatMessage({ id: 'AddSuccess' }));
                     reload();
                   }
                 }
               });
             }}>
-            添加环境变量
+            {formatMessage({ id: 'AddEnvironmentVariable' })}
           </Button>
         </Flex>
       </Flex>
@@ -117,23 +121,24 @@ const Setting = createWithRemoteLoader({
           },
           {
             name: 'value',
-            title: '值',
+            title: formatMessage({ id: 'Value' }),
             type: 'description'
           },
           {
             name: 'secret',
-            title: '是否密钥',
+            title: formatMessage({ id: 'IsSecret' }),
             type: 'singleRow',
             valueOf: item => String(item.secret !== void 0 ? item.secret : false)
           },
           {
             name: 'options',
             type: 'options',
-            title: '操作',
+            title: formatMessage({ id: 'Operation' }),
+            fixed: 'right',
             valueOf: item => {
               return [
                 {
-                  children: '删除',
+                  children: formatMessage({ id: 'Delete' }),
                   confirm: true,
                   onClick: async () => {
                     const { data: resData } = await ajax(
@@ -147,7 +152,7 @@ const Setting = createWithRemoteLoader({
                     if (resData.code !== 0) {
                       return;
                     }
-                    message.success('删除成功');
+                    message.success(formatMessage({ id: 'DeleteSuccess' }));
                     reload();
                   }
                 }
@@ -163,7 +168,7 @@ const Setting = createWithRemoteLoader({
             type="primary"
             onClick={() => {
               const modalApi = modal({
-                title: '添加自定义组件',
+                title: formatMessage({ id: 'AddCustomComponent' }),
                 size: 'large',
                 wrapClassName: style['modal-wrap'],
                 classNames: {
@@ -173,7 +178,7 @@ const Setting = createWithRemoteLoader({
                 onConfirm: async (e, { childrenRef }) => {
                   const content = childrenRef.current.getValue();
                   formModal({
-                    title: '添加自定义组件',
+                    title: formatMessage({ id: 'AddCustomComponent' }),
                     size: 'small',
                     formProps: {
                       onSubmit: async formData => {
@@ -191,7 +196,7 @@ const Setting = createWithRemoteLoader({
                         if (resData.code !== 0) {
                           return false;
                         }
-                        message.success('添加成功');
+                        message.success(formatMessage({ id: 'AddSuccess' }));
                         modalApi.close();
                         reload();
                       }
@@ -202,7 +207,7 @@ const Setting = createWithRemoteLoader({
                 }
               });
             }}>
-            添加自定义组件
+            {formatMessage({ id: 'AddCustomComponent' })}
           </Button>
         </Flex>
       </Flex>
@@ -216,26 +221,27 @@ const Setting = createWithRemoteLoader({
           },
           {
             name: 'name',
-            title: '名称'
+            title: formatMessage({ id: 'Name' })
           },
           {
             name: 'type',
-            title: '类型'
+            title: formatMessage({ id: 'Type' })
           },
           {
             name: 'description',
-            title: '描述',
+            title: formatMessage({ id: 'Description' }),
             type: 'description'
           },
           {
             name: 'options',
             type: 'options',
-            title: '操作',
+            title: formatMessage({ id: 'Operation' }),
+            fixed: 'right',
             valueOf: item => {
               return [
                 {
                   buttonComponent: ModalButton,
-                  children: '预览',
+                  children: formatMessage({ id: 'Preview' }),
                   api: Object.assign({}, apis.tenantAdmin.customComponentDetail, {
                     params: {
                       tenantId: tenant.id,
@@ -244,7 +250,7 @@ const Setting = createWithRemoteLoader({
                   }),
                   modalProps: ({ data }) => {
                     return {
-                      title: '预览',
+                      title: formatMessage({ id: 'Preview' }),
                       footer: null,
                       children: (
                         <Form>
@@ -256,7 +262,7 @@ const Setting = createWithRemoteLoader({
                 },
                 {
                   buttonComponent: ModalButton,
-                  children: '编辑',
+                  children: formatMessage({ id: 'Edit' }),
                   api: Object.assign({}, apis.tenantAdmin.customComponentDetail, {
                     params: {
                       tenantId: tenant.id,
@@ -265,13 +271,13 @@ const Setting = createWithRemoteLoader({
                   }),
                   modalProps: ({ data, close }) => {
                     return {
-                      title: '编辑',
+                      title: formatMessage({ id: 'Edit' }),
                       size: 'large',
                       children: ({ childrenRef }) => <LiveComponent defaultValue={data.content} ref={childrenRef} />,
                       onConfirm: (e, { childrenRef }) => {
                         const content = childrenRef.current.getValue();
                         formModal({
-                          title: '编辑自定义组件',
+                          title: formatMessage({ id: 'EditCustomComponent' }),
                           size: 'small',
                           formProps: {
                             data: Object.assign({}, item),
@@ -291,7 +297,7 @@ const Setting = createWithRemoteLoader({
                               if (resData.code !== 0) {
                                 return false;
                               }
-                              message.success('修改');
+                              message.success(formatMessage({ id: 'ModifySuccess' }));
                               close();
                               reload();
                             }
@@ -304,7 +310,7 @@ const Setting = createWithRemoteLoader({
                   }
                 },
                 {
-                  children: '复制',
+                  children: formatMessage({ id: 'Copy' }),
                   onClick: async () => {
                     const { data: resData } = await ajax(
                       Object.assign({}, apis.tenantAdmin.copyCustomComponent, {
@@ -317,12 +323,12 @@ const Setting = createWithRemoteLoader({
                     if (resData.code !== 0) {
                       return;
                     }
-                    message.success('复制成功');
+                    message.success(formatMessage({ id: 'CopySuccess' }));
                     reload();
                   }
                 },
                 {
-                  children: '删除',
+                  children: formatMessage({ id: 'Delete' }),
                   confirm: true,
                   onClick: async () => {
                     const { data: resData } = await ajax(
@@ -336,7 +342,7 @@ const Setting = createWithRemoteLoader({
                     if (resData.code !== 0) {
                       return;
                     }
-                    message.success('删除成功');
+                    message.success(formatMessage({ id: 'DeleteSuccess' }));
                     reload();
                   }
                 }
@@ -347,6 +353,6 @@ const Setting = createWithRemoteLoader({
       />
     </Flex>
   );
-});
+}));
 
 export default Setting;

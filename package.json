@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.1.12",
+  "version": "1.1.13",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
@@ -88,6 +88,7 @@
     "@kne/captcha-button": "^1.0.1",
     "@kne/count-down": "^0.2.2",
     "@kne/is-empty": "^1.0.1",
+    "@kne/react-intl": "^0.1.9",
     "@kne/react-org-chart": "^0.1.6",
     "@kne/token-storage": "^1.0.0",
     "@kne/use-control-value": "^0.1.9",

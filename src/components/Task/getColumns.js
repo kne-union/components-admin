@@ -1,13 +1,13 @@
-const getColumns = () => {
+const getColumns = ({ formatMessage }) => {
   return [
     {
       name: 'id',
-      title: 'ID',
+      title: formatMessage({ id: 'ID' }),
       type: 'serialNumber'
     },
     {
       name: 'type',
-      title: '类型',
+      title: formatMessage({ id: 'Type' }),
       type: 'tag',
       valueOf: ({ type }) =>
         type && {
@@ -18,7 +18,7 @@ const getColumns = () => {
     },
     {
       name: 'status',
-      title: '状态',
+      title: formatMessage({ id: 'Status' }),
       type: 'tag',
       valueOf: ({ status }) =>
         status && {
@@ -29,7 +29,7 @@ const getColumns = () => {
     },
     {
       name: 'name',
-      title: '目标名称',
+      title: formatMessage({ id: 'TargetName' }),
       type: 'description',
       valueOf: item => {
         return item.input?.name;
@@ -37,25 +37,25 @@ const getColumns = () => {
     },
     {
       name: 'runnerType',
-      title: '执行方式',
+      title: formatMessage({ id: 'ExecutionMode' }),
       valueOf: item => {
-        return item.runnerType === 'manual' ? '手动执行' : '自动执行';
+        return item.runnerType === 'manual' ? formatMessage({ id: 'ManualExecution' }) : formatMessage({ id: 'AutomaticExecution' });
       }
     },
     {
       name: 'createdAt',
-      title: '创建时间',
+      title: formatMessage({ id: 'CreatedAt' }),
       type: 'datetime'
     },
     {
       name: 'completedAt',
-      title: '完成时间',
+      title: formatMessage({ id: 'CompletedAt' }),
       type: 'datetime',
       sort: true
     },
     {
       name: 'updatedAt',
-      title: '更新时间',
+      title: formatMessage({ id: 'UpdatedAt' }),
       type: 'datetime',
       sort: true
     }

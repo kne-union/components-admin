@@ -6,6 +6,8 @@ import { useProps } from './context';
 import { App } from 'antd';
 import merge from 'lodash/merge';
 import md5 from 'md5';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
 const NavigateToLogin = () => {
   const { loginUrl } = useProps();
@@ -18,7 +20,7 @@ const AccountFormToken = createWithFetch({
   return children(data);
 });
 
-const ResetPassword = createWithRemoteLoader({
+const ResetPasswordInner = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
 })(({ remoteModules }) => {
   const [usePreset] = remoteModules;
@@ -28,6 +30,7 @@ const ResetPassword = createWithRemoteLoader({
   const [searchParams] = useSearchParams();
   const referer = searchParams.get('referer');
   const { message } = App.useApp();
+  const { formatMessage } = useIntl();
   const account = Object.assign({}, presetApis.account, apis);
   const { token } = useParams();
   return (
@@ -60,7 +63,7 @@ const ResetPassword = createWithRemoteLoader({
               if (resData.code !== 0) {
                 return;
               }
-              message.success('重置密码成功');
+              message.success(formatMessage({ id: 'ResetPasswordSuccess' }));
               navigate(`${loginUrl}${referer ? `?referer=${encodeURIComponent(referer)}` : ''}`);
             }}
           />
@@ -70,4 +73,4 @@ const ResetPassword = createWithRemoteLoader({
   );
 });
 
-export default ResetPassword;
+export default withLocale(ResetPasswordInner);

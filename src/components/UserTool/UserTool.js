@@ -2,12 +2,15 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Divider, List, Dropdown, Space, Flex } from 'antd';
 import { useLogout } from '@components/Account';
 import style from './style.module.scss';
+import withLocale from './withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const UserTool = createWithRemoteLoader({
   modules: ['components-core:Image', 'components-core:Icon']
-})(({ remoteModules, avatar, name, email, storeKeys = { token: 'X-User-Token' }, domain, list, children = null }) => {
+})(withLocale(({ remoteModules, avatar, name, email, storeKeys = { token: 'X-User-Token' }, domain, list, children = null }) => {
   const [Image, Icon] = remoteModules;
   const logout = useLogout({ storeKeys, domain });
+  const { formatMessage } = useIntl();
   return (
     <Dropdown
       trigger="click"
@@ -17,7 +20,7 @@ const UserTool = createWithRemoteLoader({
           <Space className={style['info']}>
             <Image.Avatar id={avatar} size={48} />
             <div>
-              <div className={style['line']}>{name || '未命名'}</div>
+              <div className={style['line']}>{name || formatMessage({ id: 'UserToolUnnamed' })}</div>
               <div className={style['line']}>{email || '-'}</div>
             </div>
           </Space>
@@ -41,7 +44,7 @@ const UserTool = createWithRemoteLoader({
               onClick={logout}>
               <Flex gap={8} flex={1}>
                 <Icon type="icon-tuichudenglu" />
-                <span>退出登录</span>
+                <span>{formatMessage({ id: 'UserToolLogout' })}</span>
               </Flex>
             </List.Item>
           </List>
@@ -51,11 +54,11 @@ const UserTool = createWithRemoteLoader({
       transitionName={'ant-slide-up'}>
       <Space className={style['user-tool']}>
         <Image.Avatar id={avatar} size={32} />
-        <div className={style['user-name']}>{name || '未命名'}</div>
+        <div className={style['user-name']}>{name || formatMessage({ id: 'UserToolUnnamed' })}</div>
         <Icon className={style['icon']} type="triangle-down" size={12} />
       </Space>
     </Dropdown>
   );
-});
+}));
 
 export default UserTool;

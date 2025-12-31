@@ -3,17 +3,20 @@ import { Card, List, Flex, Button, App, Badge } from 'antd';
 import Fetch from '@kne/react-fetch';
 import { useState } from 'react';
 import classnames from 'classnames';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 
 const SelectTenant = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:Image', 'components-core:InfoPage@SplitLine', 'components-core:Icon']
 })(({ remoteModules, tenantPath }) => {
   const [usePreset, Image, SplitLine, Icon] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis, ajax } = usePreset();
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   return (
-    <Card title="选择登录租户">
+    <Card title={formatMessage({ id: 'SelectLoginTenant' })}>
       <Fetch
         {...Object.assign({}, apis.tenant.availableList)}
         render={({ data, reload }) => {
@@ -34,11 +37,11 @@ const SelectTenant = createWithRemoteLoader({
                           columns={[
                             {
                               name: 'name',
-                              title: '姓名'
+                              title: formatMessage({ id: 'Name' })
                             },
                             {
                               name: 'tenantOrg.name',
-                              title: '所属部门'
+                              title: formatMessage({ id: 'Department' })
                             }
                           ]}
                         />
@@ -63,7 +66,7 @@ const SelectTenant = createWithRemoteLoader({
                           setLoading(false);
                           return;
                         }
-                        message.success('切换默认租户成功');
+                        message.success(formatMessage({ id: 'SwitchDefaultTenantSuccess' }));
                         reload();
                         setLoading(false);
                       }}
@@ -74,13 +77,13 @@ const SelectTenant = createWithRemoteLoader({
                       {(() => {
                         if (item.status !== 'open') {
                           return (
-                            <Badge.Ribbon text="租户用户不能使用" color="#CCCCCC">
+                            <Badge.Ribbon text={formatMessage({ id: 'TenantUserCannotUse' })} color="#CCCCCC">
                               {itemInner}
                             </Badge.Ribbon>
                           );
                         }
                         if (isSelected) {
-                          return <Badge.Ribbon text="当前租户">{itemInner}</Badge.Ribbon>;
+                          return <Badge.Ribbon text={formatMessage({ id: 'CurrentTenant' })}>{itemInner}</Badge.Ribbon>;
                         }
                         return itemInner;
                       })()}
@@ -97,7 +100,7 @@ const SelectTenant = createWithRemoteLoader({
                     onClick={() => {
                       window.location.href = tenantPath;
                     }}>
-                    进入租户
+                    {formatMessage({ id: 'EnterTenant' })}
                     <Icon type="fasongduihua" />
                   </Button>
                 </Flex>
@@ -110,4 +113,4 @@ const SelectTenant = createWithRemoteLoader({
   );
 });
 
-export default SelectTenant;
+export default withLocale(SelectTenant);
