@@ -6,12 +6,15 @@ import DevelopmentHistory, { FormInner as DevelopmentHistoryFormInner } from './
 import Basic, { FormInner as BasicFormInner } from './Basic';
 import Banner, { FormInner as BannerFormInner } from './Banner';
 import TeamDescription, { FormInner as TeamDescriptionFormInner } from './TeamDescription';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 
 const CompanyDetail = createWithRemoteLoader({
   modules: ['components-core:InfoPage']
 })(({ remoteModules, data }) => {
   const [InfoPage] = remoteModules;
+  const { formatMessage } = useIntl();
 
   return (
     <>
@@ -19,10 +22,10 @@ const CompanyDetail = createWithRemoteLoader({
       <InfoPage.Part>
         <Basic data={data} />
       </InfoPage.Part>
-      <InfoPage.Part title="发展历程">
+      <InfoPage.Part title={formatMessage({ id: 'DevelopmentHistory' })}>
         <DevelopmentHistory data={data} />
       </InfoPage.Part>
-      <InfoPage.Part title="团队介绍">
+      <InfoPage.Part title={formatMessage({ id: 'TeamDescription' })}>
         <TeamDescription data={data} />
       </InfoPage.Part>
     </>
@@ -34,6 +37,7 @@ const CompanyInfo = createWithRemoteLoader({
 })(({ remoteModules, data, onSubmit, hasEdit = true, apis }) => {
   const [InfoPage, FormInfo] = remoteModules;
   const [isEdit, setIsEdit] = useState(false);
+  const { formatMessage } = useIntl();
 
   const { Form, SubmitButton, CancelButton } = FormInfo;
 
@@ -49,7 +53,7 @@ const CompanyInfo = createWithRemoteLoader({
           }
           setIsEdit(false);
         }}>
-        <InfoPage.Part title="公司信息" className={style['section']}>
+        <InfoPage.Part bordered title={formatMessage({ id: 'CompanyInfo' })} className={style['section']}>
           <Flex gap={24} vertical>
             <InfoPage.Part>
               <BannerFormInner />
@@ -57,19 +61,19 @@ const CompanyInfo = createWithRemoteLoader({
             <InfoPage.Part>
               <BasicFormInner />
             </InfoPage.Part>
-            <InfoPage.Part title="发展历程">
+            <InfoPage.Part title={formatMessage({ id: 'DevelopmentHistory' })}>
               <DevelopmentHistoryFormInner />
             </InfoPage.Part>
-            <InfoPage.Part title="团队介绍">
+            <InfoPage.Part title={formatMessage({ id: 'TeamDescription' })}>
               <TeamDescriptionFormInner />
             </InfoPage.Part>
             <Flex justify="center" gap={12}>
-              <SubmitButton>保存</SubmitButton>
+              <SubmitButton>{formatMessage({ id: 'Save' })}</SubmitButton>
               <CancelButton
                 onClick={() => {
                   setIsEdit(false);
                 }}>
-                取消
+                {formatMessage({ id: 'Cancel' })}
               </CancelButton>
             </Flex>
           </Flex>
@@ -82,7 +86,8 @@ const CompanyInfo = createWithRemoteLoader({
     <InfoPage className={style['company-info']}>
       <InfoPage.Part
         className={style['section']}
-        title="公司信息"
+        title={formatMessage({ id: 'CompanyInfo' })}
+        bordered
         extra={
           hasEdit && (
             <Button
@@ -91,7 +96,7 @@ const CompanyInfo = createWithRemoteLoader({
               onClick={() => {
                 setIsEdit(true);
               }}>
-              编辑
+              {formatMessage({ id: 'Edit' })}
             </Button>
           )
         }>
@@ -107,4 +112,4 @@ CompanyInfo.Basic = Basic;
 CompanyInfo.DevelopmentHistory = DevelopmentHistory;
 CompanyInfo.TeamDescription = TeamDescription;
 
-export default CompanyInfo;
+export default withLocale(CompanyInfo);

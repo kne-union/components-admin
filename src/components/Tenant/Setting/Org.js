@@ -1,8 +1,10 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import OrgInfo from '../OrgInfo';
 import Fetch from '@kne/react-fetch';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
-const Org = createWithRemoteLoader({
+const OrgInner = createWithRemoteLoader({
   modules: [
     'components-core:Layout@Page',
     'components-core:Global@usePreset',
@@ -12,6 +14,7 @@ const Org = createWithRemoteLoader({
   ]
 })(({ remoteModules, menu, children }) => {
   const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis } = usePreset();
   const { global } = useGlobalContext('userInfo');
   const allowCreate = usePermissionsPass({ request: ['setting:org:create'] });
@@ -20,7 +23,7 @@ const Org = createWithRemoteLoader({
 
   const pageProps = {
     menu,
-    title: '组织架构',
+    title: formatMessage({ id: 'OrgStructure' }),
     children: (
       <Permissions request={['setting:org:view']} type="error">
         <Fetch
@@ -51,4 +54,4 @@ const Org = createWithRemoteLoader({
   return <Page {...pageProps} />;
 });
 
-export default Org;
+export default withLocale(OrgInner);

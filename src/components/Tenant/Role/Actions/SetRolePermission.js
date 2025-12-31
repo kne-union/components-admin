@@ -1,21 +1,22 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Button, App } from 'antd';
+import { Button } from 'antd';
 import merge from 'lodash/merge';
 import TenantPermission from '../../TenantPermission';
+import withLocale from '../../withLocale';
+import { useIntl } from '@kne/react-intl';
 
-const SetRolePermission = createWithRemoteLoader({
-  modules: ['components-core:Modal@useModal', 'components-core:Global@usePreset']
+const SetRolePermissionInner = createWithRemoteLoader({
+  modules: ['components-core:Modal@useModal']
 })(({ remoteModules, onSuccess, data, apis, options, getFormInner, ...props }) => {
-  const [useModal, usePreset] = remoteModules;
+  const [useModal] = remoteModules;
   const modal = useModal();
-  const { ajax } = usePreset();
-  const { message } = App.useApp();
+  const { formatMessage } = useIntl();
   return (
     <Button
       {...props}
       onClick={() => {
         modal({
-          title: '设置角色权限',
+          title: formatMessage({ id: 'SetRolePermission' }),
           size: 'large',
           footer: null,
           children: (
@@ -40,4 +41,4 @@ const SetRolePermission = createWithRemoteLoader({
   );
 });
 
-export default SetRolePermission;
+export default withLocale(SetRolePermissionInner);

@@ -1,16 +1,19 @@
 import { useState, useRef } from 'react';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Space, Button, App } from 'antd';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 import getColumns from './getColumns';
 import FormInner from './FormInner';
 import ResetPasswordFormInner from './ResetPasswordFormInner';
 import md5 from 'md5';
 import get from 'lodash/get';
 
-const User = createWithRemoteLoader({
+const UserInner = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Filter', 'components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
 })(({ remoteModules }) => {
   const [TablePage, Filter, useFormModal, usePreset] = remoteModules;
+  const { formatMessage } = useIntl();
   const [filter, setFilter] = useState([]);
   const { SearchInput, getFilterValue, fields: filterFields } = Filter;
   const { InputFilterItem, AdvancedSelectFilterItem } = filterFields;
@@ -26,19 +29,19 @@ const User = createWithRemoteLoader({
       name="user-list"
       ref={ref}
       columns={[
-        ...getColumns(),
+        ...getColumns({ formatMessage }),
         {
           name: 'options',
-          title: '操作',
+          title: formatMessage({ id: 'Operation' }),
           type: 'options',
           fixed: 'right',
           valueOf: item => {
             return [
               {
-                children: '编辑',
+                children: formatMessage({ id: 'EditUser' }),
                 onClick: () => {
                   const modalApi = formModal({
-                    title: '编辑用户信息',
+                    title: formatMessage({ id: 'EditUserInfo' }),
                     size: 'small',
                     children: <FormInner />,
                     formProps: {
@@ -52,7 +55,7 @@ const User = createWithRemoteLoader({
                         if (resData.code !== 0) {
                           return;
                         }
-                        message.success('修改成功');
+                        message.success(formatMessage({ id: 'SaveSuccess' }));
                         ref.current.reload();
                         modalApi.close();
                       }
@@ -61,10 +64,10 @@ const User = createWithRemoteLoader({
                 }
               },
               {
-                children: '修改密码',
+                children: formatMessage({ id: 'ModifyPassword' }),
                 onClick: () => {
                   const modalApi = formModal({
-                    title: '修改用户密码',
+                    title: formatMessage({ id: 'ModifyPassword' }),
                     size: 'small',
                     children: <ResetPasswordFormInner />,
                     formProps: {
@@ -80,7 +83,7 @@ const User = createWithRemoteLoader({
                         if (resData.code !== 0) {
                           return;
                         }
-                        message.success('修改密码成功');
+                        message.success(formatMessage({ id: 'ModifyPasswordSuccess' }));
                         modalApi.close();
                       }
                     }
@@ -89,8 +92,8 @@ const User = createWithRemoteLoader({
               },
               get(item, 'isSuperAdmin') === true
                 ? {
-                    children: '取消超管',
-                    message: '确定要取消账号的超管权限吗？',
+                    children: formatMessage({ id: 'CancelSuperAdmin' }),
+                    message: formatMessage({ id: 'CancelSuperAdminConfirm' }),
                     isDelete: false,
                     onClick: async () => {
                       const { data: resData } = await ajax(
@@ -101,13 +104,13 @@ const User = createWithRemoteLoader({
                       if (resData.code !== 0) {
                         return;
                       }
-                      message.success('设置成功');
+                      message.success(formatMessage({ id: 'SetStatusSuccess' }));
                       ref.current.reload();
                     }
                   }
                 : {
-                    children: '设置超管',
-                    message: '确定要设置账号为超管吗？',
+                    children: formatMessage({ id: 'SetSuperAdmin' }),
+                    message: formatMessage({ id: 'SetSuperAdminConfirm' }),
                     isDelete: false,
                     onClick: async () => {
                       const { data: resData } = await ajax(
@@ -118,7 +121,7 @@ const User = createWithRemoteLoader({
                       if (resData.code !== 0) {
                         return;
                       }
-                      message.success('设置成功');
+                      message.success(formatMessage({ id: 'SetStatusSuccess' }));
                       ref.current.reload();
                     }
                   },
@@ -127,8 +130,8 @@ const User = createWithRemoteLoader({
                 if (item.status !== 0) {
                   list.push({
                     confirm: true,
-                    children: '设置为正常',
-                    message: '确定要设置账号为正常吗？',
+                    children: formatMessage({ id: 'SetNormal' }),
+                    message: formatMessage({ id: 'SetNormalConfirm' }),
                     isDelete: false,
                     onClick: async () => {
                       const { data: resData } = await ajax(
@@ -141,7 +144,7 @@ const User = createWithRemoteLoader({
                       if (resData.code !== 0) {
                         return;
                       }
-                      message.success('账号已开启');
+                      message.success(formatMessage({ id: 'SetNormalSuccess' }));
                       ref.current.reload();
                     }
                   });
@@ -150,9 +153,9 @@ const User = createWithRemoteLoader({
                   list.push({
                     isDelete: true,
                     confirm: true,
-                    children: '关闭',
-                    message: '确定要关闭该账号吗？',
-                    okText: '确认',
+                    children: formatMessage({ id: 'CloseUser' }),
+                    message: formatMessage({ id: 'CloseUserConfirm' }),
+                    okText: formatMessage({ id: 'Confirm' }),
                     onClick: async () => {
                       const { data: resData } = await ajax(
                         Object.assign({}, apis.admin.setUserClose, {
@@ -164,7 +167,7 @@ const User = createWithRemoteLoader({
                       if (resData.code !== 0) {
                         return;
                       }
-                      message.success('账号已关闭');
+                      message.success(formatMessage({ id: 'CloseUserSuccess' }));
                       ref.current.reload();
                     }
                   });
@@ -181,37 +184,37 @@ const User = createWithRemoteLoader({
           onChange: setFilter,
           list: [
             [
-              <InputFilterItem label="邮箱" name="email" />,
-              <InputFilterItem label="电话" name="phone" />,
+              <InputFilterItem label={formatMessage({ id: 'FilterEmail' })} name="email" />,
+              <InputFilterItem label={formatMessage({ id: 'FilterPhone' })} name="phone" />,
               <AdvancedSelectFilterItem
-                label="状态"
+                label={formatMessage({ id: 'FilterStatus' })}
                 name="status"
                 single
                 api={{
                   loader: () => {
                     return {
                       pageData: [
-                        { label: '正常', value: 0 },
+                        { label: formatMessage({ id: 'Normal' }), value: 0 },
                         {
-                          label: '初始化未激活',
+                          label: formatMessage({ id: 'NotActivated' }),
                           value: 10
                         },
-                        { label: '已关闭', value: 12 }
+                        { label: formatMessage({ id: 'Closed' }), value: 12 }
                       ]
                     };
                   }
                 }}
               />,
               <AdvancedSelectFilterItem
-                label="是否管理员"
+                label={formatMessage({ id: 'FilterIsAdmin' })}
                 name="isSuperAdmin"
                 single
                 api={{
                   loader: () => {
                     return {
                       pageData: [
-                        { label: '是', value: true },
-                        { label: '否', value: false }
+                        { label: formatMessage({ id: 'Yes' }), value: true },
+                        { label: formatMessage({ id: 'No' }), value: false }
                       ]
                     };
                   }
@@ -222,12 +225,12 @@ const User = createWithRemoteLoader({
         },
         titleExtra: (
           <Space align="center">
-            <SearchInput name="nickname" label="昵称" />
+            <SearchInput name="nickname" label={formatMessage({ id: 'Nickname' })} />
             <Button
               type="primary"
               onClick={() => {
                 const modalApi = formModal({
-                  title: '添加用户',
+                  title: formatMessage({ id: 'AddUser' }),
                   size: 'small',
                   children: <FormInner />,
                   formProps: {
@@ -240,7 +243,7 @@ const User = createWithRemoteLoader({
                       if (resData.code !== 0) {
                         return;
                       }
-                      message.success('添加成功');
+                      message.success(formatMessage({ id: 'AddSuccess' }));
                       ref.current.reload();
                       modalApi.close();
                     }
@@ -248,7 +251,7 @@ const User = createWithRemoteLoader({
                 });
               }}
             >
-              添加用户
+              {formatMessage({ id: 'AddUser' })}
             </Button>
           </Space>
         )
@@ -257,4 +260,4 @@ const User = createWithRemoteLoader({
   );
 });
 
-export default User;
+export default withLocale(UserInner);

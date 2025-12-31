@@ -1,58 +1,58 @@
-const getColumns = () => {
+const getColumns = ({ formatMessage }) => {
   return [
     {
       name: 'avatar',
-      title: '头像',
+      title: formatMessage({ id: 'Avatar' }),
       type: 'avatar',
       valueOf: (item, { name }) => Object.assign({}, { gender: item['gender'] || 'M' }, { id: item[name] })
     },
     {
       name: 'nickname',
-      title: '昵称',
+      title: formatMessage({ id: 'Nickname' }),
       type: 'mainInfo'
     },
     {
       name: 'email',
-      title: '邮箱',
+      title: formatMessage({ id: 'Email' }),
       type: 'other'
     },
     {
       name: 'phone',
-      title: '电话',
+      title: formatMessage({ id: 'Phone' }),
       type: 'serialNumber'
     },
     {
       name: 'isSuperAdmin',
-      title: '是否超级管理员',
+      title: formatMessage({ id: 'IsSuperAdmin' }),
       type: 'other',
       valueOf: (item, { name }) => {
-        return item[name] === true ? '是' : '否';
+        return item[name] === true ? formatMessage({ id: 'Yes' }) : formatMessage({ id: 'No' });
       }
     },
     {
       name: 'status',
-      title: '状态',
+      title: formatMessage({ id: 'Status' }),
       type: 'tag',
       valueOf: (item, { name }) => {
         if (item[name] === 0) {
-          return { type: 'success', text: '正常' };
+          return { type: 'success', text: formatMessage({ id: 'Normal' }) };
         }
         if (item[name] === 10) {
-          return { text: '初始化未激活' };
+          return { text: formatMessage({ id: 'NotActivated' }) };
         }
         if (item[name] === 11) {
-          return { type: 'danger', text: '已禁用' };
+          return { type: 'danger', text: formatMessage({ id: 'Disabled' }) };
         }
         if (item[name] === 12) {
-          return { type: 'danger', text: '已关闭' };
+          return { type: 'danger', text: formatMessage({ id: 'Closed' }) };
         }
 
-        return { text: '其他' };
+        return { text: formatMessage({ id: 'Other' }) };
       }
     },
     {
       name: 'description',
-      title: '个人简介',
+      title: formatMessage({ id: 'Description' }),
       type: 'description'
     }
   ];

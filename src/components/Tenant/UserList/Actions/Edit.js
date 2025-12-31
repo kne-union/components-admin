@@ -2,12 +2,15 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Button, App } from 'antd';
 import FormInner from '../FormInner';
 import merge from 'lodash/merge';
+import withLocale from '../../withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const Edit = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
-})(({ remoteModules, apis, onSuccess, data, ...props }) => {
+})(withLocale(({ remoteModules, apis, onSuccess, data, ...props }) => {
   const [useFormModal, usePreset] = remoteModules;
   const formModal = useFormModal();
+  const { formatMessage } = useIntl();
   const { ajax } = usePreset();
   const { message } = App.useApp();
 
@@ -16,7 +19,7 @@ const Edit = createWithRemoteLoader({
       {...props}
       onClick={() => {
         formModal({
-          title: '编辑用户',
+          title: formatMessage({ id: 'EditUser' }),
           size: 'small',
           formProps: {
             data: Object.assign({}, data, {
@@ -38,7 +41,7 @@ const Edit = createWithRemoteLoader({
                 return false;
               }
 
-              message.success('保存成功');
+              message.success(formatMessage({ id: 'SaveSuccess' }));
               onSuccess && onSuccess();
             }
           },
@@ -47,6 +50,6 @@ const Edit = createWithRemoteLoader({
       }}
     />
   );
-});
+}));
 
 export default Edit;

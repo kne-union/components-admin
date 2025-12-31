@@ -15,4 +15,6 @@ const TASK_STATUS_ENUM = () => [
   { value: 'canceled', description: '取消' }
 ];
 
-export default { taskStatus: TASK_STATUS_ENUM };
+const enums = { taskStatus: TASK_STATUS_ENUM };
+
+export default enums;

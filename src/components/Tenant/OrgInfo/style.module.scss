@@ -95,7 +95,10 @@
 }
 
 .org-btn {
-  position: absolute;
+  &:global(.ant-btn) {
+    position: absolute;
+  }
+
   bottom: -12px;
   left: calc(50% - 12px);
   z-index: 1;

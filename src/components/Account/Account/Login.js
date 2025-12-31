@@ -2,6 +2,8 @@ import LoginOuterContainer from '../LoginOuterContainer';
 import DoLogin from './DoLogin';
 import { useProps } from './context';
 import LoginComponent from '../Login';
+import Language from '../Language';
+import style from './style.module.scss';
 
 const Login = () => {
   const { loginTitle, systemName, systemLogo, loginLeftInner, registerUrl, forgetUrl, accountType, afterLogin } = useProps();
@@ -23,6 +25,7 @@ const Login = () => {
           );
         }}
       </DoLogin>
+      <Language colorful={false} className={style['language']}/>
     </LoginOuterContainer>
   );
 };

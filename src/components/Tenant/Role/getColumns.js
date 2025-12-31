@@ -1,4 +1,4 @@
-const getColumns = () => {
+const getColumns = ({formatMessage}) => {
   return [
     {
       name: 'id',
@@ -9,34 +9,34 @@ const getColumns = () => {
     },
     {
       name: 'name',
-      title: '角色名称',
+      title: formatMessage({ id: 'RoleName' }),
       type: 'mainInfo',
       primary: false,
       hover: false
     },
     {
       name: 'type',
-      title: '类型',
+      title: formatMessage({ id: 'SettingType' }),
       type: 'tag',
       valueOf: ({ type }) => {
         return type === 'system'
           ? {
               type: 'default',
-              text: '系统'
+              text: formatMessage({ id: 'SystemType' })
             }
           : {
               type: 'info',
-              text: '自定义'
+              text: formatMessage({ id: 'CustomType' })
             };
       }
     },
     {
       name: 'code',
-      title: '角色编码'
+      title: formatMessage({ id: 'RoleCode' })
     },
     {
       name: 'description',
-      title: '描述',
+      title: formatMessage({ id: 'Description' }),
       type: 'description',
       ellipsis: true
     }

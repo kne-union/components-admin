@@ -2,11 +2,14 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useState } from 'react';
 import Role from '../Role';
 import TenantPermission from '../TenantPermission';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const Permission = createWithRemoteLoader({
   modules: ['components-core:StateBar']
 })(({ remoteModules, apis, children }) => {
   const [StateBar] = remoteModules;
+  const { formatMessage } = useIntl();
   const [activeKey, setActiveKey] = useState('tenant-permission');
 
   const stateBar = (
@@ -15,9 +18,9 @@ const Permission = createWithRemoteLoader({
       onChange={setActiveKey}
       type="radio"
       stateOption={[
-        { tab: '租户权限', key: 'tenant-permission' },
-        { tab: '角色', key: 'role' },
-        { tab: '共享组', key: 'sharedGroup' }
+        { tab: formatMessage({ id: 'TenantPermission' }), key: 'tenant-permission' },
+        { tab: formatMessage({ id: 'Role' }), key: 'role' },
+        { tab: formatMessage({ id: 'SharedGroup' }), key: 'sharedGroup' }
       ]}
     />
   );
@@ -49,9 +52,9 @@ const Permission = createWithRemoteLoader({
             : null}
         </Role>
       )}
-      {activeKey === 'sharedGroup' && '共享组'}
+      {activeKey === 'sharedGroup' && formatMessage({ id: 'SharedGroup' })}
     </>
   );
 });
 
-export default Permission;
+export default withLocale(Permission);

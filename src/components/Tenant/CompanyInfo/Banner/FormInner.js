@@ -1,10 +1,13 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../../withLocale';
 import style from '../style.module.scss';
 
 const FormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
-})(({ remoteModules }) => {
+})(withLocale(({ remoteModules }) => {
   const [FormInfo] = remoteModules;
+  const { formatMessage } = useIntl();
   const { Upload } = FormInfo.fields;
   return (
     <FormInfo
@@ -12,7 +15,7 @@ const FormInner = createWithRemoteLoader({
       list={[
         <Upload
           name="banners"
-          label="Banner"
+          label={formatMessage({ id: 'Banner' })}
           interceptor="photo-string-list"
           block
           getPermission={type => {
@@ -22,6 +25,6 @@ const FormInner = createWithRemoteLoader({
       ]}
     />
   );
-});
+}));
 
 export default FormInner;

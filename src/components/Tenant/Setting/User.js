@@ -1,8 +1,10 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import UserList from '../UserList';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 import { useState } from 'react';
 
-const Org = createWithRemoteLoader({
+const User = createWithRemoteLoader({
   modules: [
     'components-core:Layout@Page',
     'components-core:Global@usePreset',
@@ -13,6 +15,7 @@ const Org = createWithRemoteLoader({
   ]
 })(({ remoteModules, menu, children }) => {
   const [Page, usePreset, Permissions, usePermissionsPass, TablePage, FilterProvider] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis } = usePreset();
   const [target, setTarget] = useState({});
   const filter = Object.assign({}, { value: [] }, target.filter);
@@ -23,7 +26,7 @@ const Org = createWithRemoteLoader({
 
   const pageProps = {
     menu,
-    title: '用户管理',
+    title: formatMessage({ id: 'UserManagement' }),
     filter,
     titleExtra: <FilterProvider {...filter}>{target.topOptions}</FilterProvider>,
     children: (
@@ -54,4 +57,4 @@ const Org = createWithRemoteLoader({
   return <Page {...pageProps} />;
 });
 
-export default Org;
+export default withLocale(User);

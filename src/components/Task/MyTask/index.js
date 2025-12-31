@@ -1,16 +1,18 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState } from 'react';
 import { transform } from 'lodash';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
 import getColumns from '../getColumns';
 import Menu from '../Menu';
 import Actions from '../Actions';
-import RetryTask from '../Actions/RetryTask';
 
 const MyTask = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Tooltip']
-})(({ remoteModules, baseUrl, getManualTaskAction }) => {
-  const [TablePage, usePreset, Filter, Tooltip] = remoteModules;
+  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter']
+})(withLocale(({ remoteModules, baseUrl, getManualTaskAction }) => {
+  const [TablePage, usePreset, Filter] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis, enums } = usePreset();
   const { SearchInput, getFilterValue, fields: filterFields } = Filter;
   const { InputFilterItem, AdvancedSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
@@ -18,10 +20,10 @@ const MyTask = createWithRemoteLoader({
   const [filter, setFilter] = useState([
     {
       name: 'status',
-      label: '状态',
+      label: formatMessage({ id: 'Status' }),
       value: {
         value: 'pending',
-        label: '等待执行'
+        label: formatMessage({ id: 'Pending' })
       }
     }
   ]);
@@ -71,10 +73,10 @@ const MyTask = createWithRemoteLoader({
       sort={sort}
       onSortChange={setSortChange}
       columns={[
-        ...getColumns(),
+        ...getColumns({ formatMessage }),
         {
           name: 'options',
-          title: '操作',
+          title: formatMessage({ id: 'Operation' }),
           type: 'options',
           fixed: 'right',
           valueOf: item => {
@@ -110,10 +112,10 @@ const MyTask = createWithRemoteLoader({
           onChange: setFilter,
           list: [
             [
-              <InputFilterItem label="任务ID" name="id" />,
-              <InputFilterItem label="目标ID" name="targetId" />,
+              <InputFilterItem label={formatMessage({ id: 'TaskID' })} name="id" />,
+              <InputFilterItem label={formatMessage({ id: 'TargetID' })} name="targetId" />,
               <AdvancedSelectFilterItem
-                label="类型"
+                label={formatMessage({ id: 'Type' })}
                 name="type"
                 single
                 api={{
@@ -125,7 +127,7 @@ const MyTask = createWithRemoteLoader({
                 }}
               />,
               <AdvancedSelectFilterItem
-                label="状态"
+                label={formatMessage({ id: 'Status' })}
                 name="status"
                 single
                 api={{
@@ -136,16 +138,16 @@ const MyTask = createWithRemoteLoader({
                   }
                 }}
               />,
-              <TypeDateRangePickerFilterItem label="创建时间" name="createdAt" allowEmpty={[true, true]} />,
-              <TypeDateRangePickerFilterItem label="完成时间" name="completedAt" allowEmpty={[true, true]} />
+              <TypeDateRangePickerFilterItem label={formatMessage({ id: 'CreatedAt' })} name="createdAt" allowEmpty={[true, true]} />,
+              <TypeDateRangePickerFilterItem label={formatMessage({ id: 'CompletedAt' })} name="completedAt" allowEmpty={[true, true]} />
             ]
           ]
         },
-        titleExtra: <SearchInput name="targetName" label="目标名称" />,
+        titleExtra: <SearchInput name="targetName" label={formatMessage({ id: 'TargetName' })} />,
         menu: <Menu baseUrl={baseUrl} />
       }}
     />
   );
-});
+}));
 
 export default MyTask;

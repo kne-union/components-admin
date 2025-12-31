@@ -1,26 +1,29 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 import Save from './Save';
 import SetStatus from './SetStatus';
 import Remove from './Remove';
 
-const Actions = createWithRemoteLoader({
+const ActionsInner = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
 })(({ remoteModules, moreType, children, itemClassName, ...props }) => {
   const [ButtonGroup] = remoteModules;
+  const { formatMessage } = useIntl();
 
   const actionList = [
     {
       type: 'primary',
       ...props,
       buttonComponent: Save,
-      children: '编辑'
+      children: formatMessage({ id: 'Edit' })
     },
     {
       ...props,
       buttonComponent: SetStatus,
       status: 'open',
-      children: '开启',
-      message: '确定要开启当前租户吗？',
+      children: formatMessage({ id: 'Open' }),
+      message: formatMessage({ id: 'OpenTenantConfirm' }),
       isDelete: false,
       hidden: props?.data.status !== 'closed'
     },
@@ -28,15 +31,15 @@ const Actions = createWithRemoteLoader({
       ...props,
       buttonComponent: SetStatus,
       status: 'closed',
-      children: '关闭',
-      message: '确定要关闭当前租户吗？',
+      children: formatMessage({ id: 'Close' }),
+      message: formatMessage({ id: 'CloseTenantConfirm' }),
       isDelete: false,
       hidden: props?.data.status !== 'open'
     },
     {
       ...props,
       buttonComponent: Remove,
-      children: '删除',
+      children: formatMessage({ id: 'Delete' }),
       confirm: true
     }
   ];
@@ -52,4 +55,4 @@ const Actions = createWithRemoteLoader({
   return <ButtonGroup itemClassName={itemClassName} list={actionList} moreType={moreType} />;
 });
 
-export default Actions;
+export default withLocale(ActionsInner);

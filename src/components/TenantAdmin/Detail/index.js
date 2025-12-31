@@ -2,12 +2,15 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
 import { useSearchParams } from 'react-router-dom';
 import RightOptions from './RightOptions';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
-const Detail = createWithRemoteLoader({
+const DetailInner = createWithRemoteLoader({
   modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:InfoPage', 'components-core:Descriptions']
 })(({ remoteModules, ...props }) => {
   const [Page, usePreset, InfoPage, Descriptions] = remoteModules;
   const { apis } = usePreset();
+  const { formatMessage } = useIntl();
   const [searchParams] = useSearchParams();
   return (
     <Fetch
@@ -16,14 +19,14 @@ const Detail = createWithRemoteLoader({
         return (
           <Page {...props} name="Detail" option={<RightOptions />}>
             <InfoPage>
-              <InfoPage.Part title="详情信息">
+              <InfoPage.Part title={formatMessage({ id: 'DetailInfo' })}>
                 <InfoPage.Part>
                   <Descriptions
                     dataSource={[
                       [{ label: 'ID', content: data.id }],
                       [
                         {
-                          label: '名称',
+                          label: formatMessage({ id: 'Name' }),
                           content: data.name
                         }
                       ],
@@ -31,7 +34,7 @@ const Detail = createWithRemoteLoader({
                     ]}
                   />
                 </InfoPage.Part>
-                <InfoPage.Part title="详情信息2">详情信息详情信息详情信息详情信息详情信息详情信息详情信息详情信息</InfoPage.Part>
+                <InfoPage.Part title={formatMessage({ id: 'DetailInfo' }) + '2'}>详情信息详情信息详情信息详情信息详情信息详情信息详情信息详情信息</InfoPage.Part>
               </InfoPage.Part>
             </InfoPage>
           </Page>
@@ -41,4 +44,4 @@ const Detail = createWithRemoteLoader({
   );
 });
 
-export default Detail;
+export default withLocale(DetailInner);

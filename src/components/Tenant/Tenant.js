@@ -1,11 +1,14 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import AppChildrenRouter from '@kne/app-children-router';
 import AfterTenantLoginLayout from './AfterTenantLoginLayout';
+import withLocale from './withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const Tenant = createWithRemoteLoader({
   modules: ['components-admin:Authenticate@AfterUserLoginLayout']
 })(({ remoteModules, baseUrl, navigation = {}, list = [], children, ...props }) => {
   const [AfterUserLoginLayout] = remoteModules;
+  const { formatMessage } = useIntl();
   return (
     <AppChildrenRouter
       {...props}
@@ -25,7 +28,7 @@ const Tenant = createWithRemoteLoader({
                       ...(navigation.list || []),
                       {
                         key: 'setting',
-                        title: '系统设置',
+                        title: formatMessage({ id: 'SystemSettings' }),
                         path: `${baseUrl}/tenant/setting`,
                         permission: 'setting'
                       }
@@ -72,4 +75,4 @@ const Tenant = createWithRemoteLoader({
   );
 });
 
-export default Tenant;
+export default withLocale(Tenant);

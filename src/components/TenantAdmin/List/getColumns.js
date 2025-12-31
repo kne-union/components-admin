@@ -1,4 +1,4 @@
-const getColumns = ({ navigate }) => {
+const getColumns = ({ navigate, formatMessage }) => {
   return [
     {
       name: 'id',
@@ -12,7 +12,7 @@ const getColumns = ({ navigate }) => {
     },
     {
       name: 'name',
-      title: '名称',
+      title: formatMessage({ id: 'Name' }),
       type: 'mainInfo',
       onClick: ({ colItem }) => {
         navigate(`detail?id=${colItem.id}`);
@@ -20,21 +20,21 @@ const getColumns = ({ navigate }) => {
     },
     {
       name: 'status',
-      title: '状态',
+      title: formatMessage({ id: 'Status' }),
       type: 'tag',
       valueOf: item => {
-        return item.status === 'open' ? { type: 'success', text: '开启' } : { type: 'danger', text: '关闭' };
+        return item.status === 'open' ? { type: 'success', text: formatMessage({ id: 'Open' }) } : { type: 'danger', text: formatMessage({ id: 'Close' }) };
       }
     },
     {
       name: 'description',
-      title: '描述',
+      title: formatMessage({ id: 'Description' }),
       type: 'description',
       ellipsis: true
     },
     {
       name: 'createdAt',
-      title: '添加时间',
+      title: formatMessage({ id: 'CreatedAt' }),
       type: 'datetime'
     }
   ];

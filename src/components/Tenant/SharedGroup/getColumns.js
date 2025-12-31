@@ -1,4 +1,4 @@
-const getColumns = () => {
+const getColumns = ({formatMessage}) => {
   return [
     {
       name: 'id',
@@ -9,14 +9,14 @@ const getColumns = () => {
     },
     {
       name: 'name',
-      title: '共享组名称',
+      title: formatMessage({ id: 'SharedGroupName' }),
       type: 'mainInfo',
       primary: false,
       hover: false
     },
     {
       name: 'description',
-      title: '描述',
+      title: formatMessage({ id: 'Description' }),
       type: 'description',
       ellipsis: true
     }

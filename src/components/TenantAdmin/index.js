@@ -1,6 +1,7 @@
 import ChildrenRouter from '@kne/app-children-router';
+import withLocale from './withLocale';
 
-const TenantAdmin = ({ baseUrl, ...props }) => {
+const TenantAdminInner = ({ baseUrl, ...props }) => {
   return (
     <ChildrenRouter
       {...props}
@@ -19,4 +20,4 @@ const TenantAdmin = ({ baseUrl, ...props }) => {
   );
 };
 
-export default TenantAdmin;
+export default withLocale(TenantAdminInner);

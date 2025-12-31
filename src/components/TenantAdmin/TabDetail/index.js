@@ -8,6 +8,8 @@ import Org from './Org';
 import User from './User';
 import Permission from './Permission';
 import Setting from './Setting';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const contentMap = {
   company: Company,
@@ -17,7 +19,7 @@ const contentMap = {
   setting: Setting
 };
 
-const TabDetail = createWithRemoteLoader({
+const TabDetailInner = createWithRemoteLoader({
   modules: [
     'components-core:Layout@StateBarPage',
     'components-core:Global@usePreset',
@@ -29,6 +31,7 @@ const TabDetail = createWithRemoteLoader({
 })(({ remoteModules, ...props }) => {
   const [StateBarPage, usePreset, PageHeader, StateTag] = remoteModules;
   const { apis } = usePreset();
+  const { formatMessage } = useIntl();
   const [searchParams, setSearchParams] = useSearchParams();
   return (
     <Fetch
@@ -45,9 +48,9 @@ const TabDetail = createWithRemoteLoader({
                 title={data.name}
                 info={`ID: ${data.id}`}
                 tags={[
-                  data.status === 'open' ? <StateTag type="success" text="开启" /> : <StateTag type="danger" text="关闭" />,
-                  `服务时间:${dayjs(data.serviceStartTime).format('YYYY-MM-DD')}~${dayjs(data.serviceEndTime).format('YYYY-MM-DD')}`,
-                  `开通账号数:${data.accountCount}`
+                  data.status === 'open' ? <StateTag type="success" text={formatMessage({ id: 'Open' })} /> : <StateTag type="danger" text={formatMessage({ id: 'Close' })} />,
+                  `${formatMessage({ id: 'ServiceTimeRange' })}:${dayjs(data.serviceStartTime).format('YYYY-MM-DD')}~${dayjs(data.serviceEndTime).format('YYYY-MM-DD')}`,
+                  `${formatMessage({ id: 'AccountCountTag' })}:${data.accountCount}`
                 ]}
                 buttonOptions={
                   <Actions
@@ -66,12 +69,12 @@ const TabDetail = createWithRemoteLoader({
                 setSearchParams(searchParams.toString());
               },
               stateOption: [
-                { tab: '公司信息', key: 'company' },
-                { tab: '组织架构', key: 'org' },
-                { tab: '权限管理', key: 'permission' },
-                { tab: '用户管理', key: 'user' },
+                { tab: formatMessage({ id: 'CompanyInfo' }), key: 'company' },
+                { tab: formatMessage({ id: 'OrgStructure' }), key: 'org' },
+                { tab: formatMessage({ id: 'Permission' }), key: 'permission' },
+                { tab: formatMessage({ id: 'UserList' }), key: 'user' },
                 {
-                  tab: '设置',
+                  tab: formatMessage({ id: 'Setting' }),
                   key: 'setting'
                 }
               ]
@@ -84,4 +87,4 @@ const TabDetail = createWithRemoteLoader({
   );
 });
 
-export default TabDetail;
+export default withLocale(TabDetailInner);

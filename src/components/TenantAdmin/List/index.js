@@ -1,35 +1,38 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useNavigate } from 'react-router-dom';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 import getColumns from './getColumns';
 import { useRef, useState } from 'react';
 import { Space } from 'antd';
 import Create from '../Actions/Create';
 import Actions from '../Actions';
 
-const stateType = [
-  { tab: '全部', key: 'all' },
-  {
-    tab: '开启',
-    key: 'open'
-  },
-  {
-    tab: '关闭',
-    key: 'closed'
-  }
-];
-
-const stateTypeMap = new Map(stateType.map(item => [item.key, item]));
-
-const List = createWithRemoteLoader({
+const ListInner = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Filter', 'components-core:Global@usePreset', 'components-core:StateBar']
 })(({ remoteModules, baseUrl }) => {
   const [TablePage, Filter, usePreset, StateBar] = remoteModules;
+  const { formatMessage } = useIntl();
   const { apis } = usePreset();
   const { SearchInput, getFilterValue } = Filter;
   const ref = useRef(null);
   const [filter, setFilter] = useState([]);
   const filterValue = getFilterValue(filter);
   const navigate = useNavigate();
+
+  const stateType = [
+    { tab: formatMessage({ id: 'All' }), key: 'all' },
+    {
+      tab: formatMessage({ id: 'Open' }),
+      key: 'open'
+    },
+    {
+      tab: formatMessage({ id: 'Close' }),
+      key: 'closed'
+    }
+  ];
+
+  const stateTypeMap = new Map(stateType.map(item => [item.key, item]));
 
   return (
     <TablePage
@@ -73,18 +76,18 @@ const List = createWithRemoteLoader({
         },
         titleExtra: (
           <Space align="center">
-            <SearchInput name="keyword" label="关键字" />
+            <SearchInput name="keyword" label={formatMessage({ id: 'Keyword' })} />
             <Create type="primary" onSuccess={() => ref.current?.reload()}>
-              添加
+              {formatMessage({ id: 'AddTenant' })}
             </Create>
           </Space>
         )
       }}
       columns={[
-        ...getColumns({ navigate: path => navigate(`${baseUrl}/${path}`) }),
+        ...getColumns({ navigate: path => navigate(`${baseUrl}/${path}`), formatMessage }),
         {
           name: 'options',
-          title: '操作',
+          title: formatMessage({ id: 'Operation' }),
           type: 'options',
           fixed: 'right',
           valueOf: item => {
@@ -98,4 +101,4 @@ const List = createWithRemoteLoader({
   );
 });
 
-export default List;
+export default withLocale(ListInner);

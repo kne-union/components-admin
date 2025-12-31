@@ -6,6 +6,8 @@ import CountDown from '@kne/count-down';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import CompanyInfo from '../CompanyInfo';
 import { UserCard } from '../UserList';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 
 const JoinInvitation = createWithRemoteLoader({
@@ -13,6 +15,7 @@ const JoinInvitation = createWithRemoteLoader({
 })(({ remoteModules, baseUrl = '', children }) => {
   const [Page, usePreset, InfoPage, LoadingButton] = remoteModules;
   const [current, setCurrent] = useState(0);
+  const { formatMessage } = useIntl();
   const { apis, ajax } = usePreset();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -26,34 +29,34 @@ const JoinInvitation = createWithRemoteLoader({
           data: { token }
         })}
         error={error => {
-          return <Result status="error" title={error || '邀请链接已失效'} subTitle="请联系管理员解决此问题" />;
+          return <Result status="error" title={error || formatMessage({ id: 'InviteLinkExpired' })} subTitle={formatMessage({ id: 'ContactAdmin' })} />;
         }}
         render={({ data }) => {
           const { tenant, tenantUser } = data;
           if (!(tenant && tenant.status === 'open' && tenantUser && tenantUser.status === 'open')) {
-            return <Result status="error" title="邀请链接已失效" subTitle="请联系管理员解决此问题" />;
+            return <Result status="error" title={formatMessage({ id: 'InviteLinkExpired' })} subTitle={formatMessage({ id: 'ContactAdmin' })} />;
           }
           return (
-            <Card className={style['card']} title={`邀请您加入【${data.company.name}】`}>
+            <Card className={style['card']} title={formatMessage({ id: 'InviteYouJoin' }, { name: data.company.name })}>
               <Flex vertical gap={40}>
                 <Steps
                   className={style['steps']}
                   current={current}
                   items={[
                     {
-                      title: '确认公司信息'
+                      title: formatMessage({ id: 'ConfirmCompanyInfo' })
                     },
                     {
-                      title: '确认员工信息'
+                      title: formatMessage({ id: 'ConfirmEmployeeInfo' })
                     },
                     {
-                      title: '完成'
+                      title: formatMessage({ id: 'Complete' })
                     }
                   ]}
                 />
                 {current === 0 && (
                   <InfoPage>
-                    <InfoPage.Part title="公司信息">
+                    <InfoPage.Part title={formatMessage({ id: 'CompanyInfo' })}>
                       <CompanyInfo.Detail data={data.company} />
                     </InfoPage.Part>
                     <Flex justify="center">
@@ -63,7 +66,7 @@ const JoinInvitation = createWithRemoteLoader({
                         onClick={() => {
                           setCurrent(1);
                         }}>
-                        确认公司信息
+                        {formatMessage({ id: 'ConfirmCompanyInfo' })}
                       </Button>
                     </Flex>
                   </InfoPage>
@@ -89,7 +92,7 @@ const JoinInvitation = createWithRemoteLoader({
                           }
                           setCurrent(2);
                         }}>
-                        确认员工信息
+                        {formatMessage({ id: 'ConfirmEmployeeInfo' })}
                       </LoadingButton>
                     </Flex>
                   </Flex>
@@ -98,7 +101,7 @@ const JoinInvitation = createWithRemoteLoader({
                   <Flex vertical gap={60}>
                     <Result
                       status="success"
-                      title={`欢迎您加入【${data.company.name}】！`}
+                      title={formatMessage({ id: 'WelcomeJoin' }, { name: data.company.name })}
                       subTitle={
                         <>
                           <CountDown
@@ -108,7 +111,7 @@ const JoinInvitation = createWithRemoteLoader({
                               window.location.href = `${baseUrl}/tenant`;
                             }}
                           />
-                          秒后自动跳转到系统首页
+                          {formatMessage({ id: 'AutoJump' })}
                         </>
                       }
                       extra={
@@ -118,7 +121,7 @@ const JoinInvitation = createWithRemoteLoader({
                           onClick={() => {
                             window.location.href = `${baseUrl}/tenant`;
                           }}>
-                          直接进入
+                          {formatMessage({ id: 'EnterDirectly' })}
                         </Button>
                       }
                     />
@@ -139,4 +142,4 @@ const JoinInvitation = createWithRemoteLoader({
   return <Page backgroundColor="transparent" {...pageProps} />;
 });
 
-export default JoinInvitation;
+export default withLocale(JoinInvitation);

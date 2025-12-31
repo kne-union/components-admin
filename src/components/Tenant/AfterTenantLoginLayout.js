@@ -2,11 +2,14 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Flex, Button } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Authenticate from './Authenticate';
+import withLocale from './withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const AfterTenantLoginLayout = createWithRemoteLoader({
   modules: ['components-admin:Authenticate@MainLayout', 'components-admin:UserTool']
 })(({ remoteModules, navigation, switchTenantPath, children, ...props }) => {
   const [MainLayout, UserTool] = remoteModules;
+  const { formatMessage } = useIntl();
   const navigate = useNavigate();
   return (
     <Authenticate>
@@ -39,7 +42,7 @@ const AfterTenantLoginLayout = createWithRemoteLoader({
                               onClick={() => {
                                 navigate(switchTenantPath);
                               }}>
-                              切换租户
+                              {formatMessage({ id: 'SwitchTenant' })}
                             </Button>
                           </Flex>
                         ),
@@ -59,4 +62,4 @@ const AfterTenantLoginLayout = createWithRemoteLoader({
   );
 });
 
-export default AfterTenantLoginLayout;
+export default withLocale(AfterTenantLoginLayout);
