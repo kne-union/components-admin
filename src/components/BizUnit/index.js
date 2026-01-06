@@ -16,6 +16,7 @@ const BizUnit = createWithRemoteLoader({
       topOptionsSize,
       apis = {},
       name,
+      titleExtra = null,
       children,
       getColumns,
       getFormInner,
@@ -48,7 +49,14 @@ const BizUnit = createWithRemoteLoader({
           },
           tableProps: {
             pagination: { paramsType: 'params' }
-          }
+          },
+          keywordFilterName: 'keyword',
+          keywordFilterLabel: formatMessage({ id: 'Keyword' }),
+          getFilterValue: filterValue => ({
+            params: {
+              filter: filterValue
+            }
+          })
         },
         options
       );
@@ -59,7 +67,7 @@ const BizUnit = createWithRemoteLoader({
       const filterValue = getFilterValue(filter);
       const topOptions = (
         <Flex gap={8}>
-          {allowKeywordSearch && <SearchInput size={topOptionsSize} name="keyword" label={formatMessage({ id: 'Keyword' })} />}
+          {allowKeywordSearch && <SearchInput size={topOptionsSize} name={options.keywordFilterName} label={options.keywordFilterLabel} />}
           {apis.create && (
             <Create
               getFormInner={getFormInner}
@@ -70,48 +78,40 @@ const BizUnit = createWithRemoteLoader({
               }}
             />
           )}
+          {titleExtra}
         </Flex>
       );
 
-      const tableOptions = merge(
-        {},
-        options.tableProps,
-        merge({}, apis.list, {
-          params: {
-            filter: filterValue
-          }
-        }),
-        {
-          ref,
-          columns: [
-            ...getColumns(),
-            {
-              name: 'options',
-              type: 'options',
-              title: formatMessage({ id: 'Operation' }),
-              fixed: 'right',
-              valueOf: item => {
-                return {
-                  children: (
-                    <Actions
-                      moreType="link"
-                      data={item}
-                      apis={apis}
-                      options={options}
-                      getActionList={getActionList}
-                      getFormInner={getFormInner}
-                      onSuccess={() => {
-                        tableOptions.ref.current.reload();
-                      }}
-                    />
-                  )
-                };
-              }
+      const tableOptions = merge({}, options.tableProps, merge({}, apis.list, options.getFilterValue(filterValue)), {
+        ref,
+        columns: [
+          ...getColumns(),
+          {
+            name: 'options',
+            type: 'options',
+            title: formatMessage({ id: 'Operation' }),
+            fixed: 'right',
+            valueOf: item => {
+              return {
+                children: (
+                  <Actions
+                    moreType="link"
+                    data={item}
+                    apis={apis}
+                    options={options}
+                    getActionList={getActionList}
+                    getFormInner={getFormInner}
+                    onSuccess={() => {
+                      tableOptions.ref.current.reload();
+                    }}
+                  />
+                )
+              };
             }
-          ],
-          name
-        }
-      );
+          }
+        ],
+        name
+      });
 
       const handlerMount = useRefCallback(() => {
         onMount && onMount({ filter: { value: filter, onChange: setFilter }, topOptions, tableOptions });

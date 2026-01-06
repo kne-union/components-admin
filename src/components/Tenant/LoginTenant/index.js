@@ -16,7 +16,7 @@ const LoginTenant = createWithRemoteLoader({
   if (typeof children === 'function') {
     return children(pageProps);
   }
-  return <Page backgroundColor="transparent" {...pageProps} />;
+  return <Page {...pageProps} />;
 });
 
 export default LoginTenant;
