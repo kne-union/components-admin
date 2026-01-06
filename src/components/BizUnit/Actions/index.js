@@ -57,7 +57,7 @@ const Actions = createWithRemoteLoader({
   }
 
   if (Array.isArray(otherActionList) && otherActionList.length > 0) {
-    otherActionList.forEach(({ index, ...item }) => {
+    otherActionList.reverse().forEach(({ index, ...item }) => {
       if (item.name) {
         const existItem = actionList.find(target => target.name === item.name);
         if (existItem) {
@@ -65,7 +65,7 @@ const Actions = createWithRemoteLoader({
           return;
         }
       }
-      item.buttonComponent && actionList.splice(item.index || 0, 0, item);
+      actionList.splice(item.index || 0, 0, item);
     });
   }
 
