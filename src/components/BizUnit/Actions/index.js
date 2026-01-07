@@ -1,11 +1,14 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 import Edit from './Edit';
 import SetStatus from './SetStatus';
 import Remove from './Remove';
 
 const Actions = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
-})(({ remoteModules, moreType, children, itemClassName, getActionList, getFormInner, data, apis, onSuccess, options, ...otherProps }) => {
+})(withLocale(({ remoteModules, moreType, children, itemClassName, getActionList, getFormInner, data, apis, onSuccess, options, ...otherProps }) => {
+  const { formatMessage } = useIntl();
   const [ButtonGroup] = remoteModules;
   const actionList = [];
 
@@ -41,7 +44,7 @@ const Actions = createWithRemoteLoader({
         name: 'setStatusClose',
         buttonComponent: SetStatus,
         hidden: props.data?.status === 'closed',
-        message: props.options?.closeMessage || `确定要关闭${props.options?.bizName}吗？`,
+        message: props.options?.closeMessage || formatMessage({ id: 'ConfirmClose' }, { bizName: props.options?.bizName }),
         isDelete: false
       }
     );
@@ -52,7 +55,7 @@ const Actions = createWithRemoteLoader({
       ...props,
       name: 'remove',
       buttonComponent: Remove,
-      message: props.options?.removeMessage || `确定要删除${props.options?.bizName}吗？`
+      message: props.options?.removeMessage || formatMessage({ id: 'ConfirmDelete' }, { bizName: props.options?.bizName })
     });
   }
 
@@ -61,7 +64,7 @@ const Actions = createWithRemoteLoader({
       if (item.name) {
         const existItem = actionList.find(target => target.name === item.name);
         if (existItem) {
-          Object.assign(existItem, typeof item === 'function' ? item(existItem) : item);
+          Object.assign(existItem, typeof item.reset === 'function' ? item.reset(existItem) : item);
           return;
         }
       }
@@ -77,6 +80,6 @@ const Actions = createWithRemoteLoader({
     });
   }
   return <ButtonGroup itemClassName={itemClassName} list={actionList} moreType={moreType} />;
-});
+}));
 
 export default Actions;
