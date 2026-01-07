@@ -13,7 +13,7 @@ const DevelopmentHistory = ({ data }) => {
         className={style['timeline']}
         items={data.developmentHistory.map(item => {
           return {
-            label: dayjs(item.time).format('YYYY年MM月DD日'),
+            label: dayjs(item.time).format('YYYY-MM-DD'),
             children: item.event
           };
         })}
