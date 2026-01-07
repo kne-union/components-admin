@@ -6,7 +6,7 @@ import Language from '../Language';
 import style from './style.module.scss';
 
 const Login = () => {
-  const { loginTitle, systemName, systemLogo, loginLeftInner, registerUrl, forgetUrl, accountType, afterLogin } = useProps();
+  const { loginTitle, systemName, systemLogo, loginLeftInner, registerUrl, forgetUrl, accountType, afterLogin, allowLanguageSwitch } = useProps();
   return (
     <LoginOuterContainer title={systemName} logo={systemLogo} leftInner={loginLeftInner}>
       <DoLogin>
@@ -25,7 +25,7 @@ const Login = () => {
           );
         }}
       </DoLogin>
-      <Language colorful={false} className={style['language']}/>
+      {allowLanguageSwitch && <Language colorful={false} className={style['language']} />}
     </LoginOuterContainer>
   );
 };

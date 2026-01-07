@@ -34,7 +34,7 @@ const CompanyDetail = createWithRemoteLoader({
 
 const CompanyInfo = createWithRemoteLoader({
   modules: ['components-core:InfoPage', 'components-core:FormInfo']
-})(({ remoteModules, data, onSubmit, hasEdit = true, apis }) => {
+})(withLocale(({ remoteModules, data, onSubmit, hasEdit = true, apis }) => {
   const [InfoPage, FormInfo] = remoteModules;
   const [isEdit, setIsEdit] = useState(false);
   const { formatMessage } = useIntl();
@@ -104,7 +104,7 @@ const CompanyInfo = createWithRemoteLoader({
       </InfoPage.Part>
     </InfoPage>
   );
-});
+}));
 
 CompanyInfo.Detail = CompanyDetail;
 CompanyInfo.Banner = Banner;
@@ -112,4 +112,4 @@ CompanyInfo.Basic = Basic;
 CompanyInfo.DevelopmentHistory = DevelopmentHistory;
 CompanyInfo.TeamDescription = TeamDescription;
 
-export default withLocale(CompanyInfo);
+export default CompanyInfo;
