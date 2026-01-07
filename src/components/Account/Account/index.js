@@ -34,6 +34,7 @@ const AccountInner = ({ className, ...p }) => {
       baseUrl: '',
       accountType: 'email',
       systemLogo: null,
+      allowLanguageSwitch: true,
       systemName: formatMessage({ id: 'SystemName' }),
       loginTitle: formatMessage({ id: 'Login' }),
       registerTitle: formatMessage({ id: 'Register' }),
