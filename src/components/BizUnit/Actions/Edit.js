@@ -1,14 +1,17 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Button, App } from 'antd';
 import merge from 'lodash/merge';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
 const Edit = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
-})(({ remoteModules, apis, onSuccess, data, options, getFormInner, ...props }) => {
+})(withLocale(({ remoteModules, apis, onSuccess, data, options, getFormInner, ...props }) => {
   const [useFormModal, usePreset] = remoteModules;
   const formModal = useFormModal();
   const { ajax } = usePreset();
   const { message } = App.useApp();
+  const { formatMessage } = useIntl();
   return (
     <Button
       {...Object.assign({}, props, options.editButtonProps)}
@@ -17,7 +20,7 @@ const Edit = createWithRemoteLoader({
           merge(
             {},
             {
-              title: `编辑${options.bizName}`,
+              title: formatMessage({ id: 'EditBiz' }, { bizName: options.bizName }),
               size: 'small',
               formProps: {
                 data: Object.assign({}, data),
@@ -34,7 +37,7 @@ const Edit = createWithRemoteLoader({
                     return false;
                   }
 
-                  message.success(`保存${options.bizName}成功`);
+                  message.success(formatMessage({ id: 'SaveSuccess' }, { bizName: options.bizName }));
                   onSuccess && onSuccess();
                 }
               },
@@ -47,6 +50,6 @@ const Edit = createWithRemoteLoader({
       }}
     />
   );
-});
+}));
 
 export default Edit;

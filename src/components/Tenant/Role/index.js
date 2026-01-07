@@ -19,7 +19,10 @@ const Role = ({ apis, ...props }) => {
       getActionList={({ data, ...props }) => {
         return ['remove', 'setStatusOpen', 'setStatusClose', 'save']
           .map(name => {
-            return ({ hidden }) => ({ name, hidden: hidden || data.type === 'system' });
+            return {
+              name,
+              reset: ({ hidden }) => ({ name, hidden: hidden || data.type === 'system' })
+            };
           })
           .concat([
             {
