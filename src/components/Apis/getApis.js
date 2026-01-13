@@ -423,6 +423,64 @@ const getApis = options => {
           method: 'GET'
         }
       }
+    },
+    intlAdmin: {
+      langType: {
+        list: {
+          loader: () => {
+            return {
+              totalCount: 0,
+              pageData: []
+            };
+          },
+          url: `${prefix}/intl-admin/lang-type/list`,
+          method: 'GET'
+        },
+        create: {
+          url: `${prefix}/intl-admin/lang-type/create`,
+          method: 'POST'
+        },
+        save: {
+          url: `${prefix}/intl-admin/lang-type/save`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${prefix}/intl-admin/lang-type/remove`,
+          method: 'POST'
+        },
+        setStatus: {
+          url: `${prefix}/intl-admin/lang-type/set-status`,
+          method: 'POST'
+        }
+      },
+      langLib: {
+        list: {
+          loader: () => {
+            return {
+              totalCount: 0,
+              pageData: []
+            };
+          },
+          url: `${prefix}/intl-admin/lang-lib/list`,
+          method: 'GET'
+        },
+        create: {
+          url: `${prefix}/intl-admin/lang-lib/add-package`,
+          method: 'POST'
+        },
+        save: {
+          url: `${prefix}/intl-admin/lang-lib/save`,
+          method: 'POST'
+        },
+        setStatus: {
+          url: `${prefix}/intl-admin/lang-lib/set-status`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${prefix}/intl-admin/lang-lib/remove`,
+          method: 'POST'
+        }
+      }
     }
   };
 };
