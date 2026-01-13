@@ -1,3 +1,5 @@
+import withLocale from './withLocale';
+import { useIntl } from '@kne/react-intl';
 const getColumns = ({ formatMessage }) => {
   return [
     {
@@ -61,5 +63,10 @@ const getColumns = ({ formatMessage }) => {
     }
   ];
 };
+
+export const ColumnsLoader = withLocale(({ children }) => {
+  const { formatMessage } = useIntl();
+  return children(props => getColumns(Object.assign({}, props, {formatMessage})));
+});
 
 export default getColumns;

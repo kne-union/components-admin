@@ -1,6 +1,7 @@
 .language {
   display: flex;
   align-items: center;
+
   &.is-colorful {
     .icon {
       color: #ffffff;
@@ -24,6 +25,14 @@
       .ant-divider {
         opacity: 0.4;
         border-inline-start-color: #ffffff;
+      }
+
+      .ant-btn {
+        color: #ffffff;
+
+        &:hover {
+          color: #ffffff;
+        }
       }
     }
   }

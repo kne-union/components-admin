@@ -1,7 +1,8 @@
 import style from './style.module.scss';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import useControlValue from '@kne/use-control-value';
-import { Space, Button, Divider } from 'antd';
+import { Space, Button, Divider, Dropdown } from 'antd';
+import { CaretDownOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 
 const Language = createWithRemoteLoader({
@@ -22,9 +23,17 @@ const Language = createWithRemoteLoader({
     onChange: 'onChange'
   });
   const [Icon] = remoteModules;
+
+  const activeIndex = list.findIndex(item => item.value === current);
+  const showList = list.slice(0, 2);
+  if (activeIndex > showList.length - 1) {
+    showList[showList.length - 1] = list[activeIndex];
+  }
+  const otherList = list.filter((item, index) => showList.indexOf(item) === -1);
   return (
     <div
       className={classnames(className, 'language', style['language'], {
+        'is-colorful': colorful,
         [style['is-colorful']]: colorful
       })}
       onClick={e => {
@@ -32,7 +41,7 @@ const Language = createWithRemoteLoader({
       }}>
       <Icon className={style['icon']} type="icon-yuyanqiehuan" />
       <Space split={<Divider type="vertical" />} size={0}>
-        {list.map(({ label, value }) => (
+        {showList.slice(0, 2).map(({ label, value }) => (
           <Button
             key={value}
             type="text"
@@ -46,6 +55,22 @@ const Language = createWithRemoteLoader({
           </Button>
         ))}
       </Space>
+      {otherList.length > 0 && (
+        <Dropdown
+          menu={{
+            items: otherList.map(({ label, value }) => {
+              return {
+                label,
+                key: value,
+                onClick: () => {
+                  onChange(value);
+                }
+              };
+            })
+          }}>
+          <Button size="small" type="text" icon={<CaretDownOutlined />} />
+        </Dropdown>
+      )}
     </div>
   );
 });

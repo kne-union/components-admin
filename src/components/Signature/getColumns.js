@@ -1,4 +1,4 @@
-const getColumns = () => {
+const getColumns = ({ formatMessage }) => {
   return [
     {
       name: 'appId',
@@ -12,7 +12,7 @@ const getColumns = () => {
     },
     {
       name: 'user',
-      title: '所属用户',
+      title: formatMessage({ id: 'BelongUser' }),
       type: 'other',
       valueOf: ({ user }) => {
         return user.nickname || user.email || user.phone;
@@ -20,28 +20,28 @@ const getColumns = () => {
     },
     {
       name: 'description',
-      title: '描述',
+      title: formatMessage({ id: 'Description' }),
       type: 'description'
     },
     {
       name: 'lastVisitedAt',
-      title: '最后访问时间',
+      title: formatMessage({ id: 'LastVisitedAt' }),
       type: 'datetime'
     },
     {
       name: 'status',
-      title: '状态',
+      title: formatMessage({ id: 'Status' }),
       type: 'tag',
       valueOf: (item, { name }) => {
         if (item[name] === 0) {
-          return { type: 'success', text: '启用' };
+          return { type: 'success', text: formatMessage({ id: 'Enabled' }) };
         }
-        return { type: 'danger', text: '禁用' };
+        return { type: 'danger', text: formatMessage({ id: 'Disabled' }) };
       }
     },
     {
       name: 'createdAt',
-      title: '创建时间',
+      title: formatMessage({ id: 'CreatedAt' }),
       type: 'datetime'
     }
   ];

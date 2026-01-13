@@ -3,6 +3,8 @@ import getColumns from './getColumns';
 import { useRef } from 'react';
 import { Space, Button, App, Flex, Alert } from 'antd';
 import UserSelect from '@components/UserSelect';
+import withLocale from './withLocale';
+import { useIntl } from '@kne/react-intl';
 
 const Signature = createWithRemoteLoader({
   modules: [
@@ -12,9 +14,10 @@ const Signature = createWithRemoteLoader({
     'components-core:FormInfo@useFormModal',
     'components-core:InfoPage@CentralContent'
   ]
-})(({ remoteModules }) => {
+})(withLocale(({ remoteModules }) => {
   const [TablePage, usePreset, FormInfo, useFormModal, CentralContent] = remoteModules;
   const { ajax, apis } = usePreset();
+  const { formatMessage } = useIntl();
   const ref = useRef(null);
   const { TextArea, Input } = FormInfo.fields;
   const formModal = useFormModal();
@@ -33,7 +36,7 @@ const Signature = createWithRemoteLoader({
               type="primary"
               onClick={() => {
                 const formModalApi = formModal({
-                  title: '添加密钥',
+                  title: formatMessage({ id: 'AddSecretKey' }),
                   size: 'small',
                   formProps: {
                     onSubmit: async data => {
@@ -51,10 +54,10 @@ const Signature = createWithRemoteLoader({
                         icon: null,
                         size: 'large',
                         width: '800px',
-                        title: '密钥生成成功',
+                        title: formatMessage({ id: 'SecretKeyGenerated' }),
                         content: (
                           <Flex vertical gap={10}>
-                            <Alert type="error" message="请妥善保存当前密钥，关闭窗口后将不能再获取到，请勿泄漏" />
+                            <Alert type="error" message={formatMessage({ id: 'SaveSecretKeyWarning' })} />
                             <CentralContent
                               dataSource={resData.data}
                               col={1}
@@ -78,35 +81,35 @@ const Signature = createWithRemoteLoader({
                     <FormInfo
                       column={1}
                       list={[
-                        <UserSelect name="userId" label="所属用户" single interceptor="object-output-value" />,
-                        <TextArea name="description" label="描述" maxLength={100} />
+                        <UserSelect name="userId" label={formatMessage({ id: 'BelongUser' })} single interceptor="object-output-value" />,
+                        <TextArea name="description" label={formatMessage({ id: 'Description' })} maxLength={100} />
                       ]}
                     />
                   )
                 });
               }}
             >
-              添加密钥
+              {formatMessage({ id: 'AddSecretKey' })}
             </Button>
           </Space>
         )
       }}
       columns={[
-        ...getColumns(),
+        ...getColumns({ formatMessage }),
         {
           name: 'options',
-          title: '操作',
+          title: formatMessage({ id: 'Operation' }),
           type: 'options',
           fixed: 'right',
           valueOf: item => {
             return [
               {
-                children: '验证',
+                children: formatMessage({ id: 'Verify' }),
                 onClick: () => {
                   formModal({
-                    title: '验证密钥',
+                    title: formatMessage({ id: 'VerifySecretKey' }),
                     size: 'small',
-                    saveText: '验证',
+                    saveText: formatMessage({ id: 'Verify' }),
                     formProps: {
                       rules: {
                         NUM: value => {
@@ -118,7 +121,7 @@ const Signature = createWithRemoteLoader({
                           }
                           return {
                             result: false,
-                            errMsg: '请输入数字'
+                            errMsg: formatMessage({ id: 'InputNumber' })
                           };
                         }
                       },
@@ -134,9 +137,9 @@ const Signature = createWithRemoteLoader({
                           return;
                         }
                         if (resData.data.result) {
-                          message.success('验证成功');
+                          message.success(formatMessage({ id: 'VerifySuccess' }));
                         } else {
-                          message.error(`验证失败,${resData.data.message}`);
+                          message.error(`${formatMessage({ id: 'VerifyFailed' })},${resData.data.message}`);
                         }
                       }
                     },
@@ -144,9 +147,9 @@ const Signature = createWithRemoteLoader({
                       <FormInfo
                         column={1}
                         list={[
-                          <TextArea name="signature" label="签名" rule="REQ" />,
-                          <Input name="timestamp" label="时间戳" rule="REQ NUM" />,
-                          <Input name="expire" label="过期时间" rule="REQ NUM" />
+                          <TextArea name="signature" label={formatMessage({ id: 'Signature' })} rule="REQ" />,
+                          <Input name="timestamp" label={formatMessage({ id: 'Timestamp' })} rule="REQ NUM" />,
+                          <Input name="expire" label={formatMessage({ id: 'ExpireTime' })} rule="REQ NUM" />
                         ]}
                       />
                     )
@@ -154,18 +157,16 @@ const Signature = createWithRemoteLoader({
                 }
               },
               {
-                children: item.status === 0 ? '禁用' : '启用',
-                title: '温馨提示',
+                children: item.status === 0 ? formatMessage({ id: 'Disabled' }) : formatMessage({ id: 'Enabled' }),
+                title: formatMessage({ id: 'DisableSecretKeyTitle' }),
                 message:
                   item.status === 0 ? (
                     <div>
-                      <div>禁用此密钥后，将拒绝此密钥的所有请求。</div>
-                      <div>是否确定要禁用此密钥？</div>
+                      <div>{formatMessage({ id: 'DisableSecretKeyMessage' })}</div>
                     </div>
                   ) : (
                     <div>
-                      <div>启用此密钥后，将允许此密钥访问请求。</div>
-                      <div>是否确定要启用此密钥？</div>
+                      <div>{formatMessage({ id: 'EnableSecretKeyMessage' })}</div>
                     </div>
                   ),
                 isModal: true,
@@ -180,12 +181,12 @@ const Signature = createWithRemoteLoader({
                   if (resData.code !== 0) {
                     return;
                   }
-                  message.success('操作成功');
+                  message.success(formatMessage({ id: 'OperationSuccess' }));
                   ref.current.reload();
                 }
               },
               {
-                children: '删除',
+                children: formatMessage({ id: 'DeleteSuccess' }),
                 confirm: true,
                 hidden: item.status === 0,
                 onClick: async () => {
@@ -197,7 +198,7 @@ const Signature = createWithRemoteLoader({
                   if (resData.code !== 0) {
                     return;
                   }
-                  message.success('删除成功');
+                  message.success(formatMessage({ id: 'DeleteSuccess' }));
                   ref.current.reload();
                 }
               }
@@ -207,6 +208,6 @@ const Signature = createWithRemoteLoader({
       ]}
     />
   );
-});
+}));
 
 export default Signature;

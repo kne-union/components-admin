@@ -15,4 +15,4 @@ export default Task;
 
 export { default as enums } from './enums';
 export { default as Actions } from './Actions';
-export { default as getColumns } from './getColumns';
+export { default as getColumns, ColumnsLoader } from './getColumns';
