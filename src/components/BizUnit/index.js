@@ -7,6 +7,7 @@ import Actions from './Actions';
 import Create from './Actions/Create';
 import withLocale from './withLocale';
 import { useIntl } from '@kne/react-intl';
+import TablePageRender from './TablePageRender';
 const BizUnit = createWithRemoteLoader({
   modules: ['components-core:Table@TablePage', 'components-core:Filter']
 })(
@@ -123,7 +124,7 @@ const BizUnit = createWithRemoteLoader({
 
       if (typeof children === 'function') {
         return children({
-          filter: { value: filter, onChange: setFilter },
+          filter: { value: filter, onChange: setFilter, list: filterList },
           topOptions,
           titleExtra: (
             <Filter.FilterProvider value={filter} onChange={setFilter}>
@@ -143,4 +144,9 @@ const BizUnit = createWithRemoteLoader({
   )
 );
 
+BizUnit.TablePageRender = TablePageRender;
+BizUnit.Actions = Actions;
+
 export default BizUnit;
+
+export { TablePageRender, Actions };
