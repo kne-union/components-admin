@@ -52,7 +52,7 @@ const FormInnerInner = createWithRemoteLoader({
     ];
     const UserFormInner = get(plugins, 'tenantAdmin.UserFormInner');
     if (UserFormInner && (UserFormInner.$$typeof || typeof UserFormInner.type === 'function')) {
-      return <UserFormInner column={1} list={formInner} />;
+      return <UserFormInner column={1} list={formInner} apis={apis}/>;
     }
 
     return <FormInfo column={1} list={formInner} />;

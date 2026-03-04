@@ -21,7 +21,7 @@ const Create = createWithRemoteLoader({
             {},
             {
               title: formatMessage({ id: 'AddBiz' }, { bizName: options.bizName }),
-              size: 'small',
+              size: options.formSize || 'small',
               formProps: {
                 onSubmit: async formData => {
                   const { data: resData } = await ajax(

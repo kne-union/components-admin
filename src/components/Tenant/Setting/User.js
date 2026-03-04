@@ -13,7 +13,7 @@ const User = createWithRemoteLoader({
     'components-core:Table@TablePage',
     'components-core:Filter@FilterProvider'
   ]
-})(({ remoteModules, menu, children }) => {
+})(({ remoteModules, menu, children, apis: extraApis = {} }) => {
   const [Page, usePreset, Permissions, usePermissionsPass, TablePage, FilterProvider] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
@@ -33,17 +33,21 @@ const User = createWithRemoteLoader({
       <Permissions request={['setting:user-manager:view']} type="error">
         <UserList
           onMount={setTarget}
-          apis={{
-            list: Object.assign({}, apis.tenant.userList),
-            orgList: Object.assign({}, apis.tenant.orgList),
-            create: allowCreate && Object.assign({}, apis.tenant.userCreate),
-            save: allowSave && Object.assign({}, apis.tenant.userSave),
-            remove: allowRemove && Object.assign({}, apis.tenant.userRemove),
-            setStatus: allowSave && Object.assign({}, apis.tenant.userSetStatus),
-            inviteToken: allowInvite && Object.assign({}, apis.tenant.userInviteToken),
-            userInviteMessage: Object.assign({}, apis.tenant.userInviteMessage),
-            roleList: Object.assign({}, apis.tenant.role.list)
-          }}>
+          apis={Object.assign(
+            {},
+            {
+              list: Object.assign({}, apis.tenant.userList),
+              orgList: Object.assign({}, apis.tenant.orgList),
+              create: allowCreate && Object.assign({}, apis.tenant.userCreate),
+              save: allowSave && Object.assign({}, apis.tenant.userSave),
+              remove: allowRemove && Object.assign({}, apis.tenant.userRemove),
+              setStatus: allowSave && Object.assign({}, apis.tenant.userSetStatus),
+              inviteToken: allowInvite && Object.assign({}, apis.tenant.userInviteToken),
+              userInviteMessage: Object.assign({}, apis.tenant.userInviteMessage),
+              roleList: Object.assign({}, apis.tenant.role.list)
+            },
+            extraApis
+          )}>
           {({ tableOptions }) => <TablePage {...tableOptions} />}
         </UserList>
       </Permissions>

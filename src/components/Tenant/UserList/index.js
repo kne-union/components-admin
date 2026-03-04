@@ -42,17 +42,21 @@ const UserList = createWithRemoteLoader({
       const getUserListColumns = get(plugins, 'tenantAdmin.getUserListColumns');
       const columns = getColumns({ formatMessage });
       if (typeof getUserListColumns === 'function') {
-        return getUserListColumns({ columns });
+        return getUserListColumns({ columns, apis });
       }
       return columns;
     }, [plugins, formatMessage]);
 
     const tableOptions = {
-      ...merge({}, apis.list, {
-        params: {
-          filter: filterValue
+      ...merge(
+        {},
+        apis.list,
+        {
+          params: {
+            filter: filterValue
+          }
         }
-      }),
+      ),
       ref,
       columns: [
         ...columns,
