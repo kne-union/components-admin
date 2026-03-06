@@ -45,7 +45,7 @@ const UserList = createWithRemoteLoader({
         return getUserListColumns({ columns, apis });
       }
       return columns;
-    }, [plugins, formatMessage]);
+    }, [plugins, formatMessage, apis]);
 
     const tableOptions = {
       ...merge(

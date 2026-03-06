@@ -13,6 +13,8 @@ const RemoveInner = createWithRemoteLoader({
   return (
     <ConfirmButton
       {...props}
+      danger
+      isDelete
       onClick={async () => {
         const { data: resData } = await ajax(
           Object.assign({}, apis.tenantAdmin.remove, {

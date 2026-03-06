@@ -95,6 +95,8 @@ const OrgOptions = createWithRemoteLoader({
           children: formatMessage({ id: 'Delete' }),
           hidden: !(data.id && data.id !== 'root') || !apis.remove,
           confirm: true,
+          isDelete: true,
+          danger: true,
           disabled: data.children && data.children.length > 0,
           onClick: async () => {
             const { data: resData } = await ajax(
