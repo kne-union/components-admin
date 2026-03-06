@@ -7,7 +7,7 @@ import withLocale from '../withLocale';
 const Edit = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
 })(
-  withLocale(({ remoteModules, apis, onSuccess, data, options, getFormInner, ...props }) => {
+  withLocale(({ remoteModules, apis, onSuccess, data, options, getFormInner, fetchOptions, ...props }) => {
     const [useFormModal, usePreset] = remoteModules;
     const formModal = useFormModal();
     const { ajax } = usePreset();
@@ -24,7 +24,7 @@ const Edit = createWithRemoteLoader({
                 title: formatMessage({ id: 'EditBiz' }, { bizName: options.bizName }),
                 size: options.formSize || 'small',
                 formProps: {
-                  data: Object.assign({}, data),
+                  data: typeof options.saveData === 'function' ? options.saveData(data, { fetchOptions }) : Object.assign({}, data),
                   onSubmit: async formData => {
                     const { data: resData } = await ajax(
                       typeof apis.save === 'function'

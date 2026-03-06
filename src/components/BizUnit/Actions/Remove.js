@@ -6,31 +6,35 @@ import withLocale from '../withLocale';
 
 const Remove = createWithRemoteLoader({
   modules: ['components-core:LoadingButton', 'components-core:ConfirmButton', 'components-core:Global@usePreset']
-})(withLocale(({ remoteModules, data, onSuccess, apis, options, getFormInner, ...props }) => {
-  const [LoadingButton, ConfirmButton, usePreset] = remoteModules;
-  const { ajax } = usePreset();
-  const { message } = App.useApp();
-  const { formatMessage } = useIntl();
-  const CurrentButton = props.message || props.confirm ? ConfirmButton : LoadingButton;
-  return (
-    <CurrentButton
-      {...Object.assign({}, props, options.removeButtonProps)}
-      onClick={async () => {
-        const { data: resData } = await ajax(
-          typeof apis.remove === 'function'
-            ? apis.remove({ data, options })
-            : merge({}, apis.remove, {
-                data: { id: data.id }
-              })
-        );
-        if (resData.code !== 0) {
-          return;
-        }
-        message.success(formatMessage({ id: 'DeleteSuccess' }, { bizName: options.bizName }));
-        onSuccess && onSuccess();
-      }}
-    />
-  );
-}));
+})(
+  withLocale(({ remoteModules, data, onSuccess, apis, options, getFormInner, ...props }) => {
+    const [LoadingButton, ConfirmButton, usePreset] = remoteModules;
+    const { ajax } = usePreset();
+    const { message } = App.useApp();
+    const { formatMessage } = useIntl();
+    const CurrentButton = props.confirmMessage || props.confirm ? ConfirmButton : LoadingButton;
+    return (
+      <CurrentButton
+        {...Object.assign({}, props, options.removeButtonProps)}
+        isDelete
+        danger
+        onClick={async () => {
+          const { data: resData } = await ajax(
+            typeof apis.remove === 'function'
+              ? apis.remove({ data, options })
+              : merge({}, apis.remove, {
+                  data: { id: data.id }
+                })
+          );
+          if (resData.code !== 0) {
+            return;
+          }
+          message.success(formatMessage({ id: 'DeleteSuccess' }, { bizName: options.bizName }));
+          onSuccess && onSuccess();
+        }}
+      />
+    );
+  })
+);
 
 export default Remove;
