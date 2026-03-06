@@ -12,7 +12,7 @@ const SetStatus = createWithRemoteLoader({
     const { ajax } = usePreset();
     const { message } = App.useApp();
     const { formatMessage } = useIntl();
-    const CurrentButton = props.message || props.confirm ? ConfirmButton : LoadingButton;
+    const CurrentButton = props.confirmMessage || props.confirm ? ConfirmButton : LoadingButton;
     return (
       <CurrentButton
         {...merge({}, props, data.status === 'open' ? options.closeButtonProps : options.openButtonProps)}

@@ -145,7 +145,6 @@ const TenantPermission = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
 })(({ remoteModules, apis, children }) => {
   const [usePreset] = remoteModules;
-  const [saving, setSaving] = useState(false);
   const { ajax } = usePreset();
   const target = (
     <div className={style['tenant-permission']}>
@@ -159,16 +158,13 @@ const TenantPermission = createWithRemoteLoader({
                 settings={permissions}
                 defaultValue={codes || []}
                 onChange={codes => {
-                  setSaving(true);
                   ajax(
                     merge({}, apis.save, {
                       data: {
                         permissions: codes
                       }
                     })
-                  ).finally(() => {
-                    setSaving(false);
-                  });
+                  );
                 }}
               />
             </Flex>

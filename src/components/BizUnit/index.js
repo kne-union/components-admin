@@ -92,12 +92,13 @@ const BizUnit = createWithRemoteLoader({
             type: 'options',
             title: formatMessage({ id: 'Operation' }),
             fixed: 'right',
-            valueOf: item => {
+            valueOf: (item, fetchOptions) => {
               return {
                 children: (
                   <Actions
                     moreType="link"
                     data={item}
+                    fetchOptions={fetchOptions}
                     apis={apis}
                     options={options}
                     getActionList={getActionList}
