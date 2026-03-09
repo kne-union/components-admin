@@ -1,4 +1,4 @@
-const TASK_STATUS_ENUM = () => [
+const TASK_STATUS_ENUM = [
   { value: 'pending', description: '等待执行', type: 'info' },
   {
     value: 'running',
