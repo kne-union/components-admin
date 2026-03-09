@@ -17,31 +17,49 @@ const Edit = createWithRemoteLoader({
       <Button
         {...Object.assign({}, props, options.editButtonProps)}
         onClick={() => {
+          const formData = typeof options.saveData === 'function' ? options.saveData(data, { fetchOptions }) : Object.assign({}, data);
+          const onSubmit = async formData => {
+            const { data: resData } = await ajax(
+              typeof apis.save === 'function'
+                ? apis.save({ formData, data, options })
+                : merge({}, apis.save, {
+                    data: Object.assign({}, formData, { id: data.id })
+                  })
+            );
+
+            if (resData.code !== 0) {
+              return false;
+            }
+
+            message.success(formatMessage({ id: 'SaveSuccess' }, { bizName: options.bizName }));
+            onSuccess && onSuccess();
+          };
           formModal(
             merge(
               {},
               {
                 title: formatMessage({ id: 'EditBiz' }, { bizName: options.bizName }),
                 size: options.formSize || 'small',
-                formProps: {
-                  data: typeof options.saveData === 'function' ? options.saveData(data, { fetchOptions }) : Object.assign({}, data),
-                  onSubmit: async formData => {
-                    const { data: resData } = await ajax(
-                      typeof apis.save === 'function'
-                        ? apis.save({ formData, data, options })
-                        : merge({}, apis.save, {
-                            data: Object.assign({}, formData, { id: data.id })
-                          })
-                    );
-
-                    if (resData.code !== 0) {
-                      return false;
-                    }
-
-                    message.success(formatMessage({ id: 'SaveSuccess' }, { bizName: options.bizName }));
-                    onSuccess && onSuccess();
-                  }
-                },
+                formProps: Object.assign(
+                  {},
+                  {
+                    data: formData,
+                    onSubmit
+                  },
+                  typeof options.formProps === 'function'
+                    ? options.formProps({
+                        options,
+                        formData,
+                        onSubmit,
+                        props,
+                        apis,
+                        onSuccess,
+                        data,
+                        fetchOptions,
+                        action: 'edit'
+                      })
+                    : options.formProps
+                ),
                 children: getFormInner({ apis, action: 'edit', options })
               },
               options.formModalProps,

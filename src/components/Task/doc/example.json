@@ -1,14 +1,237 @@
 {
-  "isFull": false,
+  "isFull": true,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "基础用法",
+      "description": "Task 组件的基础使用方式，展示我的任务列表，包含任务筛选、排序和操作功能",
       "code": "./base.js",
       "scope": [
         {
           "name": "_Task",
           "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "我的任务",
+      "description": "展示我的任务列表，支持自定义手动任务的操作按钮，只显示手动执行的任务",
+      "code": "./my-task.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "全部任务",
+      "description": "展示全部任务列表，包含手动执行和自动执行的任务，支持批量重试失败的任务",
+      "code": "./all-task.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        }
+      ]
+    },
+    {
+      "title": "任务操作按钮",
+      "description": "Actions 组件根据任务状态自动显示相应的操作按钮，如取消、重试、查看错误详情、查看结果等",
+      "code": "./actions.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "取消任务",
+      "description": "展示取消任务功能，支持取消等待执行和执行中的任务",
+      "code": "./cancel-task.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "重试任务",
+      "description": "展示重试任务功能，支持重试失败和已取消的任务",
+      "code": "./retry-task.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "错误详情",
+      "description": "展示失败任务的错误详情，包括输入参数和错误信息",
+      "code": "./error-detail.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "结果详情",
+      "description": "展示成功任务的结果详情，包括输入参数和输出结果",
+      "code": "./result-detail.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "表格列配置",
+      "description": "使用 getColumns 函数获取任务列表的表格列配置，支持自定义国际化",
+      "code": "./get-columns.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "枚举值",
+      "description": "展示 Task 组件提供的枚举值，包括任务状态枚举",
+      "code": "./enums.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
         }
       ]
     }
