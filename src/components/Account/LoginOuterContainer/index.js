@@ -1,9 +1,10 @@
 import { Row, Col, Flex } from 'antd';
 import classnames from 'classnames';
+import LoginIllustration from '@components/LoginIllustration';
 import style from './style.module.scss';
 import commonStyle from '../style.module.scss';
 
-const LoginOuterContainer = ({ className, title, logo, leftInner , children }) => {
+const LoginOuterContainer = ({ className, title, logo, leftInner = <LoginIllustration />, children }) => {
   return (
     <div className={classnames(className, commonStyle['out-container'], 'account-box')}>
       <div className={commonStyle['top-banner']}>

@@ -1,0 +1,110 @@
+{
+  "code": 0,
+  "data": {
+    "pageData": [
+      {
+        "id": 1001,
+        "type": "interview_report",
+        "status": "success",
+        "runnerType": "manual",
+        "input": {
+          "name": "张三的面试报告",
+          "candidateId": 2001,
+          "interviewId": 3001
+        },
+        "output": {
+          "reportId": 5001,
+          "url": "https://example.com/reports/5001.pdf"
+        },
+        "createdAt": "2024-03-08 10:30:00",
+        "completedAt": "2024-03-08 10:35:00",
+        "updatedAt": "2024-03-08 10:35:00"
+      },
+      {
+        "id": 1002,
+        "type": "data_export",
+        "status": "running",
+        "runnerType": "system",
+        "input": {
+          "name": "用户数据导出",
+          "exportType": "excel",
+          "dateRange": ["2024-01-01", "2024-03-01"]
+        },
+        "output": null,
+        "createdAt": "2024-03-08 11:00:00",
+        "completedAt": null,
+        "updatedAt": "2024-03-08 11:05:00"
+      },
+      {
+        "id": 1003,
+        "type": "email_notification",
+        "status": "failed",
+        "runnerType": "system",
+        "input": {
+          "name": "批量邮件通知",
+          "recipients": ["user1@example.com", "user2@example.com"],
+          "subject": "系统维护通知"
+        },
+        "output": null,
+        "error": {
+          "code": "SMTP_ERROR",
+          "message": "SMTP服务器连接失败",
+          "details": "Connection timeout after 30s"
+        },
+        "createdAt": "2024-03-08 09:00:00",
+        "completedAt": "2024-03-08 09:01:00",
+        "updatedAt": "2024-03-08 09:01:00"
+      },
+      {
+        "id": 1004,
+        "type": "video_processing",
+        "status": "pending",
+        "runnerType": "manual",
+        "input": {
+          "name": "产品宣传视频处理",
+          "videoId": 4001,
+          "resolution": "1080p"
+        },
+        "output": null,
+        "createdAt": "2024-03-08 14:20:00",
+        "completedAt": null,
+        "updatedAt": "2024-03-08 14:20:00"
+      },
+      {
+        "id": 1005,
+        "type": "data_sync",
+        "status": "canceled",
+        "runnerType": "system",
+        "input": {
+          "name": "数据库同步任务",
+          "sourceDb": "production",
+          "targetDb": "backup"
+        },
+        "output": null,
+        "createdAt": "2024-03-07 23:00:00",
+        "completedAt": "2024-03-07 23:15:00",
+        "updatedAt": "2024-03-07 23:15:00"
+      },
+      {
+        "id": 1006,
+        "type": "report_generation",
+        "status": "success",
+        "runnerType": "system",
+        "input": {
+          "name": "月度财务报表",
+          "month": "2024-02",
+          "department": "财务部"
+        },
+        "output": {
+          "reportId": 5002,
+          "fileSize": "2.5MB",
+          "pageCount": 45
+        },
+        "createdAt": "2024-03-01 08:00:00",
+        "completedAt": "2024-03-01 08:10:00",
+        "updatedAt": "2024-03-01 08:10:00"
+      }
+    ],
+    "totalCount": 6
+  }
+}
