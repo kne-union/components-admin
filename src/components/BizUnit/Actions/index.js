@@ -27,6 +27,25 @@ const Actions = createWithRemoteLoader({
       const [ButtonGroup] = remoteModules;
       const actionList = [];
 
+      options = Object.assign(
+        {},
+        {
+          editButtonProps: {
+            children: formatMessage({ id: 'Edit' })
+          },
+          removeButtonProps: {
+            children: formatMessage({ id: 'Delete' })
+          },
+          openButtonProps: {
+            children: formatMessage({ id: 'Open' })
+          },
+          closeButtonProps: {
+            children: formatMessage({ id: 'Close' })
+          }
+        },
+        options
+      );
+
       const props = {
         ...otherProps,
         fetchOptions,
@@ -95,6 +114,7 @@ const Actions = createWithRemoteLoader({
           list: actionList
         });
       }
+
       return <ButtonGroup itemClassName={itemClassName} list={actionList} moreType={moreType} />;
     }
   )

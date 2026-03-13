@@ -4,6 +4,7 @@
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
+    "init-prompts": "npx @kne/npm-tools deployPrompts frontend-remote-components",
     "start": "cross-env PORT=3016 COMPONENTS_NAME=components-admin MODULES_DEV_PUBLIC_URL=/ craco start",
     "build": "cross-env COMPONENTS_NAME=components-admin MODULES_DEV_PUBLIC_URL=components-admin craco build",
     "create": "modules-dev-create",
