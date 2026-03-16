@@ -24,6 +24,7 @@ const locale = {
   Retry: 'Retry',
   ErrorDetail: 'Error Detail',
   ViewResult: 'View Result',
+  ViewLogs: 'View Logs',
   BatchRetry: 'Batch Retry',
   // Status Enums
   Pending: 'Pending',
@@ -46,7 +47,13 @@ const locale = {
   OutputResult: 'Output Result',
   // Modal Titles
   ErrorDetailTitle: 'Error Detail',
-  TaskResultTitle: 'Task Result'
+  TaskResultTitle: 'Task Result',
+  ViewLogsTitle: 'Execution Logs',
+  // ViewLogs
+  LogItem: 'Log',
+  RequestTime: 'Request Time',
+  Message: 'Message',
+  RequestData: 'Request Data'
 };
 
 export default locale;

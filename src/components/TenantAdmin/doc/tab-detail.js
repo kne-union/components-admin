@@ -1,32 +1,22 @@
 const { TabDetail } = _TenantAdmin;
+const { default: mockPreset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
-const BaseExample = createWithRemoteLoader({
+const { Routes, Route, Navigate } = reactRouterDom;
+
+const TabDetailExample = createWithRemoteLoader({
   modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
 })(({ remoteModules }) => {
   const [PureGlobal, Layout] = remoteModules;
   return (
-    <PureGlobal
-      preset={{
-        apis: {
-          testApi: {
-            getDetail: {
-              loader: () => {
-                return {
-                  id: '1212121212',
-                  name: '测试测试测试',
-                  description: '描述描述描述描述描述描述描述描述'
-                };
-              }
-            }
-          }
-        }
-      }}
-    >
+    <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
-        <TabDetail optionFixed={false} />
+        <Routes>
+          <Route path="/detail" element={<TabDetail optionFixed={false} />} />
+          <Route path="*" element={<Navigate to="/detail?id=tenant-001" replace />} />
+        </Routes>
       </Layout>
     </PureGlobal>
   );
 });
 
-render(<BaseExample />);
+render(<TabDetailExample />);

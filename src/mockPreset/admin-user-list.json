@@ -1,0 +1,93 @@
+{
+  "totalCount": 8,
+  "pageData": [
+    {
+      "id": 1,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangsan",
+      "nickname": "张三",
+      "email": "zhangsan@example.com",
+      "phone": "+86 138001380001",
+      "isSuperAdmin": true,
+      "status": 0,
+      "description": "系统超级管理员，负责整体系统维护和用户管理",
+      "gender": "M"
+    },
+    {
+      "id": 2,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=lisi",
+      "nickname": "李四",
+      "email": "lisi@example.com",
+      "phone": "+86 138001380002",
+      "isSuperAdmin": false,
+      "status": 0,
+      "description": "技术部负责人，负责技术架构设计和团队管理",
+      "gender": "M"
+    },
+    {
+      "id": 3,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=wangwu",
+      "nickname": "王五",
+      "email": "wangwu@example.com",
+      "phone": "+86 138001380003",
+      "isSuperAdmin": false,
+      "status": 0,
+      "description": "产品经理，负责产品规划和需求分析",
+      "gender": "M"
+    },
+    {
+      "id": 4,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhaoliu",
+      "nickname": "赵六",
+      "email": "zhaoliu@example.com",
+      "phone": "+86 138001380004",
+      "isSuperAdmin": false,
+      "status": 10,
+      "description": "新入职员工，等待账号激活",
+      "gender": "F"
+    },
+    {
+      "id": 5,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=qianqi",
+      "nickname": "钱七",
+      "email": "qianqi@example.com",
+      "phone": "+86 138001380005",
+      "isSuperAdmin": false,
+      "status": 12,
+      "description": "已离职员工，账号已关闭",
+      "gender": "M"
+    },
+    {
+      "id": 6,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=sunba",
+      "nickname": "孙八",
+      "email": "sunba@example.com",
+      "phone": "+86 138001380006",
+      "isSuperAdmin": false,
+      "status": 0,
+      "description": "前端开发工程师，负责前端开发工作",
+      "gender": "M"
+    },
+    {
+      "id": 7,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhoujiu",
+      "nickname": "周九",
+      "email": "zhoujiu@example.com",
+      "phone": "+86 138001380007",
+      "isSuperAdmin": false,
+      "status": 0,
+      "description": "后端开发工程师，负责后端API开发",
+      "gender": "M"
+    },
+    {
+      "id": 8,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=wushi",
+      "nickname": "吴十",
+      "email": "wushi@example.com",
+      "phone": "+86 138001380008",
+      "isSuperAdmin": true,
+      "status": 0,
+      "description": "运维工程师，负责服务器运维和部署",
+      "gender": "F"
+    }
+  ]
+}

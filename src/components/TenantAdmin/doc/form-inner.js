@@ -1,14 +1,21 @@
 const { FormInner } = _TenantAdmin;
+const { default: mockPreset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
-const BaseExample = createWithRemoteLoader({
-  modules: ['components-core:FormInfo@Form']
+const { Card } = antd;
+
+const FormInnerExample = createWithRemoteLoader({
+  modules: ['components-core:FormInfo@Form', 'components-core:Global@PureGlobal']
 })(({ remoteModules }) => {
-  const [Form] = remoteModules;
+  const [Form, PureGlobal] = remoteModules;
   return (
-    <Form>
-      <FormInner />
-    </Form>
+    <PureGlobal preset={mockPreset}>
+      <Card title="租户表单字段">
+        <Form onSubmit={(data) => console.log(data)}>
+          <FormInner />
+        </Form>
+      </Card>
+    </PureGlobal>
   );
 });
 
-render(<BaseExample />);
+render(<FormInnerExample />);

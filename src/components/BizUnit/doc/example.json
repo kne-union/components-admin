@@ -2,13 +2,101 @@
   "isFull": false,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "基础用法",
+      "description": "展示 BizUnit 的基本使用方式，包含完整的 CRUD 功能：列表展示、关键字搜索、创建、编辑、删除和状态切换。通过配置 apis、getColumns、getFormInner 等属性快速实现业务模块。",
       "code": "./base.js",
       "scope": [
         {
           "name": "_BizUnit",
           "packageName": "@components/BizUnit"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "自定义操作按钮",
+      "description": "通过 getActionList 函数自定义操作按钮。支持重置内置按钮配置（如根据条件隐藏系统类型角色的删除按钮），以及添加自定义操作按钮组件。",
+      "code": "./custom-actions.js",
+      "scope": [
+        {
+          "name": "_BizUnit",
+          "packageName": "@components/BizUnit"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "带筛选条件",
+      "description": "通过 filterList 属性添加筛选条件，配合 Filter 组件的 SelectItem 实现下拉筛选。适用于需要多条件筛选的业务场景。",
+      "code": "./with-filter.js",
+      "scope": [
+        {
+          "name": "_BizUnit",
+          "packageName": "@components/BizUnit"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "状态控制配置",
+      "description": "通过 options 配置自定义状态控制按钮。支持自定义状态值、按钮文案和确认提示信息，适用于不同业务场景的状态管理。",
+      "code": "./status-control.js",
+      "scope": [
+        {
+          "name": "_BizUnit",
+          "packageName": "@components/BizUnit"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "Actions 组件单独使用",
+      "description": "Actions 组件可以单独使用，用于自定义场景下的操作按钮区域。需要包裹 PureGlobal 提供国际化上下文。展示如何在不使用 BizUnit 完整功能时，单独使用操作按钮组件。",
+      "code": "./actions.js",
+      "scope": [
+        {
+          "name": "_BizUnit",
+          "packageName": "@components/BizUnit"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
         }
       ]
     }

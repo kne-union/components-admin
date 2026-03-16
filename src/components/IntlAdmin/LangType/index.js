@@ -5,7 +5,7 @@ import FormInner from './FormInner';
 
 const LangType = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:Layout@TablePage']
-})(({ remoteModules, menu }) => {
+})(({ remoteModules, menu, pageProps = {} }) => {
   const [usePreset, TablePage] = remoteModules;
   const { apis } = usePreset();
   return (
@@ -20,8 +20,9 @@ const LangType = createWithRemoteLoader({
       {({ filter, topOptions, titleExtra, tableOptions }) => {
         return (
           <TablePage
-            {...tableOptions}
+            {...Object.assign({}, tableOptions)}
             page={{
+              ...pageProps,
               menu,
               filter,
               titleExtra,

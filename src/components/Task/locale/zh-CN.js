@@ -24,6 +24,7 @@ const locale = {
   Retry: '重试',
   ErrorDetail: '错误详情',
   ViewResult: '查看结果',
+  ViewLogs: '查看日志',
   BatchRetry: '批量重试',
   // Status Enums
   Pending: '等待执行',
@@ -46,7 +47,13 @@ const locale = {
   OutputResult: '输出结果',
   // Modal Titles
   ErrorDetailTitle: '错误详情',
-  TaskResultTitle: '任务结果'
+  TaskResultTitle: '任务结果',
+  ViewLogsTitle: '执行日志',
+  // ViewLogs
+  LogItem: '日志',
+  RequestTime: '请求时间',
+  Message: '消息',
+  RequestData: '请求数据'
 };
 
 export default locale;

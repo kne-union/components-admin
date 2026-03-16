@@ -13,7 +13,7 @@ const User = createWithRemoteLoader({
     'components-core:Table@TablePage',
     'components-core:Filter@FilterProvider'
   ]
-})(({ remoteModules, menu, children, apis: extraApis = {} }) => {
+})(({ remoteModules, menu, children, pageProps: originPageProps, apis: extraApis = {} }) => {
   const [Page, usePreset, Permissions, usePermissionsPass, TablePage, FilterProvider] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
@@ -24,7 +24,7 @@ const User = createWithRemoteLoader({
   const allowRemove = usePermissionsPass({ request: ['setting:user-manager:remove'] });
   const allowInvite = usePermissionsPass({ request: ['setting:user-manager:invite'] });
 
-  const pageProps = {
+  const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'UserManagement' }),
     filter,
@@ -52,7 +52,7 @@ const User = createWithRemoteLoader({
         </UserList>
       </Permissions>
     )
-  };
+  });
 
   if (typeof children === 'function') {
     return children(pageProps);

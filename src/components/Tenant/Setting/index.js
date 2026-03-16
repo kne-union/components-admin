@@ -11,7 +11,7 @@ import Permission from './Permission';
 const Setting = createWithRemoteLoader({
   modules: ['components-core:Layout@Menu']
 })(
-  withLocale(({ remoteModules, apis, baseUrl: originalBaseUrl }) => {
+  withLocale(({ remoteModules, apis, baseUrl: originalBaseUrl, pageProps }) => {
     const baseUrl = `${originalBaseUrl}/setting`;
     const [Menu] = remoteModules;
     const { formatMessage } = useIntl();
@@ -51,19 +51,19 @@ const Setting = createWithRemoteLoader({
           },
           {
             path: 'company',
-            element: <Company menu={menu} />
+            element: <Company menu={menu} pageProps={pageProps} />
           },
           {
             path: 'org',
-            element: <Org menu={menu} />
+            element: <Org menu={menu} pageProps={pageProps} />
           },
           {
             path: 'permission',
-            element: <Permission menu={menu} />
+            element: <Permission menu={menu} pageProps={pageProps} />
           },
           {
             path: 'user',
-            element: <User menu={menu} apis={apis}/>
+            element: <User menu={menu} apis={apis} pageProps={pageProps} />
           }
         ]}
       />

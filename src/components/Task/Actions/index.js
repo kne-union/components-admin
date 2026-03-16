@@ -5,6 +5,7 @@ import CancelTask from './CancelTask';
 import RetryTask from './RetryTask';
 import ErrorDetail from './ErrorDetail';
 import ResultDetail from './ResultDetail';
+import ViewLogs from './ViewLogs';
 
 const ActionsInner = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
@@ -63,6 +64,16 @@ const ActionsInner = createWithRemoteLoader({
       buttonComponent: ResultDetail,
       data,
       children: formatMessage({ id: 'ViewResult' }),
+      onSuccess
+    });
+  }
+
+  if (Array.isArray(data?.options?.logs) && data.options.logs.length > 0) {
+    list.push({
+      ...props,
+      buttonComponent: ViewLogs,
+      data,
+      children: formatMessage({ id: 'ViewLogs' }),
       onSuccess
     });
   }

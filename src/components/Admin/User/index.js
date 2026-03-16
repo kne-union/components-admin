@@ -3,6 +3,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Space, Button, App } from 'antd';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
+import { useProps } from '../context';
 import getColumns from './getColumns';
 import FormInner from './FormInner';
 import ResetPasswordFormInner from './ResetPasswordFormInner';
@@ -11,9 +12,11 @@ import get from 'lodash/get';
 
 const UserInner = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Filter', 'components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
-})(({ remoteModules }) => {
+})(({ remoteModules, pageProps: propsPageProps }) => {
   const [TablePage, Filter, useFormModal, usePreset] = remoteModules;
   const { formatMessage } = useIntl();
+  const contextProps = useProps();
+  const pageProps = Object.assign({}, contextProps?.pageProps, propsPageProps);
   const [filter, setFilter] = useState([]);
   const { SearchInput, getFilterValue, fields: filterFields } = Filter;
   const { InputFilterItem, AdvancedSelectFilterItem } = filterFields;
@@ -28,6 +31,7 @@ const UserInner = createWithRemoteLoader({
       pagination={{ paramsType: 'params' }}
       name="user-list"
       ref={ref}
+      menuFixed={pageProps?.menuFixed}
       columns={[
         ...getColumns({ formatMessage }),
         {

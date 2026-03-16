@@ -21,3 +21,7 @@ const TenantAdminInner = ({ baseUrl, ...props }) => {
 };
 
 export default withLocale(TenantAdminInner);
+export { default as FormInner } from './FormInner';
+export { default as List } from './List';
+
+export { default as TabDetail } from './TabDetail';

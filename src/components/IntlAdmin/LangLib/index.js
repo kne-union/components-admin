@@ -4,7 +4,7 @@ import getColumns from './getColumns';
 
 const LangLib = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:Layout@TablePage']
-})(({ remoteModules, menu }) => {
+})(({ remoteModules, menu, pageProps = {} }) => {
   const [usePreset, TablePage] = remoteModules;
   const { apis } = usePreset();
   return (
@@ -12,8 +12,9 @@ const LangLib = createWithRemoteLoader({
       {({ filter, topOptions, titleExtra, tableOptions }) => {
         return (
           <TablePage
-            {...tableOptions}
+            {...Object.assign({}, tableOptions)}
             page={{
+              ...pageProps,
               menu,
               filter,
               titleExtra,
