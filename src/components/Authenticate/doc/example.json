@@ -1,14 +1,114 @@
 {
-  "isFull": false,
+  "isFull": true,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "用户登录后布局",
+      "description": "AfterUserLoginLayout 组件展示用户登录后的完整布局，包含顶部导航栏和用户工具",
       "code": "./base.js",
       "scope": [
         {
           "name": "_Authenticate",
           "packageName": "@components/Authenticate"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "用户信息获取",
+      "description": "UserInfo 组件获取用户信息并展示，用户信息会被设置到全局上下文中供其他组件使用",
+      "code": "./user-info.js",
+      "scope": [
+        {
+          "name": "_Authenticate",
+          "packageName": "@components/Authenticate"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "编辑用户信息",
+      "description": "SaveUserInfo 组件提供用户信息编辑功能，点击按钮弹出表单进行编辑",
+      "code": "./save-user-info.js",
+      "scope": [
+        {
+          "name": "_Authenticate",
+          "packageName": "@components/Authenticate"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "管理员登录后布局",
+      "description": "AfterAdminUserLoginLayout 组件展示管理员登录后的布局，使用超级管理员信息",
+      "code": "./admin-layout.js",
+      "scope": [
+        {
+          "name": "_Authenticate",
+          "packageName": "@components/Authenticate"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "自定义用户登录布局",
+      "description": "AfterCustomUserLoginLayout 组件支持自定义用户信息 API，适用于自定义用户系统",
+      "code": "./custom-user.js",
+      "scope": [
+        {
+          "name": "_Authenticate",
+          "packageName": "@components/Authenticate"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
         }
       ]
     }

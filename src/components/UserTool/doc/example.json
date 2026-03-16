@@ -2,13 +2,82 @@
   "isFull": false,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "基础用法",
+      "description": "展示 UserTool 组件的基本使用方式，点击显示用户信息和操作菜单",
       "code": "./base.js",
       "scope": [
         {
           "name": "_UserTool",
           "packageName": "@components/UserTool"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "自定义子元素",
+      "description": "通过 children 在下拉菜单中添加自定义内容，如升级提示、VIP 标识等",
+      "code": "./with-children.js",
+      "scope": [
+        {
+          "name": "_UserTool",
+          "packageName": "@components/UserTool"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "右侧选项组合",
+      "description": "RightOptions 组件，组合了语言切换和 UserTool，适用于顶部导航栏右侧",
+      "code": "./right-options.js",
+      "scope": [
+        {
+          "name": "_UserTool",
+          "packageName": "@components/UserTool"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "最小配置",
+      "description": "仅传入头像，名称和邮箱不传或为空时显示默认文案",
+      "code": "./minimal.js",
+      "scope": [
+        {
+          "name": "_UserTool",
+          "packageName": "@components/UserTool"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
         }
       ]
     }

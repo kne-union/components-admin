@@ -1,0 +1,94 @@
+{
+  "tenantList": {
+    "totalCount": 5,
+    "pageData": [
+      {
+        "id": "tenant-001",
+        "name": "科技创新有限公司",
+        "status": "open",
+        "description": "一家专注于人工智能和云计算技术研发的高新技术企业，主要业务包括智能软件开发、数据分析服务和云计算解决方案。",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=tech",
+        "themeColor": "#1890ff",
+        "accountCount": 50,
+        "serviceStartTime": "2024-01-01",
+        "serviceEndTime": "2025-12-31",
+        "createdAt": "2024-01-15T10:30:00Z"
+      },
+      {
+        "id": "tenant-002",
+        "name": "智慧教育集团",
+        "status": "open",
+        "description": "专注于在线教育平台开发，为学校和培训机构提供完整的数字化教学解决方案。",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=edu",
+        "themeColor": "#52c41a",
+        "accountCount": 120,
+        "serviceStartTime": "2024-03-01",
+        "serviceEndTime": "2025-02-28",
+        "createdAt": "2024-02-20T14:15:00Z"
+      },
+      {
+        "id": "tenant-003",
+        "name": "医疗健康科技",
+        "status": "closed",
+        "description": "医疗信息化解决方案提供商，专注于医院管理系统和远程医疗平台的研发。",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=health",
+        "themeColor": "#722ed1",
+        "accountCount": 35,
+        "serviceStartTime": "2023-01-01",
+        "serviceEndTime": "2024-01-01",
+        "createdAt": "2023-01-10T09:00:00Z"
+      },
+      {
+        "id": "tenant-004",
+        "name": "金融数据服务",
+        "status": "open",
+        "description": "为金融机构提供数据分析和风险控制服务，拥有专业的量化分析团队。",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=finance",
+        "themeColor": "#fa8c16",
+        "accountCount": 80,
+        "serviceStartTime": "2024-06-01",
+        "serviceEndTime": "2025-05-31",
+        "createdAt": "2024-05-25T16:45:00Z"
+      },
+      {
+        "id": "tenant-005",
+        "name": "新零售解决方案",
+        "status": "open",
+        "description": "为零售企业提供全渠道数字化转型服务，包括电商平台、会员系统和供应链管理。",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=retail",
+        "themeColor": "#eb2f96",
+        "accountCount": 45,
+        "serviceStartTime": "2024-09-01",
+        "serviceEndTime": "2025-08-31",
+        "createdAt": "2024-08-15T11:20:00Z"
+      }
+    ]
+  },
+  "tenantDetail": {
+    "id": "tenant-001",
+    "name": "科技创新有限公司",
+    "status": "open",
+    "description": "一家专注于人工智能和云计算技术研发的高新技术企业，主要业务包括智能软件开发、数据分析服务和云计算解决方案。",
+    "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=tech",
+    "themeColor": "#1890ff",
+    "accountCount": 50,
+    "serviceStartTime": "2024-01-01T00:00:00Z",
+    "serviceEndTime": "2025-12-31T23:59:59Z",
+    "createdAt": "2024-01-15T10:30:00Z",
+    "tenantCompany": {
+      "name": "科技创新有限公司",
+      "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=tech"
+    },
+    "tenantSetting": {
+      "args": [
+        { "key": "API_KEY", "value": "sk-xxxx-xxxx-xxxx", "secret": true },
+        { "key": "MAX_CONNECTIONS", "value": "100", "secret": false },
+        { "key": "TIMEOUT", "value": "30000", "secret": false }
+      ],
+      "customComponents": [
+        { "key": "custom-form", "name": "自定义表单", "type": "form", "description": "用于特殊业务场景的自定义表单组件" },
+        { "key": "data-chart", "name": "数据图表", "type": "chart", "description": "数据可视化图表组件" }
+      ]
+    }
+  }
+}

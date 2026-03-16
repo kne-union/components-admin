@@ -1,14 +1,64 @@
 {
-  "isFull": false,
+  "isFull": true,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "基础用法",
+      "description": "IntlAdmin 组件的完整功能展示，包含语言类型管理和语言库管理两个子模块，通过左侧菜单进行切换",
       "code": "./base.js",
       "scope": [
         {
           "name": "_IntlAdmin",
           "packageName": "@components/IntlAdmin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        }
+      ]
+    },
+    {
+      "title": "语言类型管理",
+      "description": "LangType 子组件单独使用，展示语言类型的列表、创建、编辑、删除和状态切换功能",
+      "code": "./lang-type.js",
+      "scope": [
+        {
+          "name": "_IntlAdmin",
+          "packageName": "@components/IntlAdmin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "语言库管理",
+      "description": "LangLib 子组件单独使用，展示语言库的列表、添加和编辑翻译文本功能",
+      "code": "./lang-lib.js",
+      "scope": [
+        {
+          "name": "_IntlAdmin",
+          "packageName": "@components/IntlAdmin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
         }
       ]
     }

@@ -1,0 +1,15 @@
+{
+  "code": 0,
+  "data": {
+    "userInfo": {
+      "id": 1,
+      "email": "zhangsan@example.com",
+      "nickname": "张三",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangsan",
+      "phone": "+86138001380001",
+      "description": "资深前端工程师，负责核心业务开发",
+      "status": 0,
+      "gender": "M"
+    }
+  }
+}

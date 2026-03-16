@@ -16,6 +16,41 @@
           "reportId": 5001,
           "url": "https://example.com/reports/5001.pdf"
         },
+        "options": {
+          "logs": [
+            {
+              "data": {
+                "url": "https://api.example.com/v1/interview/start",
+                "method": "POST",
+                "headers": {
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer xxx"
+                },
+                "body": "{\"candidateId\":2001,\"interviewId\":3001}"
+              },
+              "message": "开始生成面试报告",
+              "time": "2024-03-08T10:30:05.000Z"
+            },
+            {
+              "data": {
+                "url": "https://api.example.com/v1/interview/process",
+                "method": "POST",
+                "body": "{\"step\":\"analysis\",\"progress\":50}"
+              },
+              "message": "分析面试数据中",
+              "time": "2024-03-08T10:32:00.000Z"
+            },
+            {
+              "data": {
+                "reportId": 5001,
+                "url": "https://example.com/reports/5001.pdf",
+                "pageCount": 12
+              },
+              "message": "报告生成完成",
+              "time": "2024-03-08T10:35:00.000Z"
+            }
+          ]
+        },
         "createdAt": "2024-03-08 10:30:00",
         "completedAt": "2024-03-08 10:35:00",
         "updatedAt": "2024-03-08 10:35:00"

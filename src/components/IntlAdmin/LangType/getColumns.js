@@ -35,7 +35,7 @@ const getColumns = () => {
       valueOf: ({ status }) =>
         status && {
           isEnum: true,
-          moduleName: 'commonStatus',
+          moduleName: 'openStatus',
           name: status
         }
     }

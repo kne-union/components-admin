@@ -1,50 +1,14 @@
-const { default: List } = _TenantAdmin;
+const { List } = _TenantAdmin;
+const { default: mockPreset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
-const BaseExample = createWithRemoteLoader({
-  modules: ['components-core:Global@PureGlobal', 'components-core:Global@usePreset', 'components-core:Layout']
+const { Routes, Route } = reactRouterDom;
+
+const ListExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
 })(({ remoteModules }) => {
-  const [PureGlobal, usePreset, Layout] = remoteModules;
-  const { ajax } = usePreset();
+  const [PureGlobal, Layout] = remoteModules;
   return (
-    <PureGlobal
-      preset={{
-        ajax,
-        apis: {
-          testApi: {
-            getList: {
-              loader: () => {
-                return {
-                  pageData: [
-                    {
-                      id: 1,
-                      name: '测试数据',
-                      description: '测试测试测试测试测试测试测试',
-                      createdTime: new Date()
-                    }
-                  ],
-                  totalCount: 1
-                };
-              }
-            },
-            add: {
-              loader: () => {
-                return null;
-              }
-            },
-            save: {
-              loader: () => {
-                return null;
-              }
-            },
-            remove: {
-              loader: () => {
-                return null;
-              }
-            }
-          }
-        }
-      }}
-    >
+    <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
         <List />
       </Layout>
@@ -52,4 +16,4 @@ const BaseExample = createWithRemoteLoader({
   );
 });
 
-render(<BaseExample />);
+render(<ListExample />);

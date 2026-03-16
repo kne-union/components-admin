@@ -1,0 +1,16 @@
+{
+  "code": 0,
+  "data": {
+    "userInfo": {
+      "id": 1,
+      "email": "admin@example.com",
+      "nickname": "超级管理员",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
+      "phone": "+86138001380000",
+      "description": "系统超级管理员",
+      "status": 0,
+      "isSuperAdmin": true,
+      "gender": "M"
+    }
+  }
+}

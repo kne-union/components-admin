@@ -56,54 +56,60 @@ const Actions = createWithRemoteLoader({
         getFormInner
       };
 
-      const otherActionList = typeof getActionList === 'function' ? getActionList(props) : [];
-
-      if (props.apis.save) {
-        actionList.push({
+      const buttonOtherPropsMap = {
+        save: {
           ...props,
           name: 'save',
           buttonComponent: Edit
-        });
-      }
-
-      if (props.apis.setStatus) {
-        actionList.push(
-          {
-            ...props,
-            name: 'setStatusOpen',
-            buttonComponent: SetStatus,
-            hidden: props.data?.status === props.options?.openStatus || 'open'
-          },
-          {
-            ...props,
-            name: 'setStatusClose',
-            buttonComponent: SetStatus,
-            hidden: props.data?.status === props.options?.closedStatus || 'closed',
-            confirmMessage: props.options?.closeMessage || formatMessage({ id: 'ConfirmClose' }, { bizName: props.options?.bizName }),
-            isDelete: false
-          }
-        );
-      }
-
-      if (props.apis.remove) {
-        actionList.push({
+        },
+        setStatusOpen: {
+          ...props,
+          name: 'setStatusOpen',
+          buttonComponent: SetStatus,
+          hidden: props.data?.status === props.options?.openStatus || 'open'
+        },
+        setStatusClose: {
+          ...props,
+          name: 'setStatusClose',
+          buttonComponent: SetStatus,
+          hidden: props.data?.status === props.options?.closedStatus || 'closed',
+          confirmMessage: props.options?.closeMessage || formatMessage({ id: 'ConfirmClose' }, { bizName: props.options?.bizName }),
+          isDelete: false
+        },
+        remove: {
           ...props,
           name: 'remove',
           buttonComponent: Remove,
           confirmMessage: props.options?.removeMessage || formatMessage({ id: 'ConfirmDelete' }, { bizName: props.options?.bizName })
-        });
+        }
+      };
+
+      const otherActionList = typeof getActionList === 'function' ? getActionList(props) : [];
+
+      if (props.apis.save) {
+        actionList.push(buttonOtherPropsMap.save);
+      }
+
+      if (props.apis.setStatus) {
+        actionList.push(buttonOtherPropsMap.setStatusOpen, buttonOtherPropsMap.setStatusClose);
+      }
+
+      if (props.apis.remove) {
+        actionList.push(buttonOtherPropsMap.remove);
       }
 
       if (Array.isArray(otherActionList) && otherActionList.length > 0) {
         otherActionList.reverse().forEach(({ index, ...item }) => {
           if (item.name) {
             const existItem = actionList.find(target => target.name === item.name);
+            if (item.name === 'setStatusOpen') {
+            }
             if (existItem) {
               Object.assign(existItem, typeof item.reset === 'function' ? item.reset(existItem) : item);
               return;
             }
           }
-          actionList.splice(item.index || 0, 0, item);
+          actionList.splice(item.index || 0, 0, Object.assign({}, buttonOtherPropsMap[item.name], item));
         });
       }
 

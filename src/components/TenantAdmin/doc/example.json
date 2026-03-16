@@ -2,62 +2,72 @@
   "isFull": true,
   "list": [
     {
-      "title": "列表页",
-      "description": "列表页",
+      "title": "租户列表",
+      "description": "租户列表页面，支持状态筛选、关键字搜索、添加租户、编辑、开启/关闭、删除等操作",
       "code": "./list.js",
       "scope": [
         {
+          "name": "_TenantAdmin",
+          "packageName": "@components/TenantAdmin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
           "name": "remoteLoader",
           "packageName": "@kne/remote-loader"
         },
         {
-          "name": "_TenantAdmin",
-          "packageName": "@components/TenantAdmin"
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
         }
       ]
     },
     {
-      "title": "表单页",
-      "description": "表单页",
+      "title": "表单字段",
+      "description": "租户表单字段组件，包含租户名称、账号数量、服务时间、Logo、主题色、描述等字段",
       "code": "./form-inner.js",
       "scope": [
         {
-          "name": "remoteLoader",
-          "packageName": "@kne/remote-loader"
-        },
-        {
           "name": "_TenantAdmin",
           "packageName": "@components/TenantAdmin"
-        }
-      ]
-    },
-    {
-      "title": "详情页",
-      "description": "详情页",
-      "code": "./detail.js",
-      "scope": [
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
         {
           "name": "remoteLoader",
           "packageName": "@kne/remote-loader"
         },
         {
-          "name": "_TenantAdmin",
-          "packageName": "@components/TenantAdmin"
+          "name": "antd",
+          "packageName": "antd"
         }
       ]
     },
+
     {
-      "title": "tab详情页",
-      "description": "tab详情页",
+      "title": "Tab详情页",
+      "description": "带Tab切换的租户详情页，包含公司信息、组织架构、权限、用户列表、设置等Tab页",
       "code": "./tab-detail.js",
       "scope": [
         {
+          "name": "_TenantAdmin",
+          "packageName": "@components/TenantAdmin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
           "name": "remoteLoader",
           "packageName": "@kne/remote-loader"
         },
         {
-          "name": "_TenantAdmin",
-          "packageName": "@components/TenantAdmin"
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
         }
       ]
     }

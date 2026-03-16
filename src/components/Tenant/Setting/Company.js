@@ -7,13 +7,13 @@ import { useIntl } from '@kne/react-intl';
 
 const CompanyInner = createWithRemoteLoader({
   modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:Permissions']
-})(({ remoteModules, menu, children }) => {
+})(({ remoteModules, menu, pageProps: originPageProps, children }) => {
   const [Page, usePreset, Permissions] = remoteModules;
   const { formatMessage } = useIntl();
   const { ajax, apis } = usePreset();
   const { message } = App.useApp();
 
-  const pageProps = {
+  const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'CompanyInfoPage' }),
     children: (
@@ -49,7 +49,7 @@ const CompanyInner = createWithRemoteLoader({
         />
       </Permissions>
     )
-  };
+  });
 
   if (typeof children === 'function') {
     return children(pageProps);

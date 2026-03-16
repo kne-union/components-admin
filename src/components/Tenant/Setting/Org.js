@@ -12,7 +12,7 @@ const OrgInner = createWithRemoteLoader({
     'components-core:Permissions',
     'components-core:Permissions@usePermissionsPass'
   ]
-})(({ remoteModules, menu, children }) => {
+})(({ remoteModules, menu, pageProps: originPageProps, children }) => {
   const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
@@ -21,7 +21,7 @@ const OrgInner = createWithRemoteLoader({
   const allowSave = usePermissionsPass({ request: ['setting:org:edit'] });
   const allowRemove = usePermissionsPass({ request: ['setting:org:remove'] });
 
-  const pageProps = {
+  const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'OrgStructure' }),
     children: (
@@ -45,7 +45,7 @@ const OrgInner = createWithRemoteLoader({
         />
       </Permissions>
     )
-  };
+  });
 
   if (typeof children === 'function') {
     return children(pageProps);

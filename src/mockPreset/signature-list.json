@@ -1,0 +1,78 @@
+{
+  "code": 0,
+  "data": {
+    "pageData": [
+      {
+        "appId": "app_20240308001",
+        "secretKey": "sk_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+        "user": {
+          "id": 1,
+          "nickname": "张三",
+          "email": "zhangsan@example.com",
+          "phone": "138****1234"
+        },
+        "description": "用于API对接的主密钥",
+        "lastVisitedAt": "2024-03-08 14:30:00",
+        "status": 0,
+        "createdAt": "2024-03-01 09:00:00"
+      },
+      {
+        "appId": "app_20240305002",
+        "secretKey": "sk_z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4",
+        "user": {
+          "id": 2,
+          "nickname": "李四",
+          "email": "lisi@example.com",
+          "phone": "139****5678"
+        },
+        "description": "测试环境使用的签名密钥",
+        "lastVisitedAt": "2024-03-05 16:20:00",
+        "status": 1,
+        "createdAt": "2024-02-28 11:00:00"
+      },
+      {
+        "appId": "app_20240303003",
+        "secretKey": "sk_q1w2e3r4t5y6u7i8o9p0a1s2d3f4g5h6",
+        "user": {
+          "id": 3,
+          "nickname": "王五",
+          "email": "wangwu@example.com",
+          "phone": "137****9012"
+        },
+        "description": "内部系统集成专用",
+        "lastVisitedAt": "2024-03-03 10:15:00",
+        "status": 0,
+        "createdAt": "2024-02-20 14:30:00"
+      },
+      {
+        "appId": "app_20240302004",
+        "secretKey": "sk_j4k5l6m7n8o9p0q1r2s3t4u5v6w7x8y9",
+        "user": {
+          "id": 1,
+          "nickname": "张三",
+          "email": "zhangsan@example.com",
+          "phone": "138****1234"
+        },
+        "description": "第三方服务回调验证密钥",
+        "lastVisitedAt": "2024-03-02 18:45:00",
+        "status": 0,
+        "createdAt": "2024-02-15 08:00:00"
+      },
+      {
+        "appId": "app_20240301005",
+        "secretKey": "sk_z0a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5",
+        "user": {
+          "id": 4,
+          "nickname": "赵六",
+          "email": "zhaoliu@example.com",
+          "phone": "136****3456"
+        },
+        "description": "数据同步接口密钥",
+        "lastVisitedAt": "2024-03-01 20:00:00",
+        "status": 1,
+        "createdAt": "2024-01-10 10:00:00"
+      }
+    ],
+    "totalCount": 5
+  }
+}

@@ -1,14 +1,76 @@
 {
-  "isFull": false,
+  "isFull": true,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "基础用法",
+      "description": "Admin 组件的完整功能展示，包含用户管理子路由和路由导航功能",
       "code": "./base.js",
       "scope": [
         {
           "name": "_Admin",
           "packageName": "@components/Admin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "用户管理",
+      "description": "单独展示 User 子组件，包含用户列表、添加用户、编辑用户、修改密码、设置超级管理员等完整功能",
+      "code": "./user.js",
+      "scope": [
+        {
+          "name": "_Admin",
+          "packageName": "@components/Admin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "初始化超级管理员",
+      "description": "InitAdmin 组件用于系统首次使用时初始化超级管理员账号，初始化成功后自动跳转到管理后台",
+      "code": "./init-admin.js",
+      "scope": [
+        {
+          "name": "_Admin",
+          "packageName": "@components/Admin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
         }
       ]
     }

@@ -85,7 +85,7 @@ const AllTask = createWithRemoteLoader({
                     data={item}
                     type="link"
                     onSuccess={() => {
-                      ref.current.reload();
+                      ref.current && ref.current.reload();
                     }}
                   />
                 )
