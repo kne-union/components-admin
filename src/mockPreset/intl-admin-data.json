@@ -1,0 +1,124 @@
+{
+  "langType": {
+    "pageData": [
+      {
+        "id": 1,
+        "name": "中文（简体）",
+        "code": "zh-CN",
+        "params": "count, name, date",
+        "description": "简体中文语言包，适用于中国大陆地区",
+        "status": "open"
+      },
+      {
+        "id": 2,
+        "name": "中文（繁体）",
+        "code": "zh-TW",
+        "params": "count, name, date",
+        "description": "繁体中文语言包，适用于台湾、香港地区",
+        "status": "open"
+      },
+      {
+        "id": 3,
+        "name": "English",
+        "code": "en-US",
+        "params": "count, name, date",
+        "description": "美式英语语言包，适用于美国地区",
+        "status": "open"
+      },
+      {
+        "id": 4,
+        "name": "日本語",
+        "code": "ja-JP",
+        "params": "count, name, date",
+        "description": "日语语言包，适用于日本地区",
+        "status": "closed"
+      },
+      {
+        "id": 5,
+        "name": "한국어",
+        "code": "ko-KR",
+        "params": "count, name, date",
+        "description": "韩语语言包，适用于韩国地区",
+        "status": "open"
+      }
+    ],
+    "totalCount": 5
+  },
+  "langLib": {
+    "pageData": [
+      {
+        "id": 1,
+        "namespace": "components-admin:User",
+        "locale": "zh-CN",
+        "code": "AddUser",
+        "target": "添加用户",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 2,
+        "namespace": "components-admin:User",
+        "locale": "en-US",
+        "code": "AddUser",
+        "target": "Add User",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 3,
+        "namespace": "components-admin:User",
+        "locale": "zh-CN",
+        "code": "EditUser",
+        "target": "编辑用户",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 4,
+        "namespace": "components-admin:User",
+        "locale": "en-US",
+        "code": "EditUser",
+        "target": "Edit User",
+        "reviewStatus": "pending",
+        "status": "open"
+      },
+      {
+        "id": 5,
+        "namespace": "components-admin:Role",
+        "locale": "zh-CN",
+        "code": "RoleName",
+        "target": "角色名称",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 6,
+        "namespace": "components-admin:Role",
+        "locale": "en-US",
+        "code": "RoleName",
+        "target": "Role Name",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 7,
+        "namespace": "components-admin:Signature",
+        "locale": "zh-CN",
+        "code": "AddSecretKey",
+        "target": "添加密钥",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 8,
+        "namespace": "components-admin:Signature",
+        "locale": "en-US",
+        "code": "AddSecretKey",
+        "target": "Add Secret Key",
+        "reviewStatus": "rejected",
+        "status": "closed"
+      }
+    ],
+    "totalCount": 8
+  }
+}

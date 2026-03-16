@@ -1,0 +1,92 @@
+{
+  "code": 0,
+  "data": {
+    "totalCount": 12,
+    "pageData": [
+      {
+        "id": 1,
+        "code": "frontend",
+        "name": "前端开发",
+        "description": "包含HTML、CSS、JavaScript等前端技术栈相关技能",
+        "createdAt": "2024-01-15T10:30:00Z"
+      },
+      {
+        "id": 2,
+        "code": "backend",
+        "name": "后端开发",
+        "description": "包含Java、Python、Node.js等后端技术栈相关技能",
+        "createdAt": "2024-01-15T11:00:00Z"
+      },
+      {
+        "id": 3,
+        "code": "database",
+        "name": "数据库",
+        "description": "包含MySQL、PostgreSQL、MongoDB等数据库技术",
+        "createdAt": "2024-01-16T09:00:00Z"
+      },
+      {
+        "id": 4,
+        "code": "devops",
+        "name": "运维开发",
+        "description": "包含Docker、Kubernetes、CI/CD等运维技术",
+        "createdAt": "2024-01-16T10:00:00Z"
+      },
+      {
+        "id": 5,
+        "code": "mobile",
+        "name": "移动开发",
+        "description": "包含iOS、Android、React Native等移动开发技术",
+        "createdAt": "2024-01-17T09:30:00Z"
+      },
+      {
+        "id": 6,
+        "code": "ai",
+        "name": "人工智能",
+        "description": "包含机器学习、深度学习、NLP等AI相关技术",
+        "createdAt": "2024-01-17T14:00:00Z"
+      },
+      {
+        "id": 7,
+        "code": "security",
+        "name": "网络安全",
+        "description": "包含渗透测试、安全审计、加密算法等安全技术",
+        "createdAt": "2024-01-18T10:00:00Z"
+      },
+      {
+        "id": 8,
+        "code": "architecture",
+        "name": "系统架构",
+        "description": "包含微服务、分布式系统、高可用架构等技术",
+        "createdAt": "2024-01-18T11:30:00Z"
+      },
+      {
+        "id": 9,
+        "code": "testing",
+        "name": "测试技术",
+        "description": "包含自动化测试、性能测试、单元测试等技术",
+        "createdAt": "2024-01-19T09:00:00Z"
+      },
+      {
+        "id": 10,
+        "code": "cloud",
+        "name": "云计算",
+        "description": "包含AWS、Azure、阿里云等云服务技术",
+        "createdAt": "2024-01-19T10:30:00Z"
+      },
+      {
+        "id": 11,
+        "code": "blockchain",
+        "name": "区块链",
+        "description": "包含智能合约、DApp开发、共识算法等技术",
+        "createdAt": "2024-01-20T09:00:00Z"
+      },
+      {
+        "id": 12,
+        "code": "iot",
+        "name": "物联网",
+        "description": "包含嵌入式开发、传感器、边缘计算等技术",
+        "createdAt": "2024-01-20T14:00:00Z"
+      }
+    ]
+  }
+}

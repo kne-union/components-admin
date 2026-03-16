@@ -1,9 +1,12 @@
 import AppChildrenRouter from '@kne/app-children-router';
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import LangType from './LangType';
+import LangLib from './LangLib';
+import enums from './enums';
 
 const IntlAdmin = createWithRemoteLoader({
   modules: ['components-core:Menu']
-})(({ remoteModules, baseUrl, ...props }) => {
+})(({ remoteModules, baseUrl, pageProps, ...props }) => {
   const [Menu] = remoteModules;
 
   const menu = (
@@ -21,8 +24,6 @@ const IntlAdmin = createWithRemoteLoader({
     />
   );
 
-  console.log(baseUrl);
-
   return (
     <AppChildrenRouter
       {...props}
@@ -32,14 +33,16 @@ const IntlAdmin = createWithRemoteLoader({
           index: true,
           loader: () => import('./LangType'),
           elementProps: {
-            menu
+            menu,
+            pageProps
           }
         },
         {
           path: 'lang-lib',
           loader: () => import('./LangLib'),
           elementProps: {
-            menu
+            menu,
+            pageProps
           }
         }
       ]}
@@ -47,4 +50,8 @@ const IntlAdmin = createWithRemoteLoader({
   );
 });
 
+IntlAdmin.LangType = LangType;
+IntlAdmin.LangLib = LangLib;
+
 export default IntlAdmin;
+export { LangType, LangLib, enums };

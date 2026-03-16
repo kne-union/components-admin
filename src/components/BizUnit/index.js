@@ -36,18 +36,6 @@ const BizUnit = createWithRemoteLoader({
             children: formatMessage({ id: 'Add' }),
             type: 'primary'
           },
-          editButtonProps: {
-            children: formatMessage({ id: 'Edit' })
-          },
-          removeButtonProps: {
-            children: formatMessage({ id: 'Delete' })
-          },
-          openButtonProps: {
-            children: formatMessage({ id: 'Open' })
-          },
-          closeButtonProps: {
-            children: formatMessage({ id: 'Close' })
-          },
           tableProps: {
             pagination: { paramsType: 'params' }
           },

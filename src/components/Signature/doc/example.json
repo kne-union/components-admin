@@ -1,14 +1,45 @@
 {
-  "isFull": false,
+  "isFull": true,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "基础用法",
+      "description": "Signature 组件的完整功能展示，包括密钥列表、添加密钥、验证密钥、启用/禁用和删除密钥等功能",
       "code": "./base.js",
       "scope": [
         {
           "name": "_Signature",
           "packageName": "@components/Signature"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "表格列配置",
+      "description": "使用 getColumns 函数获取签名列表的表格列配置，可以自定义国际化展示",
+      "code": "./get-columns.js",
+      "scope": [
+        {
+          "name": "_Signature",
+          "packageName": "@components/Signature"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
         }
       ]
     }

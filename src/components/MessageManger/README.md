@@ -1,8 +1,8 @@
-# Webhook
+# MessageManger
 
 ### 概述
 
-用来实现webhook管理
+消息管理
 
 
 ### 示例
@@ -11,12 +11,12 @@
 
 - 这里填写示例标题
 - 这里填写示例说明
-- _Webhook(@components/Webhook)
+- _MessageManger(@components/MessageManger)
 
 ```jsx
-const { default: Webhook } = _Webhook;
-const BaseExample = () => {
-  return <Webhook />;
+const {default:MessageManger} = _MessageManger;
+const BaseExample = ()=>{
+    return <MessageManger />;
 };
 
 render(<BaseExample />);

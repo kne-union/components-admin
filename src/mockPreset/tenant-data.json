@@ -1,0 +1,457 @@
+{
+  "company": {
+    "id": 1,
+    "name": "科技创新有限公司",
+    "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=company",
+    "description": "一家专注于人工智能和云计算技术研发的高新技术企业",
+    "industry": "信息技术",
+    "scale": "100-500人",
+    "address": "北京市海淀区中关村科技园区",
+    "website": "https://www.tech-innovation.com",
+    "phone": "010-12345678",
+    "email": "contact@tech-innovation.com",
+    "foundedDate": "2018-06-15",
+    "developmentHistory": [
+      {
+        "time": "2018-06-15",
+        "event": "成立于北京中关村，专注于企业级软件解决方案"
+      },
+      {
+        "time": "2020-06-01",
+        "event": "获得A轮融资"
+      },
+      {
+        "time": "2022-01-01",
+        "event": "业务扩展至全国20个城市"
+      }
+    ],
+    "teamDescription": [
+      {
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ceo",
+        "name": "张伟",
+        "role": "CEO / 创始人",
+        "description": "前BAT技术总监，15年互联网从业经验，专注于企业级软件架构设计"
+      },
+      {
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=cto",
+        "name": "李娜",
+        "role": "CTO / 技术副总裁",
+        "description": "前知名互联网公司架构师，12年技术研发经验，主导多个千万级用户产品"
+      },
+      {
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=product",
+        "name": "王强",
+        "role": "产品总监",
+        "description": "前知名企业产品负责人，10年产品管理经验，擅长企业级产品规划"
+      }
+    ],
+    "banner": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800"
+  },
+  "orgList": [
+    {
+      "id": "dept-1",
+      "name": "技术研发中心",
+      "description": "负责公司核心产品的技术研发",
+      "parentId": null
+    },
+    {
+      "id": "dept-2",
+      "name": "前端开发部",
+      "description": "负责Web和移动端前端开发",
+      "parentId": "dept-1"
+    },
+    {
+      "id": "dept-3",
+      "name": "后端开发部",
+      "description": "负责服务端架构和API开发",
+      "parentId": "dept-1"
+    },
+    {
+      "id": "dept-4",
+      "name": "AI算法部",
+      "description": "负责AI模型研发和优化",
+      "parentId": "dept-1"
+    },
+    {
+      "id": "dept-5",
+      "name": "产品设计中心",
+      "description": "负责产品规划和用户体验设计",
+      "parentId": null
+    },
+    {
+      "id": "dept-6",
+      "name": "产品部",
+      "description": "负责产品规划和需求分析",
+      "parentId": "dept-5"
+    },
+    {
+      "id": "dept-7",
+      "name": "设计部",
+      "description": "负责UI/UX设计",
+      "parentId": "dept-5"
+    },
+    {
+      "id": "dept-8",
+      "name": "运营中心",
+      "description": "负责市场运营和客户服务",
+      "parentId": null
+    },
+    {
+      "id": "dept-9",
+      "name": "市场部",
+      "description": "负责市场推广和品牌建设",
+      "parentId": "dept-8"
+    },
+    {
+      "id": "dept-10",
+      "name": "客服部",
+      "description": "负责客户服务和技术支持",
+      "parentId": "dept-8"
+    }
+  ],
+  "userList": {
+    "totalCount": 8,
+    "pageData": [
+      {
+        "id": "user-1",
+        "name": "张伟",
+        "email": "zhangwei@tech-innovation.com",
+        "phone": "13800138001",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangwei",
+        "department": "技术研发中心",
+        "position": "技术总监",
+        "roles": [{ "id": "role-1", "name": "管理员" }],
+        "tenantOrg": { "id": "dept-1", "name": "技术研发中心" },
+        "status": "active",
+        "joinDate": "2018-07-01"
+      },
+      {
+        "id": "user-2",
+        "name": "李娜",
+        "email": "lina@tech-innovation.com",
+        "phone": "13800138002",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=lina",
+        "department": "前端开发部",
+        "position": "前端架构师",
+        "roles": [{ "id": "role-3", "name": "普通员工" }],
+        "tenantOrg": { "id": "dept-2", "name": "前端开发部" },
+        "status": "active",
+        "joinDate": "2019-03-15"
+      },
+      {
+        "id": "user-3",
+        "name": "王强",
+        "email": "wangqiang@tech-innovation.com",
+        "phone": "13800138003",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=wangqiang",
+        "department": "后端开发部",
+        "position": "后端开发工程师",
+        "roles": [{ "id": "role-3", "name": "普通员工" }],
+        "tenantOrg": { "id": "dept-3", "name": "后端开发部" },
+        "status": "active",
+        "joinDate": "2020-06-01"
+      },
+      {
+        "id": "user-4",
+        "name": "刘芳",
+        "email": "liufang@tech-innovation.com",
+        "phone": "13800138004",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=liufang",
+        "department": "产品设计中心",
+        "position": "产品经理",
+        "roles": [{ "id": "role-2", "name": "部门经理" }],
+        "tenantOrg": { "id": "dept-5", "name": "产品设计中心" },
+        "status": "active",
+        "joinDate": "2020-08-15"
+      },
+      {
+        "id": "user-5",
+        "name": "陈明",
+        "email": "chenming@tech-innovation.com",
+        "phone": "13800138005",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=chenming",
+        "department": "AI算法部",
+        "position": "算法工程师",
+        "roles": [{ "id": "role-3", "name": "普通员工" }],
+        "tenantOrg": { "id": "dept-4", "name": "AI算法部" },
+        "status": "active",
+        "joinDate": "2021-01-10"
+      },
+      {
+        "id": "user-6",
+        "name": "赵静",
+        "email": "zhaojing@tech-innovation.com",
+        "phone": "13800138006",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhaojing",
+        "department": "设计部",
+        "position": "UI设计师",
+        "roles": [{ "id": "role-3", "name": "普通员工" }],
+        "tenantOrg": { "id": "dept-7", "name": "设计部" },
+        "status": "active",
+        "joinDate": "2021-05-20"
+      },
+      {
+        "id": "user-7",
+        "name": "周洋",
+        "email": "zhouyang@tech-innovation.com",
+        "phone": "13800138007",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhouyang",
+        "department": "市场部",
+        "position": "市场专员",
+        "roles": [{ "id": "role-3", "name": "普通员工" }],
+        "tenantOrg": { "id": "dept-9", "name": "市场部" },
+        "status": "inactive",
+        "joinDate": "2022-02-01"
+      },
+      {
+        "id": "user-8",
+        "name": "吴敏",
+        "email": "wumin@tech-innovation.com",
+        "phone": "13800138008",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=wumin",
+        "department": "客服部",
+        "position": "客服主管",
+        "roles": [{ "id": "role-2", "name": "部门经理" }],
+        "tenantOrg": { "id": "dept-10", "name": "客服部" },
+        "status": "active",
+        "joinDate": "2022-09-15"
+      }
+    ]
+  },
+  "roleList": {
+    "totalCount": 4,
+    "pageData": [
+      {
+        "id": "role-1",
+        "code": "admin",
+        "name": "管理员",
+        "description": "拥有系统全部权限",
+        "type": "system",
+        "status": "active",
+        "userCount": 1
+      },
+      {
+        "id": "role-2",
+        "code": "manager",
+        "name": "部门经理",
+        "description": "管理部门内部事务和人员",
+        "type": "custom",
+        "status": "active",
+        "userCount": 3
+      },
+      {
+        "id": "role-3",
+        "code": "employee",
+        "name": "普通员工",
+        "description": "基础员工权限",
+        "type": "system",
+        "status": "active",
+        "userCount": 15
+      },
+      {
+        "id": "role-4",
+        "code": "guest",
+        "name": "访客",
+        "description": "仅可查看公开信息",
+        "type": "custom",
+        "status": "inactive",
+        "userCount": 0
+      }
+    ]
+  },
+  "tenantList": {
+    "totalCount": 3,
+    "pageData": [
+      {
+        "id": "tenant-1",
+        "name": "科技创新有限公司",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=tech",
+        "themeColor": "#1890ff",
+        "status": "open",
+        "serviceStartTime": "2024-01-01",
+        "serviceEndTime": "2025-12-31"
+      },
+      {
+        "id": "tenant-2",
+        "name": "智慧教育集团",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=edu",
+        "themeColor": "#52c41a",
+        "status": "open",
+        "serviceStartTime": "2024-03-01",
+        "serviceEndTime": "2025-02-28"
+      },
+      {
+        "id": "tenant-3",
+        "name": "医疗健康科技",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=health",
+        "themeColor": "#722ed1",
+        "status": "closed",
+        "serviceStartTime": "2023-01-01",
+        "serviceEndTime": "2024-01-01"
+      }
+    ]
+  },
+  "availableTenantList": {
+    "defaultTenantId": "tenant-1",
+    "list": [
+      {
+        "id": "tu-1",
+        "tenantId": "tenant-1",
+        "name": "张伟",
+        "status": "open",
+        "tenant": {
+          "id": "tenant-1",
+          "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=tech",
+          "tenantCompany": {
+            "name": "科技创新有限公司",
+            "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=tech"
+          }
+        },
+        "tenantOrg": {
+          "name": "技术研发中心"
+        }
+      },
+      {
+        "id": "tu-2",
+        "tenantId": "tenant-2",
+        "name": "张伟",
+        "status": "open",
+        "tenant": {
+          "id": "tenant-2",
+          "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=edu",
+          "tenantCompany": {
+            "name": "智慧教育集团",
+            "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=edu"
+          }
+        },
+        "tenantOrg": {
+          "name": "教学部"
+        }
+      }
+    ]
+  },
+  "permissionList": {
+    "permissions": {
+      "modules": [
+        {
+          "code": "user",
+          "name": "用户管理",
+          "permissions": [
+            { "code": "view", "name": "查看用户" },
+            { "code": "create", "name": "创建用户" },
+            { "code": "edit", "name": "编辑用户" },
+            { "code": "delete", "name": "删除用户" }
+          ]
+        },
+        {
+          "code": "role",
+          "name": "角色管理",
+          "permissions": [
+            { "code": "view", "name": "查看角色" },
+            { "code": "create", "name": "创建角色" },
+            { "code": "edit", "name": "编辑角色" },
+            { "code": "delete", "name": "删除角色" }
+          ]
+        },
+        {
+          "code": "setting",
+          "name": "系统设置",
+          "permissions": [
+            { "code": "company-setting", "name": "公司设置" },
+            { "code": "org", "name": "组织架构" },
+            { "code": "permission", "name": "权限管理" },
+            { "code": "user-manager", "name": "用户管理" }
+          ]
+        }
+      ]
+    },
+    "codes": ["user:view", "user:create", "user:edit", "role:view", "setting:company-setting", "setting:org", "setting:permission", "setting:user-manager"]
+  },
+  "permissionPageList": {
+    "totalCount": 12,
+    "pageData": [
+      { "id": "perm-1", "code": "user:view", "name": "查看用户", "module": "用户管理", "description": "查看用户列表和详情" },
+      { "id": "perm-2", "code": "user:create", "name": "创建用户", "module": "用户管理", "description": "创建新用户" },
+      { "id": "perm-3", "code": "user:edit", "name": "编辑用户", "module": "用户管理", "description": "编辑用户信息" },
+      { "id": "perm-4", "code": "user:delete", "name": "删除用户", "module": "用户管理", "description": "删除用户" },
+      { "id": "perm-5", "code": "role:view", "name": "查看角色", "module": "角色管理", "description": "查看角色列表和详情" },
+      { "id": "perm-6", "code": "role:create", "name": "创建角色", "module": "角色管理", "description": "创建新角色" },
+      { "id": "perm-7", "code": "role:edit", "name": "编辑角色", "module": "角色管理", "description": "编辑角色信息" },
+      { "id": "perm-8", "code": "role:delete", "name": "删除角色", "module": "角色管理", "description": "删除角色" },
+      { "id": "perm-9", "code": "setting:company-setting", "name": "公司设置", "module": "系统设置", "description": "管理公司基本信息" },
+      { "id": "perm-10", "code": "setting:org", "name": "组织架构", "module": "系统设置", "description": "管理组织架构" },
+      { "id": "perm-11", "code": "setting:permission", "name": "权限管理", "module": "系统设置", "description": "管理系统权限" },
+      { "id": "perm-12", "code": "setting:user-manager", "name": "用户管理", "module": "系统设置", "description": "管理系统用户" }
+    ]
+  },
+  "tenantUserInfo": {
+    "id": "tu-1",
+    "name": "张伟",
+    "email": "zhangwei@tech-innovation.com",
+    "phone": "13800138001",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangwei",
+    "status": "open",
+    "permissions": ["user:view", "user:create", "user:edit", "role:view", "setting:company-setting", "setting:org", "setting:permission", "setting:user-manager"]
+  },
+  "global": {
+    "userInfo": {
+      "userInfo": {
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangwei",
+        "nickname": "张伟",
+        "email": "zhangwei@tech-innovation.com"
+      },
+      "tenantUser": {
+        "id": "tu-1",
+        "name": "张伟",
+        "email": "zhangwei@tech-innovation.com",
+        "phone": "13800138001",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangwei",
+        "tenantOrgs": [
+          { "name": "技术研发中心" }
+        ]
+      },
+      "tenant": {
+        "id": "tenant-1",
+        "name": "科技创新有限公司",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=tech",
+        "tenantCompany": {
+          "name": "科技创新有限公司",
+          "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=tech"
+        }
+      },
+      "company": {
+        "id": 1,
+        "name": "科技创新有限公司",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=company"
+      }
+    },
+    "permissions": [
+      "setting",
+      "setting:company-setting",
+      "setting:company-setting:view",
+      "setting:company-setting:edit",
+      "setting:org",
+      "setting:org:create",
+      "setting:org:view",
+      "setting:org:edit",
+      "setting:org:remove",
+      "setting:permission",
+      "setting:permission:role",
+      "setting:permission:role:create",
+      "setting:permission:role:view",
+      "setting:permission:role:edit",
+      "setting:permission:role:remove",
+      "setting:permission:shared-group",
+      "setting:permission:shared-group:create",
+      "setting:permission:shared-group:view",
+      "setting:permission:shared-group:edit",
+      "setting:permission:shared-group:remove",
+      "setting:user-manager",
+      "setting:user-manager:create",
+      "setting:user-manager:view",
+      "setting:user-manager:edit",
+      "setting:user-manager:remove",
+      "setting:user-manager:invite"
+    ]
+  }
+}

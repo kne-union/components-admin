@@ -12,7 +12,7 @@ import style from './style.module.scss';
 
 const JoinInvitation = createWithRemoteLoader({
   modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:InfoPage', 'components-core:LoadingButton']
-})(({ remoteModules, baseUrl = '', children }) => {
+})(({ remoteModules, baseUrl = '', token: propsToken, children }) => {
   const [Page, usePreset, InfoPage, LoadingButton] = remoteModules;
   const [current, setCurrent] = useState(0);
   const { formatMessage } = useIntl();
@@ -20,7 +20,7 @@ const JoinInvitation = createWithRemoteLoader({
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const token = searchParams.get('token');
+  const token = propsToken || searchParams.get('token');
 
   const pageProps = {
     children: (

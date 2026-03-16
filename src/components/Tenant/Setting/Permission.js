@@ -15,7 +15,7 @@ const PermissionInner = createWithRemoteLoader({
     'components-core:Table@TablePage',
     'components-core:StateBar'
   ]
-})(({ remoteModules, menu, children }) => {
+})(({ remoteModules, menu, pageProps: originPageProps, children }) => {
   const [Page, usePreset, Permissions, usePermissionsPass, FilterProvider, TablePage, StateBar] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
@@ -37,7 +37,7 @@ const PermissionInner = createWithRemoteLoader({
     permissionSave: allowRoleEdit,
     remove: allowRoleRemove
   };
-  const pageProps = {
+  const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'PermissionManagement' }),
     filter,
@@ -78,7 +78,7 @@ const PermissionInner = createWithRemoteLoader({
         )}
       </>
     )
-  };
+  });
 
   if (typeof children === 'function') {
     return children(pageProps);

@@ -2,13 +2,78 @@
   "isFull": false,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "基础用法",
+      "description": "展示 GroupSelect 组件的基本使用方式，支持多选、搜索、添加和删除标签",
       "code": "./base.js",
       "scope": [
         {
           "name": "_GroupSelect",
           "packageName": "@components/GroupSelect"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "单选模式",
+      "description": "展示 GroupSelect 的单选模式，适用于只需选择一个标签的场景",
+      "code": "./single-select.js",
+      "scope": [
+        {
+          "name": "_GroupSelect",
+          "packageName": "@components/GroupSelect"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "带初始值",
+      "description": "展示 GroupSelect 带初始值的使用方式，用于编辑场景",
+      "code": "./with-initial-value.js",
+      "scope": [
+        {
+          "name": "_GroupSelect",
+          "packageName": "@components/GroupSelect"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "只读模式",
+      "description": "不传 create 和 remove 接口时，隐藏添加和删除按钮，适用于只做选择的场景",
+      "code": "./readonly.js",
+      "scope": [
+        {
+          "name": "_GroupSelect",
+          "packageName": "@components/GroupSelect"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
         }
       ]
     }
