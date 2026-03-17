@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.1.23",
+  "version": "1.1.24",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
-    "@kne/modules-dev": "^2.1.18",
+    "@kne/modules-dev": "^2.1.19",
     "@kne/react-fetch": "^1.4.3",
     "@kne/react-form-antd": "^4.0.2",
     "@kne/remote-loader": "^1.2.3",

@@ -30,8 +30,9 @@ const MyTaskExample = createWithRemoteLoader({
           baseUrl="/Task"
           getManualTaskAction={getManualTaskAction}
           pageProps={{
-            menuOpen:false,
-            menuFixed: false
+            menuOpen: false,
+            menuFixed: false,
+            menu: null
           }}
         />
       </Layout>

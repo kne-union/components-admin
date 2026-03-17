@@ -108,7 +108,6 @@ const MyTask = createWithRemoteLoader({
           }
         }}
         page={{
-          ...pageProps,
           filter: {
             value: filter,
             onChange: setFilter,
@@ -146,7 +145,8 @@ const MyTask = createWithRemoteLoader({
             ]
           },
           titleExtra: <SearchInput name="targetName" label={formatMessage({ id: 'TargetName' })} />,
-          menu: <Menu baseUrl={baseUrl} />
+          menu: <Menu baseUrl={baseUrl} />,
+          ...pageProps,
         }}
       />
     );

@@ -14,6 +14,7 @@ const AllTaskExample = createWithRemoteLoader({
         <AllTask
           baseUrl="/Task"
           pageProps={{
+            menu: null,
             menuOpen: false,
             menuFixed: false
           }}
