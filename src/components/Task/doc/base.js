@@ -39,7 +39,7 @@ const BaseExample = createWithRemoteLoader({
               </Task>
             }
           />
-          <Route path="/Task/*" element={<Navigate to="/Task/task" replace />} />
+          <Route path="*" element={<Navigate to="/Task/task" replace />} />
         </Routes>
       </Layout>
     </PureGlobal>

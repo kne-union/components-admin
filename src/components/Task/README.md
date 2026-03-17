@@ -55,7 +55,7 @@ const BaseExample = createWithRemoteLoader({
               </Task>
             }
           />
-          <Route path="/Task/*" element={<Navigate to="/Task/task" replace />} />
+          <Route path="*" element={<Navigate to="/Task/task" replace />} />
         </Routes>
       </Layout>
     </PureGlobal>
@@ -103,8 +103,9 @@ const MyTaskExample = createWithRemoteLoader({
           baseUrl="/Task"
           getManualTaskAction={getManualTaskAction}
           pageProps={{
-            menuOpen:false,
-            menuFixed: false
+            menuOpen: false,
+            menuFixed: false,
+            menu: null
           }}
         />
       </Layout>
@@ -137,6 +138,7 @@ const AllTaskExample = createWithRemoteLoader({
         <AllTask
           baseUrl="/Task"
           pageProps={{
+            menu: null,
             menuOpen: false,
             menuFixed: false
           }}

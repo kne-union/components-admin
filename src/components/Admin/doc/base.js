@@ -23,7 +23,7 @@ const BaseExample = createWithRemoteLoader({
               />
             }
           />
-          <Route path="/Admin/*" element={<Navigate to="/Admin/admin/user" replace />} />
+          <Route path="*" element={<Navigate to="/Admin/admin/user" replace />} />
         </Routes>
       </Layout>
     </PureGlobal>
