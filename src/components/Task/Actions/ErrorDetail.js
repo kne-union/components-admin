@@ -1,8 +1,9 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Button } from 'antd';
-import style from '../style.module.scss';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
+import JsonView from '@kne/json-view';
+import '@kne/json-view/dist/index.css';
 
 const ErrorDetail = createWithRemoteLoader({
   modules: ['components-core:Modal@useModal', 'components-core:InfoPage']
@@ -21,14 +22,10 @@ const ErrorDetail = createWithRemoteLoader({
           children: (
             <InfoPage>
               <InfoPage.Part title={formatMessage({ id: 'InputParams' })}>
-                <div className={style['error-box']}>
-                  <pre>{JSON.stringify(data.input, null, 2)}</pre>
-                </div>
+                <JsonView data={data.input} collapsedFrom={1} />
               </InfoPage.Part>
               <InfoPage.Part title={formatMessage({ id: 'ErrorInfo' })}>
-                <div className={style['error-box']}>
-                  <pre>{JSON.stringify(data.error, null, 2)}</pre>
-                </div>
+                <JsonView data={data.error} collapsedFrom={1} />
               </InfoPage.Part>
             </InfoPage>
           )
