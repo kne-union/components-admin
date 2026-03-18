@@ -3,6 +3,8 @@ import { Button } from 'antd';
 import style from '../style.module.scss';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
+import JsonView from '@kne/json-view';
+import '@kne/json-view/dist/index.css';
 
 const ViewLogs = createWithRemoteLoader({
   modules: ['components-core:Modal@useModal', 'components-core:InfoPage@Flow']
@@ -30,11 +32,7 @@ const ViewLogs = createWithRemoteLoader({
         type: 'content',
         render: data => {
           if (!data) return null;
-          return (
-            <div className={style['error-box']}>
-              <pre>{typeof data === 'string' ? data : JSON.stringify(data, null, 2)}</pre>
-            </div>
-          );
+          return <JsonView data={data} collapsedFrom={1} />;
         }
       }
     ];
