@@ -1,6 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Navigate, useLocation } from 'react-router-dom';
 import Fetch from '@kne/react-fetch';
+import merge from 'lodash/merge';
 
 const CheckAccountIsInit = ({ data, baseUrl, children }) => {
   const location = useLocation();
@@ -18,12 +19,12 @@ const CheckAccountIsInit = ({ data, baseUrl, children }) => {
 
 export const CustomUserInfo = createWithRemoteLoader({
   modules: ['components-core:Global@SetGlobal']
-})(({ remoteModules, cache, baseUrl, children, api }) => {
+})(({ remoteModules, cache, baseUrl, children, api, ...props }) => {
   const [SetGlobal] = remoteModules;
   return (
     <Fetch
       cache={cache}
-      {...Object.assign({}, api)}
+      {...merge({}, api, props)}
       render={({ data, reload }) => {
         return (
           <CheckAccountIsInit baseUrl={baseUrl} data={data}>
