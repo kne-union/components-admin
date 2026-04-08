@@ -9,7 +9,7 @@ import withLocale from '../withLocale';
 
 export const LOGIN_REMEMBER_ACCOUNT = 'LOGIN_REMEMBER_ACCOUNT';
 const LoginInner = createWithRemoteLoader({
-  modules: ['component-core:FormInfo']
+  modules: ['components-core:FormInfo']
 })(({ remoteModules, ...p }) => {
   const { formatMessage } = useIntl();
   const { title, registerUrl, forgetUrl, type, onSubmit } = Object.assign(

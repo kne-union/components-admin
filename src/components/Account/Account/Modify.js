@@ -10,7 +10,7 @@ import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 
 const ModifyInner = createWithRemoteLoader({
-  modules: ['component-core:Global@usePreset']
+  modules: ['components-core:Global@usePreset']
 })(({ remoteModules }) => {
   const [usePreset] = remoteModules;
   const { apis: presetApis, ajax } = usePreset();
