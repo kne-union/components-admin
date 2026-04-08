@@ -5,7 +5,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useProps } from './context';
 
 const Forget = createWithRemoteLoader({
-  modules: ['component-core:Global@usePreset']
+  modules: ['components-core:Global@usePreset']
 })(({ remoteModules }) => {
   const [usePreset] = remoteModules;
   const { apis: presetApis, ajax } = usePreset();

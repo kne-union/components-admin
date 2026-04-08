@@ -1,9 +1,10 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Outlet } from 'react-router-dom';
+import { LoginOutlined } from '@ant-design/icons';
 import { SuperAdminInfo, UserInfo, CustomUserInfo } from './Authenticate';
 import UserTool from '@components/UserTool';
 import Language from '@components/Account/Language';
-import { Flex } from 'antd';
+import { Flex, Button } from 'antd';
 
 export const MainLayout = createWithRemoteLoader({
   modules: ['components-core:Layout']
@@ -78,6 +79,36 @@ export const AfterUserLoginLayout = ({ baseUrl, navigation, children, ...props }
         )}>
         {children || <Outlet />}
       </MainLayout>
+    </UserInfo>
+  );
+};
+
+export const Layout = props => {
+  return (
+    <UserInfo
+      options={{
+        ignoreRedirect: true
+      }}
+      error={() => (
+        <MainLayout
+          {...props}
+          navigation={Object.assign({}, props.navigation, {
+            rightOptions: props.login && (
+              <Button className="right-options-login"
+                type="link"
+                icon={<LoginOutlined />}
+                onClick={() => {
+                  props.login();
+                }}
+                iconPosition="end">
+                登录
+              </Button>
+            )
+          })}>
+          <Outlet />
+        </MainLayout>
+      )}>
+      <AfterUserLoginLayout {...props} />
     </UserInfo>
   );
 };

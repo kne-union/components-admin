@@ -9,7 +9,7 @@ import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 
 const RegisterInner = createWithRemoteLoader({
-  modules: ['component-core:Global@usePreset']
+  modules: ['components-core:Global@usePreset']
 })(({ remoteModules }) => {
   const [usePreset] = remoteModules;
   const { formatMessage } = useIntl();
