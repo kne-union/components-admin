@@ -1,12 +1,21 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { App, Button } from 'antd';
+import merge from 'lodash/merge';
+import style from './style.module.scss';
 
 const GroupSelect = createWithRemoteLoader({
-  modules: ['components-core:FormInfo', 'components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
+  modules: [
+    'components-core:FormInfo',
+    'components-core:FormInfo@useFormModal',
+    'components-core:Global@usePreset',
+    'components-core:Global@useGlobalValue'
+  ]
 })(({
   remoteModules,
   name,
   label,
+  type,
+  language: propsLanguage,
   rule,
   apis,
   valueKey = 'code',
@@ -17,18 +26,21 @@ const GroupSelect = createWithRemoteLoader({
   groupName = '标签',
   ...props
 }) => {
-  const [FormInfo, useFormModal, usePreset] = remoteModules;
+  const [FormInfo, useFormModal, usePreset, useGlobalValue] = remoteModules;
   const { fields } = FormInfo;
-  const { SuperSelectTableList } = fields;
+  const { SuperSelectTableList, SuperSelectTree } = fields;
   const { ajax, apis: presetApis } = usePreset();
   const { message, modal } = App.useApp();
   const formModal = useFormModal();
+  const locale = useGlobalValue('locale');
+
+  const language = propsLanguage || locale || 'zh-CN';
 
   const handleDelete = async (item, { fetchApi, value, setValue }) => {
     try {
       const { data: resData } = await ajax(
         Object.assign({}, apis?.remove || presetApis?.group?.remove, {
-          data: { id: item.id, code: item.code }
+          data: { id: item.id, code: item.code, type }
         })
       );
 
@@ -59,7 +71,7 @@ const GroupSelect = createWithRemoteLoader({
         onSubmit: async formData => {
           const { data: resData } = await ajax(
             Object.assign({}, apis?.create || presetApis?.group?.create, {
-              data: formData
+              data: Object.assign({}, formData, { type, language })
             })
           );
           if (resData.code !== 0) {
@@ -75,6 +87,15 @@ const GroupSelect = createWithRemoteLoader({
           list={[
             <FormInfo.fields.Input name="code" label="编码" rule="REQ" placeholder="请输入唯一编码" />,
             <FormInfo.fields.Input name="name" label="名称" rule="REQ" placeholder={`请输入${groupName}名称`} />,
+            <SuperSelectTree
+              name="parentId"
+              label="父级"
+              valueKey={valueKey}
+              labelKey={labelKey}
+              single
+              interceptor="object-output-value"
+              api={merge({}, apis?.groupList || presetApis?.group?.groupList, { params: { type, output: 'list', language } })}
+            />,
             <FormInfo.fields.TextArea name="description" label="描述" placeholder={`请输入${groupName}描述`} />
           ]}
         />
@@ -121,6 +142,7 @@ const GroupSelect = createWithRemoteLoader({
 
   return (
     <SuperSelectTableList
+      className={style['group-list']}
       name={name}
       label={label}
       rule={rule}
@@ -129,7 +151,7 @@ const GroupSelect = createWithRemoteLoader({
       single={single}
       valueKey={valueKey}
       labelKey={labelKey}
-      api={apis?.list || presetApis?.group?.list}
+      api={merge({}, apis?.list || presetApis?.group?.list, { params: { type, language } })}
       getSearchProps={({ searchText }) => ({
         filter: { keyword: searchText }
       })}
