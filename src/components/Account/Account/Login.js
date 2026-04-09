@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { removeToken } from '@kne/token-storage';
 import LoginOuterContainer from '../LoginOuterContainer';
 import DoLogin from './DoLogin';
 import { useProps } from './context';
@@ -6,7 +8,12 @@ import Language from '../Language';
 import style from './style.module.scss';
 
 const Login = () => {
-  const { loginTitle, systemName, systemLogo, loginLeftInner, registerUrl, forgetUrl, accountType, afterLogin, allowLanguageSwitch } = useProps();
+  const { loginTitle, systemName, systemLogo, loginLeftInner, registerUrl, forgetUrl, accountType, afterLogin, allowLanguageSwitch, storeKeys, domain } = useProps();
+  useEffect(() => {
+    Object.values(storeKeys || { token: 'X-User-Token' }).forEach(tokenKey => {
+      removeToken(tokenKey, domain);
+    });
+  }, [storeKeys, domain]);
   return (
     <LoginOuterContainer title={systemName} logo={systemLogo} leftInner={loginLeftInner}>
       <DoLogin>
