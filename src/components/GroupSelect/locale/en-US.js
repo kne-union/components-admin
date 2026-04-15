@@ -1,0 +1,22 @@
+export default {
+  GroupSelectDefaultName: 'Tag',
+  GroupSelectCode: 'Code',
+  GroupSelectName: 'Name',
+  GroupSelectParent: 'Parent',
+  GroupSelectDescription: 'Description',
+  GroupSelectOperation: 'Operation',
+  GroupSelectDelete: 'Delete',
+  GroupSelectConfirm: 'Confirm',
+  GroupSelectCancel: 'Cancel',
+  GroupSelectConfirmDelete: 'Confirm Delete',
+  GroupSelectDeleteSuccess: 'Deleted successfully',
+  GroupSelectDeleteFailed: 'Delete failed',
+  GroupSelectAddSuccess: 'Added successfully',
+  GroupSelectAdd: 'Add {name}',
+  GroupSelectDeleteConfirm: 'Are you sure you want to delete {name} "{title}"?',
+  GroupSelectCodePlaceholder: 'Please enter a unique code',
+  GroupSelectNamePlaceholder: 'Please enter {name} name',
+  GroupSelectDescPlaceholder: 'Please enter {name} description',
+  GroupSelectLoading: 'Loading...',
+  GroupSelectAll: 'All'
+};
