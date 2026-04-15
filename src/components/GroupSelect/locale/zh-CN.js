@@ -1,0 +1,22 @@
+export default {
+  GroupSelectDefaultName: '标签',
+  GroupSelectCode: '编码',
+  GroupSelectName: '名称',
+  GroupSelectParent: '父级',
+  GroupSelectDescription: '描述',
+  GroupSelectOperation: '操作',
+  GroupSelectDelete: '删除',
+  GroupSelectConfirm: '确定',
+  GroupSelectCancel: '取消',
+  GroupSelectConfirmDelete: '确认删除',
+  GroupSelectDeleteSuccess: '删除成功',
+  GroupSelectDeleteFailed: '删除失败',
+  GroupSelectAddSuccess: '添加成功',
+  GroupSelectAdd: '添加{name}',
+  GroupSelectDeleteConfirm: '确定要删除{name}"{title}"吗？',
+  GroupSelectCodePlaceholder: '请输入唯一编码',
+  GroupSelectNamePlaceholder: '请输入{name}名称',
+  GroupSelectDescPlaceholder: '请输入{name}描述',
+  GroupSelectLoading: '加载中...',
+  GroupSelectAll: '全部'
+};

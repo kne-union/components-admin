@@ -1,5 +1,61 @@
-:global {
-  .select-table-search {
-    padding: 0;
+.group-folder {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 12px;
+  height: 100%;
+  overflow: auto;
+
+  :global {
+    .ant-tree {
+      background: transparent;
+      min-width: max-content;
+
+      .ant-tree-list-holder {
+        overflow-x: auto;
+      }
+
+      .ant-tree-treenode {
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        width: 100%;
+      }
+
+      .ant-tree-node-selected {
+        background-color: var(--primary-color-1) !important;
+
+        .ant-tree-title {
+          color: var(--primary-color);
+          font-weight: 500;
+        }
+
+        .ant-tree-iconEle {
+          color: var(--primary-color);
+        }
+      }
+
+      .ant-tree-switcher {
+        line-height: 32px;
+      }
+
+      .ant-tree-iconEle {
+        line-height: 32px;
+        margin-right: 4px;
+      }
+
+      .ant-tree-title {
+        font-size: 14px;
+        line-height: 32px;
+        min-width: 100px;
+        display: inline-block;
+        color: #595959;
+      }
+    }
   }
+}
+
+.loading-wrapper {
+  padding: 24px 12px;
+  color: #999;
+  text-align: center;
 }
