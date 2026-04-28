@@ -10,6 +10,7 @@ import Permission from './Permission';
 import Setting from './Setting';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
+import get from 'lodash/get';
 
 const contentMap = {
   company: Company,
@@ -30,15 +31,36 @@ const TabDetailInner = createWithRemoteLoader({
   ]
 })(({ remoteModules, ...props }) => {
   const [StateBarPage, usePreset, PageHeader, StateTag] = remoteModules;
-  const { apis } = usePreset();
+  const { apis, plugins } = usePreset();
   const { formatMessage } = useIntl();
   const [searchParams, setSearchParams] = useSearchParams();
+  const appendTabDetails = get(plugins, 'admin.tenant.appendTabDetails');
   return (
     <Fetch
       {...Object.assign({}, apis.tenantAdmin.detail, { params: { id: searchParams.get('id') } })}
       render={({ data, reload }) => {
+        const stateOption = [
+          { tab: formatMessage({ id: 'CompanyInfo' }), key: 'company' },
+          { tab: formatMessage({ id: 'OrgStructure' }), key: 'org' },
+          { tab: formatMessage({ id: 'Permission' }), key: 'permission' },
+          { tab: formatMessage({ id: 'UserList' }), key: 'user' },
+          {
+            tab: formatMessage({ id: 'Setting' }),
+            key: 'setting'
+          }
+        ];
+        const componentMap = Object.assign({}, contentMap);
+        if (appendTabDetails && Array.isArray(appendTabDetails) && appendTabDetails.length > 0) {
+          appendTabDetails.forEach(item => {
+            stateOption.splice(Number.isInteger(item.index) && item.index >= 1 ? item.index : stateOption.length - 1, 0, {
+              tab: item.tab,
+              key: item.key
+            });
+            componentMap[item.key] = item.component;
+          });
+        }
         const activeKey = searchParams.get('tab') || 'company';
-        const ContentComponent = contentMap[activeKey] || Company;
+        const ContentComponent = componentMap[activeKey] || Company;
         return (
           <StateBarPage
             {...props}
@@ -48,7 +70,11 @@ const TabDetailInner = createWithRemoteLoader({
                 title={data.name}
                 info={`ID: ${data.id}`}
                 tags={[
-                  data.status === 'open' ? <StateTag type="success" text={formatMessage({ id: 'Open' })} /> : <StateTag type="danger" text={formatMessage({ id: 'Close' })} />,
+                  data.status === 'open' ? (
+                    <StateTag type="success" text={formatMessage({ id: 'Open' })} />
+                  ) : (
+                    <StateTag type="danger" text={formatMessage({ id: 'Close' })} />
+                  ),
                   `${formatMessage({ id: 'ServiceTimeRange' })}:${dayjs(data.serviceStartTime).format('YYYY-MM-DD')}~${dayjs(data.serviceEndTime).format('YYYY-MM-DD')}`,
                   `${formatMessage({ id: 'AccountCountTag' })}:${data.accountCount}`
                 ]}
@@ -68,16 +94,7 @@ const TabDetailInner = createWithRemoteLoader({
                 searchParams.set('tab', key);
                 setSearchParams(searchParams.toString());
               },
-              stateOption: [
-                { tab: formatMessage({ id: 'CompanyInfo' }), key: 'company' },
-                { tab: formatMessage({ id: 'OrgStructure' }), key: 'org' },
-                { tab: formatMessage({ id: 'Permission' }), key: 'permission' },
-                { tab: formatMessage({ id: 'UserList' }), key: 'user' },
-                {
-                  tab: formatMessage({ id: 'Setting' }),
-                  key: 'setting'
-                }
-              ]
+              stateOption
             }}>
             <ContentComponent tenant={data} reload={reload} />
           </StateBarPage>
