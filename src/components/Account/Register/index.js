@@ -1,7 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Col, Row, Space } from 'antd';
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import CaptchaButton from '@kne/captcha-button';
 import classnames from 'classnames';
 import get from 'lodash/get';
 import commonStyle from '../style.module.scss';
@@ -10,6 +9,40 @@ import useNavigate from '@kne/use-refer-navigate';
 import style from './style.module.scss';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
+
+const CaptchaButton = createWithRemoteLoader({
+  modules: ['components-core:FormInfo', 'components-core:LoadingButton']
+})(({ remoteModules, children, target, onClick, duration = 60, ...props }) => {
+  const [FormInfo, LoadingButton] = remoteModules;
+  const { useFormContext, formUtils } = FormInfo;
+  const { formState } = useFormContext();
+
+  const targetField = formUtils.findField(formState, target);
+  const [time, setTime] = useState(0);
+  const setCountdown = time => {
+    setTime(time);
+    const timer = setInterval(() => {
+      setTime(time => {
+        if (time - 1 === 0) {
+          clearInterval(timer);
+        }
+        return time - 1;
+      });
+    }, 1000);
+  };
+
+  return (
+    <LoadingButton
+      {...props}
+      disabled={get(targetField, 'validate.status') !== 'PASS' || time > 0}
+      onClick={async () => {
+        const res = onClick && (await onClick());
+        res !== false && setCountdown(duration);
+      }}>
+      {time === 0 ? children : `${time}s`}
+    </LoadingButton>
+  );
+});
 
 const RegisterInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
@@ -55,7 +88,16 @@ const RegisterInner = createWithRemoteLoader({
           <Space className={classnames(commonStyle['form-inner'])} size={38} direction="vertical">
             <div className={commonStyle['title']}>{title}</div>
             <div>
-              {type === 'phone' && <PhoneNumber name="phone" label={formatMessage({ id: 'PhoneCode' })} rule="REQ" codeType="code" realtime interceptor="phone-number-string" />}
+              {type === 'phone' && (
+                <PhoneNumber
+                  name="phone"
+                  label={formatMessage({ id: 'PhoneCode' })}
+                  rule="REQ"
+                  codeType="code"
+                  realtime
+                  interceptor="phone-number-string"
+                />
+              )}
               {type === 'email' && <Input name="email" label={formatMessage({ id: 'Email' })} rule="REQ EMAIL" realtime />}
               <Row align={'bottom'} justify={'space-between'}>
                 <Col className={style['code-field']}>
