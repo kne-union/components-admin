@@ -66,7 +66,6 @@
   "devDependencies": {
     "@kne/modules-dev": "^2.2.1",
     "@kne/react-fetch": "^1.4.3",
-    "@kne/react-form-antd": "^4.0.2",
     "@kne/react-scripts": "^5.1.5",
     "@kne/remote-loader": "^1.2.3",
     "@testing-library/jest-dom": "^6.4.2",
