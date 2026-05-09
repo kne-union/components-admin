@@ -39,14 +39,15 @@ const Language = createWithRemoteLoader({
       onClick={e => {
         e.stopPropagation();
       }}>
-      <Icon className={style['icon']} type="icon-yuyanqiehuan" />
+      <Icon className={classnames(style['icon'], 'language-icon')} type="icon-yuyanqiehuan" />
       <Space split={<Divider type="vertical" />} size={0}>
         {showList.slice(0, 2).map(({ label, value }) => (
           <Button
             key={value}
             type="text"
-            className={classnames('btn-no-padding', style['item'], {
-              [style['is-active']]: value === current
+            className={classnames('btn-no-padding', style['item'], 'language-item', {
+              [style['is-active']]: value === current,
+              ['is-active']: value === current
             })}
             onClick={() => {
               onChange(value);
