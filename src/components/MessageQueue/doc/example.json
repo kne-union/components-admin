@@ -1,0 +1,50 @@
+{
+  "isFull": true,
+  "list": [
+    {
+      "title": "基础用法",
+      "description": "完整展示 MessageQueue 的仪表盘、消息列表、死信队列、轨迹追踪和队列工具页。",
+      "code": "./base.js",
+      "scope": [
+        { "name": "_MessageQueue", "packageName": "@components/MessageQueue" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "reactRouterDom", "packageName": "react-router-dom" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
+      "title": "消息详情",
+      "description": "展示独立使用消息操作按钮查看消息详情。",
+      "code": "./message-detail.js",
+      "scope": [
+        { "name": "_MessageQueue", "packageName": "@components/MessageQueue" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
+      "title": "死信重放",
+      "description": "展示独立使用死信操作按钮提交重放。",
+      "code": "./dead-letter-replay.js",
+      "scope": [
+        { "name": "_MessageQueue", "packageName": "@components/MessageQueue" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
+      "title": "枚举值",
+      "description": "展示消息状态和轨迹事件枚举。",
+      "code": "./enums.js",
+      "scope": [
+        { "name": "_MessageQueue", "packageName": "@components/MessageQueue" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    }
+  ]
+}

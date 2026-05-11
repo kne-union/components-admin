@@ -1,0 +1,86 @@
+{
+  "pageData": [
+    {
+      "id": "trace_001",
+      "traceId": "trace_abc123",
+      "topic": "order.created",
+      "event": "PUBLISHED",
+      "detail": { "orderId": "ord_12345" },
+      "messageId": "msg_001",
+      "createdAt": "2026-05-10T10:00:00Z"
+    },
+    {
+      "id": "trace_002",
+      "traceId": "trace_abc123",
+      "topic": "order.created",
+      "event": "PROCESSING",
+      "detail": { "consumerId": "consumer_01" },
+      "messageId": "msg_001",
+      "createdAt": "2026-05-10T10:00:01Z"
+    },
+    {
+      "id": "trace_003",
+      "traceId": "trace_abc123",
+      "topic": "order.created",
+      "event": "PROCESSING",
+      "detail": { "startTime": "2026-05-10T10:00:01Z" },
+      "messageId": "msg_001",
+      "createdAt": "2026-05-10T10:00:01Z"
+    },
+    {
+      "id": "trace_004",
+      "traceId": "trace_abc123",
+      "topic": "order.created",
+      "event": "COMPLETED",
+      "detail": { "duration": 4000, "result": "success" },
+      "messageId": "msg_001",
+      "createdAt": "2026-05-10T10:00:05Z"
+    },
+    {
+      "id": "trace_005",
+      "traceId": "trace_def456",
+      "topic": "user.registered",
+      "event": "PUBLISHED",
+      "detail": { "userId": "user_54321" },
+      "messageId": "msg_002",
+      "createdAt": "2026-05-10T10:05:00Z"
+    },
+    {
+      "id": "trace_006",
+      "traceId": "trace_def456",
+      "topic": "user.registered",
+      "event": "PROCESSING",
+      "detail": { "consumerId": "consumer_02" },
+      "messageId": "msg_002",
+      "createdAt": "2026-05-10T10:05:01Z"
+    },
+    {
+      "id": "trace_007",
+      "traceId": "trace_def456",
+      "topic": "user.registered",
+      "event": "PROCESSING",
+      "detail": { "startTime": "2026-05-10T10:05:01Z" },
+      "messageId": "msg_002",
+      "createdAt": "2026-05-10T10:05:01Z"
+    },
+    {
+      "id": "trace_008",
+      "traceId": "trace_def456",
+      "topic": "user.registered",
+      "event": "FAILED",
+      "detail": { "error": "Database connection failed", "retryCount": 1 },
+      "messageId": "msg_002",
+      "createdAt": "2026-05-10T10:05:30Z"
+    },
+    {
+      "id": "trace_009",
+      "traceId": "trace_def456",
+      "topic": "user.registered",
+      "event": "FAILED",
+      "detail": { "nextRetryAt": "2026-05-10T10:06:00Z" },
+      "messageId": "msg_002",
+      "createdAt": "2026-05-10T10:05:30Z"
+    }
+  ],
+  "totalCount": 9
+}

@@ -1,0 +1,60 @@
+{
+  "pageData": [
+    {
+      "id": "dlq_001",
+      "originalId": "msg_004",
+      "topic": "email.send",
+      "payload": { "to": "user@example.com", "template": "welcome", "vars": { "name": "John" } },
+      "errorMessage": "SMTP connection timeout after 30000ms",
+      "replayed": false,
+      "replayedAt": null,
+      "createdAt": "2026-05-10T09:50:00Z",
+      "updatedAt": "2026-05-10T09:50:00Z"
+    },
+    {
+      "id": "dlq_002",
+      "originalId": "msg_008",
+      "topic": "file.process",
+      "payload": { "fileId": "file_555", "type": "image", "operations": ["resize", "compress"] },
+      "errorMessage": "File too large: exceeds 10MB limit",
+      "replayed": false,
+      "replayedAt": null,
+      "createdAt": "2026-05-10T09:40:00Z",
+      "updatedAt": "2026-05-10T09:40:00Z"
+    },
+    {
+      "id": "dlq_003",
+      "originalId": "msg_010",
+      "topic": "payment.process",
+      "payload": { "paymentId": "pay_456", "amount": 2500.00 },
+      "errorMessage": "Payment gateway error: invalid merchant ID",
+      "replayed": true,
+      "replayedAt": "2026-05-10T08:30:00Z",
+      "createdAt": "2026-05-10T08:00:00Z",
+      "updatedAt": "2026-05-10T08:30:00Z"
+    },
+    {
+      "id": "dlq_004",
+      "originalId": "msg_012",
+      "topic": "sms.send",
+      "payload": { "phone": "+1234567890", "message": "Your code is 123456" },
+      "errorMessage": "Invalid phone number format",
+      "replayed": false,
+      "replayedAt": null,
+      "createdAt": "2026-05-09T15:20:00Z",
+      "updatedAt": "2026-05-09T15:20:00Z"
+    },
+    {
+      "id": "dlq_005",
+      "originalId": "msg_015",
+      "topic": "webhook.invoke",
+      "payload": { "url": "https://example.com/webhook", "event": "order.created" },
+      "errorMessage": "Webhook endpoint returned 503 Service Unavailable",
+      "replayed": true,
+      "replayedAt": "2026-05-09T12:00:00Z",
+      "createdAt": "2026-05-09T11:30:00Z",
+      "updatedAt": "2026-05-09T12:00:00Z"
+    }
+  ],
+  "totalCount": 5
+}
