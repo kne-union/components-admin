@@ -482,6 +482,28 @@ const getApis = options => {
         }
       }
     },
+    messageManger: {
+      records: {
+        list: {
+          url: `${prefix}/message/records`,
+          method: 'GET'
+        },
+        detail: {
+          url: `${prefix}/message/records/:id`,
+          method: 'GET'
+        }
+      },
+      templates: {
+        list: {
+          url: `${prefix}/message/templates`,
+          method: 'GET'
+        },
+        detail: {
+          url: `${prefix}/message/templates/:id`,
+          method: 'GET'
+        }
+      }
+    },
     mq: {
       message: {
         publish: {
