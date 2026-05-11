@@ -3,6 +3,7 @@ import { getApis } from '@components/Apis';
 import { enums as taskEnums } from '@components/Task';
 import { enums as intlAdminEnums } from '@components/IntlAdmin';
 import merge from 'lodash/merge';
+import { filterPageData } from '@components/MessageQueue/utils';
 
 import taskList from './task-list.json';
 import signatureList from './signature-list.json';
@@ -13,8 +14,11 @@ import superAdminInfo from './super-admin-info.json';
 import groupList from './group-list.json';
 import tenantData from './tenant-data.json';
 import tenantAdminData from './tenant-admin-data.json';
+import messageQueueList from './message-queue-list.json';
+import deadLetterList from './dead-letter-list.json';
+import traceList from './trace-list.json';
 
-export { taskList, signatureList, intlAdminData, adminUserList, userInfo, superAdminInfo, groupList, tenantData, tenantAdminData };
+export { taskList, signatureList, intlAdminData, adminUserList, userInfo, superAdminInfo, groupList, tenantData, tenantAdminData, messageQueueList, deadLetterList, traceList };
 
 const apis = merge({}, getApis(), {
   task: {
@@ -433,6 +437,141 @@ const apis = merge({}, getApis(), {
     removeCustomComponent: {
       loader: () => ({ code: 0 })
     }
+  },
+  mq: {
+    message: {
+      publish: {
+        loader: ({ data }) => ({
+          id: `msg_${Date.now()}`,
+          traceId: data?.traceId || `trace_${Date.now()}`,
+          status: 'PENDING',
+          ...data
+        })
+      },
+      list: {
+        loader: ({ params }) => {
+          return filterPageData({
+            pageData: messageQueueList.pageData,
+            params,
+            filters: {
+              topic: (item, value) => item.topic === value,
+              status: (item, value) => item.status === value,
+              traceId: (item, value) => item.traceId === value
+            }
+          });
+        }
+      }
+    },
+    deadLetter: {
+      list: {
+        loader: ({ params }) => {
+          return filterPageData({
+            pageData: deadLetterList.pageData,
+            params,
+            filters: {
+              topic: (item, value) => item.topic === value,
+              replayed: (item, value) => item.replayed === value
+            }
+          });
+        }
+      },
+      replay: {
+        loader: ({ data }) => {
+          if (Array.isArray(data?.ids) && data.ids.length > 0) {
+            return data.ids.map(id => ({ id, success: true, messageId: `msg_replay_${Date.now()}` }));
+          }
+          return {
+            id: `msg_replay_${Date.now()}`,
+            originalDeadLetterId: data?.id,
+            status: 'PENDING'
+          };
+        }
+      }
+    },
+    trace: {
+      list: {
+        loader: ({ params }) => {
+          return filterPageData({
+            pageData: traceList.pageData,
+            params,
+            filters: {
+              topic: (item, value) => item.topic === value,
+              messageId: (item, value) => item.messageId === value,
+              event: (item, value) => item.event === value
+            }
+          });
+        }
+      },
+      detail: {
+        loader: ({ params }) => {
+          const traceId = params?.traceId || 'trace_abc123';
+          return traceList.pageData.filter(item => item.traceId === traceId);
+        }
+      }
+    },
+    dashboard: {
+      getData: {
+        loader: () => ({
+          timestamp: Date.now(),
+          current: {
+            queueDepth: { byTopic: { 'order.created': 5, 'user.registered': 2, 'payment.completed': 1 }, total: 8 },
+            consumedTotal: { byTopic: { 'order.created': 100, 'user.registered': 50 }, total: 150 },
+            failedTotal: { byTopic: { 'email.send': 2, 'file.process': 1 }, total: 3 },
+            dlqTotal: { byTopic: { 'email.send': 2, 'file.process': 1 }, total: 3 },
+            consumeRate: { byTopic: { 'order.created': 0.5, 'user.registered': 0.3 }, total: 0.8 },
+            failureRate: { byTopic: { 'email.send': 0.02 }, total: 0.02 },
+            dlqRate: { byTopic: { 'email.send': 0.01 }, total: 0.01 },
+            successRatio: 0.96,
+            successRatioByTopic: { 'order.created': 0.96, 'user.registered': 0.98 }
+          },
+          timeSeries: {
+            queueDepth: [
+              { timestamp: Date.now() - 300000, 'order.created': 8, 'user.registered': 3 },
+              { timestamp: Date.now() - 240000, 'order.created': 7, 'user.registered': 2 },
+              { timestamp: Date.now() - 180000, 'order.created': 6, 'user.registered': 2 },
+              { timestamp: Date.now() - 120000, 'order.created': 5, 'user.registered': 2 },
+              { timestamp: Date.now() - 60000, 'order.created': 5, 'user.registered': 1 },
+              { timestamp: Date.now(), 'order.created': 5, 'user.registered': 2 }
+            ],
+            consumeRate: [
+              { timestamp: Date.now() - 300000, 'order.created': 0.5, 'user.registered': 0.3 },
+              { timestamp: Date.now() - 240000, 'order.created': 0.6, 'user.registered': 0.2 },
+              { timestamp: Date.now() - 180000, 'order.created': 0.4, 'user.registered': 0.4 },
+              { timestamp: Date.now() - 120000, 'order.created': 0.5, 'user.registered': 0.3 },
+              { timestamp: Date.now() - 60000, 'order.created': 0.5, 'user.registered': 0.3 },
+              { timestamp: Date.now(), 'order.created': 0.5, 'user.registered': 0.3 }
+            ],
+            failureRate: [
+              { timestamp: Date.now() - 300000, 'email.send': 0.02 },
+              { timestamp: Date.now() - 240000, 'email.send': 0.01 },
+              { timestamp: Date.now() - 180000, 'email.send': 0.03 },
+              { timestamp: Date.now() - 120000, 'email.send': 0.02 },
+              { timestamp: Date.now() - 60000, 'email.send': 0.01 },
+              { timestamp: Date.now(), 'email.send': 0.02 }
+            ],
+            dlqRate: [
+              { timestamp: Date.now() - 300000, 'email.send': 0.01 },
+              { timestamp: Date.now() - 240000, 'email.send': 0.005 },
+              { timestamp: Date.now() - 180000, 'email.send': 0.015 },
+              { timestamp: Date.now() - 120000, 'email.send': 0.01 },
+              { timestamp: Date.now() - 60000, 'email.send': 0.005 },
+              { timestamp: Date.now(), 'email.send': 0.01 }
+            ]
+          }
+        })
+      }
+    },
+    queue: {
+      depth: {
+        loader: ({ params }) => {
+          const list = messageQueueList.pageData.filter(item => item.status === 'PENDING' && (!params?.topic || item.topic === params.topic));
+          return { depth: list.length };
+        }
+      },
+      cleanup: {
+        loader: () => ({ deleted: 3 })
+      }
+    }
   }
 });
 
@@ -444,6 +583,29 @@ const enums = Object.assign({}, taskEnums, intlAdminEnums, {
     { value: 'video_processing', description: '视频处理' },
     { value: 'data_sync', description: '数据同步' },
     { value: 'report_generation', description: '报表生成' }
+  ],
+  messageStatus: [
+    { value: 'PENDING', description: '等待执行', type: 'info' },
+    { value: 'PROCESSING', description: '处理中', type: 'progress' },
+    { value: 'COMPLETED', description: '已完成', type: 'success' },
+    { value: 'FAILED', description: '失败', type: 'danger' }
+  ],
+  traceEvent: [
+    { value: 'PUBLISHED', description: '消息发布', type: 'info' },
+    { value: 'PROCESSING', description: '开始处理', type: 'progress' },
+    { value: 'COMPLETED', description: '处理完成', type: 'success' },
+    { value: 'FAILED', description: '处理失败', type: 'danger' },
+    { value: 'MOVED_TO_DLQ', description: '进入死信', type: 'danger' },
+    { value: 'REPLAYED', description: '死信重放', type: 'success' },
+    { value: 'LOCK_RECOVERED', description: '锁定恢复', type: 'info' }
+  ],
+  mqBoolean: [
+    { value: true, description: '是', type: 'success' },
+    { value: false, description: '否', type: 'info' }
+  ],
+  yesNo: [
+    { value: 'yes', description: '是' },
+    { value: 'no', description: '否' }
   ]
 });
 
@@ -453,7 +615,7 @@ const preset = {
       const { ajax } = await globalInit();
       return ajax({ loader, ...props });
     }
-    return Promise.resolve({ data: loader ? { code: 0, data: loader() } : { code: 0, data: {} } });
+    return Promise.resolve({ data: loader ? { code: 0, data: loader(props) } : { code: 0, data: {} } });
   },
   apis,
   enums,
