@@ -1,0 +1,127 @@
+{
+  "templates": {
+    "totalCount": 4,
+    "currentPage": 1,
+    "perPage": 20,
+    "pageData": [
+      {
+        "id": "tpl_1001",
+        "name": "欢迎邮件",
+        "code": "welcome",
+        "type": 0,
+        "level": 0,
+        "status": 0,
+        "content": "<!-- subject -->欢迎加入<!-- html --><h1>你好，<%= name %>！</h1><!-- text -->欢迎加入我们",
+        "createdAt": "2026-05-10T09:30:00.000Z"
+      },
+      {
+        "id": "tpl_1002",
+        "name": "登录验证码",
+        "code": "login_verify",
+        "type": 1,
+        "level": 0,
+        "status": 0,
+        "content": "<!-- text -->您的验证码是 <%= code %>，5分钟内有效。",
+        "createdAt": "2026-05-10T10:00:00.000Z"
+      },
+      {
+        "id": "tpl_1003",
+        "name": "订单发货提醒",
+        "code": "order_shipped",
+        "type": 0,
+        "level": 1,
+        "status": 0,
+        "content": "<!-- subject -->订单已发货<!-- html --><p>订单 <%= orderNo %> 已发货。</p>",
+        "createdAt": "2026-05-10T11:20:00.000Z"
+      },
+      {
+        "id": "tpl_1004",
+        "name": "旧版通知",
+        "code": "legacy_notice",
+        "type": 0,
+        "level": 1,
+        "status": 1,
+        "content": "<!-- subject -->通知<!-- html --><p>这是一条旧版通知。</p>",
+        "createdAt": "2026-05-09T08:15:00.000Z"
+      }
+    ]
+  },
+  "records": {
+    "totalCount": 4,
+    "currentPage": 1,
+    "perPage": 20,
+    "pageData": [
+      {
+        "id": "record_2001",
+        "name": "alice@example.com",
+        "type": 0,
+        "code": "welcome",
+        "props": {
+          "name": "Alice"
+        },
+        "content": {
+          "from": "\"notify@example.com\" <notify@example.com>",
+          "to": "alice@example.com",
+          "subject": "欢迎加入",
+          "text": "欢迎加入我们",
+          "html": "<h1>你好，Alice！</h1>"
+        },
+        "templateId": "tpl_1001",
+        "createdAt": "2026-05-11T08:00:00.000Z"
+      },
+      {
+        "id": "record_2002",
+        "name": "13800138000",
+        "type": 1,
+        "code": "login_verify",
+        "props": {
+          "code": "836521"
+        },
+        "content": {
+          "content": {
+            "text": "您的验证码是 836521，5分钟内有效。"
+          },
+          "props": {
+            "code": "836521"
+          },
+          "level": 0,
+          "options": {}
+        },
+        "templateId": "tpl_1002",
+        "createdAt": "2026-05-11T08:12:00.000Z"
+      },
+      {
+        "id": "record_2003",
+        "name": "ops@example.com",
+        "type": 0,
+        "code": "order_shipped",
+        "props": {
+          "orderNo": "SO20260511001"
+        },
+        "content": {
+          "to": "ops@example.com",
+          "subject": "订单已发货",
+          "html": "<p>订单 SO20260511001 已发货。</p>"
+        },
+        "templateId": "tpl_1003",
+        "createdAt": "2026-05-11T08:30:00.000Z"
+      },
+      {
+        "id": "record_2004",
+        "name": "bob@example.com",
+        "type": 0,
+        "code": "welcome",
+        "props": {
+          "name": "Bob"
+        },
+        "content": {
+          "to": "bob@example.com",
+          "subject": "欢迎加入",
+          "html": "<h1>你好，Bob！</h1>"
+        },
+        "templateId": "tpl_1001",
+        "createdAt": "2026-05-11T09:00:00.000Z"
+      }
+    ]
+  }
+}

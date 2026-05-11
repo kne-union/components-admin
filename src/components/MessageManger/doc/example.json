@@ -1,14 +1,30 @@
 {
-  "isFull": false,
+  "isFull": true,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "消息管理",
+      "description": "基于 fastify-message 的消息模板和发送记录管理示例",
       "code": "./base.js",
       "scope": [
         {
           "name": "_MessageManger",
           "packageName": "@components/MessageManger"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
         }
       ]
     }

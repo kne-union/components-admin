@@ -4,6 +4,7 @@ import { enums as taskEnums } from '@components/Task';
 import { enums as intlAdminEnums } from '@components/IntlAdmin';
 import merge from 'lodash/merge';
 import { filterPageData } from '@components/MessageQueue/utils';
+import { filterMessagePageData } from '@components/MessageManger/utils';
 
 import taskList from './task-list.json';
 import signatureList from './signature-list.json';
@@ -17,8 +18,9 @@ import tenantAdminData from './tenant-admin-data.json';
 import messageQueueList from './message-queue-list.json';
 import deadLetterList from './dead-letter-list.json';
 import traceList from './trace-list.json';
+import messageMangerData from './message-manger-data.json';
 
-export { taskList, signatureList, intlAdminData, adminUserList, userInfo, superAdminInfo, groupList, tenantData, tenantAdminData, messageQueueList, deadLetterList, traceList };
+export { taskList, signatureList, intlAdminData, adminUserList, userInfo, superAdminInfo, groupList, tenantData, tenantAdminData, messageQueueList, deadLetterList, traceList, messageMangerData };
 
 const apis = merge({}, getApis(), {
   task: {
@@ -438,6 +440,49 @@ const apis = merge({}, getApis(), {
       loader: () => ({ code: 0 })
     }
   },
+  messageManger: {
+    records: {
+      list: {
+        loader: ({ params }) => {
+          return filterMessagePageData({
+            pageData: messageMangerData.records.pageData,
+            params,
+            filters: {
+              type: (item, value) => Number(item.type) === Number(value),
+              code: (item, value) => item.code === value,
+              name: (item, value) => item.name === value
+            }
+          });
+        }
+      },
+      detail: {
+        loader: ({ params }) => {
+          return messageMangerData.records.pageData.find(item => String(item.id) === String(params?.id));
+        }
+      }
+    },
+    templates: {
+      list: {
+        loader: ({ params }) => {
+          return filterMessagePageData({
+            pageData: messageMangerData.templates.pageData,
+            params,
+            filters: {
+              type: (item, value) => Number(item.type) === Number(value),
+              code: (item, value) => item.code === value,
+              level: (item, value) => Number(item.level) === Number(value),
+              status: (item, value) => Number(item.status) === Number(value)
+            }
+          });
+        }
+      },
+      detail: {
+        loader: ({ params }) => {
+          return messageMangerData.templates.pageData.find(item => String(item.id) === String(params?.id));
+        }
+      }
+    }
+  },
   mq: {
     message: {
       publish: {
@@ -602,6 +647,18 @@ const enums = Object.assign({}, taskEnums, intlAdminEnums, {
   mqBoolean: [
     { value: true, description: '是', type: 'success' },
     { value: false, description: '否', type: 'info' }
+  ],
+  messageManagerType: [
+    { value: 0, description: '邮件', type: 'info' },
+    { value: 1, description: '短信', type: 'success' }
+  ],
+  messageTemplateLevel: [
+    { value: 0, description: '系统', type: 'info' },
+    { value: 1, description: '业务', type: 'progress' }
+  ],
+  messageTemplateStatus: [
+    { value: 0, description: '启用', type: 'success' },
+    { value: 1, description: '禁用', type: 'info' }
   ],
   yesNo: [
     { value: 'yes', description: '是' },
