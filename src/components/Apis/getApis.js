@@ -481,6 +481,58 @@ const getApis = options => {
           method: 'POST'
         }
       }
+    },
+    mq: {
+      message: {
+        publish: {
+          url: `${prefix}/mq/message/publish`,
+          method: 'POST'
+        },
+        list: {
+          url: `${prefix}/mq/message/list`,
+          method: 'GET'
+        }
+      },
+      deadLetter: {
+        list: {
+          url: `${prefix}/mq/dlq/list`,
+          method: 'GET'
+        },
+        replay: {
+          url: `${prefix}/mq/dlq/replay`,
+          method: 'POST'
+        }
+      },
+      trace: {
+        list: {
+          url: `${prefix}/mq/trace/list`,
+          method: 'GET'
+        },
+        detail: {
+          url: `${prefix}/mq/trace/detail`,
+          method: 'GET'
+        }
+      },
+      dashboard: {
+        getData: {
+          url: `${prefix}/mq/dashboard`,
+          method: 'GET'
+        },
+        sse: {
+          url: `${prefix}/mq/dashboard/sse`,
+          method: 'GET'
+        }
+      },
+      queue: {
+        depth: {
+          url: `${prefix}/mq/queue/depth`,
+          method: 'GET'
+        },
+        cleanup: {
+          url: `${prefix}/mq/queue/cleanup`,
+          method: 'POST'
+        }
+      }
     }
   };
 };
