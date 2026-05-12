@@ -14,6 +14,14 @@ const messages = {
   Level: '级别',
   Status: '状态',
   Content: '内容',
+  Subject: '主题',
+  From: '发件人',
+  To: '收件人',
+  HtmlPreview: 'HTML预览',
+  PlainText: '纯文本',
+  Signature: '签名',
+  Result: '发送结果',
+  Attachments: '附件',
   Props: '模板变量',
   TemplateId: '模板ID',
   CreatedAt: '创建时间',
@@ -22,7 +30,15 @@ const messages = {
   System: '系统',
   Business: '业务',
   Enabled: '启用',
-  Disabled: '禁用'
+  Disabled: '禁用',
+  SendMessage: '发送消息',
+  SendMessageSuccess: '发送成功',
+  Resend: '重新发送',
+  PropsPlaceholder: '请输入模板变量，JSON格式',
+  EmailAddress: '邮箱地址',
+  PhoneNumber: '手机号',
+  TemplateContent: '模板内容',
+  PropsTip: '模板变量示例：{example}'
 };
 
 export default messages;

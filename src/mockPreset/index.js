@@ -480,6 +480,9 @@ const apis = merge({}, getApis(), {
         loader: ({ params }) => {
           return messageMangerData.templates.pageData.find(item => String(item.id) === String(params?.id));
         }
+      },
+      send: {
+        loader: () => ({ code: 0, data: { id: `record_${Date.now()}` } })
       }
     }
   },

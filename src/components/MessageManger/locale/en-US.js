@@ -14,6 +14,14 @@ const messages = {
   Level: 'Level',
   Status: 'Status',
   Content: 'Content',
+  Subject: 'Subject',
+  From: 'From',
+  To: 'To',
+  HtmlPreview: 'HTML Preview',
+  PlainText: 'Plain Text',
+  Signature: 'Signature',
+  Result: 'Result',
+  Attachments: 'Attachments',
   Props: 'Template Props',
   TemplateId: 'Template ID',
   CreatedAt: 'Created At',
@@ -22,7 +30,15 @@ const messages = {
   System: 'System',
   Business: 'Business',
   Enabled: 'Enabled',
-  Disabled: 'Disabled'
+  Disabled: 'Disabled',
+  SendMessage: 'Send Message',
+  SendMessageSuccess: 'Message sent successfully',
+  Resend: 'Resend',
+  PropsPlaceholder: 'Enter template variables in JSON format',
+  EmailAddress: 'Email Address',
+  PhoneNumber: 'Phone Number',
+  TemplateContent: 'Template Content',
+  PropsTip: 'Props example: {example}'
 };
 
 export default messages;

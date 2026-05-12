@@ -1,164 +1,24 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import AppChildrenRouter from '@kne/app-children-router';
-import { Button, Descriptions, Space, Tag } from 'antd';
-import JsonView from '@kne/json-view';
-import '@kne/json-view/dist/index.css';
 import { useIntl } from '@kne/react-intl';
 import { useRef, useState } from 'react';
 import withLocale from './withLocale';
 import { buildMessageParams } from './utils';
-
-const MESSAGE_TYPE_COLORS = {
-  0: 'blue',
-  1: 'green'
-};
-
-const DetailContent = withLocale(({ data, type }) => {
-  const { formatMessage } = useIntl();
-  const isRecord = type === 'record';
-
-  return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Descriptions bordered column={2} size="small">
-        <Descriptions.Item label={formatMessage({ id: 'ID' })}>{data?.id}</Descriptions.Item>
-        <Descriptions.Item label={formatMessage({ id: 'Code' })}>{data?.code || '-'}</Descriptions.Item>
-        <Descriptions.Item label={formatMessage({ id: isRecord ? 'Target' : 'Name' })}>{isRecord ? data?.name : data?.name || '-'}</Descriptions.Item>
-        <Descriptions.Item label={formatMessage({ id: 'Type' })}>{formatMessage({ id: Number(data?.type) === 1 ? 'SMS' : 'Email' })}</Descriptions.Item>
-        {isRecord ? <Descriptions.Item label={formatMessage({ id: 'TemplateId' })}>{data?.templateId || '-'}</Descriptions.Item> : null}
-        {!isRecord ? <Descriptions.Item label={formatMessage({ id: 'Level' })}>{formatMessage({ id: Number(data?.level) === 1 ? 'Business' : 'System' })}</Descriptions.Item> : null}
-        {!isRecord ? <Descriptions.Item label={formatMessage({ id: 'Status' })}>{formatMessage({ id: Number(data?.status) === 1 ? 'Disabled' : 'Enabled' })}</Descriptions.Item> : null}
-        <Descriptions.Item label={formatMessage({ id: 'CreatedAt' })}>{data?.createdAt || '-'}</Descriptions.Item>
-      </Descriptions>
-      {isRecord ? (
-        <>
-          <div>
-            <strong>{formatMessage({ id: 'Props' })}</strong>
-            <JsonView data={data?.props || {}} collapsedFrom={1} />
-          </div>
-          <div>
-            <strong>{formatMessage({ id: 'Content' })}</strong>
-            <JsonView data={data?.content || {}} collapsedFrom={1} />
-          </div>
-        </>
-      ) : (
-        <div>
-          <strong>{formatMessage({ id: 'Content' })}</strong>
-          <pre style={{ marginTop: 8, padding: 12, background: '#f5f5f5', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{data?.content || '-'}</pre>
-        </div>
-      )}
-    </Space>
-  );
-});
-
-const MessageMenu = createWithRemoteLoader({
-  modules: ['components-core:Menu']
-})(
-  withLocale(({ remoteModules, baseUrl }) => {
-    const [Menu] = remoteModules;
-    const { formatMessage } = useIntl();
-    const rootPath = baseUrl || '';
-
-    return (
-      <Menu
-        items={[
-          { label: formatMessage({ id: 'TemplateList' }), key: 'templates', path: rootPath },
-          { label: formatMessage({ id: 'RecordList' }), key: 'records', path: `${rootPath}/records` }
-        ]}
-      />
-    );
-  })
-);
-
-const renderEnumTag = ({ formatMessage, value, moduleName }) => {
-  if (moduleName === 'messageManagerType') {
-    return <Tag color={MESSAGE_TYPE_COLORS[value] || 'default'}>{formatMessage({ id: Number(value) === 1 ? 'SMS' : 'Email' })}</Tag>;
-  }
-  if (moduleName === 'messageTemplateLevel') {
-    return <Tag color={Number(value) === 1 ? 'purple' : 'blue'}>{formatMessage({ id: Number(value) === 1 ? 'Business' : 'System' })}</Tag>;
-  }
-  return <Tag color={Number(value) === 1 ? 'default' : 'green'}>{formatMessage({ id: Number(value) === 1 ? 'Disabled' : 'Enabled' })}</Tag>;
-};
-
-const getTemplateColumns = ({ formatMessage, openDetail }) => [
-  { name: 'name', title: formatMessage({ id: 'Name' }), type: 'mainInfo' },
-  { name: 'code', title: formatMessage({ id: 'Code' }) },
-  {
-    name: 'type',
-    title: formatMessage({ id: 'Type' }),
-    valueOf: item => renderEnumTag({ formatMessage, value: item.type, moduleName: 'messageManagerType' })
-  },
-  {
-    name: 'level',
-    title: formatMessage({ id: 'Level' }),
-    valueOf: item => renderEnumTag({ formatMessage, value: item.level, moduleName: 'messageTemplateLevel' })
-  },
-  {
-    name: 'status',
-    title: formatMessage({ id: 'Status' }),
-    valueOf: item => renderEnumTag({ formatMessage, value: item.status, moduleName: 'messageTemplateStatus' })
-  },
-  { name: 'createdAt', title: formatMessage({ id: 'CreatedAt' }), type: 'datetime' },
-  {
-    name: 'options',
-    title: formatMessage({ id: 'Operation' }),
-    type: 'options',
-    fixed: 'right',
-    valueOf: item => ({
-      children: (
-        <Button type="link" onClick={() => openDetail(item, 'template')}>
-          {formatMessage({ id: 'Detail' })}
-        </Button>
-      )
-    })
-  }
-];
-
-const getRecordColumns = ({ formatMessage, openDetail }) => [
-  { name: 'name', title: formatMessage({ id: 'Target' }), type: 'mainInfo' },
-  { name: 'code', title: formatMessage({ id: 'Code' }) },
-  {
-    name: 'type',
-    title: formatMessage({ id: 'Type' }),
-    valueOf: item => renderEnumTag({ formatMessage, value: item.type, moduleName: 'messageManagerType' })
-  },
-  { name: 'templateId', title: formatMessage({ id: 'TemplateId' }) },
-  { name: 'createdAt', title: formatMessage({ id: 'CreatedAt' }), type: 'datetime' },
-  {
-    name: 'options',
-    title: formatMessage({ id: 'Operation' }),
-    type: 'options',
-    fixed: 'right',
-    valueOf: item => ({
-      children: (
-        <Button type="link" onClick={() => openDetail(item, 'record')}>
-          {formatMessage({ id: 'Detail' })}
-        </Button>
-      )
-    })
-  }
-];
+import MessageMenu from './Menu';
+import { getTemplateColumns, getRecordColumns } from './getColumns';
 
 const TemplateList = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Enum', 'components-core:Modal@useModal']
+  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Enum']
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {} }) => {
-    const [TablePage, usePreset, Filter, Enum, useModal] = remoteModules;
+    const [TablePage, usePreset, Filter, Enum] = remoteModules;
     const { apis } = usePreset();
     const { formatMessage } = useIntl();
     const { SearchInput, getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem } = filterFields;
-    const modal = useModal();
     const ref = useRef(null);
     const [filter, setFilter] = useState([]);
     const filterValue = getFilterValue(filter);
-    const openDetail = data => {
-      modal({
-        title: formatMessage({ id: 'TemplateDetail' }),
-        width: 760,
-        footer: null,
-        children: <DetailContent data={data} type="template" />
-      });
-    };
 
     return (
       <TablePage
@@ -168,7 +28,7 @@ const TemplateList = createWithRemoteLoader({
         ref={ref}
         pagination={{ paramsType: 'params' }}
         name="message-manger-template-list"
-        columns={getTemplateColumns({ formatMessage, openDetail })}
+        columns={getTemplateColumns({ formatMessage, onSuccess: () => ref.current?.refresh() })}
         page={{
           filter: {
             value: filter,
@@ -219,26 +79,17 @@ const TemplateList = createWithRemoteLoader({
 );
 
 const RecordList = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Enum', 'components-core:Modal@useModal']
+  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Enum']
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {} }) => {
-    const [TablePage, usePreset, Filter, Enum, useModal] = remoteModules;
+    const [TablePage, usePreset, Filter, Enum] = remoteModules;
     const { apis } = usePreset();
     const { formatMessage } = useIntl();
     const { SearchInput, getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem } = filterFields;
-    const modal = useModal();
     const ref = useRef(null);
     const [filter, setFilter] = useState([]);
     const filterValue = getFilterValue(filter);
-    const openDetail = data => {
-      modal({
-        title: formatMessage({ id: 'RecordDetail' }),
-        width: 760,
-        footer: null,
-        children: <DetailContent data={data} type="record" />
-      });
-    };
 
     return (
       <TablePage
@@ -248,7 +99,7 @@ const RecordList = createWithRemoteLoader({
         ref={ref}
         pagination={{ paramsType: 'params' }}
         name="message-manger-record-list"
-        columns={getRecordColumns({ formatMessage, openDetail })}
+        columns={getRecordColumns({ formatMessage, onSuccess: () => ref.current?.refresh() })}
         page={{
           filter: {
             value: filter,
@@ -281,7 +132,7 @@ const RecordList = createWithRemoteLoader({
 
 const MessageManger = ({ baseUrl, children, ...props }) => {
   return (
-    <AppChildrenRouter
+    <AppChildrenRouter baseUrl={baseUrl}
       list={[
         { index: true, element: <TemplateList {...props} baseUrl={baseUrl} /> },
         { path: 'records', element: <RecordList {...props} baseUrl={baseUrl} /> }
@@ -294,3 +145,7 @@ const MessageManger = ({ baseUrl, children, ...props }) => {
 
 export default MessageManger;
 export { TemplateList, RecordList, MessageMenu };
+export { default as enums } from './enums';
+export { getTemplateColumns, getRecordColumns, TemplateColumnsLoader, RecordColumnsLoader } from './getColumns';
+export { default as DetailContent } from './DetailContent';
+export { default as Actions, Detail, SendMessage } from './Actions';

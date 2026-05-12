@@ -501,6 +501,10 @@ const getApis = options => {
         detail: {
           url: `${prefix}/message/templates/:id`,
           method: 'GET'
+        },
+        send: {
+          url: `${prefix}/message/templates/send`,
+          method: 'POST'
         }
       }
     },
