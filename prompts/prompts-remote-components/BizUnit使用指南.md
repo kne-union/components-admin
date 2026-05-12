@@ -164,20 +164,263 @@ export default withLocale;
 
 ### 9. Actions组件 (Actions/index.js)
 
-- 使用 `ButtonGroup` 组件
-- 定义操作列表：
-    - 编辑
-    - 设置状态
-    - 删除
-- 支持条件显示（hidden属性）
-- 支持确认弹窗（confirm属性）
+Actions 是一个**条件组合器**，根据业务状态动态组装可用 Action 列表，通过 `ButtonGroup` 统一渲染。
+
+#### 核心架构
+
+```
+Actions (组合器)
+  ├── 根据 data 条件组装 list 数组
+  ├── list 每项: { buttonComponent, data, children, onSuccess, ...props }
+  └── <ButtonGroup list={list} /> 或 children({ list }) 自定义渲染
+       └── 遍历 list → React.createElement(item.buttonComponent, item)
+           ├── Detail      → <Button onClick={modal(DetailContent)} />
+           ├── SendMessage  → <Button onClick={modal(Form)} />
+           ├── Remove       → <ConfirmButton onClick={ajax(remove)} />
+           └── ...
+```
+
+#### 实现规范
+
+```javascript
+import { createWithRemoteLoader } from '@kne/remote-loader';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
+import Detail from './Detail';
+import SendMessage from './SendMessage';
+
+const ActionsInner = createWithRemoteLoader({
+  modules: ['components-core:ButtonGroup']
+})(({ remoteModules, children, data, onSuccess, moreType = 'link', itemClassName, ...props }) => {
+  const [ButtonGroup] = remoteModules;
+  const { formatMessage } = useIntl();
+  const list = [];
+
+  // 始终显示详情按钮
+  list.push({
+    ...props,
+    buttonComponent: Detail,
+    data,
+    children: formatMessage({ id: 'Detail' }),
+    onSuccess
+  });
+
+  // 条件显示：状态为启用时才显示发送按钮
+  if (Number(data.status) === 0) {
+    list.push({
+      ...props,
+      buttonComponent: SendMessage,
+      data,
+      children: formatMessage({ id: 'SendMessage' }),
+      onSuccess
+    });
+  }
+
+  // 支持自定义渲染
+  if (typeof children === 'function') {
+    return children({ list });
+  }
+
+  // 默认渲染 ButtonGroup
+  return <ButtonGroup itemClassName={itemClassName} list={list} moreType={moreType} />;
+});
+
+const Actions = withLocale(ActionsInner);
+export { Detail, SendMessage };
+export default Actions;
+```
+
+#### 关键要点
+
+1. **`list` 项结构**：每项必须包含 `buttonComponent`（组件引用）+ `children`（按钮文字）+ `data` + `onSuccess` + `...props`
+2. **`...props` 透传机制**：让 `ButtonGroup` → 个体 Action 之间的属性传递自然流畅，按钮样式（`type="link"`）、`className` 等由上层注入
+3. **条件组合**：根据业务状态（如 `data.status`）动态决定显示哪些 Action
+4. **双渲染模式**：默认 `<ButtonGroup list={list} />` 自动渲染按钮组（按钮过多时折叠为"更多"下拉）；当 `children` 是函数时，`children({ list })` 让调用方完全掌控渲染
+5. **业务区分属性**：如需区分不同业务场景（模板/记录），使用 `detailType` 等语义化命名，**不要占用 `type` 属性**（`type` 专用于按钮样式，如 `type="link"`）
 
 ### 10. 各个Action按钮
 
-- **Create.js**: 新建按钮，使用 `useFormModal`
-- **Save.js**: 编辑按钮，使用 `useFormModal`，预填充数据
-- **Remove.js**: 删除按钮，需要confirm确认
-- **SetStatus.js**: 设置状态按钮
+**核心原则：每个 Action 组件自己渲染自己的 Button，自己管理自己的 Modal/请求逻辑，不依赖外部提供 UI 容器。**
+
+#### 两种 Action 模式
+
+**模式 A — 展示型 Action（详情、错误详情等）**
+
+使用 `Button` + `useModal`，点击按钮打开弹窗展示内容：
+
+```javascript
+import { createWithRemoteLoader } from '@kne/remote-loader';
+import { Button } from 'antd';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
+import DetailContent from '../DetailContent';
+
+const DetailInner = createWithRemoteLoader({
+  modules: ['components-core:Modal@useModal']
+})(({ remoteModules, data, ...props }) => {
+  const [useModal] = remoteModules;
+  const { formatMessage } = useIntl();
+  const modal = useModal();
+
+  return (
+    <Button
+      {...props}    // ← 关键：透传，让 ButtonGroup 控制按钮外观
+      onClick={() => {
+        modal({
+          title: formatMessage({ id: 'Detail' }),
+          width: 760,
+          footer: null,
+          children: <DetailContent data={data} />
+        });
+      }}
+    />
+  );
+});
+
+const Detail = withLocale(DetailInner);
+export default Detail;
+```
+
+**模式 B — 操作型 Action（删除、取消、重试等）**
+
+使用 `ConfirmButton`，点击后确认再执行 API 请求：
+
+```javascript
+import { createWithRemoteLoader } from '@kne/remote-loader';
+import { App } from 'antd';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
+
+const RemoveInner = createWithRemoteLoader({
+  modules: ['components-core:Global@usePreset', 'components-core:ConfirmButton']
+})(({ remoteModules, data, onSuccess, ...props }) => {
+  const [usePreset, ConfirmButton] = remoteModules;
+  const { formatMessage } = useIntl();
+  const { apis, ajax } = usePreset();
+  const { message } = App.useApp();
+
+  return (
+    <ConfirmButton
+      {...props}    // ← 关键：透传
+      message={formatMessage({ id: 'DeleteConfirm' })}
+      isDelete={true}
+      onClick={async () => {
+        const { data: resData } = await ajax(
+          Object.assign({}, apis.moduleName.remove, {
+            data: { id: data.id }
+          })
+        );
+        if (resData.code !== 0) {
+          return;
+        }
+        message.success(formatMessage({ id: 'DeleteSuccess' }));
+        onSuccess && onSuccess();
+      }}
+    />
+  );
+});
+
+const Remove = withLocale(RemoveInner);
+export default Remove;
+```
+
+**模式 C — 表单型 Action（新建、编辑、发送等）**
+
+使用 `Button` + `useModal` + `Form`，点击按钮打开表单弹窗：
+
+```javascript
+import { createWithRemoteLoader } from '@kne/remote-loader';
+import { App, Button } from 'antd';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
+
+const SendMessageInner = createWithRemoteLoader({
+  modules: ['components-core:Global@usePreset', 'components-core:FormInfo', 'components-core:Modal@useModal']
+})(({ remoteModules, data, onSuccess, ...props }) => {
+  const [usePreset, FormInfo, useModal] = remoteModules;
+  const { apis, ajax } = usePreset();
+  const { formatMessage } = useIntl();
+  const { message } = App.useApp();
+  const modal = useModal();
+  const { Form, FormGroup, FormItem, Input } = FormInfo;
+
+  return (
+    <Button
+      {...props}    // ← 关键：透传
+      onClick={() => {
+        modal({
+          title: formatMessage({ id: 'SendMessage' }),
+          width: 520,
+          children: (
+            <Form
+              onSubmit={async (formData) => {
+                const { data: resData } = await ajax(
+                  Object.assign({}, apis.moduleName.send, {
+                    data: { id: data.id, ...formData }
+                  })
+                );
+                if (resData.code !== 0) {
+                  return;
+                }
+                message.success(formatMessage({ id: 'SendMessageSuccess' }));
+                onSuccess && onSuccess();
+                return true; // 返回 true 关闭弹窗
+              }}
+            >
+              <FormGroup>
+                <FormItem name="name" label="名称" required>
+                  <Input />
+                </FormItem>
+              </FormGroup>
+            </Form>
+          )
+        });
+      }}
+    />
+  );
+});
+
+const SendMessage = withLocale(SendMessageInner);
+export default SendMessage;
+```
+
+#### Action 组件通用规范
+
+| 特性 | 说明 |
+|------|------|
+| `createWithRemoteLoader` | 声明远程模块依赖，框架异步加载后注入 `remoteModules` |
+| `withLocale` 包裹 | 注入 i18n 的 `formatMessage` 能力 |
+| 接收 `data` prop | 当前行的数据对象 |
+| 接收 `onSuccess` prop | 操作成功后的回调（刷新列表等） |
+| `...props` 透传 | **关键机制** — 让 ButtonGroup 能控制按钮外观和行为 |
+| **自己渲染自己的 Button** | 每个 Action 是完整自包含的组件，而非单纯的配置项 |
+| **独立可用** | 每个 Action 可以脱离 Actions 组合器独立使用（如批量操作场景） |
+
+#### 在 getColumns 中的集成方式
+
+操作列由 Actions 完全接管，不在 getColumns 中手动创建 Button：
+
+```javascript
+import Actions from './Actions';
+
+const getColumns = ({ formatMessage, onSuccess }) => [
+  // ... 数据列 ...
+  {
+    name: 'options',
+    title: formatMessage({ id: 'Operation' }),
+    type: 'options',
+    fixed: 'right',
+    valueOf: item => ({
+      children: <Actions type="link" data={item} onSuccess={onSuccess} />
+    })
+  }
+];
+```
+
+**注意**：
+- 操作列不需要 `openDetail` 等外部回调，详情等展示型操作由 Action 组件自行管理
+- `type="link"` 控制按钮样式为链接型，与 Task 等组件保持一致
+- 业务区分属性（如模板/记录）使用 `detailType` 等语义化命名，不占用 `type`
 
 ## 国际化文件规范
 
