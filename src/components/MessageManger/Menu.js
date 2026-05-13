@@ -13,7 +13,8 @@ const MessageMenu = createWithRemoteLoader({
     return (
       <Menu
         items={[
-          { label: formatMessage({ id: 'TemplateList' }), key: 'templates', path: rootPath },
+          { label: formatMessage({ id: 'Dashboard' }), key: 'dashboard', path: rootPath },
+          { label: formatMessage({ id: 'TemplateList' }), key: 'templates', path: `${rootPath}/templates` },
           { label: formatMessage({ id: 'RecordList' }), key: 'records', path: `${rootPath}/records` }
         ]}
       />

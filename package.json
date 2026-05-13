@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.1.37",
+  "version": "1.1.38",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
@@ -85,9 +85,11 @@
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
     "@kne/app-children-router": "^0.1.7",
+    "@kne/column-split": "^1.0.5",
     "@kne/count-down": "^0.2.2",
     "@kne/is-empty": "^1.0.1",
     "@kne/json-view": "^0.1.1",
+    "@kne/react-box": "^0.1.9",
     "@kne/react-icon": "^0.1.4",
     "@kne/react-intl": "^0.1.9",
     "@kne/react-org-chart": "^0.1.6",
