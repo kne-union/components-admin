@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom';
 import AppChildrenRouter from '@kne/app-children-router';
 import MyTask from './MyTask';
 import AllTask from './AllTask';
+import Dashboard from './Dashboard';
 
 const Task = ({ baseUrl, getManualTaskAction, children, ...props }) => {
   const location = useLocation();
@@ -10,6 +11,10 @@ const Task = ({ baseUrl, getManualTaskAction, children, ...props }) => {
       list={[
         {
           index: true,
+          element: <Dashboard {...props} baseUrl={baseUrl} />
+        },
+        {
+          path: 'my',
           element: <MyTask {...props} baseUrl={baseUrl} getManualTaskAction={getManualTaskAction} />
         },
         {
@@ -27,4 +32,4 @@ export default Task;
 export { default as enums } from './enums';
 export { default as Actions } from './Actions';
 export { default as getColumns, ColumnsLoader } from './getColumns';
-export { MyTask, AllTask };
+export { MyTask, AllTask, Dashboard };

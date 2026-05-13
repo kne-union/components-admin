@@ -1,5 +1,6 @@
 const locale = {
   // Menu
+  Dashboard: 'Dashboard',
   MyTask: 'My Task',
   AllTask: 'All Task',
   // Columns
@@ -53,7 +54,47 @@ const locale = {
   LogItem: 'Log',
   RequestTime: 'Request Time',
   Message: 'Message',
-  RequestData: 'Request Data'
+  RequestData: 'Request Data',
+  // Dashboard
+  RealtimeData: 'Real-time Data',
+  HistoricalData: 'Historical Data',
+  RealtimeConnected: 'Realtime Connected',
+  RealtimeDisconnected: 'Realtime Disconnected',
+  LastUpdatedAt: 'Last Updated',
+  Today: 'Today',
+  TotalCount: 'Total Count',
+  NoData: 'No Data',
+  WaitingForData: 'Waiting for data...',
+  TodayTasks: 'Today Tasks',
+  TodaySuccess: 'Today Success',
+  TodayFailed: 'Today Failed',
+  TodayPending: 'Today Pending',
+  AvgExecutionTime: 'Avg Execution Time',
+  AvgWaitingTime: 'Avg Waiting Time',
+  AvgTotalTime: 'Avg Total Time',
+  RealtimeTaskOverview: 'Task Execution Overview',
+  ManualExecutionStats: 'Manual Execution Tasks',
+  ManualExecutionTasks: 'Manual Task Count',
+  ManualPendingTasks: 'Manual Pending Count',
+  ManualExecutedTasks: 'Manual Executed Count',
+  ManualAvgExecutionTime: 'Manual Avg Execution Time',
+  ManualAvgWaitingTime: 'Manual Avg Waiting Time',
+  ManualAvgTotalTime: 'Manual Avg Total Time',
+  ExecutionTimeStatistics: 'Execution Time Statistics',
+  ExecutionTimeByTaskType: 'Execution Time by Task Type',
+  TotalTasks: 'Total Tasks',
+  Range_7d: 'Last 7 Days',
+  Range_1m: 'Last Month',
+  Range_1y: 'Last Year',
+  Refresh: 'Refresh',
+  Dawn: 'Dawn',
+  Morning: 'Morning',
+  Afternoon: 'Afternoon',
+  Evening: 'Evening',
+  PeriodCompare: 'Period Compare',
+  TodayHourlyTrend: 'Today Hourly Trend',
+  StatusDistribution: 'Status Distribution',
+  TaskTypeDistribution: 'Task Type Distribution'
 };
 
 export default locale;

@@ -1,0 +1,293 @@
+.dashboardRoot {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 8px 16px 32px;
+  box-sizing: border-box;
+}
+
+.sectionPanel {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* 实时数据区块背景 */
+.realtimeSectionWrap {
+  background: linear-gradient(165deg, #f1f5f9 0%, #f8fafc 42%, #eef2ff 100%);
+  border-radius: 12px;
+  padding: 16px 18px 22px;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-sizing: border-box;
+}
+
+.sectionDivider {
+  margin: 32px 0 !important;
+  border-color: rgba(226, 232, 240, 0.9) !important;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+/* 实时区：标题 + 一行汇总 + 状态，提高头部信息密度 */
+.realtimeHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 14px;
+  margin-bottom: 12px;
+}
+
+.realtimeHeaderMain {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.realtimeTitle {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 650;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.realtimeSubline {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.realtimeHeaderMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  flex-shrink: 0;
+}
+
+.realtimeTime {
+  font-size: 11px;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.metaMuted {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+/* 顶部 KPI：由 ColorfulCard 承载，此处只做行布局 */
+.kpiRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.kpiRowDense {
+  gap: 10px;
+}
+
+.kpiCard {
+  flex: 1 1 200px;
+  min-width: min(100%, 200px);
+  max-width: 100%;
+}
+
+.kpiCardDense {
+  flex: 1 1 140px;
+  min-width: min(100%, 140px);
+}
+
+.kpiValue {
+  font-size: clamp(1.65rem, 3.6vw, 2.1rem);
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  display: block;
+}
+
+.kpiValueDense {
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  display: block;
+}
+
+.kpiDescDense {
+  font-size: 11px;
+  line-height: 1.3;
+  margin-top: 2px;
+  opacity: 0.92;
+}
+
+/* 时段：单容器 + 细分隔线，避免四张独立卡片 */
+.periodStrip {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  margin-top: 16px;
+  border-radius: 14px;
+  background: #FFF;
+  overflow: hidden;
+}
+
+.periodStripCell {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 12px;
+  text-align: center;
+
+  &:not(:last-child) {
+    box-shadow: 1px 0 0 rgba(226, 232, 240, 0.95);
+  }
+}
+
+@media (max-width: 640px) {
+  .periodStrip {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .periodStripCell:not(:last-child) {
+    box-shadow: 0 1px 0 rgba(226, 232, 240, 0.95);
+  }
+}
+
+.periodStripLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: center;
+}
+
+.periodStripLabelInner {
+  justify-content: center !important;
+}
+
+.periodStripLabel :global(.ant-tag),
+.periodStripMeta :global(.ant-tag) {
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+.periodStripValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.periodStripMeta {
+  margin-top: 8px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.periodStripMetaInner {
+  justify-content: center !important;
+}
+
+.chartsRow {
+  margin-top: 24px;
+}
+
+.chartCol {
+  min-width: 0;
+}
+
+/* 图表容器：统一内边距，避免贴边 */
+.chartCardSurface {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* 历史：统计块与趋势图、双饼之间的垂直节奏 */
+.historyTrendCard {
+  margin-top: 20px;
+}
+
+.historyPiesRow {
+  margin-top: 24px;
+}
+
+/* 历史区：扁平统计格，左色条区分维度 */
+.historyStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 1200px) {
+  .historyStatsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .historyStatsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.historyStatCell {
+  padding: 14px 14px 14px 16px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.55);
+  border-left-width: 3px;
+  border-left-style: solid;
+  min-width: 0;
+}
+
+.historyStatLabel {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.historyStatValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 36px 16px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.emptyStateLarge {
+  text-align: center;
+  padding: 44px 16px;
+  color: #94a3b8;
+  font-size: 14px;
+}
