@@ -147,6 +147,28 @@ const apis = merge({}, getApis(), {
             hourlyTrend,
             hourlyTrendByStatus,
             hourlyTrendByType,
+            pendingByRunnerType: {
+              manual: Math.max(0, Math.floor(totalPending * 0.45)),
+              system: Math.max(0, totalPending - Math.floor(totalPending * 0.45))
+            },
+            runnerTypeStats: (() => {
+              const manualTotal = Math.floor(totalTasks * 0.4);
+              const systemTotal = Math.ceil(totalTasks * 0.6);
+              const manualPending = Math.max(0, Math.floor(totalPending * 0.45));
+              const systemPending = Math.max(0, totalPending - Math.floor(totalPending * 0.45));
+              return {
+                manual: {
+                  total: manualTotal,
+                  pending: manualPending,
+                  executed: Math.max(0, manualTotal - manualPending)
+                },
+                system: {
+                  total: systemTotal,
+                  pending: systemPending,
+                  executed: Math.max(0, systemTotal - systemPending)
+                }
+              };
+            })(),
             todayDuration: {
               completedCount: totalSuccess + totalFailed + totalCanceled,
               successCount: totalSuccess,

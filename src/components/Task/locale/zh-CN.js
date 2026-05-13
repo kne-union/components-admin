@@ -74,6 +74,7 @@ const locale = {
   AvgTotalTime: '平均总耗时',
   RealtimeTaskOverview: '任务执行概览',
   ManualExecutionStats: '手动执行任务',
+  ManualExecutionGoMyTaskTitle: '点击此处查看我的任务',
   ManualExecutionTasks: '手动执行数量',
   ManualPendingTasks: '手动待执行数',
   ManualExecutedTasks: '手动已执行数',

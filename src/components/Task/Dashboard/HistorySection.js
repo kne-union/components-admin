@@ -10,9 +10,10 @@ import {
   PALETTE, RANGE_OPTIONS, TASK_STATUS_LIST, STATUS_COLOR_MAP, TASK_TYPE_COLOR_MAP,
   tooltipStyle, legendCenterStyle,
   lineChartGrid, lineChartGridWithRotatedLabels, lineSmooth,
-  axisLineStyle, axisLabelStyle, splitLineStyle, formatDuration
+  axisLineStyle, axisLabelStyle, splitLineStyle, formatDuration, sanitizeStatisticsDurationMs
 } from './constants';
 import SectionHeader from './SectionHeader';
+import { getClientIanaTimezone } from '../utils';
 import style from './dashboard.module.scss';
 
 const HistorySection = createWithRemoteLoader({
@@ -47,7 +48,7 @@ const HistorySection = createWithRemoteLoader({
 
         <Fetch
           {...Object.assign({}, apis.task.statistics.getOverview, {
-            params: { range }
+            params: { range, timezone: getClientIanaTimezone() }
           })}
           render={({ data, reload }) => {
             reloadRef.current = reload;
@@ -194,8 +195,8 @@ const HistorySection = createWithRemoteLoader({
             const buildWaitExecDurationOption = rows => {
               if (!rows || rows.length === 0) return null;
               const dates = rows.map(item => item.date);
-              const avgWait = rows.map(item => item.avgWaitingTime || 0);
-              const avgExec = rows.map(item => item.avgExecutionTime || 0);
+              const avgWait = rows.map(item => sanitizeStatisticsDurationMs(item.avgWaitingTime) ?? 0);
+              const avgExec = rows.map(item => sanitizeStatisticsDurationMs(item.avgExecutionTime) ?? 0);
               const manyPoints = dates.length > 14;
               return {
                 color: [PALETTE.waiting, PALETTE.running],

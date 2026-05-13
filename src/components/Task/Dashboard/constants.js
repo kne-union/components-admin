@@ -131,6 +131,41 @@ export const axisLineStyle = { lineStyle: { color: '#e2e8f0' } };
 export const axisLabelStyle = { color: '#94a3b8' };
 export const splitLineStyle = { lineStyle: { color: '#f1f5f9', type: 'dashed', width: 1 } };
 
+/** 接口约定为毫秒；超出此上限视为异常数据（如错误聚合），不参与展示与加权回算 */
+export const MAX_STATISTICS_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+
+export const sanitizeStatisticsDurationMs = value => {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) return null;
+  if (n > MAX_STATISTICS_DURATION_MS) return null;
+  return n;
+};
+
+/**
+ * 优先使用容器顶层字段（经 sanitize）；无效时按 count 对 byType、byRunnerType 做加权回算（毫秒）。
+ */
+export const pickStatisticsDurationMs = (container, field, breakdownKeys = ['byType', 'byRunnerType']) => {
+  const direct = sanitizeStatisticsDurationMs(container?.[field]);
+  if (direct != null) return direct;
+  for (const key of breakdownKeys) {
+    const obj = container?.[key];
+    if (!obj || typeof obj !== 'object') continue;
+    let sum = 0;
+    let w = 0;
+    for (const v of Object.values(obj)) {
+      if (!v || typeof v !== 'object') continue;
+      const c = Number(v.count) || 0;
+      if (c <= 0) continue;
+      const x = sanitizeStatisticsDurationMs(v[field]);
+      if (x == null) continue;
+      sum += x * c;
+      w += c;
+    }
+    if (w > 0) return sum / w;
+  }
+  return null;
+};
+
 export const formatDuration = ms => {
   if (ms == null || !Number.isFinite(ms) || ms < 0) return '-';
   if (ms === 0) return '0ms';
