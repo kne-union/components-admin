@@ -24,7 +24,7 @@ const Dashboard = createWithRemoteLoader({
         children={
           <div className={style.dashboardRoot}>
             <div className={`${style.sectionPanel} ${style.realtimeSectionWrap}`}>
-              <RealtimeSection apis={apis} />
+              <RealtimeSection apis={apis} baseUrl={baseUrl} />
             </div>
             <Divider className={style.sectionDivider} />
             <div className={style.sectionPanel}>
