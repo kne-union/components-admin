@@ -38,6 +38,127 @@ const apis = merge({}, getApis(), {
       loader: () => {
         return { code: 0, data: { success: true } };
       }
+    },
+    statistics: {
+      getOverview: {
+        loader: ({ params }) => {
+          const range = params?.range || '7d';
+          const now = new Date();
+          const days = range === '1y' ? 365 : range === '1m' ? 30 : 7;
+          const recentTrend = [];
+          const recentTrendByStatus = [];
+          const recentTrendByType = [];
+          const durationTrend = [];
+          for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const success = Math.floor(Math.random() * 30) + 5;
+            const failed = Math.floor(Math.random() * 8) + 1;
+            const running = Math.floor(Math.random() * 5);
+            const pending = Math.floor(Math.random() * 6) + 1;
+            const canceled = Math.floor(Math.random() * 3);
+            const total = success + failed + running + pending + canceled;
+            recentTrend.push({ date: dateStr, count: total });
+            recentTrendByStatus.push({ date: dateStr, status: 'success', count: success });
+            recentTrendByStatus.push({ date: dateStr, status: 'failed', count: failed });
+            recentTrendByStatus.push({ date: dateStr, status: 'running', count: running });
+            recentTrendByStatus.push({ date: dateStr, status: 'pending', count: pending });
+            recentTrendByStatus.push({ date: dateStr, status: 'canceled', count: canceled });
+            recentTrendByType.push({ date: dateStr, type: 'export', count: Math.floor(total * 0.6) });
+            recentTrendByType.push({ date: dateStr, type: 'import', count: Math.ceil(total * 0.4) });
+            durationTrend.push({
+              date: dateStr,
+              completedCount: success + failed + canceled,
+              successCount: success,
+              failedCount: failed,
+              canceledCount: canceled,
+              avgWaitingTime: Math.floor(Math.random() * 3000) + 500,
+              avgExecutionTime: Math.floor(Math.random() * 8000) + 2000,
+              avgTotalTime: Math.floor(Math.random() * 10000) + 3000,
+              byType: {
+                export: { count: Math.floor(total * 0.6), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 },
+                import: { count: Math.ceil(total * 0.4), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
+              },
+              byRunnerType: {
+                manual: { count: Math.floor(total * 0.4), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 },
+                system: { count: Math.ceil(total * 0.6), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
+              }
+            });
+          }
+          const totalSuccess = recentTrendByStatus.filter(item => item.status === 'success').reduce((sum, item) => sum + item.count, 0);
+          const totalFailed = recentTrendByStatus.filter(item => item.status === 'failed').reduce((sum, item) => sum + item.count, 0);
+          const totalRunning = recentTrendByStatus.filter(item => item.status === 'running').reduce((sum, item) => sum + item.count, 0);
+          const totalPending = recentTrendByStatus.filter(item => item.status === 'pending').reduce((sum, item) => sum + item.count, 0);
+          const totalCanceled = recentTrendByStatus.filter(item => item.status === 'canceled').reduce((sum, item) => sum + item.count, 0);
+          const totalWaiting = recentTrendByStatus.filter(item => item.status === 'waiting').reduce((sum, item) => sum + item.count, 0);
+          return {
+            range,
+            rangeLabel: range === '7d' ? '近7天' : range === '1m' ? '近1个月' : '近1年',
+            totalTasks: totalSuccess + totalFailed + totalRunning + totalPending + totalCanceled + totalWaiting,
+            byStatus: { success: totalSuccess, failed: totalFailed, running: totalRunning, pending: totalPending, canceled: totalCanceled, waiting: totalWaiting },
+            byType: { export: Math.floor((totalSuccess + totalFailed) * 0.6), import: Math.ceil((totalSuccess + totalFailed) * 0.4) },
+            byRunnerType: { manual: Math.floor((totalSuccess + totalFailed) * 0.4), system: Math.ceil((totalSuccess + totalFailed) * 0.6) },
+            byTargetType: { project: Math.floor((totalSuccess + totalFailed) * 0.5), document: Math.ceil((totalSuccess + totalFailed) * 0.5) },
+            recentTrend,
+            recentTrendByStatus,
+            recentTrendByType,
+            durationTrend
+          };
+        }
+      },
+      sse: {
+        loader: () => {
+          const now = new Date();
+          const currentHour = now.getHours();
+          const hourlyTrend = [];
+          const hourlyTrendByStatus = [];
+          const hourlyTrendByType = [];
+          for (let h = 0; h <= currentHour; h++) {
+            const success = Math.floor(Math.random() * 6) + 1;
+            const failed = Math.floor(Math.random() * 3);
+            const running = Math.floor(Math.random() * 2);
+            const pending = Math.floor(Math.random() * 3);
+            const canceled = Math.floor(Math.random() * 2);
+            const total = success + failed + running + pending + canceled;
+            const exportCount = Math.floor(total * 0.6);
+            const importCount = total - exportCount;
+            hourlyTrend.push({ hour: h, count: total });
+            if (success > 0) hourlyTrendByStatus.push({ hour: h, status: 'success', count: success });
+            if (failed > 0) hourlyTrendByStatus.push({ hour: h, status: 'failed', count: failed });
+            if (running > 0) hourlyTrendByStatus.push({ hour: h, status: 'running', count: running });
+            if (pending > 0) hourlyTrendByStatus.push({ hour: h, status: 'pending', count: pending });
+            if (canceled > 0) hourlyTrendByStatus.push({ hour: h, status: 'canceled', count: canceled });
+            if (exportCount > 0) hourlyTrendByType.push({ hour: h, type: 'export', count: exportCount });
+            if (importCount > 0) hourlyTrendByType.push({ hour: h, type: 'import', count: importCount });
+          }
+          const totalTasks = hourlyTrend.reduce((sum, item) => sum + item.count, 0);
+          const totalSuccess = hourlyTrendByStatus.filter(item => item.status === 'success').reduce((sum, item) => sum + item.count, 0);
+          const totalFailed = hourlyTrendByStatus.filter(item => item.status === 'failed').reduce((sum, item) => sum + item.count, 0);
+          const totalRunning = hourlyTrendByStatus.filter(item => item.status === 'running').reduce((sum, item) => sum + item.count, 0);
+          const totalPending = hourlyTrendByStatus.filter(item => item.status === 'pending').reduce((sum, item) => sum + item.count, 0);
+          const totalCanceled = hourlyTrendByStatus.filter(item => item.status === 'canceled').reduce((sum, item) => sum + item.count, 0);
+          return {
+            date: now.toISOString().split('T')[0],
+            totalTasks,
+            byStatus: { success: totalSuccess, failed: totalFailed, running: totalRunning, pending: totalPending, canceled: totalCanceled },
+            byType: { export: Math.floor(totalTasks * 0.6), import: Math.ceil(totalTasks * 0.4) },
+            byRunnerType: { manual: Math.floor(totalTasks * 0.4), system: Math.ceil(totalTasks * 0.6) },
+            hourlyTrend,
+            hourlyTrendByStatus,
+            hourlyTrendByType,
+            todayDuration: {
+              completedCount: totalSuccess + totalFailed + totalCanceled,
+              successCount: totalSuccess,
+              failedCount: totalFailed,
+              canceledCount: totalCanceled,
+              avgWaitingTime: Math.floor(Math.random() * 3000) + 500,
+              avgExecutionTime: Math.floor(Math.random() * 8000) + 2000,
+              avgTotalTime: Math.floor(Math.random() * 10000) + 3000
+            }
+          };
+        }
+      }
     }
   },
   signature: {
@@ -483,6 +604,80 @@ const apis = merge({}, getApis(), {
       },
       send: {
         loader: () => ({ code: 0, data: { id: `record_${Date.now()}` } })
+      }
+    },
+    statistics: {
+      getOverview: {
+        loader: ({ params }) => {
+          const range = params?.range || '7d';
+          const now = new Date();
+          const days = range === '1y' ? 365 : range === '1m' ? 30 : 7;
+          const recentTrend = [];
+          const recentTrendByType = [];
+          for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const emailCount = Math.floor(Math.random() * 30) + 5;
+            const smsCount = Math.floor(Math.random() * 15) + 1;
+            recentTrend.push({ date: dateStr, count: emailCount + smsCount });
+            recentTrendByType.push({ date: dateStr, type: 0, count: emailCount });
+            recentTrendByType.push({ date: dateStr, type: 1, count: smsCount });
+          }
+          const totalRecords = recentTrend.reduce((sum, item) => sum + item.count, 0);
+          const emailTotal = recentTrendByType.filter(item => item.type === 0).reduce((sum, item) => sum + item.count, 0);
+          const smsTotal = recentTrendByType.filter(item => item.type === 1).reduce((sum, item) => sum + item.count, 0);
+          return {
+            range,
+            rangeLabel: range === '7d' ? '近7天' : range === '1m' ? '近1个月' : '近1年',
+            totalRecords,
+            byType: { '0': emailTotal, '1': smsTotal },
+            byCode: { welcome: Math.floor(totalRecords * 0.4), verify: Math.floor(totalRecords * 0.3), notification: Math.floor(totalRecords * 0.2), alert: totalRecords - Math.floor(totalRecords * 0.4) - Math.floor(totalRecords * 0.3) - Math.floor(totalRecords * 0.2) },
+            templateStats: {
+              total: messageMangerData.templates.pageData.length,
+              byStatus: { '0': messageMangerData.templates.pageData.filter(t => Number(t.status) === 0).length, '1': messageMangerData.templates.pageData.filter(t => Number(t.status) === 1).length },
+              byType: { '0': messageMangerData.templates.pageData.filter(t => Number(t.type) === 0).length, '1': messageMangerData.templates.pageData.filter(t => Number(t.type) === 1).length }
+            },
+            recentTrend,
+            recentTrendByType
+          };
+        }
+      },
+      sse: {
+        loader: () => {
+          const now = new Date();
+          const currentHour = now.getHours();
+          const hourlyTrend = [];
+          const hourlyTrendByType = [];
+          for (let h = 0; h <= currentHour; h++) {
+            const email = Math.floor(Math.random() * 8) + 2;
+            const sms = Math.floor(Math.random() * 4);
+            hourlyTrend.push({ hour: h, count: email + sms });
+            hourlyTrendByType.push({ hour: h, type: 0, count: email });
+            if (sms > 0) hourlyTrendByType.push({ hour: h, type: 1, count: sms });
+          }
+          const totalRecords = hourlyTrend.reduce((sum, item) => sum + item.count, 0);
+          const emailTotal = hourlyTrendByType.filter(item => item.type === 0).reduce((sum, item) => sum + item.count, 0);
+          const smsTotal = hourlyTrendByType.filter(item => item.type === 1).reduce((sum, item) => sum + item.count, 0);
+          return {
+            date: now.toISOString().split('T')[0],
+            totalRecords,
+            byType: { '0': emailTotal, '1': smsTotal },
+            byCode: { welcome: Math.floor(totalRecords * 0.4), verify: Math.floor(totalRecords * 0.3), notification: totalRecords - Math.floor(totalRecords * 0.4) - Math.floor(totalRecords * 0.3) },
+            hourlyTrend,
+            hourlyTrendByType,
+            intervalTrend: [],
+            records: [
+              {
+                id: 'mock_record_1',
+                name: 'demo@example.com',
+                type: 0,
+                code: 'welcome',
+                createdAt: now.toISOString()
+              }
+            ]
+          };
+        }
       }
     }
   },

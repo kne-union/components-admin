@@ -11,7 +11,8 @@ const Menu = createWithRemoteLoader({
   return (
     <Menu
       items={[
-        { label: formatMessage({ id: 'MyTask' }), key: 'myTask', path: `${baseUrl}/task` },
+        { label: formatMessage({ id: 'Dashboard' }), key: 'dashboard', path: `${baseUrl}/task` },
+        { label: formatMessage({ id: 'MyTask' }), key: 'myTask', path: `${baseUrl}/task/my` },
         {
           label: formatMessage({ id: 'AllTask' }),
           key: 'task',

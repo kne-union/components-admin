@@ -162,6 +162,16 @@ const getApis = options => {
       retry: {
         url: `${prefix}/task/retry`,
         method: 'POST'
+      },
+      statistics: {
+        getOverview: {
+          url: `${prefix}/task/statistics`,
+          method: 'GET'
+        },
+        sse: {
+          url: `${prefix}/task/statistics/sse`,
+          method: 'GET'
+        }
       }
     },
     tenantAdmin: {
@@ -505,6 +515,16 @@ const getApis = options => {
         send: {
           url: `${prefix}/message/templates/send`,
           method: 'POST'
+        }
+      },
+      statistics: {
+        getOverview: {
+          url: `${prefix}/message/statistics`,
+          method: 'GET'
+        },
+        sse: {
+          url: `${prefix}/message/statistics/sse`,
+          method: 'GET'
         }
       }
     },

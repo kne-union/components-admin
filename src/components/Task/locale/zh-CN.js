@@ -1,5 +1,6 @@
 const locale = {
   // Menu
+  Dashboard: '数据面板',
   MyTask: '我的任务',
   AllTask: '全部任务',
   // Columns
@@ -32,7 +33,7 @@ const locale = {
   Waiting: '等待操作',
   Success: '成功',
   Failed: '失败',
-  Canceled: '取消',
+  Canceled: '已取消',
   // Messages
   ConfirmCancelTask: '确定要取消任务吗?',
   CancelTaskSuccess: '取消任务成功',
@@ -53,7 +54,47 @@ const locale = {
   LogItem: '日志',
   RequestTime: '请求时间',
   Message: '消息',
-  RequestData: '请求数据'
+  RequestData: '请求数据',
+  // Dashboard
+  RealtimeData: '实时数据',
+  HistoricalData: '历史数据',
+  RealtimeConnected: '实时已连接',
+  RealtimeDisconnected: '实时未连接',
+  LastUpdatedAt: '最后更新',
+  Today: '今日',
+  TotalCount: '总数',
+  NoData: '暂无数据',
+  WaitingForData: '等待数据...',
+  TodayTasks: '今日任务',
+  TodaySuccess: '今日成功',
+  TodayFailed: '今日失败',
+  TodayPending: '今日待执行',
+  AvgExecutionTime: '平均执行时间',
+  AvgWaitingTime: '平均等待时间',
+  AvgTotalTime: '平均总耗时',
+  RealtimeTaskOverview: '任务执行概览',
+  ManualExecutionStats: '手动执行任务',
+  ManualExecutionTasks: '手动执行数量',
+  ManualPendingTasks: '手动待执行数',
+  ManualExecutedTasks: '手动已执行数',
+  ManualAvgExecutionTime: '手动平均执行时间',
+  ManualAvgWaitingTime: '手动平均等待时间',
+  ManualAvgTotalTime: '手动平均总耗时',
+  ExecutionTimeStatistics: '执行时间统计',
+  ExecutionTimeByTaskType: '按任务类型执行时间对比',
+  TotalTasks: '任务总数',
+  Range_7d: '近7天',
+  Range_1m: '近1个月',
+  Range_1y: '近1年',
+  Refresh: '刷新',
+  Dawn: '凌晨',
+  Morning: '上午',
+  Afternoon: '下午',
+  Evening: '晚间',
+  PeriodCompare: '时段对比',
+  TodayHourlyTrend: '今日每小时趋势',
+  StatusDistribution: '任务状态分布',
+  TaskTypeDistribution: '任务类型分布'
 };
 
 export default locale;

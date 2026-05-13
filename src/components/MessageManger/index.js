@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import withLocale from './withLocale';
 import { buildMessageParams } from './utils';
 import MessageMenu from './Menu';
+import Dashboard from './Dashboard';
 import { getTemplateColumns, getRecordColumns } from './getColumns';
 
 const TemplateList = createWithRemoteLoader({
@@ -134,7 +135,8 @@ const MessageManger = ({ baseUrl, children, ...props }) => {
   return (
     <AppChildrenRouter baseUrl={baseUrl}
       list={[
-        { index: true, element: <TemplateList {...props} baseUrl={baseUrl} /> },
+        { index: true, element: <Dashboard {...props} baseUrl={baseUrl} /> },
+        { path: 'templates', element: <TemplateList {...props} baseUrl={baseUrl} /> },
         { path: 'records', element: <RecordList {...props} baseUrl={baseUrl} /> }
       ]}
     >
@@ -144,7 +146,7 @@ const MessageManger = ({ baseUrl, children, ...props }) => {
 };
 
 export default MessageManger;
-export { TemplateList, RecordList, MessageMenu };
+export { TemplateList, RecordList, MessageMenu, Dashboard };
 export { default as enums } from './enums';
 export { getTemplateColumns, getRecordColumns, TemplateColumnsLoader, RecordColumnsLoader } from './getColumns';
 export { default as DetailContent } from './DetailContent';
