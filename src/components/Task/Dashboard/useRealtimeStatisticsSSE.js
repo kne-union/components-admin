@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getToken } from '@kne/token-storage';
 import { buildUrlWithParams } from './constants';
-
-const getClientIanaTimezone = () => {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-  } catch {
-    return '';
-  }
-};
+import { getClientIanaTimezone } from '../utils';
 
 const isLikelyTaskStatisticsPayload = obj =>
   obj &&
@@ -19,7 +12,9 @@ const isLikelyTaskStatisticsPayload = obj =>
     'hourlyTrend' in obj ||
     'hourlyTrendByStatus' in obj ||
     'byType' in obj ||
-    'todayDuration' in obj);
+    'todayDuration' in obj ||
+    'pendingByRunnerType' in obj ||
+    'runnerTypeStats' in obj);
 
 const unwrapStatisticsPayload = parsed => {
   if (parsed == null) return null;

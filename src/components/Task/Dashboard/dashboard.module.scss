@@ -152,10 +152,24 @@
   border-radius: 10px;
 }
 
+.manualExecutionPanelClickable {
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    border-color: rgba(239, 68, 68, 0.38);
+    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.12);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(185, 28, 28, 0.45);
+    outline-offset: 2px;
+  }
+}
+
 .manualExecutionHeader {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
 }
 
@@ -164,13 +178,6 @@
   color: #b91c1c;
   font-weight: 700;
   letter-spacing: 0.02em;
-}
-
-.manualExecutionValue {
-  font-size: 1.2rem;
-  color: #dc2626;
-  font-weight: 750;
-  font-variant-numeric: tabular-nums;
 }
 
 .manualPendingCard {

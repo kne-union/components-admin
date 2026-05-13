@@ -74,6 +74,7 @@ const locale = {
   AvgTotalTime: 'Avg Total Time',
   RealtimeTaskOverview: 'Task Execution Overview',
   ManualExecutionStats: 'Manual Execution Tasks',
+  ManualExecutionGoMyTaskTitle: 'Click here to open My Tasks',
   ManualExecutionTasks: 'Manual Task Count',
   ManualPendingTasks: 'Manual Pending Count',
   ManualExecutedTasks: 'Manual Executed Count',

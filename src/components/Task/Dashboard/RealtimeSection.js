@@ -1,5 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Col, Row, Space, Tag } from 'antd';
 import { BarChartOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Card as BoxCard, ColorfulCard } from '@kne/react-box';
@@ -17,7 +18,9 @@ import {
   axisLineStyle,
   axisLabelStyle,
   splitLineStyle,
-  formatDuration
+  formatDuration,
+  pickStatisticsDurationMs,
+  sanitizeStatisticsDurationMs
 } from './constants';
 import useRealtimeStatisticsSSE from './useRealtimeStatisticsSSE';
 import style from './dashboard.module.scss';
@@ -43,42 +46,40 @@ const buildTodayHourlySlots = raw => {
     slots[h].byType[item.type] = (slots[h].byType[item.type] || 0) + n;
   });
 
-  const hasByTypeHourly = Object.values(slots).some(item => Object.keys(item.byType).length > 0);
-  // 兼容后端只返回 records 的场景：从 records 反推每小时按类型统计
-  if (!hasByTypeHourly && Array.isArray(raw?.records) && raw.records.length > 0) {
-    raw.records.forEach(record => {
-      const createdAt = record?.createdAt ? new Date(record.createdAt) : null;
-      if (!createdAt || Number.isNaN(createdAt.getTime())) return;
-      const h = createdAt.getHours();
-      if (!Number.isFinite(h) || h < 0 || h >= HOURS_IN_DAY) return;
-      const typeKey = String(record?.type);
-      slots[h].byType[typeKey] = (slots[h].byType[typeKey] || 0) + 1;
-      if (!slots[h].hasTotalFromApi) {
-        slots[h].total += 1;
-      }
-    });
-  }
-
   return slots;
 };
 
 const hasHourlyInput = raw => {
   const a = raw?.hourlyTrend;
   const b = raw?.hourlyTrendByType;
-  const r = raw?.records;
-  return (
-    (Array.isArray(a) && a.length > 0) ||
-    (Array.isArray(b) && b.length > 0) ||
-    (Array.isArray(r) && r.length > 0)
-  );
+  return (Array.isArray(a) && a.length > 0) || (Array.isArray(b) && b.length > 0);
 };
 
 const RealtimeSection = createWithRemoteLoader({
   modules: ['components-thirdparty:Echart', 'components-core:Enum']
 })(
-  withLocale(({ remoteModules, apis }) => {
+  withLocale(({ remoteModules, apis, baseUrl }) => {
     const [Echart, Enum] = remoteModules;
     const { formatMessage } = useIntl();
+    const navigate = useNavigate();
+    const myTaskPath = useMemo(() => {
+      if (baseUrl == null || baseUrl === '') return null;
+      const prefix = String(baseUrl).replace(/\/$/, '');
+      return `${prefix}/task/my`;
+    }, [baseUrl]);
+    const goMyTasks = useCallback(() => {
+      if (myTaskPath) navigate(myTaskPath);
+    }, [navigate, myTaskPath]);
+    const manualPanelKeyHandler = useCallback(
+      e => {
+        if (!myTaskPath) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          goMyTasks();
+        }
+      },
+      [goMyTasks, myTaskPath]
+    );
     const sseUrl = apis?.task?.statistics?.sse?.url;
     const { realtimeData, isConnected, lastUpdatedAt } = useRealtimeStatisticsSSE(sseUrl);
 
@@ -90,23 +91,25 @@ const RealtimeSection = createWithRemoteLoader({
     const runningCount = Number(byStatus.running) || 0;
     const waitingCount = Number(byStatus.waiting) || 0;
     const canceledCount = Number(byStatus.canceled) || 0;
-    const manualTaskCount = Number(byRunnerType.manual) || 0;
-    const manualPendingCount = useMemo(() => {
-      const records = Array.isArray(realtimeData?.records) ? realtimeData.records : [];
-      return records.reduce((acc, item) => {
-        const isManual = String(item?.runnerType || '') === 'manual';
-        const isPending = String(item?.status || '') === 'pending';
-        return isManual && isPending ? acc + 1 : acc;
-      }, 0);
-    }, [realtimeData]);
-    const manualExecutedCount = Math.max(0, manualTaskCount - manualPendingCount);
+    const manualRt = realtimeData?.runnerTypeStats?.manual;
+    const hasManualRunnerStats = manualRt && typeof manualRt === 'object';
+    const pendingByRunnerType = realtimeData?.pendingByRunnerType || {};
+    const manualTaskCount = hasManualRunnerStats
+      ? Number(manualRt.total) || 0
+      : Number(byRunnerType.manual) || 0;
+    const manualPendingCount = hasManualRunnerStats
+      ? Number(manualRt.pending) || 0
+      : Number(pendingByRunnerType.manual) || 0;
+    const manualExecutedCount = hasManualRunnerStats
+      ? Number(manualRt.executed) || 0
+      : Math.max(0, manualTaskCount - (Number(pendingByRunnerType.manual) || 0));
     const manualDurationDisplay = useMemo(() => {
       const manualDur = realtimeData?.todayDuration?.byRunnerType?.manual;
       if (!manualDur || typeof manualDur !== 'object') return null;
       return {
-        avgWaitingTime: formatDuration(manualDur.avgWaitingTime),
-        avgExecutionTime: formatDuration(manualDur.avgExecutionTime),
-        avgTotalTime: formatDuration(manualDur.avgTotalTime)
+        avgWaitingTime: formatDuration(sanitizeStatisticsDurationMs(manualDur.avgWaitingTime)),
+        avgExecutionTime: formatDuration(sanitizeStatisticsDurationMs(manualDur.avgExecutionTime)),
+        avgTotalTime: formatDuration(sanitizeStatisticsDurationMs(manualDur.avgTotalTime))
       };
     }, [realtimeData]);
 
@@ -228,17 +231,39 @@ const RealtimeSection = createWithRemoteLoader({
       const dur = realtimeData?.todayDuration;
       if (!dur) return null;
       return {
-        avgWaitingTime: formatDuration(dur.avgWaitingTime),
-        avgExecutionTime: formatDuration(dur.avgExecutionTime),
-        avgTotalTime: formatDuration(dur.avgTotalTime)
+        avgWaitingTime: formatDuration(pickStatisticsDurationMs(dur, 'avgWaitingTime')),
+        avgExecutionTime: formatDuration(pickStatisticsDurationMs(dur, 'avgExecutionTime')),
+        avgTotalTime: formatDuration(pickStatisticsDurationMs(dur, 'avgTotalTime'))
       };
     }, [realtimeData]);
 
     const durationByTypeOption = useMemo(() => {
-      const byType = realtimeData?.todayDuration?.byType;
-      if (!byType || typeof byType !== 'object') return null;
-      const entries = Object.entries(byType).filter(([, value]) => value && typeof value === 'object');
-      if (entries.length === 0) return null;
+      const todayDur = realtimeData?.todayDuration;
+      if (!todayDur || typeof todayDur !== 'object') return null;
+
+      const durationByType =
+        todayDur.byType && typeof todayDur.byType === 'object' ? todayDur.byType : {};
+      const countByType =
+        realtimeData.byType && typeof realtimeData.byType === 'object' ? realtimeData.byType : {};
+
+      const typeSet = new Set([
+        ...Object.keys(countByType).filter(k => (Number(countByType[k]) || 0) > 0),
+        ...Object.keys(durationByType).filter(k => durationByType[k] && typeof durationByType[k] === 'object')
+      ]);
+      if (typeSet.size === 0) return null;
+
+      const entries = Array.from(typeSet)
+        .map(type => {
+          const d = durationByType[type];
+          if (d && typeof d === 'object') return [type, d];
+          const c = Number(countByType[type]) || 0;
+          return [type, { count: c }];
+        })
+        .sort((a, b) => {
+          const ca = Number(a[1]?.count) || Number(countByType[a[0]]) || 0;
+          const cb = Number(b[1]?.count) || Number(countByType[b[0]]) || 0;
+          return cb - ca;
+        });
 
       return {
         color: [PALETTE.running, PALETTE.waiting, PALETTE.total],
@@ -277,21 +302,21 @@ const RealtimeSection = createWithRemoteLoader({
           {
             name: formatMessage({ id: 'AvgExecutionTime' }),
             type: 'bar',
-            data: entries.map(([, value]) => Number(value.avgExecutionTime) || 0),
+            data: entries.map(([, value]) => sanitizeStatisticsDurationMs(value.avgExecutionTime) ?? 0),
             barMaxWidth: 28,
             itemStyle: { color: PALETTE.running, borderRadius: [4, 4, 0, 0] }
           },
           {
             name: formatMessage({ id: 'AvgWaitingTime' }),
             type: 'bar',
-            data: entries.map(([, value]) => Number(value.avgWaitingTime) || 0),
+            data: entries.map(([, value]) => sanitizeStatisticsDurationMs(value.avgWaitingTime) ?? 0),
             barMaxWidth: 28,
             itemStyle: { color: PALETTE.waiting, borderRadius: [4, 4, 0, 0] }
           },
           {
             name: formatMessage({ id: 'AvgTotalTime' }),
             type: 'bar',
-            data: entries.map(([, value]) => Number(value.avgTotalTime) || 0),
+            data: entries.map(([, value]) => sanitizeStatisticsDurationMs(value.avgTotalTime) ?? 0),
             barMaxWidth: 28,
             itemStyle: { color: PALETTE.total, borderRadius: [4, 4, 0, 0] }
           }
@@ -368,10 +393,16 @@ const RealtimeSection = createWithRemoteLoader({
 
               return (
                 <>
-                  <div className={style.manualExecutionPanel}>
+                  <div
+                    className={`${style.manualExecutionPanel}${myTaskPath ? ` ${style.manualExecutionPanelClickable}` : ''}`}
+                    onClick={myTaskPath ? goMyTasks : undefined}
+                    onKeyDown={myTaskPath ? manualPanelKeyHandler : undefined}
+                    role={myTaskPath ? 'button' : undefined}
+                    tabIndex={myTaskPath ? 0 : undefined}
+                    title={myTaskPath ? formatMessage({ id: 'ManualExecutionGoMyTaskTitle' }) : undefined}
+                  >
                     <div className={style.manualExecutionHeader}>
                       <span className={style.manualExecutionTitle}>{formatMessage({ id: 'ManualExecutionStats' })}</span>
-                      <strong className={style.manualExecutionValue}>{manualPendingCount}</strong>
                     </div>
                     <div className={`${style.kpiRow} ${style.kpiRowDense}`}>
                       <ColorfulCard
