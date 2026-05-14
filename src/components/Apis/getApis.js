@@ -164,10 +164,22 @@ const getApis = options => {
         method: 'POST'
       },
       statistics: {
+        /**
+         * 历史统计看板（GET）。
+         * Query：`range`（7d|1m|1y）、`timezone`（IANA，与「今日」划界一致）。
+         * 响应字段约定见 `src/components/Task/doc/api.md`「任务统计 HTTP」。
+         */
         getOverview: {
           url: `${prefix}/task/statistics`,
           method: 'GET'
         },
+        /**
+         * 实时统计（Server-Sent Events，GET）。
+         * Query：`interval`、`token`、`timezone`（见 `useRealtimeStatisticsSSE` 与 Task `getClientIanaTimezone`）。
+         * 每条 `message` 的 `data` 为 JSON 对象（或 `{ data: {...} }` 包裹），字段约定见 `src/components/Task/doc/api.md`「任务实时统计 SSE」。
+         * 看板手动区：条数用 `waitingByRunnerType.manual` / `completedToday.manual`；主时长用
+         * `waitingQueueMaxWaitMsByRunnerType.manual`（队列最长等待）、`completedTodayTotalDurationMsByRunnerType.manual`（当日完成创建→完成之和）。
+         */
         sse: {
           url: `${prefix}/task/statistics/sse`,
           method: 'GET'

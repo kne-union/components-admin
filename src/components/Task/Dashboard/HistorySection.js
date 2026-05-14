@@ -16,6 +16,59 @@ import SectionHeader from './SectionHeader';
 import { getClientIanaTimezone } from '../utils';
 import style from './dashboard.module.scss';
 
+const RANGE_DAY_COUNT = { '7d': 7, '1m': 30, '1y': 365 };
+
+/** 每小时趋势「按状态」折线：避免 running 使用琥珀色易与其它图表橙色混淆 */
+const HOURLY_STATUS_LINE_COLOR_MAP = {
+  ...STATUS_COLOR_MAP,
+  running: '#7c3aed'
+};
+
+/** 本地日历上从 range 起点到今天的日期轴（YYYY-MM-DD） */
+const buildLocalDateAxisForRange = rangeKey => {
+  const days = RANGE_DAY_COUNT[rangeKey] || 7;
+  const dates = [];
+  for (let i = days - 1; i >= 0; i -= 1) {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - i);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    dates.push(`${y}-${m}-${day}`);
+  }
+  return dates;
+};
+
+const buildEmptyHorizontalBarOption = (placeholder, splitLineStyle, axisLineStyle, axisLabelStyle) => ({
+  tooltip: { show: false },
+  grid: { left: 6, right: 28, top: 10, bottom: 10, containLabel: true },
+  xAxis: {
+    type: 'value',
+    max: 1,
+    min: 0,
+    splitLine: splitLineStyle,
+    axisLine: { show: false },
+    axisLabel: axisLabelStyle,
+    axisTick: { show: false }
+  },
+  yAxis: {
+    type: 'category',
+    data: [placeholder],
+    axisLine: axisLineStyle,
+    axisTick: { show: false },
+    axisLabel: { ...axisLabelStyle, fontSize: 11 }
+  },
+  series: [
+    {
+      type: 'bar',
+      data: [{ value: 0, itemStyle: { color: '#e2e8f0', borderRadius: [0, 6, 6, 0] } }],
+      barMaxWidth: 26,
+      label: { show: false }
+    }
+  ]
+});
+
 const HistorySection = createWithRemoteLoader({
   modules: ['components-thirdparty:Echart', 'components-core:Enum']
 })(
@@ -23,6 +76,8 @@ const HistorySection = createWithRemoteLoader({
     const [Echart, Enum] = remoteModules;
     const { formatMessage } = useIntl();
     const [range, setRange] = useState('7d');
+    /** 历史每小时趋势：按任务类型 | 按任务状态 */
+    const [hourlyHistoryDim, setHourlyHistoryDim] = useState('type');
     const reloadRef = useRef(() => {});
 
     return (
@@ -60,12 +115,18 @@ const HistorySection = createWithRemoteLoader({
             const trendOption = (() => {
               const recentTrend = data?.recentTrend || [];
               const recentTrendByType = data?.recentTrendByType || [];
-              if (recentTrend.length === 0) return null;
+              const axisDates = recentTrend.length > 0 ? null : buildLocalDateAxisForRange(range);
 
               const dateMap = {};
-              recentTrend.forEach(item => {
-                dateMap[item.date] = { date: item.date, total: item.count };
-              });
+              if (recentTrend.length > 0) {
+                recentTrend.forEach(item => {
+                  dateMap[item.date] = { date: item.date, total: item.count };
+                });
+              } else {
+                axisDates.forEach(d => {
+                  dateMap[d] = { date: d, total: 0 };
+                });
+              }
               recentTrendByType.forEach(item => {
                 if (!dateMap[item.date]) {
                   dateMap[item.date] = { date: item.date, total: 0 };
@@ -78,7 +139,6 @@ const HistorySection = createWithRemoteLoader({
               const totals = sorted.map(item => item.total);
               const manyPoints = dates.length > 14;
 
-              // 收集所有出现过的 type
               const typeSet = new Set();
               recentTrendByType.forEach(item => typeSet.add(item.type));
               const typeList = Array.from(typeSet);
@@ -182,7 +242,7 @@ const HistorySection = createWithRemoteLoader({
                     }
                   ]
                 }
-                : null;
+                : buildEmptyHorizontalBarOption(formatMessage({ id: 'NoData' }), splitLineStyle, axisLineStyle, axisLabelStyle);
 
             const typeEntries = Object.entries(byType)
               .map(([type, count]) => ({ type: String(type), count: Number(count) || 0 }))
@@ -193,7 +253,6 @@ const HistorySection = createWithRemoteLoader({
             const durationTrend = data?.durationTrend || [];
 
             const buildWaitExecDurationOption = rows => {
-              if (!rows || rows.length === 0) return null;
               const dates = rows.map(item => item.date);
               const avgWait = rows.map(item => sanitizeStatisticsDurationMs(item.avgWaitingTime) ?? 0);
               const avgExec = rows.map(item => sanitizeStatisticsDurationMs(item.avgExecutionTime) ?? 0);
@@ -253,22 +312,35 @@ const HistorySection = createWithRemoteLoader({
               };
             };
 
-            const manualDurationRows = durationTrend.map(day => {
-              const b = day?.byRunnerType?.manual;
-              return {
-                date: day.date,
-                avgWaitingTime: b?.avgWaitingTime ?? 0,
-                avgExecutionTime: b?.avgExecutionTime ?? 0
-              };
-            });
-            const systemDurationRows = durationTrend.map(day => {
-              const b = day?.byRunnerType?.system;
-              return {
-                date: day.date,
-                avgWaitingTime: b?.avgWaitingTime ?? 0,
-                avgExecutionTime: b?.avgExecutionTime ?? 0
-              };
-            });
+            const durationAxisDates = buildLocalDateAxisForRange(range);
+            const manualDurationRows = durationTrend.length
+              ? durationTrend.map(day => {
+                const b = day?.byRunnerType?.manual;
+                return {
+                  date: day.date,
+                  avgWaitingTime: b?.avgWaitingTime ?? 0,
+                  avgExecutionTime: b?.avgExecutionTime ?? 0
+                };
+              })
+              : durationAxisDates.map(date => ({
+                date,
+                avgWaitingTime: 0,
+                avgExecutionTime: 0
+              }));
+            const systemDurationRows = durationTrend.length
+              ? durationTrend.map(day => {
+                const b = day?.byRunnerType?.system;
+                return {
+                  date: day.date,
+                  avgWaitingTime: b?.avgWaitingTime ?? 0,
+                  avgExecutionTime: b?.avgExecutionTime ?? 0
+                };
+              })
+              : durationAxisDates.map(date => ({
+                date,
+                avgWaitingTime: 0,
+                avgExecutionTime: 0
+              }));
             const manualDurationOption = buildWaitExecDurationOption(manualDurationRows);
             const systemDurationOption = buildWaitExecDurationOption(systemDurationRows);
 
@@ -289,8 +361,8 @@ const HistorySection = createWithRemoteLoader({
                   <div className={style.historyBarRow}>
                     <div className={style.historyBarRowLabel}>{formatMessage({ id: 'StatusDistribution' })}</div>
                     <div className={style.historyBarRowSplit}>
-                      {statusHBarOption ? (
-                        <div className={style.historySplitLegendBar}>
+                      <div className={style.historySplitLegendBar}>
+                        {statusDistItems.length > 0 ? (
                           <div className={style.historySplitTagRow}>
                             <Space wrap className={style.historySplitTagInner}>
                               {statusDistItems.map(d => (
@@ -312,16 +384,14 @@ const HistorySection = createWithRemoteLoader({
                               ))}
                             </Space>
                           </div>
-                          <div className={style.historySplitBar}>
-                            <Echart
-                              style={{ height: Math.max(112, statusDistItems.length * 28) }}
-                              option={statusHBarOption}
-                            />
-                          </div>
+                        ) : null}
+                        <div className={style.historySplitBar}>
+                          <Echart
+                            style={{ height: Math.max(112, Math.max(statusDistItems.length, 1) * 28) }}
+                            option={statusHBarOption}
+                          />
                         </div>
-                      ) : (
-                        <div className={style.historyBarSplitEmpty}>{formatMessage({ id: 'NoData' })}</div>
-                      )}
+                      </div>
                     </div>
                   </div>
                   <div className={style.historyBarRowDivider} />
@@ -383,15 +453,15 @@ const HistorySection = createWithRemoteLoader({
                               }
                             ]
                           }
-                          : null;
+                          : buildEmptyHorizontalBarOption(formatMessage({ id: 'NoData' }), splitLineStyle, axisLineStyle, axisLabelStyle);
                       return (
                         <div className={style.historyBarRow}>
                           <div className={style.historyBarRowLabel}>
                             {formatMessage({ id: 'TaskTypeDistribution' })}
                           </div>
                           <div className={style.historyBarRowSplit}>
-                            {typeHBarOption ? (
-                              <div className={style.historySplitLegendBar}>
+                            <div className={style.historySplitLegendBar}>
+                              {typeDistItems.length > 0 ? (
                                 <div className={style.historySplitTagRow}>
                                   <Space wrap className={style.historySplitTagInner}>
                                     {typeDistItems.map(d => (
@@ -413,16 +483,14 @@ const HistorySection = createWithRemoteLoader({
                                     ))}
                                   </Space>
                                 </div>
-                                <div className={style.historySplitBar}>
-                                  <Echart
-                                    style={{ height: Math.max(112, typeDistItems.length * 28) }}
-                                    option={typeHBarOption}
-                                  />
-                                </div>
+                              ) : null}
+                              <div className={style.historySplitBar}>
+                                <Echart
+                                  style={{ height: Math.max(112, Math.max(typeDistItems.length, 1) * 28) }}
+                                  option={typeHBarOption}
+                                />
                               </div>
-                            ) : (
-                              <div className={style.historyBarSplitEmpty}>{formatMessage({ id: 'NoData' })}</div>
-                            )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -431,63 +499,261 @@ const HistorySection = createWithRemoteLoader({
                 </div>
 
                 <BoxCard className={`${style.chartCardSurface} ${style.historyTrendCard} ${style.historyTrendTightTop}`}>
-                  {trendOption ? (
-                    <Enum moduleName="taskType">
-                      {taskTypeList => {
-                        const typeLabelMap = {};
-                        (taskTypeList || []).forEach(item => {
-                          typeLabelMap[item.value] = item.label || item.description || item.value;
-                        });
-                        const resolvedOption = {
-                          ...trendOption,
-                          legend: {
-                            ...trendOption.legend,
-                            data: [
-                              trendOption.legend.data[0],
-                              ...trendOption.legend.data.slice(1).map(name => typeLabelMap[name] || name)
-                            ]
-                          },
-                          series: trendOption.series.map((s, i) => {
-                            if (i === 0) return s;
-                            return { ...s, name: typeLabelMap[s.name] || s.name };
-                          })
-                        };
-                        return <Echart style={{ height: 380 }} option={resolvedOption} />;
-                      }}
-                    </Enum>
-                  ) : (
-                    <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                  )}
+                  <Enum moduleName="taskType">
+                    {taskTypeList => {
+                      const typeLabelMap = {};
+                      (taskTypeList || []).forEach(item => {
+                        typeLabelMap[item.value] = item.label || item.description || item.value;
+                      });
+                      const resolvedOption = {
+                        ...trendOption,
+                        legend: {
+                          ...trendOption.legend,
+                          data: [
+                            trendOption.legend.data[0],
+                            ...trendOption.legend.data.slice(1).map(name => typeLabelMap[name] || name)
+                          ]
+                        },
+                        series: trendOption.series.map((s, i) => {
+                          if (i === 0) return s;
+                          return { ...s, name: typeLabelMap[s.name] || s.name };
+                        })
+                      };
+                      return <Echart style={{ height: 380 }} option={resolvedOption} />;
+                    }}
+                  </Enum>
                 </BoxCard>
 
-                {durationTrend.length > 0 ? (
-                  <Row gutter={[16, 16]} className={style.historyDurationRunnerRow}>
-                    <Col xs={24} lg={12} className={style.chartCol}>
+                <Row gutter={[16, 16]} className={style.historyDurationRunnerRow}>
+                  <Col xs={24} lg={12} className={style.chartCol}>
+                    <BoxCard
+                      className={`${style.chartCardSurface} ${style.historyTrendCard}`}
+                      title={formatMessage({ id: 'ManualExecution' })}
+                    >
+                      <Echart style={{ height: 320 }} option={manualDurationOption} />
+                    </BoxCard>
+                  </Col>
+                  <Col xs={24} lg={12} className={style.chartCol}>
+                    <BoxCard
+                      className={`${style.chartCardSurface} ${style.historyTrendCard}`}
+                      title={formatMessage({ id: 'AutomaticExecution' })}
+                    >
+                      <Echart style={{ height: 320 }} option={systemDurationOption} />
+                    </BoxCard>
+                  </Col>
+                </Row>
+
+                <Enum moduleName="taskType">
+                  {taskTypeList => {
+                    const typeLabelMap = {};
+                    (taskTypeList || []).forEach(item => {
+                      typeLabelMap[String(item.value)] = item.label || item.description || item.value;
+                    });
+
+                    const hourlyCompletionTrend = data?.hourlyCompletionTrend || [];
+                    const rangeDates = new Set(buildLocalDateAxisForRange(range));
+                    const hourLabels = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
+                    const empty24 = () => Array.from({ length: 24 }, () => 0);
+
+                    const statusCountField = {
+                      success: 'successCount',
+                      failed: 'failedCount',
+                      canceled: 'canceledCount',
+                      running: 'runningCount',
+                      pending: 'pendingCount',
+                      waiting: 'waitingCount'
+                    };
+
+                    const baseAxes = {
+                      xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: hourLabels,
+                        axisLine: axisLineStyle,
+                        axisTick: { show: false },
+                        axisLabel: { ...axisLabelStyle, fontSize: 10, interval: 1 }
+                      },
+                      yAxis: {
+                        type: 'value',
+                        ...splitLineStyle,
+                        axisLabel: { ...axisLabelStyle, minInterval: 1 },
+                        min: 0
+                      }
+                    };
+
+                    let option;
+                    if (hourlyHistoryDim === 'status') {
+                      const seriesData = {};
+                      TASK_STATUS_LIST.forEach(s => {
+                        seriesData[s] = empty24();
+                      });
+                      hourlyCompletionTrend.forEach(r => {
+                        if (!r?.date || !rangeDates.has(r.date)) return;
+                        const h = Number(r.hour);
+                        if (!Number.isFinite(h) || h < 0 || h >= 24) return;
+                        if (r.status != null && (r.count != null || r.totalCompleted != null)) {
+                          const st = String(r.status);
+                          if (seriesData[st]) {
+                            seriesData[st][h] += Number(r.count != null ? r.count : r.totalCompleted) || 0;
+                          }
+                          return;
+                        }
+                        TASK_STATUS_LIST.forEach(st => {
+                          const field = statusCountField[st];
+                          if (field && r[field] != null) {
+                            seriesData[st][h] += Number(r[field]) || 0;
+                          }
+                        });
+                      });
+                      const activeStatuses = TASK_STATUS_LIST.filter(st =>
+                        seriesData[st].reduce((a, b) => a + b, 0) > 0
+                      );
+                      if (activeStatuses.length === 0) {
+                        const totals = empty24();
+                        hourlyCompletionTrend.forEach(r => {
+                          if (!r?.date || !rangeDates.has(r.date)) return;
+                          const hh = Number(r.hour);
+                          if (!Number.isFinite(hh) || hh < 0 || hh >= 24) return;
+                          totals[hh] += Number(r.totalCompleted) || 0;
+                        });
+                        const totalLabel = formatMessage({ id: 'TotalCount' });
+                        option = {
+                          color: [PALETTE.total],
+                          tooltip: tooltipStyle,
+                          legend: { ...legendCenterStyle, data: [totalLabel] },
+                          grid: { ...lineChartGrid, bottom: 28 },
+                          ...baseAxes,
+                          series: [
+                            {
+                              name: totalLabel,
+                              type: 'line',
+                              smooth: lineSmooth,
+                              symbol: 'circle',
+                              symbolSize: 5,
+                              data: totals,
+                              lineStyle: { width: 2, color: PALETTE.total },
+                              itemStyle: { color: PALETTE.total, borderColor: '#fff', borderWidth: 1 },
+                              emphasis: { focus: 'series' },
+                              areaStyle: { color: `${PALETTE.total}18` }
+                            }
+                          ]
+                        };
+                      } else {
+                        const legendData = activeStatuses.map(s =>
+                          formatMessage({ id: s.charAt(0).toUpperCase() + s.slice(1) })
+                        );
+                        const series = activeStatuses.map((st, i) => ({
+                          name: legendData[i],
+                          type: 'line',
+                          smooth: lineSmooth,
+                          symbol: 'circle',
+                          symbolSize: 4,
+                          data: seriesData[st],
+                          lineStyle: { width: 1.5, color: HOURLY_STATUS_LINE_COLOR_MAP[st] },
+                          itemStyle: { color: HOURLY_STATUS_LINE_COLOR_MAP[st], borderColor: '#fff', borderWidth: 1 },
+                          emphasis: { focus: 'series' }
+                        }));
+                        option = {
+                          color: activeStatuses.map(s => HOURLY_STATUS_LINE_COLOR_MAP[s]),
+                          tooltip: tooltipStyle,
+                          legend: { ...legendCenterStyle, data: legendData },
+                          grid: { ...lineChartGrid, bottom: 28 },
+                          ...baseAxes,
+                          series
+                        };
+                      }
+                    } else {
+                      const byType = {};
+                      hourlyCompletionTrend.forEach(r => {
+                        if (!r?.date || !rangeDates.has(r.date)) return;
+                        const h = Number(r.hour);
+                        if (!Number.isFinite(h) || h < 0 || h >= 24) return;
+                        const t = r.type != null && r.type !== '' ? String(r.type) : null;
+                        if (!t) return;
+                        if (!byType[t]) byType[t] = empty24();
+                        byType[t][h] += Number(r.totalCompleted) || 0;
+                      });
+                      const typeKeys = Object.keys(byType).sort();
+                      if (typeKeys.length === 0) {
+                        const totals = empty24();
+                        hourlyCompletionTrend.forEach(r => {
+                          if (!r?.date || !rangeDates.has(r.date)) return;
+                          const h = Number(r.hour);
+                          if (!Number.isFinite(h) || h < 0 || h >= 24) return;
+                          totals[h] += Number(r.totalCompleted) || 0;
+                        });
+                        const totalLabel = formatMessage({ id: 'TotalCount' });
+                        option = {
+                          color: [PALETTE.total],
+                          tooltip: tooltipStyle,
+                          legend: { ...legendCenterStyle, data: [totalLabel] },
+                          grid: { ...lineChartGrid, bottom: 28 },
+                          ...baseAxes,
+                          series: [
+                            {
+                              name: totalLabel,
+                              type: 'line',
+                              smooth: lineSmooth,
+                              symbol: 'circle',
+                              symbolSize: 5,
+                              data: totals,
+                              lineStyle: { width: 2, color: PALETTE.total },
+                              itemStyle: { color: PALETTE.total, borderColor: '#fff', borderWidth: 1 },
+                              emphasis: { focus: 'series' },
+                              areaStyle: { color: `${PALETTE.total}18` }
+                            }
+                          ]
+                        };
+                      } else {
+                        const legendData = typeKeys.map(t => typeLabelMap[t] || t);
+                        const series = typeKeys.map((t, i) => ({
+                          name: typeLabelMap[t] || t,
+                          type: 'line',
+                          smooth: lineSmooth,
+                          symbol: 'circle',
+                          symbolSize: 4,
+                          data: byType[t],
+                          lineStyle: { width: 1.5, color: TASK_TYPE_COLOR_MAP[i % TASK_TYPE_COLOR_MAP.length] },
+                          itemStyle: {
+                            color: TASK_TYPE_COLOR_MAP[i % TASK_TYPE_COLOR_MAP.length],
+                            borderColor: '#fff',
+                            borderWidth: 1
+                          },
+                          emphasis: { focus: 'series' }
+                        }));
+                        option = {
+                          color: typeKeys.map((_, i) => TASK_TYPE_COLOR_MAP[i % TASK_TYPE_COLOR_MAP.length]),
+                          tooltip: tooltipStyle,
+                          legend: { ...legendCenterStyle, data: legendData },
+                          grid: { ...lineChartGrid, bottom: 28 },
+                          ...baseAxes,
+                          series
+                        };
+                      }
+                    }
+
+                    return (
                       <BoxCard
                         className={`${style.chartCardSurface} ${style.historyTrendCard}`}
-                        title={formatMessage({ id: 'ManualExecution' })}
+                        title={formatMessage({ id: 'HistoricalHourlyTrendTitle' })}
+                        extra={
+                          <Segmented
+                            className={style.historyHourlyTrendSegmented}
+                            size="small"
+                            value={hourlyHistoryDim}
+                            onChange={setHourlyHistoryDim}
+                            options={[
+                              { label: formatMessage({ id: 'HourlyTrendModeByType' }), value: 'type' },
+                              { label: formatMessage({ id: 'HourlyTrendModeByStatus' }), value: 'status' }
+                            ]}
+                          />
+                        }
                       >
-                        {manualDurationOption ? (
-                          <Echart style={{ height: 320 }} option={manualDurationOption} />
-                        ) : (
-                          <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                        )}
+                        <Echart key={hourlyHistoryDim} style={{ height: 340 }} option={option} />
                       </BoxCard>
-                    </Col>
-                    <Col xs={24} lg={12} className={style.chartCol}>
-                      <BoxCard
-                        className={`${style.chartCardSurface} ${style.historyTrendCard}`}
-                        title={formatMessage({ id: 'AutomaticExecution' })}
-                      >
-                        {systemDurationOption ? (
-                          <Echart style={{ height: 320 }} option={systemDurationOption} />
-                        ) : (
-                          <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                        )}
-                      </BoxCard>
-                    </Col>
-                  </Row>
-                ) : null}
+                    );
+                  }}
+                </Enum>
               </>
             );
           }}
