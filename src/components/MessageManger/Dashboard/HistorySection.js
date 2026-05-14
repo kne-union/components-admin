@@ -26,6 +26,24 @@ import SectionHeader from './SectionHeader';
 import { getClientIanaTimezone } from '../utils';
 import style from './dashboard.module.scss';
 
+const RANGE_DAY_COUNT = { '7d': 7, '1m': 30, '1y': 365 };
+
+/** 本地日历上从 range 起点到今天的日期轴（YYYY-MM-DD） */
+const buildLocalDateAxisForRange = rangeKey => {
+  const days = RANGE_DAY_COUNT[rangeKey] || 7;
+  const dates = [];
+  for (let i = days - 1; i >= 0; i -= 1) {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - i);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    dates.push(`${y}-${m}-${day}`);
+  }
+  return dates;
+};
+
 const HistorySection = createWithRemoteLoader({
   modules: ['components-thirdparty:Echart']
 })(
@@ -70,12 +88,18 @@ const HistorySection = createWithRemoteLoader({
           const trendOption = (() => {
             const recentTrend = data?.recentTrend || [];
             const recentTrendByType = data?.recentTrendByType || [];
-            if (recentTrend.length === 0) return null;
+            const axisDates = recentTrend.length > 0 ? null : buildLocalDateAxisForRange(range);
 
             const dateMap = {};
-            recentTrend.forEach(item => {
-              dateMap[item.date] = { date: item.date, total: item.count };
-            });
+            if (recentTrend.length > 0) {
+              recentTrend.forEach(item => {
+                dateMap[item.date] = { date: item.date, total: item.count };
+              });
+            } else {
+              axisDates.forEach(d => {
+                dateMap[d] = { date: d, total: 0 };
+              });
+            }
             recentTrendByType.forEach(item => {
               if (!dateMap[item.date]) {
                 dateMap[item.date] = { date: item.date, total: 0 };
@@ -155,7 +179,32 @@ const HistorySection = createWithRemoteLoader({
           const codePieOption = (() => {
             const byCode = data?.byCode || {};
             const entries = Object.entries(byCode);
-            if (entries.length === 0) return null;
+            if (entries.length === 0) {
+              return {
+                tooltip: { show: false },
+                legend: { show: false },
+                graphic: [
+                  {
+                    type: 'text',
+                    left: 'center',
+                    top: 'center',
+                    style: {
+                      text: formatMessage({ id: 'NoData' }),
+                      fill: '#94a3b8',
+                      fontSize: 14,
+                      fontWeight: 500
+                    }
+                  }
+                ],
+                series: [
+                  {
+                    ...pieSeries(['50%', '42%'], ['44%', '62%']),
+                    silent: true,
+                    data: [{ value: 1, name: '', itemStyle: { color: '#f1f5f9' }, label: { show: false } }]
+                  }
+                ]
+              };
+            }
             return {
               color: PALETTE.pie,
               tooltip: itemTooltipStyle,
@@ -232,11 +281,7 @@ const HistorySection = createWithRemoteLoader({
               </div>
 
               <BoxCard className={`${style.chartCardSurface} ${style.historyTrendCard}`}>
-                {trendOption ? (
-                  <Echart style={{ height: 380 }} option={trendOption} />
-                ) : (
-                  <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                )}
+                <Echart style={{ height: 380 }} option={trendOption} />
               </BoxCard>
 
               <Row gutter={[20, 24]} className={style.historyPiesRow}>
@@ -247,11 +292,7 @@ const HistorySection = createWithRemoteLoader({
                 </Col>
                 <Col xs={24} lg={12} className={style.chartCol}>
                   <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'ByCodeStats' })} style={{ height: '100%' }}>
-                    {codePieOption ? (
-                      <Echart style={{ height: 320 }} option={codePieOption} />
-                    ) : (
-                      <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                    )}
+                    <Echart style={{ height: 320 }} option={codePieOption} />
                   </BoxCard>
                 </Col>
               </Row>

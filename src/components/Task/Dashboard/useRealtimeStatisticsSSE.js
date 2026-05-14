@@ -3,6 +3,8 @@ import { getToken } from '@kne/token-storage';
 import { buildUrlWithParams } from './constants';
 import { getClientIanaTimezone } from '../utils';
 
+/** 任务实时统计 SSE：负载字段约定见 `src/components/Task/doc/api.md`「任务实时统计 SSE」。 */
+
 const isLikelyTaskStatisticsPayload = obj =>
   obj &&
   typeof obj === 'object' &&
@@ -14,7 +16,9 @@ const isLikelyTaskStatisticsPayload = obj =>
     'byType' in obj ||
     'todayDuration' in obj ||
     'pendingByRunnerType' in obj ||
-    'runnerTypeStats' in obj);
+    'runnerTypeStats' in obj ||
+    'waitingByRunnerType' in obj ||
+    'completedToday' in obj);
 
 const unwrapStatisticsPayload = parsed => {
   if (parsed == null) return null;
