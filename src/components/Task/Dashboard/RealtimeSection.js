@@ -1,7 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Col, Row, Space, Tag } from 'antd';
+import { Col, Row, Segmented, Space, Tag } from 'antd';
 import { BarChartOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Card as BoxCard, ColorfulCard } from '@kne/react-box';
 import withLocale from '../withLocale';
@@ -20,12 +20,24 @@ import {
   splitLineStyle,
   formatDuration,
   pickStatisticsDurationMs,
-  sanitizeStatisticsDurationMs
+  sanitizeStatisticsDurationMs,
+  resolveDurationMsForDashboard,
+  sortTaskTypeKeys
 } from './constants';
 import useRealtimeStatisticsSSE from './useRealtimeStatisticsSSE';
 import style from './dashboard.module.scss';
 
 const HOURS_IN_DAY = 24;
+
+/** 取第一个有效非负整数；用于统计类字段的多来源兼容 */
+const pickNonNegativeInt = (...candidates) => {
+  for (const v of candidates) {
+    if (v === undefined || v === null) continue;
+    const n = Number(v);
+    if (Number.isFinite(n) && n >= 0) return Math.trunc(n);
+  }
+  return 0;
+};
 
 const buildTodayHourlySlots = raw => {
   const slots = Array.from({ length: HOURS_IN_DAY }, (_, h) => ({
@@ -47,12 +59,6 @@ const buildTodayHourlySlots = raw => {
   });
 
   return slots;
-};
-
-const hasHourlyInput = raw => {
-  const a = raw?.hourlyTrend;
-  const b = raw?.hourlyTrendByType;
-  return (Array.isArray(a) && a.length > 0) || (Array.isArray(b) && b.length > 0);
 };
 
 const RealtimeSection = createWithRemoteLoader({
@@ -82,6 +88,8 @@ const RealtimeSection = createWithRemoteLoader({
     );
     const sseUrl = apis?.task?.statistics?.sse?.url;
     const { realtimeData, isConnected, lastUpdatedAt } = useRealtimeStatisticsSSE(sseUrl);
+    /** 执行时间统计三张卡 + 按类型耗时图：全部 | 手动 | 自动（todayDuration / byTypeByRunnerType） */
+    const [durationByTypeRunnerMode, setDurationByTypeRunnerMode] = useState('all');
 
     const byStatus = realtimeData?.byStatus || {};
     const byRunnerType = realtimeData?.byRunnerType || {};
@@ -93,25 +101,35 @@ const RealtimeSection = createWithRemoteLoader({
     const canceledCount = Number(byStatus.canceled) || 0;
     const manualRt = realtimeData?.runnerTypeStats?.manual;
     const hasManualRunnerStats = manualRt && typeof manualRt === 'object';
-    const pendingByRunnerType = realtimeData?.pendingByRunnerType || {};
     const manualTaskCount = hasManualRunnerStats
       ? Number(manualRt.total) || 0
       : Number(byRunnerType.manual) || 0;
-    const manualPendingCount = hasManualRunnerStats
-      ? Number(manualRt.pending) || 0
-      : Number(pendingByRunnerType.manual) || 0;
-    const manualExecutedCount = hasManualRunnerStats
-      ? Number(manualRt.executed) || 0
-      : Math.max(0, manualTaskCount - (Number(pendingByRunnerType.manual) || 0));
-    const manualDurationDisplay = useMemo(() => {
-      const manualDur = realtimeData?.todayDuration?.byRunnerType?.manual;
-      if (!manualDur || typeof manualDur !== 'object') return null;
-      return {
-        avgWaitingTime: formatDuration(sanitizeStatisticsDurationMs(manualDur.avgWaitingTime)),
-        avgExecutionTime: formatDuration(sanitizeStatisticsDurationMs(manualDur.avgExecutionTime)),
-        avgTotalTime: formatDuration(sanitizeStatisticsDurationMs(manualDur.avgTotalTime))
-      };
-    }, [realtimeData]);
+    /**
+     * 手动「等待操作」：**主展示条数**（waitingByRunnerType.manual 等）；次展示队列内
+     * 最长等待（`waitingQueueMaxWaitMsByRunnerType.manual`，当前时间 − createdAt）。
+     */
+    const manualPendingCount = pickNonNegativeInt(
+      realtimeData?.waitingByRunnerType?.manual,
+      manualRt?.waiting,
+      manualRt?.waitingCount
+    );
+    /**
+     * 手动「当日完成」：**主展示条数**（completedToday.manual）；次展示当日完成任务的
+     * 创建→完成耗时之和（`completedTodayTotalDurationMsByRunnerType.manual`）。
+     */
+    const manualExecutedCount = pickNonNegativeInt(realtimeData?.completedToday?.manual);
+
+    const manualPendingMaxWaitDisplay = useMemo(() => {
+      if (manualPendingCount <= 0) return '—';
+      const ms = resolveDurationMsForDashboard(realtimeData?.waitingQueueMaxWaitMsByRunnerType?.manual);
+      return ms != null ? formatDuration(ms) : '—';
+    }, [realtimeData, manualPendingCount]);
+
+    const manualCompletedTotalDurationDisplay = useMemo(() => {
+      if (manualExecutedCount <= 0) return '—';
+      const ms = resolveDurationMsForDashboard(realtimeData?.completedTodayTotalDurationMsByRunnerType?.manual);
+      return ms != null ? formatDuration(ms) : '—';
+    }, [realtimeData, manualExecutedCount]);
 
     const lastUpdatedShort = useMemo(() => {
       if (!lastUpdatedAt) return '';
@@ -125,7 +143,7 @@ const RealtimeSection = createWithRemoteLoader({
     }, [lastUpdatedAt]);
 
     const periodStats = useMemo(() => {
-      if (!realtimeData || !hasHourlyInput(realtimeData)) return [];
+      if (!realtimeData) return [];
       const slots = buildTodayHourlySlots(realtimeData);
       return TIME_PERIODS.map(period => {
         let total = 0;
@@ -141,17 +159,53 @@ const RealtimeSection = createWithRemoteLoader({
       });
     }, [realtimeData]);
 
+    /** 与「今日每小时趋势」series 顺序一致；下方时段条按此列表取色，避免同色不同 type */
+    const todayHourlyTaskTypeOrder = useMemo(() => {
+      if (!realtimeData) return [];
+      const slots = buildTodayHourlySlots(realtimeData);
+      const typeSet = new Set();
+      slots.forEach(s => Object.keys(s.byType).forEach(t => typeSet.add(t)));
+      return sortTaskTypeKeys(typeSet);
+    }, [realtimeData]);
+
     const hourlyOption = useMemo(() => {
-      if (!realtimeData || !hasHourlyInput(realtimeData)) return null;
+      if (!realtimeData) return null;
 
       const slots = buildTodayHourlySlots(realtimeData);
       const hours = slots.map(s => `${String(s.hour).padStart(2, '0')}:00`);
 
-      // 收集所有出现过的 type
-      const typeSet = new Set();
-      slots.forEach(s => Object.keys(s.byType).forEach(t => typeSet.add(t)));
-      const typeList = Array.from(typeSet);
-      if (typeList.length === 0) return null;
+      const typeList = todayHourlyTaskTypeOrder;
+
+      if (typeList.length === 0) {
+        const totalLabel = formatMessage({ id: 'TotalCount' });
+        return {
+          color: [PALETTE.total],
+          tooltip: tooltipStyle,
+          legend: { ...legendCenterStyle, data: [totalLabel] },
+          grid: { ...lineChartGrid, bottom: 28 },
+          xAxis: {
+            type: 'category', boundaryGap: false, data: hours,
+            axisLine: axisLineStyle, axisTick: { show: false },
+            axisLabel: { ...axisLabelStyle, fontSize: 10, interval: 1 }
+          },
+          yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
+          series: [
+            {
+              name: totalLabel,
+              type: 'line',
+              smooth: lineSmooth,
+              symbol: 'circle',
+              symbolSize: 4,
+              showSymbol: true,
+              data: slots.map(s => s.total),
+              lineStyle: { width: 1.5, color: PALETTE.total },
+              itemStyle: { color: PALETTE.total, borderColor: '#fff', borderWidth: 1 },
+              emphasis: { focus: 'series' },
+              areaStyle: { color: `${PALETTE.total}18` }
+            }
+          ]
+        };
+      }
 
       const typeSeries = typeList.map((type, i) => ({
         name: type,
@@ -183,11 +237,10 @@ const RealtimeSection = createWithRemoteLoader({
         yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
         series: typeSeries
       };
-    }, [realtimeData]);
+    }, [realtimeData, formatMessage, todayHourlyTaskTypeOrder]);
 
     const periodCompareOption = useMemo(() => {
       const hourlyTrendByStatus = Array.isArray(realtimeData?.hourlyTrendByStatus) ? realtimeData.hourlyTrendByStatus : [];
-      if (hourlyTrendByStatus.length === 0) return null;
       const labels = TIME_PERIODS.map(p => formatMessage({ id: p.id }));
       const statusKeys = ['success', 'running', 'waiting', 'canceled', 'failed'];
       const statusLabelMap = {
@@ -230,27 +283,140 @@ const RealtimeSection = createWithRemoteLoader({
     const durationDisplay = useMemo(() => {
       const dur = realtimeData?.todayDuration;
       if (!dur) return null;
+
+      if (durationByTypeRunnerMode === 'all') {
+        return {
+          avgWaitingTime: formatDuration(pickStatisticsDurationMs(dur, 'avgWaitingTime')),
+          avgExecutionTime: formatDuration(pickStatisticsDurationMs(dur, 'avgExecutionTime')),
+          avgTotalTime: formatDuration(pickStatisticsDurationMs(dur, 'avgTotalTime'))
+        };
+      }
+
+      const source =
+        dur.byRunnerType && typeof dur.byRunnerType === 'object'
+          ? dur.byRunnerType[durationByTypeRunnerMode]
+          : undefined;
+      const pickSlice = field => formatDuration(pickStatisticsDurationMs(source, field, []));
+
       return {
-        avgWaitingTime: formatDuration(pickStatisticsDurationMs(dur, 'avgWaitingTime')),
-        avgExecutionTime: formatDuration(pickStatisticsDurationMs(dur, 'avgExecutionTime')),
-        avgTotalTime: formatDuration(pickStatisticsDurationMs(dur, 'avgTotalTime'))
+        avgWaitingTime: pickSlice('avgWaitingTime'),
+        avgExecutionTime: pickSlice('avgExecutionTime'),
+        avgTotalTime: pickSlice('avgTotalTime')
       };
-    }, [realtimeData]);
+    }, [realtimeData, durationByTypeRunnerMode]);
 
     const durationByTypeOption = useMemo(() => {
-      const todayDur = realtimeData?.todayDuration;
-      if (!todayDur || typeof todayDur !== 'object') return null;
+      if (!realtimeData) return null;
 
-      const durationByType =
-        todayDur.byType && typeof todayDur.byType === 'object' ? todayDur.byType : {};
-      const countByType =
+      const todayDur = realtimeData?.todayDuration;
+      const byRunnerSplit = todayDur?.byTypeByRunnerType;
+      let durationByType = {};
+      let countByType =
         realtimeData.byType && typeof realtimeData.byType === 'object' ? realtimeData.byType : {};
+
+      if (durationByTypeRunnerMode === 'manual') {
+        const m = byRunnerSplit?.manual;
+        if (m && typeof m === 'object') {
+          durationByType = m;
+          countByType = Object.fromEntries(
+            Object.keys(durationByType).map(k => {
+              const d = durationByType[k];
+              const c = d && typeof d === 'object' ? Number(d.count) || 0 : 0;
+              return [k, c];
+            })
+          );
+        } else {
+          durationByType = {};
+          countByType = {};
+        }
+      } else if (durationByTypeRunnerMode === 'system') {
+        const s = byRunnerSplit?.system;
+        if (s && typeof s === 'object') {
+          durationByType = s;
+          countByType = Object.fromEntries(
+            Object.keys(durationByType).map(k => {
+              const d = durationByType[k];
+              const c = d && typeof d === 'object' ? Number(d.count) || 0 : 0;
+              return [k, c];
+            })
+          );
+        } else {
+          durationByType = {};
+          countByType = {};
+        }
+      } else {
+        durationByType =
+          todayDur && typeof todayDur === 'object' && todayDur.byType && typeof todayDur.byType === 'object'
+            ? todayDur.byType
+            : {};
+        countByType =
+          realtimeData.byType && typeof realtimeData.byType === 'object' ? realtimeData.byType : {};
+      }
 
       const typeSet = new Set([
         ...Object.keys(countByType).filter(k => (Number(countByType[k]) || 0) > 0),
         ...Object.keys(durationByType).filter(k => durationByType[k] && typeof durationByType[k] === 'object')
       ]);
-      if (typeSet.size === 0) return null;
+      const noDataLabel = formatMessage({ id: 'NoData' });
+      if (typeSet.size === 0) {
+        return {
+          color: [PALETTE.running, PALETTE.waiting, PALETTE.total],
+          tooltip: {
+            ...tooltipStyle,
+            axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(148,163,184,0.15)' } },
+            formatter: params => {
+              const title = params?.[0]?.axisValue || '';
+              const lines = (params || []).map(p => `${p.marker} ${p.seriesName}: ${formatDuration(p.value)}`).join('<br/>');
+              return `<div style="font-weight:600;margin-bottom:4px">${title}</div>${lines}`;
+            }
+          },
+          legend: {
+            ...legendCenterStyle,
+            data: [
+              formatMessage({ id: 'AvgExecutionTime' }),
+              formatMessage({ id: 'AvgWaitingTime' }),
+              formatMessage({ id: 'AvgTotalTime' })
+            ]
+          },
+          grid: { ...lineChartGrid, bottom: 20 },
+          xAxis: {
+            type: 'category',
+            data: [noDataLabel],
+            axisLine: axisLineStyle,
+            axisTick: { show: false },
+            axisLabel: axisLabelStyle
+          },
+          yAxis: {
+            type: 'value',
+            ...splitLineStyle,
+            axisLabel: { ...axisLabelStyle, formatter: value => formatDuration(value) },
+            min: 0
+          },
+          series: [
+            {
+              name: formatMessage({ id: 'AvgExecutionTime' }),
+              type: 'bar',
+              data: [0],
+              barMaxWidth: 28,
+              itemStyle: { color: PALETTE.running, borderRadius: [4, 4, 0, 0] }
+            },
+            {
+              name: formatMessage({ id: 'AvgWaitingTime' }),
+              type: 'bar',
+              data: [0],
+              barMaxWidth: 28,
+              itemStyle: { color: PALETTE.waiting, borderRadius: [4, 4, 0, 0] }
+            },
+            {
+              name: formatMessage({ id: 'AvgTotalTime' }),
+              type: 'bar',
+              data: [0],
+              barMaxWidth: 28,
+              itemStyle: { color: PALETTE.total, borderRadius: [4, 4, 0, 0] }
+            }
+          ]
+        };
+      }
 
       const entries = Array.from(typeSet)
         .map(type => {
@@ -322,7 +488,7 @@ const RealtimeSection = createWithRemoteLoader({
           }
         ]
       };
-    }, [realtimeData, formatMessage]);
+    }, [realtimeData, formatMessage, durationByTypeRunnerMode]);
 
     return (
       <>
@@ -406,45 +572,42 @@ const RealtimeSection = createWithRemoteLoader({
                     </div>
                     <div className={`${style.kpiRow} ${style.kpiRowDense}`}>
                       <ColorfulCard
-                        className={`${style.kpiCard} ${style.kpiCardDense} ${style.manualPendingCard}`}
+                        className={`${style.kpiCard} ${style.kpiCardDense} ${style.manualPendingCard} ${style.manualKpiCard}`}
                         color={PALETTE.failed}
                         icon={<ClockCircleOutlined />}
-                        title={<span className={`${style.kpiValueDense} ${style.manualPendingValue}`} style={{ color: PALETTE.failed }}>{manualPendingCount}</span>}
-                        description={<span className={style.kpiDescDense}>{formatMessage({ id: 'ManualPendingTasks' })}</span>}
+                        style={{ textAlign: 'left' }}
+                        title={<span className={style.kpiValueDense} style={{ color: PALETTE.failed }}>{manualPendingCount}</span>}
+                        description={
+                          <div className={style.kpiManualCardDesc}>
+                            <span className={style.kpiManualCardPurpose}>{formatMessage({ id: 'ManualPendingTasks' })}</span>
+                            <div className={`${style.manualKpiTimeBlock} ${style.manualKpiTimeBlockPending}`}>
+                              <span className={style.manualKpiTimeLabel}>{formatMessage({ id: 'ManualPendingMaxWaitLabel' })}</span>
+                              <span className={style.manualKpiTimeValue} style={{ color: PALETTE.failed }}>
+                                {manualPendingMaxWaitDisplay}
+                              </span>
+                            </div>
+                          </div>
+                        }
                       />
                       <ColorfulCard
-                        className={`${style.kpiCard} ${style.kpiCardDense}`}
+                        className={`${style.kpiCard} ${style.kpiCardDense} ${style.manualKpiCard}`}
                         color={PALETTE.success}
                         icon={<CheckCircleOutlined />}
+                        style={{ textAlign: 'left' }}
                         title={<span className={style.kpiValueDense} style={{ color: PALETTE.success }}>{manualExecutedCount}</span>}
-                        description={<span className={style.kpiDescDense}>{formatMessage({ id: 'ManualExecutedTasks' })}</span>}
+                        description={
+                          <div className={style.kpiManualCardDesc}>
+                            <span className={style.kpiManualCardPurpose}>{formatMessage({ id: 'ManualExecutedTasks' })}</span>
+                            <div className={`${style.manualKpiTimeBlock} ${style.manualKpiTimeBlockDone}`}>
+                              <span className={style.manualKpiTimeLabel}>{formatMessage({ id: 'ManualCompletedTotalDurationLabel' })}</span>
+                              <span className={style.manualKpiTimeValue} style={{ color: PALETTE.success }}>
+                                {manualCompletedTotalDurationDisplay}
+                              </span>
+                            </div>
+                          </div>
+                        }
                       />
                     </div>
-                    {manualDurationDisplay && (
-                      <div className={`${style.kpiRow} ${style.kpiRowDense} ${style.manualDurationRow}`}>
-                        <ColorfulCard
-                          className={`${style.kpiCard} ${style.kpiCardDense}`}
-                          color={PALETTE.running}
-                          icon={<ThunderboltOutlined />}
-                          title={<span className={style.kpiValueDense} style={{ color: PALETTE.running }}>{manualDurationDisplay.avgExecutionTime}</span>}
-                          description={<span className={style.kpiDescDense}>{formatMessage({ id: 'ManualAvgExecutionTime' })}</span>}
-                        />
-                        <ColorfulCard
-                          className={`${style.kpiCard} ${style.kpiCardDense}`}
-                          color={PALETTE.waiting}
-                          icon={<ClockCircleOutlined />}
-                          title={<span className={style.kpiValueDense} style={{ color: PALETTE.waiting }}>{manualDurationDisplay.avgWaitingTime}</span>}
-                          description={<span className={style.kpiDescDense}>{formatMessage({ id: 'ManualAvgWaitingTime' })}</span>}
-                        />
-                        <ColorfulCard
-                          className={`${style.kpiCard} ${style.kpiCardDense}`}
-                          color={PALETTE.total}
-                          icon={<BarChartOutlined />}
-                          title={<span className={style.kpiValueDense} style={{ color: PALETTE.total }}>{manualDurationDisplay.avgTotalTime}</span>}
-                          description={<span className={style.kpiDescDense}>{formatMessage({ id: 'ManualAvgTotalTime' })}</span>}
-                        />
-                      </div>
-                    )}
                   </div>
 
                   <div className={style.realtimeGroupTitle}>{formatMessage({ id: 'RealtimeTaskOverview' })}</div>
@@ -494,7 +657,20 @@ const RealtimeSection = createWithRemoteLoader({
             </div>
 
                   <div className={style.realtimeSectionDivider} />
-                  <div className={style.realtimeGroupTitle}>{formatMessage({ id: 'ExecutionTimeStatistics' })}</div>
+                  <div className={style.executionTimeStatHead}>
+                    <span className={style.realtimeGroupTitle}>{formatMessage({ id: 'ExecutionTimeStatistics' })}</span>
+                    <Segmented
+                      className={style.durationByTypeRunnerSegmented}
+                      size="small"
+                      value={durationByTypeRunnerMode}
+                      onChange={setDurationByTypeRunnerMode}
+                      options={[
+                        { label: formatMessage({ id: 'DurationByTypeRunnerAll' }), value: 'all' },
+                        { label: formatMessage({ id: 'DurationByTypeRunnerManual' }), value: 'manual' },
+                        { label: formatMessage({ id: 'DurationByTypeRunnerSystem' }), value: 'system' }
+                      ]}
+                    />
+                  </div>
                   <div className={`${style.kpiRow} ${style.kpiRowDense}`}>
                     {durationDisplay ? (
                       <>
@@ -527,12 +703,11 @@ const RealtimeSection = createWithRemoteLoader({
                     )}
                   </div>
 
-                  <BoxCard className={`${style.chartCardSurface} ${style.durationByTypeCard}`} title={formatMessage({ id: 'ExecutionTimeByTaskType' })}>
-                    {resolvedDurationByTypeOption ? (
-                      <Echart style={{ height: 320 }} option={resolvedDurationByTypeOption} />
-                    ) : (
-                      <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                    )}
+                  <BoxCard
+                    className={`${style.chartCardSurface} ${style.durationByTypeCard}`}
+                    title={formatMessage({ id: 'ExecutionTimeByTaskType' })}
+                  >
+                    <Echart style={{ height: 320 }} option={resolvedDurationByTypeOption} />
                   </BoxCard>
 
                   <div className={style.periodStrip}>
@@ -567,12 +742,18 @@ const RealtimeSection = createWithRemoteLoader({
                         </div>
                         <div className={style.periodStripMeta}>
                           <Space size={[6, 6]} wrap className={style.periodStripMetaInner}>
-                            {Object.entries(period.byType)
-                              .map(([type, count]) => ({ type, count: Number(count) || 0 }))
-                              .filter(({ count }) => count > 0)
-                              .map(({ type, count }, i) => {
-                                const color = TASK_TYPE_COLOR_MAP[i % TASK_TYPE_COLOR_MAP.length];
-                                return (
+                            {sortTaskTypeKeys(
+                              Object.entries(period.byType)
+                                .filter(([, c]) => (Number(c) || 0) > 0)
+                                .map(([type]) => type)
+                            ).map(type => {
+                              const count = Number(period.byType[type]) || 0;
+                              const ci = todayHourlyTaskTypeOrder.indexOf(type);
+                              const color =
+                                TASK_TYPE_COLOR_MAP[
+                                  (ci >= 0 ? ci : 0) % TASK_TYPE_COLOR_MAP.length
+                                ];
+                              return (
                                   <Tag
                                     key={type}
                                     style={{
@@ -586,7 +767,7 @@ const RealtimeSection = createWithRemoteLoader({
                                     <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{count}</span>
                                   </Tag>
                                 );
-                              })}
+                            })}
                           </Space>
                         </div>
                       </div>
@@ -595,20 +776,12 @@ const RealtimeSection = createWithRemoteLoader({
                   <Row gutter={[20, 24]} className={style.chartsRow}>
                     <Col xs={24} lg={12} className={style.chartCol}>
                       <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'PeriodCompare' })} style={{ height: '100%' }}>
-                        {periodCompareOption ? (
-                          <Echart style={{ height: 320 }} option={periodCompareOption} />
-                        ) : (
-                          <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                        )}
+                        <Echart style={{ height: 320 }} option={periodCompareOption} />
                       </BoxCard>
                     </Col>
                     <Col xs={24} lg={12} className={style.chartCol}>
                       <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'TodayHourlyTrend' })} style={{ height: '100%' }}>
-                        {resolvedHourlyOption ? (
-                          <Echart style={{ height: 320 }} option={resolvedHourlyOption} />
-                        ) : (
-                          <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                        )}
+                        <Echart style={{ height: 320 }} option={resolvedHourlyOption} />
                       </BoxCard>
                     </Col>
                   </Row>

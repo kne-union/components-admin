@@ -49,6 +49,7 @@ const buildTodayHourlySlots = raw => {
       if (!Number.isFinite(h) || h < 0 || h >= HOURS_IN_DAY) return;
       const n = Number(item?.count) || 0;
       const typ = Number(item?.type);
+      if (!Number.isFinite(typ)) return;
       if (typ === 0) slots[h].email += n;
       else if (typ === 1) slots[h].sms += n;
     });
@@ -79,15 +80,17 @@ const buildTodayHourlySlots = raw => {
   return slots;
 };
 
-const hasHourlyInput = raw => {
-  const records = raw?.records;
-  const a = raw?.hourlyTrend;
-  const b = raw?.hourlyTrendByType;
-  return (
-    (Array.isArray(records) && records.length > 0) ||
-    (Array.isArray(a) && a.length > 0) ||
-    (Array.isArray(b) && b.length > 0)
-  );
+/** 消息实时统计：type 0 邮件、1 短信（与 enums messageManagerType 一致） */
+const messageTypeLabel = (typeKey, formatMessage) => {
+  if (typeKey === '0') return formatMessage({ id: 'Email' });
+  if (typeKey === '1') return formatMessage({ id: 'SMS' });
+  return `${formatMessage({ id: 'Type' })} ${typeKey}`;
+};
+
+const messageTypeLineColor = (typeKey, index) => {
+  if (typeKey === '0') return PALETTE.email;
+  if (typeKey === '1') return PALETTE.sms;
+  return PALETTE.pie[index % PALETTE.pie.length];
 };
 
 /** 当前接口：byType 为 { "0": n, "1": m }，totalRecords 为数字 */
@@ -140,7 +143,7 @@ const RealtimeSection = createWithRemoteLoader({
 
     // 时段汇总：与 hourly 序列同源（buildTodayHourlySlots），按四小时段聚合
     const periodStats = useMemo(() => {
-      if (!realtimeData || !hasHourlyInput(realtimeData)) return [];
+      if (!realtimeData) return [];
       const slots = buildTodayHourlySlots(realtimeData);
       return TIME_PERIODS.map(period => {
         let email = 0;
@@ -156,84 +159,220 @@ const RealtimeSection = createWithRemoteLoader({
       });
     }, [realtimeData]);
 
-    /** 今日每小时趋势：按任务类型（hourlyTrendByType） */
+    /** 今日每小时趋势：有 hourlyTrendByType 时按类型分线，否则按 slots 展示总量与邮件/短信 */
     const hourlyOption = useMemo(() => {
-      const hourlyTrendByType = Array.isArray(realtimeData?.hourlyTrendByType) ? realtimeData.hourlyTrendByType : [];
-      if (hourlyTrendByType.length === 0) return null;
+      if (!realtimeData) return null;
 
-      const hours = Array.from({ length: HOURS_IN_DAY }, (_, h) => h);
-      const typeMap = {};
-      hourlyTrendByType.forEach(item => {
-        const h = Number(item?.hour);
-        const type = String(item?.type);
-        if (!Number.isFinite(h) || h < 0 || h >= HOURS_IN_DAY || !type) return;
-        if (!typeMap[type]) typeMap[type] = Array.from({ length: HOURS_IN_DAY }, () => 0);
-        typeMap[type][h] += Number(item?.count) || 0;
+      const hours = Array.from({ length: HOURS_IN_DAY }, (_, h) => `${String(h).padStart(2, '0')}:00`);
+      const hourlyTrendByType = Array.isArray(realtimeData?.hourlyTrendByType) ? realtimeData.hourlyTrendByType : [];
+
+      if (hourlyTrendByType.length > 0) {
+        const typeMap = {};
+        hourlyTrendByType.forEach(item => {
+          const h = Number(item?.hour);
+          const typeNum = Number(item?.type);
+          if (!Number.isFinite(h) || h < 0 || h >= HOURS_IN_DAY || !Number.isFinite(typeNum)) return;
+          const type = String(typeNum);
+          if (!typeMap[type]) typeMap[type] = Array.from({ length: HOURS_IN_DAY }, () => 0);
+          typeMap[type][h] += Number(item?.count) || 0;
+        });
+
+        const typeKeys = Object.keys(typeMap).sort((a, b) => Number(a) - Number(b));
+        if (typeKeys.length > 0) {
+          return {
+            color: typeKeys.map((key, index) => messageTypeLineColor(key, index)),
+            tooltip: tooltipStyle,
+            legend: {
+              ...legendCenterStyle,
+              data: typeKeys.map(key => messageTypeLabel(key, formatMessage))
+            },
+            grid: { ...lineChartGrid, bottom: 28 },
+            xAxis: {
+              type: 'category',
+              boundaryGap: false,
+              data: hours,
+              axisLine: axisLineStyle,
+              axisTick: { show: false },
+              axisLabel: {
+                ...axisLabelStyle,
+                fontSize: 10,
+                interval: 1,
+                rotate: 0
+              }
+            },
+            yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
+            series: typeKeys.map((key, index) => {
+              const color = messageTypeLineColor(key, index);
+              return {
+                name: messageTypeLabel(key, formatMessage),
+                type: 'line',
+                symbol: 'circle',
+                symbolSize: 5,
+                smooth: 0.28,
+                data: typeMap[key],
+                lineStyle: { width: 2.5, color },
+                itemStyle: { color, borderColor: '#fff', borderWidth: 2 },
+                emphasis: { focus: 'series' }
+              };
+            })
+          };
+        }
+      }
+
+      const slots = buildTodayHourlySlots(realtimeData);
+      const totalLabel = formatMessage({ id: 'TotalCount' });
+      const emailLabel = formatMessage({ id: 'Email' });
+      const smsLabel = formatMessage({ id: 'SMS' });
+      const lineFor = (data, color) => ({
+        type: 'line',
+        symbol: 'circle',
+        symbolSize: 5,
+        smooth: 0.28,
+        data,
+        lineStyle: { width: 2.5, color },
+        itemStyle: { color, borderColor: '#fff', borderWidth: 2 },
+        emphasis: { focus: 'series' }
       });
 
-      const typeKeys = Object.keys(typeMap);
-      if (typeKeys.length === 0) return null;
-
       return {
-        color: PALETTE.pie,
+        color: [PALETTE.total, PALETTE.email, PALETTE.sms],
         tooltip: tooltipStyle,
-        legend: {
-          ...legendCenterStyle,
-          data: typeKeys.map(key => `Type ${key}`)
-        },
+        legend: { ...legendCenterStyle, data: [totalLabel, emailLabel, smsLabel] },
         grid: { ...lineChartGrid, bottom: 28 },
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: hours.map(h => `${String(h).padStart(2, '0')}:00`),
+          data: hours,
           axisLine: axisLineStyle,
           axisTick: { show: false },
-          axisLabel: {
-            ...axisLabelStyle,
-            fontSize: 10,
-            interval: 1,
-            rotate: 0
-          }
+          axisLabel: { ...axisLabelStyle, fontSize: 10, interval: 1, rotate: 0 }
         },
         yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
-        series: typeKeys.map((key, index) => ({
-          name: `Type ${key}`,
-          type: 'line',
-          symbol: 'circle',
-          symbolSize: 5,
-          smooth: 0.28,
-          data: typeMap[key],
-          lineStyle: { width: 2.5, color: PALETTE.pie[index % PALETTE.pie.length] },
-          itemStyle: { color: PALETTE.pie[index % PALETTE.pie.length], borderColor: '#fff', borderWidth: 2 },
-          emphasis: { focus: 'series' }
-        }))
+        series: [
+          { name: totalLabel, ...lineFor(slots.map(s => (s.hasTotalFromApi ? s.total : s.email + s.sms)), PALETTE.total) },
+          { name: emailLabel, ...lineFor(slots.map(s => s.email), PALETTE.email) },
+          { name: smsLabel, ...lineFor(slots.map(s => s.sms), PALETTE.sms) }
+        ]
       };
-    }, [realtimeData]);
+    }, [realtimeData, formatMessage]);
 
-    /** 时段对比：按状态（成功/执行中/等待/取消/错误） */
+    /**
+     * 时段对比：优先按状态（hourlyTrendByStatus）；消息统计接口无该字段时，
+     * 用 hourly 数据按时段汇总邮件/短信，与上方时段条一致。
+     */
     const periodCompareOption = useMemo(() => {
-      const hourlyTrendByStatus = Array.isArray(realtimeData?.hourlyTrendByStatus) ? realtimeData.hourlyTrendByStatus : [];
-      if (hourlyTrendByStatus.length === 0) return null;
       const labels = TIME_PERIODS.map(p => formatMessage({ id: p.id }));
-      const statusData = STATUS_SERIES.reduce((acc, cur) => ({ ...acc, [cur.key]: [0, 0, 0, 0] }), {});
+      const hourlyTrendByStatus = Array.isArray(realtimeData?.hourlyTrendByStatus) ? realtimeData.hourlyTrendByStatus : [];
 
-      hourlyTrendByStatus.forEach(item => {
-        const h = Number(item?.hour);
-        const status = String(item?.status || '');
-        const count = Number(item?.count) || 0;
-        if (!Number.isFinite(h) || !statusData[status]) return;
-        const periodIndex = TIME_PERIODS.findIndex(p => h >= p.start && h < p.end);
-        if (periodIndex >= 0) statusData[status][periodIndex] += count;
+      if (hourlyTrendByStatus.length > 0) {
+        const statusData = STATUS_SERIES.reduce((acc, cur) => ({ ...acc, [cur.key]: [0, 0, 0, 0] }), {});
+
+        hourlyTrendByStatus.forEach(item => {
+          const h = Number(item?.hour);
+          const status = String(item?.status || '');
+          const count = Number(item?.count) || 0;
+          if (!Number.isFinite(h) || !statusData[status]) return;
+          const periodIndex = TIME_PERIODS.findIndex(p => h >= p.start && h < p.end);
+          if (periodIndex >= 0) statusData[status][periodIndex] += count;
+        });
+
+        return {
+          color: STATUS_SERIES.map(item => item.color),
+          tooltip: {
+            ...tooltipStyle,
+            trigger: 'axis',
+            axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(148,163,184,0.15)' } }
+          },
+          legend: { ...legendCenterStyle, data: STATUS_SERIES.map(item => item.label) },
+          grid: { ...lineChartGrid, bottom: 20 },
+          xAxis: {
+            type: 'category',
+            data: labels,
+            axisLine: axisLineStyle,
+            axisTick: { show: false },
+            axisLabel: { color: '#64748b', fontSize: 12 }
+          },
+          yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
+          series: STATUS_SERIES.map((item, index) => ({
+            name: item.label,
+            type: 'bar',
+            data: statusData[item.key],
+            barMaxWidth: 24,
+            itemStyle: { color: item.color, borderRadius: [4, 4, 0, 0] },
+            emphasis: { focus: 'series' },
+            z: 10 - index
+          }))
+        };
+      }
+
+      if (!realtimeData) {
+        const emailLabel = formatMessage({ id: 'Email' });
+        const smsLabel = formatMessage({ id: 'SMS' });
+        return {
+          color: [PALETTE.email, PALETTE.sms],
+          tooltip: {
+            ...tooltipStyle,
+            trigger: 'axis',
+            axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(148,163,184,0.15)' } }
+          },
+          legend: { ...legendCenterStyle, data: [emailLabel, smsLabel] },
+          grid: { ...lineChartGrid, bottom: 20 },
+          xAxis: {
+            type: 'category',
+            data: labels,
+            axisLine: axisLineStyle,
+            axisTick: { show: false },
+            axisLabel: { color: '#64748b', fontSize: 12 }
+          },
+          yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
+          series: [
+            {
+              name: emailLabel,
+              type: 'bar',
+              data: [0, 0, 0, 0],
+              barMaxWidth: 28,
+              barGap: '12%',
+              itemStyle: { color: PALETTE.email, borderRadius: [4, 4, 0, 0] },
+              emphasis: { focus: 'series' },
+              z: 2
+            },
+            {
+              name: smsLabel,
+              type: 'bar',
+              data: [0, 0, 0, 0],
+              barMaxWidth: 28,
+              barGap: '12%',
+              itemStyle: { color: PALETTE.sms, borderRadius: [4, 4, 0, 0] },
+              emphasis: { focus: 'series' },
+              z: 1
+            }
+          ]
+        };
+      }
+
+      const slots = buildTodayHourlySlots(realtimeData);
+      const emailData = TIME_PERIODS.map(period => {
+        let sum = 0;
+        for (let h = period.start; h < period.end; h++) sum += slots[h].email;
+        return sum;
+      });
+      const smsData = TIME_PERIODS.map(period => {
+        let sum = 0;
+        for (let h = period.start; h < period.end; h++) sum += slots[h].sms;
+        return sum;
       });
 
+      const emailLabel = formatMessage({ id: 'Email' });
+      const smsLabel = formatMessage({ id: 'SMS' });
+
       return {
-        color: STATUS_SERIES.map(item => item.color),
+        color: [PALETTE.email, PALETTE.sms],
         tooltip: {
           ...tooltipStyle,
           trigger: 'axis',
           axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(148,163,184,0.15)' } }
         },
-        legend: { ...legendCenterStyle, data: STATUS_SERIES.map(item => item.label) },
+        legend: { ...legendCenterStyle, data: [emailLabel, smsLabel] },
         grid: { ...lineChartGrid, bottom: 20 },
         xAxis: {
           type: 'category',
@@ -243,15 +382,28 @@ const RealtimeSection = createWithRemoteLoader({
           axisLabel: { color: '#64748b', fontSize: 12 }
         },
         yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
-        series: STATUS_SERIES.map((item, index) => ({
-          name: item.label,
-          type: 'bar',
-          data: statusData[item.key],
-          barMaxWidth: 24,
-          itemStyle: { color: item.color, borderRadius: [4, 4, 0, 0] },
-          emphasis: { focus: 'series' },
-          z: 10 - index
-        }))
+        series: [
+          {
+            name: emailLabel,
+            type: 'bar',
+            data: emailData,
+            barMaxWidth: 28,
+            barGap: '12%',
+            itemStyle: { color: PALETTE.email, borderRadius: [4, 4, 0, 0] },
+            emphasis: { focus: 'series' },
+            z: 2
+          },
+          {
+            name: smsLabel,
+            type: 'bar',
+            data: smsData,
+            barMaxWidth: 28,
+            barGap: '12%',
+            itemStyle: { color: PALETTE.sms, borderRadius: [4, 4, 0, 0] },
+            emphasis: { focus: 'series' },
+            z: 1
+          }
+        ]
       };
     }, [realtimeData, formatMessage]);
 
@@ -400,20 +552,12 @@ const RealtimeSection = createWithRemoteLoader({
             <Row gutter={[20, 24]} className={style.chartsRow}>
               <Col xs={24} lg={12} className={style.chartCol}>
                 <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'PeriodCompare' })} style={{ height: '100%' }}>
-                  {periodCompareOption ? (
-                    <Echart style={{ height: 320 }} option={periodCompareOption} />
-                  ) : (
-                    <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                  )}
+                  <Echart style={{ height: 320 }} option={periodCompareOption} />
                 </BoxCard>
               </Col>
               <Col xs={24} lg={12} className={style.chartCol}>
                 <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'TodayHourlyTrend' })} style={{ height: '100%' }}>
-                  {hourlyOption ? (
-                    <Echart style={{ height: 320 }} option={hourlyOption} />
-                  ) : (
-                    <div className={style.emptyState}>{formatMessage({ id: 'NoData' })}</div>
-                  )}
+                  <Echart style={{ height: 320 }} option={hourlyOption} />
                 </BoxCard>
               </Col>
             </Row>

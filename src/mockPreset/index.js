@@ -49,6 +49,7 @@ const apis = merge({}, getApis(), {
           const recentTrendByStatus = [];
           const recentTrendByType = [];
           const durationTrend = [];
+          const hourlyCompletionTrend = [];
           for (let i = days - 1; i >= 0; i--) {
             const d = new Date(now);
             d.setDate(d.getDate() - i);
@@ -85,6 +86,22 @@ const apis = merge({}, getApis(), {
                 system: { count: Math.ceil(total * 0.6), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
               }
             });
+            ['import', 'export'].forEach(type => {
+              [9, 12, 15, 18].forEach(h => {
+                const ok = Math.floor(Math.random() * 3) + 1;
+                const bad = Math.random() < 0.15 ? 1 : 0;
+                hourlyCompletionTrend.push({
+                  date: dateStr,
+                  hour: h,
+                  type,
+                  runnerType: type === 'import' ? 'system' : 'manual',
+                  totalCompleted: ok + bad,
+                  successCount: ok,
+                  failedCount: bad,
+                  canceledCount: 0
+                });
+              });
+            });
           }
           const totalSuccess = recentTrendByStatus.filter(item => item.status === 'success').reduce((sum, item) => sum + item.count, 0);
           const totalFailed = recentTrendByStatus.filter(item => item.status === 'failed').reduce((sum, item) => sum + item.count, 0);
@@ -103,7 +120,8 @@ const apis = merge({}, getApis(), {
             recentTrend,
             recentTrendByStatus,
             recentTrendByType,
-            durationTrend
+            durationTrend,
+            hourlyCompletionTrend
           };
         }
       },
@@ -119,8 +137,9 @@ const apis = merge({}, getApis(), {
             const failed = Math.floor(Math.random() * 3);
             const running = Math.floor(Math.random() * 2);
             const pending = Math.floor(Math.random() * 3);
+            const waiting = Math.floor(Math.random() * 2);
             const canceled = Math.floor(Math.random() * 2);
-            const total = success + failed + running + pending + canceled;
+            const total = success + failed + running + pending + waiting + canceled;
             const exportCount = Math.floor(total * 0.6);
             const importCount = total - exportCount;
             hourlyTrend.push({ hour: h, count: total });
@@ -128,6 +147,7 @@ const apis = merge({}, getApis(), {
             if (failed > 0) hourlyTrendByStatus.push({ hour: h, status: 'failed', count: failed });
             if (running > 0) hourlyTrendByStatus.push({ hour: h, status: 'running', count: running });
             if (pending > 0) hourlyTrendByStatus.push({ hour: h, status: 'pending', count: pending });
+            if (waiting > 0) hourlyTrendByStatus.push({ hour: h, status: 'waiting', count: waiting });
             if (canceled > 0) hourlyTrendByStatus.push({ hour: h, status: 'canceled', count: canceled });
             if (exportCount > 0) hourlyTrendByType.push({ hour: h, type: 'export', count: exportCount });
             if (importCount > 0) hourlyTrendByType.push({ hour: h, type: 'import', count: importCount });
@@ -137,16 +157,45 @@ const apis = merge({}, getApis(), {
           const totalFailed = hourlyTrendByStatus.filter(item => item.status === 'failed').reduce((sum, item) => sum + item.count, 0);
           const totalRunning = hourlyTrendByStatus.filter(item => item.status === 'running').reduce((sum, item) => sum + item.count, 0);
           const totalPending = hourlyTrendByStatus.filter(item => item.status === 'pending').reduce((sum, item) => sum + item.count, 0);
+          const totalWaiting = hourlyTrendByStatus.filter(item => item.status === 'waiting').reduce((sum, item) => sum + item.count, 0);
           const totalCanceled = hourlyTrendByStatus.filter(item => item.status === 'canceled').reduce((sum, item) => sum + item.count, 0);
+          const manualWaiting = Math.max(0, Math.floor(totalWaiting * 0.5));
+          const systemWaiting = Math.max(0, totalWaiting - manualWaiting);
+          const manualCompletedToday = Math.max(0, Math.floor(totalSuccess * 0.35));
+          const systemCompletedToday = Math.max(0, totalSuccess - manualCompletedToday);
+          // 看板 KPI：waiting 用 waitingByRunnerType；当日完成仅用顶层 completedToday（见 Task doc/api.md）
           return {
             date: now.toISOString().split('T')[0],
             totalTasks,
-            byStatus: { success: totalSuccess, failed: totalFailed, running: totalRunning, pending: totalPending, canceled: totalCanceled },
+            byStatus: {
+              success: totalSuccess,
+              failed: totalFailed,
+              running: totalRunning,
+              pending: totalPending,
+              waiting: totalWaiting,
+              canceled: totalCanceled
+            },
             byType: { export: Math.floor(totalTasks * 0.6), import: Math.ceil(totalTasks * 0.4) },
             byRunnerType: { manual: Math.floor(totalTasks * 0.4), system: Math.ceil(totalTasks * 0.6) },
             hourlyTrend,
             hourlyTrendByStatus,
             hourlyTrendByType,
+            waitingByRunnerType: {
+              manual: manualWaiting,
+              system: systemWaiting
+            },
+            completedToday: {
+              manual: manualCompletedToday,
+              system: systemCompletedToday
+            },
+            waitingQueueMaxWaitMsByRunnerType: {
+              manual: manualWaiting > 0 ? 180000 + Math.floor(Math.random() * 240000) : 0,
+              system: systemWaiting > 0 ? 120000 + Math.floor(Math.random() * 180000) : 0
+            },
+            completedTodayTotalDurationMsByRunnerType: {
+              manual: manualCompletedToday * (90000 + Math.floor(Math.random() * 120000)),
+              system: systemCompletedToday * 60000
+            },
             pendingByRunnerType: {
               manual: Math.max(0, Math.floor(totalPending * 0.45)),
               system: Math.max(0, totalPending - Math.floor(totalPending * 0.45))
@@ -160,12 +209,14 @@ const apis = merge({}, getApis(), {
                 manual: {
                   total: manualTotal,
                   pending: manualPending,
-                  executed: Math.max(0, manualTotal - manualPending)
+                  executed: Math.max(0, manualTotal - manualPending),
+                  waiting: manualWaiting
                 },
                 system: {
                   total: systemTotal,
                   pending: systemPending,
-                  executed: Math.max(0, systemTotal - systemPending)
+                  executed: Math.max(0, systemTotal - systemPending),
+                  waiting: systemWaiting
                 }
               };
             })(),
@@ -176,7 +227,31 @@ const apis = merge({}, getApis(), {
               canceledCount: totalCanceled,
               avgWaitingTime: Math.floor(Math.random() * 3000) + 500,
               avgExecutionTime: Math.floor(Math.random() * 8000) + 2000,
-              avgTotalTime: Math.floor(Math.random() * 10000) + 3000
+              avgTotalTime: Math.floor(Math.random() * 10000) + 3000,
+              byType: {
+                export: {
+                  count: Math.max(1, Math.floor(totalSuccess * 0.35)),
+                  avgWaitingTime: 800,
+                  avgExecutionTime: 2200,
+                  avgTotalTime: 3200
+                },
+                import: {
+                  count: Math.max(1, Math.floor(totalSuccess * 0.25)),
+                  avgWaitingTime: 1200,
+                  avgExecutionTime: 3100,
+                  avgTotalTime: 4500
+                }
+              },
+              byTypeByRunnerType: {
+                manual: {
+                  export: { count: 2, avgWaitingTime: 900, avgExecutionTime: 2000, avgTotalTime: 3000 },
+                  import: { count: 1, avgWaitingTime: 1100, avgExecutionTime: 2800, avgTotalTime: 4000 }
+                },
+                system: {
+                  export: { count: 4, avgWaitingTime: 700, avgExecutionTime: 2400, avgTotalTime: 3400 },
+                  import: { count: 3, avgWaitingTime: 1300, avgExecutionTime: 3300, avgTotalTime: 4800 }
+                }
+              }
             }
           };
         }

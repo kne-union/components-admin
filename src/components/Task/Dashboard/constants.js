@@ -1,3 +1,5 @@
+import { defaultColors } from '@kne/react-box';
+
 export const RANGE_OPTIONS = ['7d', '1m', '1y'];
 
 export const buildUrlWithParams = (url, params = {}) => {
@@ -41,7 +43,21 @@ export const STATUS_COLOR_MAP = {
   canceled: PALETTE.canceled
 };
 
-export const TASK_TYPE_COLOR_MAP = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316', '#14b8a6'];
+/**
+ * 任务类型折线/柱状：色值全部来自 @kne/react-box 的 defaultColors（与 ColorfulCard 同源）。
+ * 顺序按 key 打散，减轻相邻系列里橙/黄等相近色贴在一起；不含 Black，避免细线对比度不足。
+ */
+const TASK_TYPE_COLOR_KEYS = ['Purple', 'Green', 'Orange', 'Blue', 'Pink', 'Yellow', 'Red', 'Gray'];
+
+export const TASK_TYPE_COLOR_MAP = TASK_TYPE_COLOR_KEYS.map(key => defaultColors[key]);
+
+/** 任务类型 key 稳定排序：折线图 series 与下方 Tag 等共用，保证同一 type 色标一致 */
+export const sortTaskTypeKeys = types => {
+  const arr = types == null ? [] : [...types];
+  return arr.sort((a, b) =>
+    String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' })
+  );
+};
 
 export const tooltipStyle = {
   trigger: 'axis',
@@ -134,11 +150,23 @@ export const splitLineStyle = { lineStyle: { color: '#f1f5f9', type: 'dashed', w
 /** 接口约定为毫秒；超出此上限视为异常数据（如错误聚合），不参与展示与加权回算 */
 export const MAX_STATISTICS_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
+/** 看板「多任务耗时合计」等展示用：允许大于单任务校验上限，仍防极端异常值 */
+export const DASHBOARD_AGGREGATE_DURATION_CAP_MS = 5 * 365 * 24 * 60 * 60 * 1000;
+
 export const sanitizeStatisticsDurationMs = value => {
   const n = Number(value);
   if (!Number.isFinite(n) || n < 0) return null;
   if (n > MAX_STATISTICS_DURATION_MS) return null;
   return n;
+};
+
+/** 单任务仍走 sanitize；超长队列等待或合计耗时在 cap 内用于展示 */
+export const resolveDurationMsForDashboard = raw => {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return null;
+  const sane = sanitizeStatisticsDurationMs(n);
+  if (sane != null) return sane;
+  return Math.min(n, DASHBOARD_AGGREGATE_DURATION_CAP_MS);
 };
 
 /**
