@@ -1,0 +1,50 @@
+.container {
+  display: flex;
+  gap: 12px;
+  min-height: 280px;
+  width: 100%;
+}
+
+.org-panel {
+  flex: 0 0 220px;
+  max-width: 40%;
+  padding: 8px;
+  border: 1px solid var(--font-color-grey-3, #f0f0f0);
+  border-radius: 8px;
+  background: #fafafa;
+  overflow: auto;
+}
+
+.org-title {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.user-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-title {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.user-select {
+  flex: 1;
+  min-height: 0;
+}
+
+.org-tree {
+  :global {
+    .ant-tree-node-content-wrapper {
+      border-radius: 4px;
+    }
+  }
+}

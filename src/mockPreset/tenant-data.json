@@ -2,7 +2,9 @@
   "company": {
     "id": 1,
     "name": "科技创新有限公司",
+    "fullName": "北京科技创新有限公司",
     "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=company",
+    "companyTags": [{ "label": "高新技术企业" }, { "label": "双软认证" }, { "label": "专精特新" }],
     "description": "一家专注于人工智能和云计算技术研发的高新技术企业",
     "industry": "信息技术",
     "scale": "100-500人",
@@ -14,15 +16,25 @@
     "developmentHistory": [
       {
         "time": "2018-06-15",
-        "event": "成立于北京中关村，专注于企业级软件解决方案"
+        "event": "成立于北京中关村，专注于企业级软件解决方案",
+        "images": [
+          "https://images.unsplash.com/photo-1497366216548-37526070297c?w=960&q=80"
+        ]
       },
       {
         "time": "2020-06-01",
-        "event": "获得A轮融资"
+        "event": "获得A轮融资",
+        "images": [
+          "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=960&q=80",
+          "https://images.unsplash.com/photo-1552664730-d307ca884978?w=960&q=80"
+        ]
       },
       {
         "time": "2022-01-01",
-        "event": "业务扩展至全国20个城市"
+        "event": "业务扩展至全国20个城市",
+        "images": [
+          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=960&q=80"
+        ]
       }
     ],
     "teamDescription": [
@@ -45,14 +57,27 @@
         "description": "前知名企业产品负责人，10年产品管理经验，擅长企业级产品规划"
       }
     ],
-    "banner": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800"
+    "banners": [
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80",
+      "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1200&q=80",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80"
+    ]
   },
   "orgList": [
     {
       "id": "dept-1",
       "name": "技术研发中心",
       "description": "负责公司核心产品的技术研发",
-      "parentId": null
+      "parentId": null,
+      "leaderUserId": "user-1",
+      "leader": {
+        "id": "user-1",
+        "name": "张伟",
+        "email": "zhangwei@tech-innovation.com",
+        "phone": "13800138001",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangwei",
+        "status": "open"
+      }
     },
     {
       "id": "dept-2",
@@ -122,7 +147,7 @@
         "position": "技术总监",
         "roles": [{ "id": "role-1", "name": "管理员" }],
         "tenantOrg": { "id": "dept-1", "name": "技术研发中心" },
-        "status": "active",
+        "status": "open",
         "joinDate": "2018-07-01"
       },
       {
@@ -135,7 +160,7 @@
         "position": "前端架构师",
         "roles": [{ "id": "role-3", "name": "普通员工" }],
         "tenantOrg": { "id": "dept-2", "name": "前端开发部" },
-        "status": "active",
+        "status": "open",
         "joinDate": "2019-03-15"
       },
       {
@@ -148,7 +173,7 @@
         "position": "后端开发工程师",
         "roles": [{ "id": "role-3", "name": "普通员工" }],
         "tenantOrg": { "id": "dept-3", "name": "后端开发部" },
-        "status": "active",
+        "status": "open",
         "joinDate": "2020-06-01"
       },
       {
@@ -161,7 +186,7 @@
         "position": "产品经理",
         "roles": [{ "id": "role-2", "name": "部门经理" }],
         "tenantOrg": { "id": "dept-5", "name": "产品设计中心" },
-        "status": "active",
+        "status": "open",
         "joinDate": "2020-08-15"
       },
       {
@@ -174,7 +199,7 @@
         "position": "算法工程师",
         "roles": [{ "id": "role-3", "name": "普通员工" }],
         "tenantOrg": { "id": "dept-4", "name": "AI算法部" },
-        "status": "active",
+        "status": "open",
         "joinDate": "2021-01-10"
       },
       {
@@ -187,7 +212,7 @@
         "position": "UI设计师",
         "roles": [{ "id": "role-3", "name": "普通员工" }],
         "tenantOrg": { "id": "dept-7", "name": "设计部" },
-        "status": "active",
+        "status": "open",
         "joinDate": "2021-05-20"
       },
       {
@@ -200,7 +225,7 @@
         "position": "市场专员",
         "roles": [{ "id": "role-3", "name": "普通员工" }],
         "tenantOrg": { "id": "dept-9", "name": "市场部" },
-        "status": "inactive",
+        "status": "closed",
         "joinDate": "2022-02-01"
       },
       {
@@ -213,7 +238,7 @@
         "position": "客服主管",
         "roles": [{ "id": "role-2", "name": "部门经理" }],
         "tenantOrg": { "id": "dept-10", "name": "客服部" },
-        "status": "active",
+        "status": "open",
         "joinDate": "2022-09-15"
       }
     ]
@@ -227,7 +252,7 @@
         "name": "管理员",
         "description": "拥有系统全部权限",
         "type": "system",
-        "status": "active",
+        "status": "open",
         "userCount": 1
       },
       {
@@ -236,7 +261,7 @@
         "name": "部门经理",
         "description": "管理部门内部事务和人员",
         "type": "custom",
-        "status": "active",
+        "status": "open",
         "userCount": 3
       },
       {
@@ -245,7 +270,7 @@
         "name": "普通员工",
         "description": "基础员工权限",
         "type": "system",
-        "status": "active",
+        "status": "open",
         "userCount": 15
       },
       {
@@ -254,7 +279,7 @@
         "name": "访客",
         "description": "仅可查看公开信息",
         "type": "custom",
-        "status": "inactive",
+        "status": "closed",
         "userCount": 0
       }
     ]
@@ -336,6 +361,18 @@
         {
           "code": "user",
           "name": "用户管理",
+          "modules": [
+            {
+              "code": "ops",
+              "name": "运营数据",
+              "permissions": [{ "code": "view", "name": "查看" }],
+              "dataScope": {
+                "open": true,
+                "list": ["read", "write"],
+                "type": "owner"
+              }
+            }
+          ],
           "permissions": [
             { "code": "view", "name": "查看用户" },
             { "code": "create", "name": "创建用户" },
@@ -356,6 +393,79 @@
         {
           "code": "setting",
           "name": "系统设置",
+          "modules": [
+            {
+              "code": "biz-center",
+              "name": "业务中心",
+              "modules": [
+                {
+                  "code": "order",
+                  "name": "订单",
+                  "permissions": [{ "code": "view", "name": "查看" }],
+                  "dataScope": {
+                    "open": true,
+                    "list": ["read", "write"],
+                    "type": "owner"
+                  }
+                },
+                {
+                  "code": "crm",
+                  "name": "客户",
+                  "modules": [
+                    {
+                      "code": "lead",
+                      "name": "线索",
+                      "permissions": [{ "code": "view", "name": "查看" }],
+                      "dataScope": {
+                        "open": true,
+                        "list": ["read"],
+                        "type": "org"
+                      }
+                    }
+                  ],
+                  "permissions": [{ "code": "view", "name": "查看" }]
+                }
+              ],
+              "permissions": []
+            },
+            {
+              "code": "biz-data",
+              "name": "业务数据",
+              "modules": [
+                {
+                  "code": "order",
+                  "name": "订单",
+                  "permissions": [{ "code": "view", "name": "查看" }],
+                  "dataScope": {
+                    "open": true,
+                    "list": ["read", "write"],
+                    "type": "owner"
+                  }
+                },
+                {
+                  "code": "report",
+                  "name": "报表",
+                  "permissions": [{ "code": "view", "name": "查看" }],
+                  "dataScope": {
+                    "open": true,
+                    "list": ["read"],
+                    "type": "orgSubtree"
+                  }
+                }
+              ],
+              "permissions": []
+            },
+            {
+              "code": "finance",
+              "name": "财务",
+              "permissions": [{ "code": "view", "name": "查看" }],
+              "dataScope": {
+                "open": true,
+                "list": ["read", "write"],
+                "type": "org"
+              }
+            }
+          ],
           "permissions": [
             { "code": "company-setting", "name": "公司设置" },
             { "code": "org", "name": "组织架构" },
@@ -382,6 +492,36 @@
       { "id": "perm-10", "code": "setting:org", "name": "组织架构", "module": "系统设置", "description": "管理组织架构" },
       { "id": "perm-11", "code": "setting:permission", "name": "权限管理", "module": "系统设置", "description": "管理系统权限" },
       { "id": "perm-12", "code": "setting:user-manager", "name": "用户管理", "module": "系统设置", "description": "管理系统用户" }
+    ]
+  },
+  "sharedGroupList": {
+    "totalCount": 1,
+    "pageData": [
+      {
+        "id": "sg-1",
+        "name": "研发数据共享",
+        "description": "演示用共享组：含数据权限模块与数据来源、成员",
+        "status": "open",
+        "sharedModules": [
+          { "moduleCode": "setting:biz-center:order", "access": "read" },
+          { "moduleCode": "setting:biz-data:report", "access": "read" },
+          { "moduleCode": "user:ops", "access": "write" }
+        ],
+        "dataSources": [
+          {
+            "id": "ds-1",
+            "tenantUserId": "user-2",
+            "tenantUser": { "id": "user-2", "name": "李娜" }
+          }
+        ],
+        "members": [
+          {
+            "id": "m-1",
+            "tenantUserId": "user-1",
+            "tenantUser": { "id": "user-1", "name": "张伟" }
+          }
+        ]
+      }
     ]
   },
   "tenantUserInfo": {

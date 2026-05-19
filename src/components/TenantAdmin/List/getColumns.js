@@ -1,3 +1,19 @@
+const resolveTenantRowId = item => {
+  const id = item?.id ?? item?.tenantId;
+  if (id == null || id === '') {
+    return null;
+  }
+  return String(id);
+};
+
+const goTenantDetail = (navigate, colItem) => {
+  const id = resolveTenantRowId(colItem);
+  if (!id || !navigate) {
+    return;
+  }
+  navigate(`detail?id=${encodeURIComponent(id)}`);
+};
+
 const getColumns = ({ navigate, formatMessage }) => {
   return [
     {
@@ -7,7 +23,7 @@ const getColumns = ({ navigate, formatMessage }) => {
       primary: true,
       hover: true,
       onClick: ({ colItem }) => {
-        navigate(`detail?id=${colItem.id}`);
+        goTenantDetail(navigate, colItem);
       }
     },
     {
@@ -15,7 +31,7 @@ const getColumns = ({ navigate, formatMessage }) => {
       title: formatMessage({ id: 'Name' }),
       type: 'mainInfo',
       onClick: ({ colItem }) => {
-        navigate(`detail?id=${colItem.id}`);
+        goTenantDetail(navigate, colItem);
       }
     },
     {

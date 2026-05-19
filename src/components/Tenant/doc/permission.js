@@ -22,7 +22,9 @@ const PermissionExample = createWithRemoteLoader({
               remove: mockPreset.apis.tenant.removeRole,
               permissionSave: mockPreset.apis.tenant.savePermission,
               permissionList: mockPreset.apis.tenant.getPermissionList
-            }
+            },
+            userList: mockPreset.apis.tenant.userList,
+            sharedGroup: mockPreset.apis.tenant.sharedGroup
           }}
         />
       </Layout>

@@ -1,4 +1,6 @@
-const getColumns = ({formatMessage}) => {
+import UserOrgTags from './UserOrgTags';
+
+const getColumns = ({ formatMessage }) => {
   return [
     {
       name: 'id',
@@ -40,9 +42,19 @@ const getColumns = ({formatMessage}) => {
     {
       name: 'tenantOrg',
       title: formatMessage({ id: 'Department' }),
-      valueOf: item => {
-        return item.tenantOrg?.name;
-      }
+      type: 'other',
+      width: 260,
+      disableColItem: true,
+      valueOf: item => <UserOrgTags item={item} />
+    },
+    {
+      name: 'status',
+      title: formatMessage({ id: 'FilterStatus' }),
+      type: 'tag',
+      valueOf: item => ({
+        type: item.status === 'open' ? 'success' : 'default',
+        text: item.status === 'open' ? formatMessage({ id: 'Open' }) : formatMessage({ id: 'Close' })
+      })
     },
     {
       name: 'description',

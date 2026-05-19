@@ -1,5 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { Flex } from 'antd';
 import useRefCallback from '@kne/use-ref-callback';
 import merge from 'lodash/merge';
@@ -41,6 +41,7 @@ const BizUnit = createWithRemoteLoader({
           },
           keywordFilterName: 'keyword',
           keywordFilterLabel: formatMessage({ id: 'Keyword' }),
+          mapFilterValue: null,
           getFilterValue: filterValue => ({
             params: {
               filter: filterValue
@@ -53,7 +54,9 @@ const BizUnit = createWithRemoteLoader({
       const ref = useRef();
       const { SearchInput, getFilterValue } = Filter;
       const [filter, setFilter] = useState([]);
-      const filterValue = getFilterValue(filter);
+      const filterValue = options.mapFilterValue ? options.mapFilterValue(filter, getFilterValue) : getFilterValue(filter);
+      const filterParamsKey = useMemo(() => JSON.stringify(filterValue), [filterValue]);
+      const isFirstFilterEffect = useRef(true);
       const topOptions = (
         <Flex gap={8}>
           {allowKeywordSearch && <SearchInput size={topOptionsSize} name={options.keywordFilterName} label={options.keywordFilterLabel} />}
@@ -104,12 +107,26 @@ const BizUnit = createWithRemoteLoader({
       });
 
       const handlerMount = useRefCallback(() => {
-        onMount && onMount({ filter: { value: filter, onChange: setFilter }, topOptions, tableOptions });
+        onMount &&
+          onMount({
+            filter: { value: filter, onChange: setFilter },
+            filterList,
+            topOptions,
+            tableOptions
+          });
       });
 
       useEffect(() => {
         handlerMount();
-      }, [handlerMount]);
+      }, [handlerMount, filter]);
+
+      useEffect(() => {
+        if (isFirstFilterEffect.current) {
+          isFirstFilterEffect.current = false;
+          return;
+        }
+        ref.current?.reload?.();
+      }, [filterParamsKey]);
       if (typeof children === 'function') {
         return children({
           filter: { value: filter, onChange: setFilter, list: filterList },

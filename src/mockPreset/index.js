@@ -22,6 +22,81 @@ import messageMangerData from './message-manger-data.json';
 
 export { taskList, signatureList, intlAdminData, adminUserList, userInfo, superAdminInfo, groupList, tenantData, tenantAdminData, messageQueueList, deadLetterList, traceList, messageMangerData };
 
+const collectOrgSubtreeIds = (orgs, rootId) => {
+  const ids = new Set([String(rootId)]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const org of orgs) {
+      const id = String(org.id);
+      const parentId = org.parentId != null && org.parentId !== '' ? String(org.parentId) : null;
+      if (parentId && ids.has(parentId) && !ids.has(id)) {
+        ids.add(id);
+        changed = true;
+      }
+    }
+  }
+  return [...ids];
+};
+
+const normalizeTenantUserStatusFilter = status => {
+  const s = status != null ? String(status).trim() : '';
+  if (s === 'active') return 'open';
+  if (s === 'inactive') return 'closed';
+  if (s === 'open' || s === 'closed') return s;
+  return '';
+};
+
+const loadFilteredTenantUserList = ({ params } = {}) =>
+  import('./tenant-data.json').then(({ default: data }) => {
+    const filter = params?.filter || {};
+    let pageData = data.userList?.pageData || [];
+    if (filter.tenantOrgId) {
+      const orgIds = collectOrgSubtreeIds(data.orgList || [], filter.tenantOrgId);
+      pageData = pageData.filter(item => {
+        const ids = new Set();
+        if (Array.isArray(item.tenantOrgIds)) {
+          item.tenantOrgIds.forEach(id => ids.add(String(id)));
+        }
+        if (item.tenantOrg?.id) {
+          ids.add(String(item.tenantOrg.id));
+        }
+        return [...ids].some(id => orgIds.includes(id));
+      });
+    }
+    const statusFilter = normalizeTenantUserStatusFilter(filter.status);
+    if (statusFilter) {
+      pageData = pageData.filter(item => item.status === statusFilter);
+    }
+    if (filter.keyword) {
+      const keyword = String(filter.keyword).toLowerCase();
+      pageData = pageData.filter(item =>
+        [item.name, item.email, item.phone].filter(Boolean).join(' ').toLowerCase().includes(keyword)
+      );
+    }
+    return { pageData, totalCount: pageData.length };
+  });
+
+const loadFilteredRoleList = ({ params } = {}) =>
+  import('./tenant-data.json').then(({ default: data }) => {
+    const filter = params?.filter || {};
+    let pageData = data.roleList.pageData || [];
+    if (filter.type) {
+      pageData = pageData.filter(item => item.type === filter.type);
+    }
+    if (filter.keyword) {
+      const keyword = String(filter.keyword).toLowerCase();
+      pageData = pageData.filter(
+        item =>
+          [item.name, item.code, item.description].filter(Boolean).join(' ').toLowerCase().indexOf(keyword) >= 0
+      );
+    }
+    if (filter.status) {
+      pageData = pageData.filter(item => item.status === filter.status);
+    }
+    return { pageData, totalCount: pageData.length };
+  });
+
 const apis = merge({}, getApis(), {
   task: {
     list: {
@@ -414,10 +489,14 @@ const apis = merge({}, getApis(), {
     orgRemove: {
       loader: () => ({ code: 0 })
     },
+    orgBatchImport: {
+      loader: () => ({
+        code: 0,
+        data: { createdOrgs: 2, createdUsers: 1, reusedUsers: 0, rowCount: 2 }
+      })
+    },
     userList: {
-      loader: () => {
-        return import('./tenant-data.json').then(({ default: data }) => data.userList);
-      }
+      loader: loadFilteredTenantUserList
     },
     userCreate: {
       loader: () => ({ id: `user-${Date.now()}` })
@@ -439,9 +518,7 @@ const apis = merge({}, getApis(), {
     },
     role: {
       list: {
-        loader: () => {
-          return import('./tenant-data.json').then(({ default: data }) => data.roleList);
-        }
+        loader: loadFilteredRoleList
       },
       create: {
         loader: () => ({ id: `role-${Date.now()}` })
@@ -464,6 +541,25 @@ const apis = merge({}, getApis(), {
         loader: () => ({ code: 0 })
       }
     },
+    sharedGroup: {
+      list: {
+        loader: () => {
+          return import('./tenant-data.json').then(({ default: data }) => data.sharedGroupList);
+        }
+      },
+      create: {
+        loader: () => ({ id: `sg-${Date.now()}` })
+      },
+      save: {
+        loader: () => ({ code: 0 })
+      },
+      setStatus: {
+        loader: () => ({ code: 0 })
+      },
+      remove: {
+        loader: () => ({ code: 0 })
+      }
+    },
     permission: {
       list: {
         loader: () => {
@@ -473,9 +569,7 @@ const apis = merge({}, getApis(), {
     },
     // 旧名称别名，兼容示例文件
     getUserList: {
-      loader: () => {
-        return import('./tenant-data.json').then(({ default: data }) => data.userList);
-      }
+      loader: loadFilteredTenantUserList
     },
     createUser: {
       loader: () => ({ id: `user-${Date.now()}` })
@@ -487,9 +581,7 @@ const apis = merge({}, getApis(), {
       loader: () => ({ code: 0 })
     },
     getRoleList: {
-      loader: () => {
-        return import('./tenant-data.json').then(({ default: data }) => data.roleList);
-      }
+      loader: loadFilteredRoleList
     },
     createRole: {
       loader: () => ({ id: `role-${Date.now()}` })
@@ -508,16 +600,44 @@ const apis = merge({}, getApis(), {
     savePermission: {
       loader: () => ({ code: 0 })
     },
+    getSharedGroupList: {
+      loader: () => {
+        return import('./tenant-data.json').then(({ default: data }) => data.sharedGroupList);
+      }
+    },
+    createSharedGroup: {
+      loader: () => ({ id: `sg-${Date.now()}` })
+    },
+    saveSharedGroup: {
+      loader: () => ({ code: 0 })
+    },
+    removeSharedGroup: {
+      loader: () => ({ code: 0 })
+    },
+    setSharedGroupStatus: {
+      loader: () => ({ code: 0 })
+    },
     parseJoinToken: {
       loader: ({ data }) => {
         if (!data || !data.token || data.token === 'invalid') {
           return null;
         }
-        return import('./tenant-data.json').then(({ default: data }) => ({
-          tenant: data.tenantList.pageData[0],
-          tenantUser: data.tenantUserInfo,
-          company: data.company
-        }));
+        return import('./tenant-data.json').then(({ default: data }) => {
+          const sampleUser = data.userList.pageData[0];
+          const positionName = sampleUser?.position;
+          return {
+            tenant: data.tenantList.pageData[0],
+            tenantUser: Object.assign({}, data.tenantUserInfo, {
+              roles: sampleUser?.roles,
+              position: positionName,
+              options: positionName ? { position: positionName } : {},
+              tenantOrg: sampleUser?.tenantOrg,
+              tenantOrgs: sampleUser?.tenantOrgs
+            }),
+            company: data.company,
+            positionList: positionName ? [{ id: 'mock-position', name: positionName }] : []
+          };
+        });
       }
     },
     join: {
@@ -579,10 +699,14 @@ const apis = merge({}, getApis(), {
     orgRemove: {
       loader: () => ({ code: 0 })
     },
+    orgBatchImport: {
+      loader: () => ({
+        code: 0,
+        data: { createdOrgs: 2, createdUsers: 1, reusedUsers: 0, rowCount: 2 }
+      })
+    },
     userList: {
-      loader: () => {
-        return import('./tenant-data.json').then(({ default: data }) => data.userList);
-      }
+      loader: loadFilteredTenantUserList
     },
     userCreate: {
       loader: () => ({ id: `user-${Date.now()}` })
@@ -601,9 +725,7 @@ const apis = merge({}, getApis(), {
     },
     role: {
       list: {
-        loader: () => {
-          return import('./tenant-data.json').then(({ default: data }) => data.roleList);
-        }
+        loader: loadFilteredRoleList
       },
       create: {
         loader: () => ({ id: `role-${Date.now()}` })
@@ -623,6 +745,25 @@ const apis = merge({}, getApis(), {
         }
       },
       permissionSave: {
+        loader: () => ({ code: 0 })
+      }
+    },
+    sharedGroup: {
+      list: {
+        loader: () => {
+          return import('./tenant-data.json').then(({ default: data }) => data.sharedGroupList);
+        }
+      },
+      create: {
+        loader: () => ({ id: `sg-${Date.now()}` })
+      },
+      save: {
+        loader: () => ({ code: 0 })
+      },
+      setStatus: {
+        loader: () => ({ code: 0 })
+      },
+      remove: {
         loader: () => ({ code: 0 })
       }
     },
