@@ -1,6 +1,8 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useState } from 'react';
+import merge from 'lodash/merge';
 import Role from '../Role';
+import SharedGroup from '../SharedGroup';
 import TenantPermission from '../TenantPermission';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
@@ -52,7 +54,22 @@ const Permission = createWithRemoteLoader({
             : null}
         </Role>
       )}
-      {activeKey === 'sharedGroup' && formatMessage({ id: 'SharedGroup' })}
+      {activeKey === 'sharedGroup' && (
+        <SharedGroup
+          apis={merge({}, apis.sharedGroup, {
+            permissionList: apis.permission?.list,
+            userList: apis.userList
+          })}>
+          {typeof children === 'function'
+            ? props =>
+                children(
+                  Object.assign({}, props, {
+                    stateBar
+                  })
+                )
+            : null}
+        </SharedGroup>
+      )}
     </>
   );
 });

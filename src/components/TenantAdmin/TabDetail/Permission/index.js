@@ -58,6 +58,38 @@ const Permission = createWithRemoteLoader({
               tenantId: tenant.id
             }
           })
+        },
+        userList: merge({}, apis.tenantAdmin.userList, {
+          params: {
+            tenantId: tenant.id
+          }
+        }),
+        sharedGroup: {
+          list: merge({}, apis.tenantAdmin.sharedGroup.list, {
+            params: {
+              tenantId: tenant.id
+            }
+          }),
+          create: merge({}, apis.tenantAdmin.sharedGroup.create, {
+            data: {
+              tenantId: tenant.id
+            }
+          }),
+          save: merge({}, apis.tenantAdmin.sharedGroup.save, {
+            data: {
+              tenantId: tenant.id
+            }
+          }),
+          remove: merge({}, apis.tenantAdmin.sharedGroup.remove, {
+            data: {
+              tenantId: tenant.id
+            }
+          }),
+          setStatus: merge({}, apis.tenantAdmin.sharedGroup.setStatus, {
+            data: {
+              tenantId: tenant.id
+            }
+          })
         }
       }}
     />

@@ -35,6 +35,7 @@ const locale = {
   DisableSecretKeyTitle: 'Friendly Reminder',
   DisableSecretKeyMessage: 'After disabling this secret key, all requests using this key will be rejected. Are you sure you want to disable this secret key?',
   EnableSecretKeyMessage: 'After enabling this secret key, it will be allowed to access requests. Are you sure you want to enable this secret key?',
+  ConfirmDelete: 'Are you sure you want to delete {bizName}?',
 
   // Form rules
   InputNumber: 'Please enter a number'

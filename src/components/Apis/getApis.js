@@ -235,6 +235,10 @@ const getApis = options => {
         url: `${prefix}/tenant/admin/org-remove`,
         method: 'POST'
       },
+      orgBatchImport: {
+        url: `${prefix}/tenant/admin/org-batch-import`,
+        method: 'POST'
+      },
       userList: {
         url: `${prefix}/tenant/admin/user-list`,
         method: 'GET'
@@ -321,6 +325,28 @@ const getApis = options => {
           method: 'POST'
         }
       },
+      sharedGroup: {
+        list: {
+          url: `${prefix}/tenant/admin/shared-group/list`,
+          method: 'GET'
+        },
+        create: {
+          url: `${prefix}/tenant/admin/shared-group/create`,
+          method: 'POST'
+        },
+        save: {
+          url: `${prefix}/tenant/admin/shared-group/save`,
+          method: 'POST'
+        },
+        setStatus: {
+          url: `${prefix}/tenant/admin/shared-group/set-status`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${prefix}/tenant/admin/shared-group/remove`,
+          method: 'POST'
+        }
+      },
       permission: {
         list: {
           url: `${prefix}/tenant/admin/permission/list`,
@@ -375,6 +401,10 @@ const getApis = options => {
       },
       orgRemove: {
         url: `${prefix}/tenant/org-remove`,
+        method: 'POST'
+      },
+      orgBatchImport: {
+        url: `${prefix}/tenant/org-batch-import`,
         method: 'POST'
       },
       userList: {
@@ -436,6 +466,28 @@ const getApis = options => {
         },
         permissionSave: {
           url: `${prefix}/tenant/role/save-permission`,
+          method: 'POST'
+        }
+      },
+      sharedGroup: {
+        list: {
+          url: `${prefix}/tenant/shared-group/list`,
+          method: 'GET'
+        },
+        create: {
+          url: `${prefix}/tenant/shared-group/create`,
+          method: 'POST'
+        },
+        save: {
+          url: `${prefix}/tenant/shared-group/save`,
+          method: 'POST'
+        },
+        setStatus: {
+          url: `${prefix}/tenant/shared-group/set-status`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${prefix}/tenant/shared-group/remove`,
           method: 'POST'
         }
       },

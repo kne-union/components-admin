@@ -1,0 +1,110 @@
+.panel {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  padding: 0;
+}
+
+.card {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  background: #fff;
+  padding: 0;
+
+  :global(.ant-card-head) {
+    min-height: 0;
+    padding: 0;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  :global(.ant-card-head-title) {
+    padding: 10px 12px;
+    font-weight: 600;
+  }
+
+  :global(.ant-card-body) {
+    padding: 0;
+    background: #fff;
+  }
+}
+
+.hint {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+}
+
+.scroller {
+  max-height: 360px;
+  overflow: auto;
+  padding: 0;
+  background: #fff;
+}
+
+.section {
+  padding: 8px 12px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.row {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s;
+  background: #fff;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+}
+
+.rowMain {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.moduleTitle {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.scopeTag {
+  margin: 0;
+  font-weight: normal;
+  line-height: 18px;
+}
+
+.rowMeta {
+  margin-top: 4px;
+  padding-left: 24px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.access {
+  flex-shrink: 0;
+}
+
+.empty {
+  padding: 16px 12px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+  background: #fff;
+}

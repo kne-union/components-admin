@@ -8,10 +8,30 @@ const FormInner = createWithRemoteLoader({
 })(withLocale(({ remoteModules }) => {
   const [FormInfo] = remoteModules;
   const { formatMessage } = useIntl();
-  const { TableList } = FormInfo;
-  const { DatePicker, Input } = FormInfo.fields;
+  const { List } = FormInfo;
+  const { DatePicker, TextArea, Upload } = FormInfo.fields;
 
-  return <TableList className={style['form-section']} name="developmentHistory" list={[<DatePicker name="time" label={formatMessage({ id: 'Time' })} rule="REQ" />, <Input name="event" label={formatMessage({ id: 'Event' })} rule="REQ LEN-0-500" />]} />;
+  return (
+    <List bordered
+      className={style['form-section']}
+      title={formatMessage({ id: 'DevelopmentHistory' })}
+      name="developmentHistory"
+      list={[
+        <DatePicker name="time" label={formatMessage({ id: 'Time' })} rule="REQ" />,
+        <TextArea name="event" label={formatMessage({ id: 'Event' })} rule="REQ LEN-0-500" block />,
+        <Upload
+          name="images"
+          label={formatMessage({ id: 'HistoryImages' })}
+          interceptor="photo-string-list"
+          block
+          getPermission={type => {
+            return ['preview', 'delete'].indexOf(type) > -1;
+          }}
+        />,
+        <TextArea name="extra" label={formatMessage({ id: 'HistoryExtra' })} rule="LEN-0-500" block />
+      ]}
+    />
+  );
 }));
 
 export default FormInner;

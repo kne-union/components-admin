@@ -3,6 +3,7 @@ import OrgInfo from '../OrgInfo';
 import Fetch from '@kne/react-fetch';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
+import { useNavigate } from 'react-router-dom';
 
 const OrgInner = createWithRemoteLoader({
   modules: [
@@ -20,6 +21,9 @@ const OrgInner = createWithRemoteLoader({
   const allowCreate = usePermissionsPass({ request: ['setting:org:create'] });
   const allowSave = usePermissionsPass({ request: ['setting:org:edit'] });
   const allowRemove = usePermissionsPass({ request: ['setting:org:remove'] });
+  const allowImport = usePermissionsPass({ request: ['setting:org:create'] }) || usePermissionsPass({ request: ['setting:org:edit'] });
+  const allowViewUsers = usePermissionsPass({ request: ['setting:user-manager:view'] });
+  const navigate = useNavigate();
 
   const pageProps = Object.assign({}, originPageProps, {
     menu,
@@ -32,12 +36,26 @@ const OrgInner = createWithRemoteLoader({
             return (
               <OrgInfo
                 data={data}
+                tenantId={global.tenant?.id}
                 companyName={global.tenant?.tenantCompany?.name || global.tenant.name}
                 onSuccess={reload}
+                onViewUsers={
+                  allowViewUsers
+                    ? org => {
+                        const query = new URLSearchParams({
+                          tenantOrgId: String(org.id),
+                          orgName: org.name || ''
+                        });
+                        navigate(`../user?${query.toString()}`);
+                      }
+                    : undefined
+                }
                 apis={{
                   create: allowCreate && Object.assign({}, apis.tenant.orgCreate),
                   save: allowSave && Object.assign({}, apis.tenant.orgSave),
-                  remove: allowRemove && Object.assign({}, apis.tenant.orgRemove)
+                  remove: allowRemove && Object.assign({}, apis.tenant.orgRemove),
+                  userList: Object.assign({}, apis.tenant.userList),
+                  import: allowImport && Object.assign({}, apis.tenant.orgBatchImport)
                 }}
               />
             );

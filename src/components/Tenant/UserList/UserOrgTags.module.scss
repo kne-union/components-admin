@@ -1,0 +1,121 @@
+/* 与 OrgInfo import-preview-ref-tag / org-user-count 保持一致 */
+.tag {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: none;
+  background: var(--primary-color-1, #f5f7ff);
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.tagWrap {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.tagMore {
+  cursor: pointer;
+  color: var(--primary-color);
+}
+
+.wrap {
+  max-width: 100%;
+  line-height: 1.5;
+}
+
+/* Tooltip：使用 inherit 适配 Ant Design 深浅色气泡 */
+.tooltipOverlay {
+  :global(.ant-tooltip-inner) {
+    min-width: 120px;
+    max-width: 360px;
+    padding: 10px 12px;
+    text-align: left;
+  }
+}
+
+.tooltipSingle {
+  color: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.tooltipPrimary {
+  color: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.tooltipSecondary {
+  margin-top: 4px;
+  color: inherit;
+  opacity: 0.75;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.tooltipPanel {
+  color: inherit;
+}
+
+.tooltipHeader {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: inherit;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.tooltipList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tooltipListItem {
+  position: relative;
+  padding-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.45;
+  }
+}
+
+.tooltipItemLabel {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: inherit;
+  word-break: break-word;
+}
+
+.tooltipItemPath {
+  font-size: 12px;
+  line-height: 1.45;
+  color: inherit;
+  opacity: 0.72;
+  word-break: break-word;
+}

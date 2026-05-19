@@ -10,7 +10,8 @@ const FormInner = createWithRemoteLoader({
   const { formatMessage } = useIntl();
   const { Upload } = FormInfo.fields;
   return (
-    <FormInfo
+    <FormInfo bordered
+      title={formatMessage({ id: 'Banner' })}
       className={style['form-section']}
       list={[
         <Upload

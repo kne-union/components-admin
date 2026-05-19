@@ -1,0 +1,30 @@
+.invite-modal {
+  width: 100%;
+}
+
+.hint {
+  margin-bottom: 0 !important;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+  line-height: 1.5;
+}
+
+.link-row {
+  width: 100%;
+}
+
+.actions {
+  padding-top: 4px;
+}
