@@ -28,7 +28,8 @@
 | --- | --- | --- | --- |
 | data | 组织列表数据 | array | [] |
 | companyName | 公司名称 | string | - |
-| apis | API 配置 | object | - |
+| tenantId | 租户 ID（管理端 `tenantAdmin` 场景传入，用于批量导入等接口 body） | string | - |
+| apis | API 配置（含 create、save、remove、userList、import 等） | object | - |
 | onSuccess | 操作成功回调 | function | - |
 
 ### UserList 用户列表
@@ -45,6 +46,14 @@
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | apis | API 配置 | object | - |
+
+角色列表 `apis.list` 支持 `params.filter`：
+
+| 字段 | 说明 |
+| --- | --- |
+| keyword | 名称/编码/描述模糊搜索 |
+| type | 角色类型：`system` / `custom` |
+| status | 状态：`open` / `closed` |
 
 ### Permission 权限管理
 
@@ -73,6 +82,24 @@
 | --- | --- | --- | --- |
 | apis | API 配置 | object | - |
 | baseUrl | 基础路径 | string | - |
+
+### TenantUserSelect 按组织选择租户用户
+
+参考 `UserSelect`，用于在表单中先选组织、再选租户成员。左侧为组织树，右侧为成员选择器（`SuperSelect`），成员列表按所选组织及其子组织过滤（`filter.tenantOrgId`）。
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| name | 表单字段名称 | string | - |
+| label | 表单标签 | string | - |
+| rule | 校验规则，如 `REQ` | string | - |
+| placeholder | 成员选择占位文本 | string | - |
+| single | 是否单选 | boolean | true |
+| disabled | 是否禁用 | boolean | false |
+| userStatus | 成员状态筛选：`open` / `closed`（兼容 `active` → `open`、`inactive` → `closed`） | string | - |
+| companyName | 组织树根节点（公司）名称 | string | - |
+| showOrgRoot | 是否展示公司根节点 | boolean | true |
+| orgApi | 自定义组织列表 API，默认 `apis.tenant.orgList` | object | - |
+| userApi | 自定义成员列表 API，默认 `apis.tenant.userList` | object | - |
 
 ## API 配置说明
 

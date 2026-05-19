@@ -1,5 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Card, Typography } from 'antd';
+import { Card, Typography, Flex } from 'antd';
+import UserOrgTags from '../UserOrgTags';
+import getUserOrgDisplayItems from '../getUserOrgDisplayItems';
 import style from './style.module.scss';
 
 const { Title, Paragraph } = Typography;
@@ -15,10 +17,10 @@ const UserCard = createWithRemoteLoader({
         <Image.Avatar size={100} id={data.avatar} />
       </div>
       <Title level={4}>{data.name}</Title>
-      {data.tenantOrg && (
-        <Title level={5} type="secondary">
-          {data.tenantOrg.name}
-        </Title>
+      {getUserOrgDisplayItems(data).length > 0 && (
+        <Flex justify="center" className={style.orgs}>
+          <UserOrgTags item={data} maxVisible={4} />
+        </Flex>
       )}
       <SplitLine
         dataSource={data}

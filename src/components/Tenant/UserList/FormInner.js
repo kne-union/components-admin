@@ -21,13 +21,12 @@ const FormInnerInner = createWithRemoteLoader({
       </Flex>,
       <Input name="name" label={formatMessage({ id: 'UserName' })} rule="REQ LEN-0-100" />,
       <SuperSelectTree
-        name="tenantOrgId"
-        label={formatMessage({ id: 'Department' })}
+        name="tenantOrgIds"
+        label={formatMessage({ id: 'Departments' })}
         api={apis.orgList}
         valueKey="id"
         labelKey="name"
-        single
-        interceptor="object-output-value"
+        interceptor="array-output-value"
       />,
       <SuperSelect
         name="roles"

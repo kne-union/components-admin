@@ -1,17 +1,29 @@
+import '@kne/react-box/dist/index.css';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import merge from 'lodash/merge';
-import { Flex, App } from 'antd';
+import { App, Button, Flex, Input, Space, Typography } from 'antd';
+import { CopyOutlined, MailOutlined } from '@ant-design/icons';
 import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
+import TenantUserPersonalCard from '../TenantUserPersonalCard';
+import style from './inviteModal.module.scss';
+
+const buildInviteUrl = token => `${window.location.origin}/join-tenant?token=${token}`;
 
 const InviteInner = createWithRemoteLoader({
-  modules: ['components-core:LoadingButton', 'components-core:Modal@useModal', 'components-core:Global@usePreset', 'components-core:InfoPage@CentralContent']
-})(({ remoteModules, data, apis, onSuccess, ...props }) => {
-  const [LoadingButton, useModal, usePreset, CentralContent] = remoteModules;
+  modules: ['components-core:LoadingButton', 'components-core:Modal@useModal', 'components-core:Global@usePreset']
+})(({ remoteModules, data, apis, onSuccess, positionList, ...props }) => {
+  const [LoadingButton, useModal, usePreset] = remoteModules;
   const { ajax } = usePreset();
   const modal = useModal();
   const { formatMessage } = useIntl();
   const { message } = App.useApp();
+
+  const copyInviteLink = async url => {
+    await navigator.clipboard.writeText(url);
+    message.success(formatMessage({ id: 'CopySuccess' }));
+  };
+
   return (
     <LoadingButton
       {...props}
@@ -24,61 +36,58 @@ const InviteInner = createWithRemoteLoader({
         if (resData.code !== 0) {
           return;
         }
+        const token = resData.data?.token;
+        if (!token) {
+          return;
+        }
+        const inviteUrl = buildInviteUrl(token);
         modal({
           title: formatMessage({ id: 'InviteUser' }),
+          size: 'small',
+          width: 560,
           footer: null,
           children: (
-            <Flex vertical gap={40}>
-              <Flex flex={1}>
-                <CentralContent
-                  dataSource={Object.assign({}, data, {
-                    token: resData.data.token
-                  })}
-                  columns={[
-                    {
-                      name: 'id',
-                      title: 'ID'
-                    },
-                    {
-                      name: 'name',
-                      title: formatMessage({ id: 'Name' })
-                    },
-                    {
-                      name: 'token',
-                      title: formatMessage({ id: 'InviteLink' }),
-                      block: true,
-                      render: value => {
-                        return `${window.location.origin}/join-tenant?token=${value}`;
+            <Flex vertical gap={20} className={style.inviteModal}>
+              <Typography.Paragraph type="secondary" className={style.hint}>
+                {formatMessage({ id: 'InviteUserHint' })}
+              </Typography.Paragraph>
+
+              <TenantUserPersonalCard data={data} positionList={positionList} />
+
+              <div className={style.section}>
+                <div className={style.fieldLabel}>{formatMessage({ id: 'InviteLink' })}</div>
+                <Space.Compact className={style.linkRow}>
+                  <Input readOnly value={inviteUrl} />
+                  <Button
+                    icon={<CopyOutlined />}
+                    onClick={() => {
+                      copyInviteLink(inviteUrl);
+                    }}>
+                    {formatMessage({ id: 'CopyInviteLink' })}
+                  </Button>
+                </Space.Compact>
+              </div>
+
+              <Flex gap={8} justify="flex-end" wrap="wrap" className={style.actions}>
+                {apis.userInviteMessage ? (
+                  <LoadingButton
+                    type="primary"
+                    icon={<MailOutlined />}
+                    onClick={async () => {
+                      const { data: sendRes } = await ajax(
+                        merge({}, apis.userInviteMessage, {
+                          data: { id: data.id }
+                        })
+                      );
+                      if (sendRes.code !== 0) {
+                        return;
                       }
-                    }
-                  ]}
-                />
-              </Flex>
-              <Flex gap={8} justify="center">
-                <LoadingButton
-                  type="primary"
-                  onClick={async () => {
-                    const { data: resData } = await ajax(
-                      merge({}, apis.userInviteMessage, {
-                        data: { id: data.id }
-                      })
-                    );
-                    if (resData.code !== 0) {
-                      return;
-                    }
-                    message.success(formatMessage({ id: 'SendSuccess' }));
-                  }}
-                >
-                  {formatMessage({ id: 'SendInviteEmail' })}
-                </LoadingButton>
-                <LoadingButton
-                  onClick={async () => {
-                    await navigator.clipboard.writeText(`${window.location.origin}/join-tenant?token=${resData.data.token}`);
-                    message.success(formatMessage({ id: 'CopySuccess' }));
-                  }}
-                >
-                  {formatMessage({ id: 'CopyInviteLink' })}
-                </LoadingButton>
+                      message.success(formatMessage({ id: 'SendSuccess' }));
+                      onSuccess && onSuccess();
+                    }}>
+                    {formatMessage({ id: 'SendInviteEmail' })}
+                  </LoadingButton>
+                ) : null}
               </Flex>
             </Flex>
           )

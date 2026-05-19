@@ -91,8 +91,9 @@ const TabDetailInner = createWithRemoteLoader({
             stateBar={{
               activeKey,
               onChange: key => {
-                searchParams.set('tab', key);
-                setSearchParams(searchParams.toString());
+                const next = new URLSearchParams(searchParams);
+                next.set('tab', key);
+                setSearchParams(next);
               },
               stateOption
             }}>

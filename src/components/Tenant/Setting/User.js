@@ -27,11 +27,12 @@ const User = createWithRemoteLoader({
   const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'UserManagement' }),
-    filter,
+    filter: Object.assign({}, filter, { list: target.filterList || [] }),
     titleExtra: <FilterProvider {...filter}>{target.topOptions}</FilterProvider>,
     children: (
       <Permissions request={['setting:user-manager:view']} type="error">
         <UserList
+          allowQueryIdForUserFilter
           onMount={setTarget}
           apis={Object.assign(
             {},

@@ -10,17 +10,15 @@ const Banner = createWithRemoteLoader({
     return null;
   }
   return (
-    <div className={style['section']}>
-      <Carousel arrows autoplay className={style['images']}>
-        {data.banners.map((image, index) => {
-          return (
-            <div key={index}>
-              <Image id={image} className={style['image-item']} />
-            </div>
-          );
-        })}
-      </Carousel>
-    </div>
+    <Carousel arrows autoplay className={style.images}>
+      {data.banners.map((image, index) => {
+        return (
+          <div key={index}>
+            <Image id={image} className={style['image-item']} />
+          </div>
+        );
+      })}
+    </Carousel>
   );
 });
 

@@ -35,6 +35,7 @@ const locale = {
   DisableSecretKeyTitle: '温馨提示',
   DisableSecretKeyMessage: '禁用此密钥后，将拒绝此密钥的所有请求。是否确定要禁用此密钥？',
   EnableSecretKeyMessage: '启用此密钥后，将允许此密钥访问请求。是否确定要启用此密钥？',
+  ConfirmDelete: '确定要删除{bizName}吗？',
 
   // Form rules
   InputNumber: '请输入数字'

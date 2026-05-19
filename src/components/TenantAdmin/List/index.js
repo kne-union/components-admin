@@ -84,7 +84,7 @@ const ListInner = createWithRemoteLoader({
         )
       }}
       columns={[
-        ...getColumns({ navigate: path => navigate(`${baseUrl}/${path}`), formatMessage }),
+        ...getColumns({ navigate, formatMessage }),
         {
           name: 'options',
           title: formatMessage({ id: 'Operation' }),
