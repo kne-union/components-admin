@@ -1,12 +1,13 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Col, Row, Space, Statistic, Table, Tag } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import Menu from '../Menu';
 import { buildUrlWithParams, formatPercent, formatRate, getMetricTotal } from '../utils';
+import useManagedEventSource from '../../../utils/useManagedEventSource';
 
 const toTopicRows = current => {
   const topics = new Set([
@@ -42,29 +43,22 @@ const DashboardContent = withLocale(({ Page, baseUrl, pageProps, apis, initialDa
     setLastUpdatedAt(initialData?.timestamp);
   }, [initialData]);
 
-  useEffect(() => {
-    if (!apis?.mq?.dashboard?.sse?.url || typeof window === 'undefined' || typeof window.EventSource !== 'function') {
-      return undefined;
-    }
+  const mqStreamUrl = useMemo(() => {
+    const url = apis?.mq?.dashboard?.sse?.url;
+    if (!url) return null;
+    return buildUrlWithParams(url, { interval: 1000 });
+  }, [apis]);
 
-    const source = new EventSource(buildUrlWithParams(apis.mq.dashboard.sse.url, { interval: 1000 }));
-    source.onopen = () => {
-      setIsConnected(true);
-    };
-    source.onmessage = event => {
+  useManagedEventSource(mqStreamUrl, {
+    onOpen: () => setIsConnected(true),
+    onError: () => setIsConnected(false),
+    onMessage: event => {
       const nextData = JSON.parse(event.data);
       setData(nextData);
       setLastUpdatedAt(nextData.timestamp || Date.now());
       setIsConnected(true);
-    };
-    source.onerror = () => {
-      setIsConnected(false);
-    };
-
-    return () => {
-      source.close();
-    };
-  }, [apis]);
+    }
+  });
 
   const current = data?.current || {};
   const rows = toTopicRows(current);

@@ -2,22 +2,11 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Button, App } from 'antd';
 import FormInner from '../FormInner';
 import merge from 'lodash/merge';
+import get from 'lodash/get';
 import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
-import { mapUserOrgIdsToFormValue, pickTenantOrgIdsFromForm } from '../pickTenantOrgIdsFromForm';
-import { extractPositionPageData, mapUserOptionsToFormValue } from '../mapUserOptionsToFormValue';
-
-const loadPositionList = async (ajax, positionListApi) => {
-  if (!positionListApi?.url) {
-    return [];
-  }
-  try {
-    const response = await ajax(merge({}, positionListApi));
-    return extractPositionPageData(response);
-  } catch {
-    return [];
-  }
-};
+import { mapUserOrgIdsToFormValue } from '../transformUserFormData';
+import transformUserFormData from '../transformUserFormData';
 
 const Edit = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
@@ -25,35 +14,33 @@ const Edit = createWithRemoteLoader({
   const [useFormModal, usePreset] = remoteModules;
   const formModal = useFormModal();
   const { formatMessage } = useIntl();
-  const { ajax } = usePreset();
+  const { ajax, plugins } = usePreset();
   const { message } = App.useApp();
+
+  const enhanceData = async (item) => {
+    const enhanceUserData = get(plugins, 'tenantAdmin.enhanceUserData');
+    if (typeof enhanceUserData !== 'function') {
+      return item;
+    }
+    return enhanceUserData(item, { apis, ajax });
+  };
 
   return (
     <Button
       {...props}
       onClick={async () => {
-        const positionList = await loadPositionList(ajax, apis.positionList);
+        const enhancedData = await enhanceData(data);
         formModal({
           title: formatMessage({ id: 'EditUser' }),
           size: 'small',
           formProps: {
-            data: Object.assign({}, data, {
-              tenantOrgIds: mapUserOrgIdsToFormValue(data),
-              options: mapUserOptionsToFormValue(data.options, { positionList })
+            data: Object.assign({}, enhancedData, {
+              tenantOrgIds: mapUserOrgIdsToFormValue(enhancedData)
             }),
             onSubmit: async formData => {
-              const tenantOrgIds = pickTenantOrgIdsFromForm(formData.tenantOrgIds);
-              const position = formData.options?.position;
               const { data: resData } = await ajax(
                 merge({}, apis.save, {
-                  data: Object.assign({}, formData, {
-                    id: data.id,
-                    tenantOrgIds,
-                    tenantOrgId: tenantOrgIds[0] || null,
-                    options: Object.assign({}, formData.options, {
-                      position: position && typeof position === 'object' ? position.id : position
-                    })
-                  })
+                  data: transformUserFormData(formData, enhancedData)
                 })
               );
 

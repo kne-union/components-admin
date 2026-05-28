@@ -6,13 +6,16 @@ import flattenPermissions from './flattenPermissions';
 import { useState } from 'react';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 import style from './style.module.scss';
 
 export const PermissionPanel = createWithRemoteLoader({
   modules: ['components-core:Common@SimpleBar']
-})(({ remoteModules, settings, ...props }) => {
+})(withLocale(({ remoteModules, settings, ...props }) => {
   const [value, onChange] = useControlValue(props);
   const [SimpleBar] = remoteModules;
+  const { formatMessage } = useIntl();
   const [currentList, setCurrentList] = useState([0]);
   const allPermission = flattenPermissions(settings).map(({ code }) => code);
   const onCheckedChange = ({ itemCode, checked, parentCodeList }) => {
@@ -77,7 +80,7 @@ export const PermissionPanel = createWithRemoteLoader({
                               return value.slice(0).concat(currentChildren);
                             });
                           }}>
-                          全选
+                          {formatMessage({ id: 'SelectAll' })}
                         </Button>
                       )}
                     </Flex>
@@ -139,11 +142,11 @@ export const PermissionPanel = createWithRemoteLoader({
       </Flex>
     </SimpleBar>
   );
-});
+}));
 
 const TenantPermission = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
-})(({ remoteModules, apis, children }) => {
+})(withLocale(({ remoteModules, apis, children }) => {
   const [usePreset] = remoteModules;
   const { ajax } = usePreset();
   const target = (
@@ -181,6 +184,6 @@ const TenantPermission = createWithRemoteLoader({
   }
 
   return target;
-});
+}));
 
 export default TenantPermission;

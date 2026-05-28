@@ -1,5 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Tree, App, Card, Button, Space, Modal, Upload, Typography, Table, Avatar, Divider, Checkbox, Tag, Badge } from 'antd';
+import { Flex, Tree, App, Card, Button, Space, Modal, Upload, Typography, Table, Avatar, Divider, Checkbox, Tag, Badge, Tooltip, Drawer } from 'antd';
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import OrgChart from '@kne/react-org-chart';
 import merge from 'lodash/merge';
@@ -12,17 +12,27 @@ import {
   InboxOutlined,
   DownloadOutlined,
   TeamOutlined,
-  UserOutlined
+  UserOutlined,
+  CloudOutlined,
+  EditOutlined,
+  LinkOutlined
 } from '@ant-design/icons';
 import FormInner from './FormInner';
+import LeaderFormInner from './LeaderFormInner';
 import { normalizeLeaderUserIdForSubmit } from './normalizeLeaderUserIdForSubmit';
 import OrgNodeUserCount from './OrgNodeUserCount';
+import OrgLinkSetting from './OrgLinkSetting';
 import { buildImportPreviewGroups, downloadOrgImportTemplate, parseOrgImportExcelFile, prepareImportRowsForSubmit } from './orgImportTemplate';
 import ImportAnchorOrgSelect from './ImportAnchorOrgSelect';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 import '@kne/react-org-chart/dist/index.css';
+
+const SOURCE_LABEL_MAP = {
+  wecom: '企业微信',
+  dingtalk: '钉钉'
+};
 
 /** SuperSelect object-output-value 回显需 { id, name }，不能只传 id 字符串 */
 const mapOrgToFormData = org => {
@@ -38,14 +48,30 @@ const mapOrgToFormData = org => {
   return Object.assign({}, org, { leaderUserId });
 };
 
+const OrgSourceTag = ({ source }) => {
+  const { formatMessage } = useIntl();
+  if (!source) {
+    return null;
+  }
+  const label = SOURCE_LABEL_MAP[source] || source;
+  return (
+    <Tooltip title={formatMessage({ id: 'OrgSourceFrom' }, { source: label })}>
+      <Tag className={style['org-source-tag']} icon={<CloudOutlined />} color="processing">
+        {label}
+      </Tag>
+    </Tooltip>
+  );
+};
+
 const OrgOptions = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:ButtonGroup', 'components-core:Icon', 'components-core:FormInfo@useFormModal']
-})(({ remoteModules, showLength = 3, data, apis, onSuccess, onViewUsers }) => {
+})(({ remoteModules, showLength = 3, data, apis, onSuccess, onViewUsers, linkedSource }) => {
   const [usePreset, ButtonGroup, Icon, useFormModal] = remoteModules;
   const { ajax } = usePreset();
   const formModal = useFormModal();
   const { formatMessage } = useIntl();
   const { message } = App.useApp();
+  const isExternalSource = linkedSource && data.source === linkedSource;
   return (
     <ButtonGroup
       itemClassName="btn-no-padding"
@@ -64,7 +90,7 @@ const OrgOptions = createWithRemoteLoader({
           icon: <Icon type="tianjia" />,
           type: 'link',
           children: formatMessage({ id: 'AddSubOrg' }),
-          hidden: !apis.create,
+          hidden: !apis.create || isExternalSource,
           onClick: async () => {
             formModal({
               title: formatMessage({ id: 'AddSubOrg' }),
@@ -102,7 +128,7 @@ const OrgOptions = createWithRemoteLoader({
           icon: <Icon type="bianji" />,
           type: 'link',
           children: formatMessage({ id: 'Edit' }),
-          hidden: !(data.id && data.id !== 'root') || !apis.save,
+          hidden: !(data.id && data.id !== 'root') || !apis.save || isExternalSource,
           onClick: async () => {
             formModal({
               title: formatMessage({ id: 'EditOrgNode' }),
@@ -131,10 +157,44 @@ const OrgOptions = createWithRemoteLoader({
           }
         },
         {
+          icon: <EditOutlined />,
+          type: 'link',
+          children: formatMessage({ id: 'EditOrgLeader' }),
+          hidden: !(data.id && data.id !== 'root') || !apis.save || !isExternalSource,
+          onClick: async () => {
+            formModal({
+              title: formatMessage({ id: 'EditOrgLeader' }),
+              size: 'small',
+              formProps: {
+                data: mapOrgToFormData(data),
+                onSubmit: async formData => {
+                  const { data: resData } = await ajax(
+                    merge({}, apis.save, {
+                      data: Object.assign({}, {
+                        id: data.id,
+                        parentId: data.parentId,
+                        name: data.name,
+                        description: data.description,
+                        leaderUserId: normalizeLeaderUserIdForSubmit(formData.leaderUserId)
+                      })
+                    })
+                  );
+                  if (resData.code !== 0) {
+                    return false;
+                  }
+                  message.success(formatMessage({ id: 'SaveSuccess' }));
+                  onSuccess && onSuccess();
+                }
+              },
+              children: <LeaderFormInner apis={apis} orgId={data.id} />
+            });
+          }
+        },
+        {
           icon: <Icon type="shanchu" />,
           type: 'link',
           children: formatMessage({ id: 'Delete' }),
-          hidden: !(data.id && data.id !== 'root') || !apis.remove,
+          hidden: !(data.id && data.id !== 'root') || !apis.remove || isExternalSource,
           confirm: true,
           isDelete: true,
           danger: true,
@@ -316,7 +376,7 @@ const ControlPanel = ({ value, onChange }) => {
 
 const GraphOrg = createWithRemoteLoader({
   modules: ['components-core:Common@SimpleBar']
-})(({ remoteModules, data, apis, onSuccess, onViewUsers }) => {
+})(({ remoteModules, data, apis, onSuccess, onViewUsers, linkedSource }) => {
   const [expandIds, setExpandIds] = useState([]);
   const [scale, setScale] = useState(1);
   const { scrollRef, isDragging, onMouseDown, onTouchStart } = useDragToScroll();
@@ -328,9 +388,10 @@ const GraphOrg = createWithRemoteLoader({
           hoverable
           size="small"
           className={style['org-card']}
-          extra={<OrgOptions data={node} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} showLength={0} />}>
+          extra={<OrgOptions data={node} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} showLength={0} />}>
           <Flex align="center" gap={8} wrap="wrap" className={style['tree-node-title-row']}>
             <div className={style['tree-node-title']}>{node.name}</div>
+            <OrgSourceTag source={linkedSource && node.source === linkedSource ? node.source : null} />
             <OrgNodeUserCount count={node.userCount} />
           </Flex>
           {node.description && <div className={style['tree-node-description']}>{node.description}</div>}
@@ -397,7 +458,7 @@ const GraphOrg = createWithRemoteLoader({
   );
 });
 
-const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers }) => {
+const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers, linkedSource }) => {
   const [expandedKeys, setExpandedKeys] = useState(['root']);
 
   useEffect(() => {
@@ -423,10 +484,11 @@ const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers }) => {
             <Flex className={style['tree-node-main']} align="center" wrap="nowrap">
               <Flex align="center" gap={8} wrap="wrap" className={style['tree-node-title-row']}>
                 <span className={style['tree-node-title']}>{nodeData.name}</span>
+                <OrgSourceTag source={linkedSource && nodeData.source === linkedSource ? nodeData.source : null} />
                 <OrgNodeUserCount count={nodeData.userCount} />
               </Flex>
               <span className={style['tree-node-options']}>
-                <OrgOptions data={nodeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} />
+                <OrgOptions data={nodeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />
               </span>
             </Flex>
             {(nodeData.description || nodeData.leader?.name) && (
@@ -444,11 +506,12 @@ const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers }) => {
 
 const OrgInfo = createWithRemoteLoader({
   modules: ['components-core:StateBar', 'components-core:Global@usePreset']
-})(({ remoteModules, data, companyName, apis, onSuccess, tenantId, onViewUsers }) => {
+})(({ remoteModules, data, companyName, apis, onSuccess, tenantId, onViewUsers, linkedSource, linkSettingProps }) => {
   const [StateBar, usePreset] = remoteModules;
   const { ajax } = usePreset();
   const [activeKey, setActiveKey] = useState('tree');
   const [importOpen, setImportOpen] = useState(false);
+  const [linkDrawerOpen, setLinkDrawerOpen] = useState(false);
   const [importLoading, setImportLoading] = useState(false);
   const [anchorOrgId, setAnchorOrgId] = useState(undefined);
   const [importFile, setImportFile] = useState(null);
@@ -722,21 +785,46 @@ const OrgInfo = createWithRemoteLoader({
             { tab: formatMessage({ id: 'Graph' }), key: 'graph' }
           ]}
         />
-        {apis.import ? (
-          <Button
-            type="primary"
-            onClick={() => {
-              setImportFile(null);
-              setParsedRows(null);
-              setImportSelectedRowKeys([]);
-              setUploadKey(k => k + 1);
-              setAnchorOrgId(undefined);
-              setImportOpen(true);
-            }}>
-            {formatMessage({ id: 'OrgExcelImport' })}
-          </Button>
-        ) : null}
+        <Space>
+          {linkSettingProps ? (
+            <Button
+              icon={linkedSource ? <CloudOutlined /> : <LinkOutlined />}
+              onClick={() => setLinkDrawerOpen(true)}>
+              {linkedSource ? `${SOURCE_LABEL_MAP[linkedSource] || linkedSource}` : formatMessage({ id: 'OrgLinkTitle' })}
+            </Button>
+          ) : null}
+          {apis.import ? (
+            <Button
+              type="primary"
+              onClick={() => {
+                setImportFile(null);
+                setParsedRows(null);
+                setImportSelectedRowKeys([]);
+                setUploadKey(k => k + 1);
+                setAnchorOrgId(undefined);
+                setImportOpen(true);
+              }}>
+              {formatMessage({ id: 'OrgExcelImport' })}
+            </Button>
+          ) : null}
+        </Space>
       </Flex>
+      {linkSettingProps ? (
+        <Drawer
+          title={formatMessage({ id: 'OrgLinkTitle' })}
+          open={linkDrawerOpen}
+          onClose={() => setLinkDrawerOpen(false)}
+          width={480}
+          destroyOnClose>
+          <OrgLinkSetting
+            tenantId={linkSettingProps.tenantId}
+            envArgs={linkSettingProps.envArgs}
+            onSuccess={() => {
+              linkSettingProps.onLinkChange && linkSettingProps.onLinkChange();
+            }}
+          />
+        </Drawer>
+      ) : null}
       <Modal
         title={formatMessage({ id: 'OrgExcelImport' })}
         open={importOpen}
@@ -896,8 +984,8 @@ const OrgInfo = createWithRemoteLoader({
         </Flex>
       </Modal>
       <div className={style['org']}>
-        {activeKey === 'tree' && <TreeOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} />}
-        {activeKey === 'graph' && <GraphOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} />}
+        {activeKey === 'tree' && <TreeOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />}
+        {activeKey === 'graph' && <GraphOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />}
       </div>
     </Flex>
   );

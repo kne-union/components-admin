@@ -1,11 +1,11 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useMemo } from 'react';
 import { Flex } from 'antd';
-import merge from 'lodash/merge';
 import get from 'lodash/get';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import useRefCallback from '@kne/use-ref-callback';
+import getRoleListApi from '../Role/getRoleListApi';
 
 const FormInnerInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo', 'components-core:Global@usePreset']
@@ -31,16 +31,7 @@ const FormInnerInner = createWithRemoteLoader({
       <SuperSelect
         name="roles"
         label={formatMessage({ id: 'UserRole' })}
-        api={merge({}, apis.roleList, {
-          params: {
-            filter: { status: 'open' }
-          },
-          transformData: data => {
-            return Object.assign({}, data, {
-              pageData: data.pageData.filter(item => !(item.type === 'system' && item.code === 'default'))
-            });
-          }
-        })}
+        api={getRoleListApi(apis)}
         valueKey="id"
         labelKey="name"
         interceptor="array-output-value"

@@ -2,13 +2,16 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { CompanyInfo } from '@components/Tenant';
 import Fetch from '@kne/react-fetch';
 import { App } from 'antd';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../../withLocale';
 
 const Company = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
-})(({ remoteModules, tenant }) => {
+})(withLocale(({ remoteModules, tenant }) => {
   const [usePreset] = remoteModules;
   const { apis, ajax } = usePreset();
   const { message } = App.useApp();
+  const { formatMessage } = useIntl();
   return (
     <Fetch
       {...Object.assign({}, apis.tenantAdmin.companyDetail, {
@@ -29,7 +32,7 @@ const Company = createWithRemoteLoader({
               if (resData.code !== 0) {
                 return false;
               }
-              message.success('公司信息保存成功');
+              message.success(formatMessage({ id: 'CompanyInfoSaveSuccess' }));
               reload();
             }}
           />
@@ -37,6 +40,6 @@ const Company = createWithRemoteLoader({
       }}
     />
   );
-});
+}));
 
 export default Company;

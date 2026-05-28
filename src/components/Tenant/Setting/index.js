@@ -51,19 +51,19 @@ const Setting = createWithRemoteLoader({
           },
           {
             path: 'company',
-            element: <Company menu={menu} pageProps={pageProps} />
+            element: <Company menu={menu} pageProps={pageProps} baseUrl={baseUrl} />
           },
           {
             path: 'org',
-            element: <Org menu={menu} pageProps={pageProps} />
+            element: <Org menu={menu} pageProps={pageProps} baseUrl={baseUrl} />
           },
           {
             path: 'permission',
-            element: <Permission menu={menu} pageProps={pageProps} />
+            element: <Permission menu={menu} pageProps={pageProps} baseUrl={baseUrl} />
           },
           {
             path: 'user',
-            element: <User menu={menu} apis={apis} pageProps={pageProps} />
+            element: <User menu={menu} apis={apis} pageProps={pageProps} baseUrl={baseUrl} />
           }
         ]}
       />

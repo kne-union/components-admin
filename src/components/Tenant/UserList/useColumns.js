@@ -1,4 +1,7 @@
+import { useMemo } from 'react';
+import get from 'lodash/get';
 import UserOrgTags from './UserOrgTags';
+import buildRolesTitle from '../Role/buildRolesTitle';
 
 const getColumns = ({ formatMessage }) => {
   return [
@@ -35,9 +38,7 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'roles',
       title: formatMessage({ id: 'UserRole' }),
-      valueOf: item => {
-        return item.roles.map(item => item.name).join(',') || formatMessage({ id: 'DefaultRole' });
-      }
+      valueOf: item => buildRolesTitle(item) || formatMessage({ id: 'DefaultRole' })
     },
     {
       name: 'tenantOrg',
@@ -65,4 +66,15 @@ const getColumns = ({ formatMessage }) => {
   ];
 };
 
-export default getColumns;
+const useColumns = ({ formatMessage, apis, plugins }) => {
+  return useMemo(() => {
+    const getUserListColumns = get(plugins, 'tenantAdmin.getUserListColumns');
+    const cols = getColumns({ formatMessage });
+    if (typeof getUserListColumns === 'function') {
+      return getUserListColumns({ columns: cols, apis });
+    }
+    return cols;
+  }, [plugins, formatMessage, apis]);
+};
+
+export default useColumns;

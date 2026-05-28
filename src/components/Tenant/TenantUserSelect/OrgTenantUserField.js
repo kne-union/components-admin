@@ -6,7 +6,7 @@ import omit from 'lodash/omit';
 import { useMemo, useState } from 'react';
 import { useIntl } from '@kne/react-intl';
 import buildOrgTreeData from './buildOrgTreeData';
-import { normalizeTenantUserStatus } from '../UserList/normalizeTenantUserStatus';
+import withLocale from '../withLocale';
 import style from './style.module.scss';
 
 const normalizeOrgList = data => {
@@ -21,7 +21,7 @@ const normalizeOrgList = data => {
 
 const OrgTenantUserField = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
-})(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, ...props }) => {
+})(withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, ...props }) => {
   const [FormInfo] = remoteModules;
   const { useDecorator, fields } = FormInfo;
   const { SuperSelect } = fields;
@@ -32,7 +32,7 @@ const OrgTenantUserField = createWithRemoteLoader({
 
   const InnerControl = ({ value, onChange, disabled }) => {
     const userSelectApi = useMemo(() => {
-      const statusFilter = normalizeTenantUserStatus(userStatus);
+      const statusFilter = userStatus;
       return merge({}, userApi, {
         params: merge({}, userApi?.params || {}, {
           perPage: 100,
@@ -112,6 +112,6 @@ const OrgTenantUserField = createWithRemoteLoader({
   };
 
   return render(InnerControl);
-});
+}));
 
 export default OrgTenantUserField;

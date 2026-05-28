@@ -239,6 +239,23 @@ const getApis = options => {
         url: `${prefix}/tenant/admin/org-batch-import`,
         method: 'POST'
       },
+      orgLinkConfig: {
+        url: `${prefix}/tenant/admin/org-link-config`,
+        method: 'GET'
+      },
+      orgLinkSave: {
+        url: `${prefix}/tenant/admin/org-link-save`,
+        method: 'POST'
+      },
+      orgLinkCancel: {
+        url: `${prefix}/tenant/admin/org-link-cancel`,
+        method: 'POST'
+      },
+      orgLinkSync: {
+        url: `${prefix}/tenant/admin/org-link-sync`,
+        method: 'POST'
+      },
+
       userList: {
         url: `${prefix}/tenant/admin/user-list`,
         method: 'GET'
@@ -406,6 +423,10 @@ const getApis = options => {
       orgBatchImport: {
         url: `${prefix}/tenant/org-batch-import`,
         method: 'POST'
+      },
+      orgLinkConfig: {
+        url: `${prefix}/tenant/org-link-config`,
+        method: 'GET'
       },
       userList: {
         url: `${prefix}/tenant/user-list`,

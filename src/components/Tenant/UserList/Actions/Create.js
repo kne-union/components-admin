@@ -4,7 +4,7 @@ import merge from 'lodash/merge';
 import FormInner from '../FormInner';
 import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
-import { pickTenantOrgIdsFromForm } from '../pickTenantOrgIdsFromForm';
+import transformUserFormData from '../transformUserFormData';
 
 const Create = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
@@ -23,17 +23,9 @@ const Create = createWithRemoteLoader({
           size: 'small',
           formProps: {
             onSubmit: async formData => {
-              const tenantOrgIds = pickTenantOrgIdsFromForm(formData.tenantOrgIds);
-              const position = formData.options?.position;
               const { data: resData } = await ajax(
                 merge({}, apis.create, {
-                  data: Object.assign({}, formData, {
-                    tenantOrgIds,
-                    tenantOrgId: tenantOrgIds[0] || null,
-                    options: Object.assign({}, formData.options, {
-                      position: position && typeof position === 'object' ? position.id : position
-                    })
-                  })
+                  data: transformUserFormData(formData)
                 })
               );
               if (resData.code !== 0) {
