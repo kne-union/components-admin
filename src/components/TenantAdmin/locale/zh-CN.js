@@ -58,7 +58,30 @@ const locale = {
   AccountManagement: '账号管理',
   DetailInfo: '详情信息',
   ServiceTimeRange: '服务时间',
-  AccountCountTag: '开通账号数'
+  AccountCountTag: '开通账号数',
+
+  // TabDetail
+  CompanyInfoSaveSuccess: '公司信息保存成功',
+  Department: '部门',
+
+  // OrgLink
+  OrgLinkTitle: '关联组织架构',
+  OrgLinkHint: '开启关联后，可从企业微信或钉钉同步组织架构数据，同步的组织不可修改和删除，仅可修改部门负责人。',
+  OrgLinkEnable: '开启关联',
+  OrgLinkSource: '来源',
+  OrgLinkSyncInterval: '自动同步间隔',
+  OrgLinkTargetId: '关联目标ID',
+  OrgLinkTargetIdPlaceholder: '请选择 TARGET_LINKED_ 开头的环境变量',
+  OrgLinkTargetIdDesc: '请在「设置」中添加环境变量，且 KEY 需以 TARGET_LINKED_ 开头方可在此选择。',
+  OrgLinkManualSync: '手动同步',
+  OrgLinkCancel: '取消关联',
+  OrgLinkCancelConfirm: '确定要取消关联吗？取消后已同步的组织将保留，但不再自动同步更新。',
+  OrgLinkLastSyncTime: '上次同步时间',
+  OrgLinkSaveSuccess: '关联配置保存成功',
+  OrgLinkCancelSuccess: '已取消关联',
+  OrgLinkSyncSuccess: '同步成功',
+  OrgSourceFrom: '来源：{source}',
+  EditOrgLeader: '修改负责人',
 };
 
 export default locale;

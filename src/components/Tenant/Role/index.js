@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import BizUnit from '@components/BizUnit';
 import getColumns from './getColumns';
 import getFilterList from './getFilterList';
-import getRoleListFilterValue from './getRoleListFilterValue';
 import FormInner from './FormInner';
 import SetRolePermission from './Actions/SetRolePermission';
 import withLocale from '../withLocale';
@@ -14,12 +13,15 @@ const Role = createWithRemoteLoader({
 })(({ remoteModules, apis, ...props }) => {
   const { formatMessage } = useIntl();
   const [Filter] = remoteModules;
-  const { SuperSelectFilterItem } = Filter.fields;
+  const { SuperSelectFilterItem, createFilterValueMapper } = Filter;
   const columns = getColumns({ formatMessage });
   const filterList = useMemo(
     () => getFilterList({ formatMessage, SuperSelectFilterItem }),
     [formatMessage, SuperSelectFilterItem]
   );
+  const mapFilterValue = useMemo(() => createFilterValueMapper({
+    type: 'single'
+  }), [createFilterValueMapper]);
   return (
     <BizUnit
       {...props}
@@ -50,7 +52,7 @@ const Role = createWithRemoteLoader({
       name="role-list"
       options={{
         bizName: formatMessage({ id: 'Role' }),
-        mapFilterValue: getRoleListFilterValue
+        mapFilterValue
       }}
     />
   );

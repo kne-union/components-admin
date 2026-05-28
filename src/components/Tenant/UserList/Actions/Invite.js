@@ -5,14 +5,14 @@ import { App, Button, Flex, Input, Space, Typography } from 'antd';
 import { CopyOutlined, MailOutlined } from '@ant-design/icons';
 import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
-import TenantUserPersonalCard from '../TenantUserPersonalCard';
+import TenantUserPersonalCard from '../UserPersonalCard';
 import style from './inviteModal.module.scss';
 
 const buildInviteUrl = token => `${window.location.origin}/join-tenant?token=${token}`;
 
 const InviteInner = createWithRemoteLoader({
   modules: ['components-core:LoadingButton', 'components-core:Modal@useModal', 'components-core:Global@usePreset']
-})(({ remoteModules, data, apis, onSuccess, positionList, ...props }) => {
+})(({ remoteModules, data, apis, onSuccess, ...props }) => {
   const [LoadingButton, useModal, usePreset] = remoteModules;
   const { ajax } = usePreset();
   const modal = useModal();
@@ -52,7 +52,7 @@ const InviteInner = createWithRemoteLoader({
                 {formatMessage({ id: 'InviteUserHint' })}
               </Typography.Paragraph>
 
-              <TenantUserPersonalCard data={data} positionList={positionList} />
+              <TenantUserPersonalCard data={data} />
 
               <div className={style.section}>
                 <div className={style.fieldLabel}>{formatMessage({ id: 'InviteLink' })}</div>

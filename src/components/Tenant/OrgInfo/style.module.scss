@@ -343,6 +343,20 @@
   border-color: transparent;
 }
 
+.org-source-tag {
+  margin: 0;
+  font-size: 11px;
+  line-height: 18px;
+  padding: 0 6px;
+  border-radius: 4px;
+}
+
+.org-link-card {
+  border-radius: 10px;
+  border: 1px solid var(--font-color-grey-3, #e8e8e8);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
 .tree-node-title {
   font-weight: bold;
 }

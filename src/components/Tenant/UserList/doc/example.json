@@ -1,0 +1,62 @@
+{
+  "isFull": true,
+  "list": [
+    {
+      "title": "基础用法",
+      "description": "UserList 组件提供完整的用户列表管理功能，包含搜索筛选、分页、创建/编辑/删除用户等操作",
+      "code": "./base.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "插件扩展",
+      "description": "通过 plugins.tenantAdmin 插件扩展用户属性，如增加岗位、入职时间等字段，扩展列表列和 PersonalCard 展示",
+      "code": "./plugin-extension.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "自定义渲染",
+      "description": "通过 children 函数自定义 UserList 的渲染方式，获取 filter、filterList、topOptions、tableOptions 自行组合布局",
+      "code": "./custom-render.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    }
+  ]
+}

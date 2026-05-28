@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { getToken } from '@kne/token-storage';
 import { buildUrlWithParams } from './constants';
 import { getClientIanaTimezone } from '../utils';
+import useManagedEventSource from '../../../utils/useManagedEventSource';
 
 const isLikelyStatisticsPayload = obj =>
   obj &&
@@ -44,21 +45,19 @@ const useRealtimeStatisticsSSE = sseUrl => {
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
 
-  useEffect(() => {
-    if (!sseUrl || typeof window === 'undefined' || typeof window.EventSource !== 'function') {
-      return undefined;
-    }
+  const streamUrl = useMemo(() => {
+    if (!sseUrl) return null;
+    return buildUrlWithParams(sseUrl, {
+      interval: 5,
+      token: getToken('X-User-Token'),
+      timezone: getClientIanaTimezone()
+    });
+  }, [sseUrl]);
 
-    const source = new EventSource(
-      buildUrlWithParams(sseUrl, {
-        interval: 5,
-        token: getToken('X-User-Token'),
-        timezone: getClientIanaTimezone()
-      })
-    );
-
-    source.onopen = () => setIsConnected(true);
-    source.onmessage = event => {
+  useManagedEventSource(streamUrl, {
+    onOpen: () => setIsConnected(true),
+    onError: () => setIsConnected(false),
+    onMessage: event => {
       try {
         const parsed = JSON.parse(event.data);
         const nextData = unwrapStatisticsPayload(parsed);
@@ -69,13 +68,8 @@ const useRealtimeStatisticsSSE = sseUrl => {
       } catch {
         // ignore parse errors
       }
-    };
-    source.onerror = () => setIsConnected(false);
-
-    return () => {
-      source.close();
-    };
-  }, [sseUrl]);
+    }
+  });
 
   return { realtimeData, isConnected, lastUpdatedAt };
 };

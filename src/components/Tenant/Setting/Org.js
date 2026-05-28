@@ -4,6 +4,7 @@ import Fetch from '@kne/react-fetch';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import { useNavigate } from 'react-router-dom';
+import { Flex } from 'antd';
 
 const OrgInner = createWithRemoteLoader({
   modules: [
@@ -11,10 +12,11 @@ const OrgInner = createWithRemoteLoader({
     'components-core:Global@usePreset',
     'components-core:Global@useGlobalContext',
     'components-core:Permissions',
-    'components-core:Permissions@usePermissionsPass'
+    'components-core:Permissions@usePermissionsPass',
+    'components-core:Filter@filterToUrlParams'
   ]
-})(({ remoteModules, menu, pageProps: originPageProps, children }) => {
-  const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass] = remoteModules;
+})(({ remoteModules, menu, pageProps: originPageProps, baseUrl, children, ...props }) => {
+  const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass, filterToUrlParams] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
   const { global } = useGlobalContext('userInfo');
@@ -31,31 +33,41 @@ const OrgInner = createWithRemoteLoader({
     children: (
       <Permissions request={['setting:org:view']} type="error">
         <Fetch
-          {...Object.assign({}, apis.tenant.orgList)}
-          render={({ data, reload }) => {
+          {...Object.assign({}, apis.tenant.orgLinkConfig || {}, { params: Object.assign({ tenantId: global.tenant?.id }, (apis.tenant.orgLinkConfig || {}).params || {}) })}
+          render={({ data: linkConfigData }) => {
+            const linkedSource = linkConfigData?.enabled ? linkConfigData.source : null;
             return (
-              <OrgInfo
-                data={data}
-                tenantId={global.tenant?.id}
-                companyName={global.tenant?.tenantCompany?.name || global.tenant.name}
-                onSuccess={reload}
-                onViewUsers={
-                  allowViewUsers
-                    ? org => {
-                        const query = new URLSearchParams({
-                          tenantOrgId: String(org.id),
-                          orgName: org.name || ''
-                        });
-                        navigate(`../user?${query.toString()}`);
-                      }
-                    : undefined
-                }
-                apis={{
-                  create: allowCreate && Object.assign({}, apis.tenant.orgCreate),
-                  save: allowSave && Object.assign({}, apis.tenant.orgSave),
-                  remove: allowRemove && Object.assign({}, apis.tenant.orgRemove),
-                  userList: Object.assign({}, apis.tenant.userList),
-                  import: allowImport && Object.assign({}, apis.tenant.orgBatchImport)
+              <Fetch
+                {...Object.assign({}, apis.tenant.orgList)}
+                render={({ data, reload }) => {
+                  return (
+                    <Flex vertical gap={16}>
+                      <OrgInfo
+                        data={data}
+                        tenantId={global.tenant?.id}
+                        companyName={global.tenant?.tenantCompany?.name || global.tenant.name}
+                        onSuccess={reload}
+                        linkedSource={linkedSource}
+                        onViewUsers={
+                          allowViewUsers
+                            ? org => {
+                                const query = filterToUrlParams([
+                                  { name: 'tenantOrgId', label: 'tenantOrgId', value: { label: org.name || '', value: String(org.id) } },
+                                ]);
+                                navigate(`${baseUrl}/user?${query.toString()}`);
+                              }
+                            : undefined
+                        }
+                        apis={{
+                          create: allowCreate && Object.assign({}, apis.tenant.orgCreate),
+                          save: allowSave && Object.assign({}, apis.tenant.orgSave),
+                          remove: allowRemove && Object.assign({}, apis.tenant.orgRemove),
+                          userList: Object.assign({}, apis.tenant.userList),
+                          import: allowImport && Object.assign({}, apis.tenant.orgBatchImport)
+                        }}
+                      />
+                    </Flex>
+                  );
                 }}
               />
             );

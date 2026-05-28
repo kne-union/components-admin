@@ -30,7 +30,7 @@ const locale = {
   // Status Enums
   Pending: '等待执行',
   Running: '执行中',
-  Waiting: '等待操作',
+  Waiting: '等待',
   Success: '成功',
   Failed: '失败',
   Canceled: '已取消',
@@ -76,7 +76,7 @@ const locale = {
   ManualExecutionStats: '手动执行任务',
   ManualExecutionGoMyTaskTitle: '点击此处查看我的任务',
   ManualExecutionTasks: '手动执行数量',
-  ManualPendingTasks: '等待操作',
+  ManualPendingTasks: '等待',
   ManualExecutedTasks: '当日完成',
   ManualPendingMaxWaitLabel: '最长等待',
   ManualCompletedTotalDurationLabel: '总耗时',

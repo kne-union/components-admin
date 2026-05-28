@@ -1,0 +1,46 @@
+import { useMemo } from 'react';
+import merge from 'lodash/merge';
+import DepartmentTreeFilterItem from './DepartmentTreeFilterItem';
+import getRoleListApi from '../Role/getRoleListApi';
+
+const useFilterList = ({ formatMessage, apis, InputFilterItem, AdvancedSelectFilterItem, SuperSelectFilterItem, multiSelectInterceptor }) => {
+  return useMemo(
+    () => [
+      [
+        <InputFilterItem key="id" label={formatMessage({ id: 'FilterUserId' })} name="id" />,
+        <SuperSelectFilterItem
+          key="roles"
+          label={formatMessage({ id: 'UserRole' })}
+          name="roles"
+          valueKey="id"
+          labelKey="name"
+          interceptor={multiSelectInterceptor}
+          api={getRoleListApi(apis)}
+        />,
+        <DepartmentTreeFilterItem
+          key="tenantOrgId"
+          label={formatMessage({ id: 'Department' })}
+          name="tenantOrgId"
+          api={merge({}, apis.orgList, { params: apis.orgList?.params || {} })}
+        />,
+        <AdvancedSelectFilterItem
+          key="status"
+          label={formatMessage({ id: 'FilterStatus' })}
+          name="status"
+          single
+          api={{
+            loader: () => ({
+              pageData: [
+                { label: formatMessage({ id: 'Open' }), value: 'open' },
+                { label: formatMessage({ id: 'Close' }), value: 'closed' }
+              ]
+            })
+          }}
+        />
+      ]
+    ],
+    [formatMessage, apis.roleList, apis.orgList, InputFilterItem, AdvancedSelectFilterItem, SuperSelectFilterItem]
+  );
+};
+
+export default useFilterList;
