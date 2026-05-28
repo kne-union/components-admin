@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Card, Checkbox, Radio, Tag } from 'antd';
 import { useIntl } from '@kne/react-intl';
 import { collectDataScopeModules } from './collectDataScopeModules';
+import withLocale from '../withLocale';
 import styles from './SharedGroupModulesField.module.scss';
 
 /** 在 dataScope.list 允许的 access 中取值；非法或缺省时用 list 第一项（与权限配置顺序一致） */
@@ -33,7 +34,7 @@ const dataScopeTypeLabels = {
  * layout=field 时供 SharedGroupModulesFormField 使用（标题由 FormInfo 字段 label/description 承担）。
  * 受控 value：[{ moduleCode, access: 'read' | 'write' }]。可直接点击「只读/读写」以选中该模块。
  */
-const SharedGroupModulesField = ({ permissions, value = [], onChange, disabled, layout = 'card' }) => {
+const SharedGroupModulesField = withLocale(({ permissions, value = [], onChange, disabled, layout = 'card' }) => {
   const { formatMessage } = useIntl();
   const options = useMemo(() => collectDataScopeModules(permissions || { modules: [] }), [permissions]);
 
@@ -192,6 +193,6 @@ const SharedGroupModulesField = ({ permissions, value = [], onChange, disabled, 
       {body}
     </Card>
   );
-};
+});
 
 export default SharedGroupModulesField;

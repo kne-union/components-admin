@@ -41,3 +41,13 @@ export function mapUserOrgIdsToFormValue(data) {
   }
   return [];
 }
+
+/** 将表单数据转换为 API 提交格式（处理组织 ID 映射） */
+const transformUserFormData = (formData, existingData) => {
+  const tenantOrgIds = pickTenantOrgIdsFromForm(formData.tenantOrgIds);
+  return Object.assign({}, formData, existingData ? { id: existingData.id } : null, {
+    tenantOrgIds
+  });
+};
+
+export default transformUserFormData;

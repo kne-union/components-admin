@@ -19,52 +19,41 @@ const getOrgFullPath = org => {
   return getOrgLabel(org);
 };
 
-/** @returns {{ id: string, label: string, fullPath: string }[]} */
+const buildOrgDisplayItem = (id, org) => {
+  const label = getOrgLabel(org);
+  if (!label) {
+    return null;
+  }
+  const fullPath = getOrgFullPath(org);
+  const path = fullPath || label;
+  const showPath = path && label && path !== label;
+  return { id, label, fullPath, path, showPath };
+};
+
+/** @returns {{ id: string, label: string, fullPath: string, path: string, showPath: boolean }[]} */
 const getUserOrgDisplayItems = item => {
   if (Array.isArray(item?.tenantOrgs) && item.tenantOrgs.length) {
     return item.tenantOrgs
-      .map((org, index) => {
-        const id = org.id != null ? String(org.id) : `org-${index}`;
-        const label = getOrgLabel(org);
-        if (!label) {
-          return null;
-        }
-        return {
-          id,
-          label,
-          fullPath: getOrgFullPath(org)
-        };
-      })
+      .map((org, index) => buildOrgDisplayItem(org.id != null ? String(org.id) : `org-${index}`, org))
       .filter(Boolean);
   }
 
   if (item?.tenantOrgPath) {
-    const path = String(item.tenantOrgPath).trim();
-    const segments = path.split(/[；;]/).map(s => s.trim()).filter(Boolean);
+    const rawPath = String(item.tenantOrgPath).trim();
+    const segments = rawPath.split(/[；;]/).map(s => s.trim()).filter(Boolean);
     if (segments.length > 1) {
-      return segments.map((segment, index) => ({
-        id: `path-${index}`,
-        label: getOrgLabel({ path: segment }),
-        fullPath: segment
-      }));
+      return segments
+        .map((segment, index) => buildOrgDisplayItem(`path-${index}`, { path: segment }))
+        .filter(Boolean);
     }
-    return [
-      {
-        id: item.tenantOrg?.id != null ? String(item.tenantOrg.id) : 'primary',
-        label: item.tenantOrg?.name || getOrgLabel({ path }),
-        fullPath: path
-      }
-    ];
+    return [buildOrgDisplayItem(
+      item.tenantOrg?.id != null ? String(item.tenantOrg.id) : 'primary',
+      { name: item.tenantOrg?.name, path: rawPath }
+    )].filter(Boolean);
   }
 
   if (item?.tenantOrg?.name) {
-    return [
-      {
-        id: String(item.tenantOrg.id ?? 'primary'),
-        label: String(item.tenantOrg.name).trim(),
-        fullPath: getOrgFullPath(item.tenantOrg)
-      }
-    ];
+    return [buildOrgDisplayItem(String(item.tenantOrg.id ?? 'primary'), item.tenantOrg)].filter(Boolean);
   }
 
   return [];

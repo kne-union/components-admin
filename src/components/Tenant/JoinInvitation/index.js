@@ -8,8 +8,8 @@ import Fetch from '@kne/react-fetch';
 import CountDown from '@kne/count-down';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import CompanyInfo from '../CompanyInfo';
-import TenantUserPersonalCard from '../UserList/TenantUserPersonalCard';
-import normalizeTenantUserForPersonalCard from '../UserList/normalizeTenantUserForPersonalCard';
+import TenantUserPersonalCard from '../UserList/UserPersonalCard';
+
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
@@ -174,7 +174,7 @@ const JoinInvitation = createWithRemoteLoader({
                         {formatMessage({ id: 'ConfirmEmployeeInfoHint' })}
                       </Typography.Paragraph>
                       <TenantUserPersonalCard
-                        data={normalizeTenantUserForPersonalCard(tenantUser)}
+                        data={tenantUser}
                         positionList={data.positionList}
                       />
                     </div>
