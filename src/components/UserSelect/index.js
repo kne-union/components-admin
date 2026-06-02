@@ -28,7 +28,7 @@ const createComponent = (callback = item => item) => {
                 pageData: (data.pageData || []).map(item =>
                   Object.assign({}, item, {
                     value: item.id,
-                    label: item.nickname || item.email || item.phone
+                    label: item.nickname || item.name || item.email || item.phone
                   })
                 )
               });

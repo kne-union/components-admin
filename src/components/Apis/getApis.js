@@ -284,6 +284,10 @@ const getApis = options => {
         url: `${prefix}/tenant/admin/send-invite-message`,
         method: 'POST'
       },
+      sendOrgMessage: {
+        url: `${prefix}/tenant/admin/send-org-message`,
+        method: 'POST'
+      },
       appendArgs: {
         url: `${prefix}/tenant/admin/append-args`,
         method: 'POST'
@@ -428,6 +432,18 @@ const getApis = options => {
         url: `${prefix}/tenant/org-link-config`,
         method: 'GET'
       },
+      orgLinkSave: {
+        url: `${prefix}/tenant/org-link-save`,
+        method: 'POST'
+      },
+      orgLinkCancel: {
+        url: `${prefix}/tenant/org-link-cancel`,
+        method: 'POST'
+      },
+      orgLinkSync: {
+        url: `${prefix}/tenant/org-link-sync`,
+        method: 'POST'
+      },
       userList: {
         url: `${prefix}/tenant/user-list`,
         method: 'GET'
@@ -454,6 +470,10 @@ const getApis = options => {
       },
       userInviteMessage: {
         url: `${prefix}/tenant/send-invite-message`,
+        method: 'POST'
+      },
+      sendOrgMessage: {
+        url: `${prefix}/tenant/send-org-message`,
         method: 'POST'
       },
       customComponentDetail: {

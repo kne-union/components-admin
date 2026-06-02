@@ -5,6 +5,7 @@ import CancelTask from './CancelTask';
 import RetryTask from './RetryTask';
 import ErrorDetail from './ErrorDetail';
 import ResultDetail from './ResultDetail';
+import InputDetail from './InputDetail';
 import ViewLogs from './ViewLogs';
 
 const ActionsInner = createWithRemoteLoader({
@@ -26,6 +27,16 @@ const ActionsInner = createWithRemoteLoader({
           onSuccess
         });
     }
+  }
+
+  if (['pending'].indexOf(data.status) > -1) {
+    list.push({
+      ...props,
+      buttonComponent: InputDetail,
+      data,
+      children: formatMessage({ id: 'ViewInputParams' }),
+      onSuccess
+    });
   }
 
   if (['pending', 'running'].indexOf(data.status) > -1) {

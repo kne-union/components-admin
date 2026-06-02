@@ -33,9 +33,10 @@ const OrgInner = createWithRemoteLoader({
     children: (
       <Permissions request={['setting:org:view']} type="error">
         <Fetch
-          {...Object.assign({}, apis.tenant.orgLinkConfig || {}, { params: Object.assign({ tenantId: global.tenant?.id }, (apis.tenant.orgLinkConfig || {}).params || {}) })}
-          render={({ data: linkConfigData }) => {
+          {...Object.assign({}, apis.tenant.orgLinkConfig)}
+          render={({ data: linkConfigData, reload: reloadLinkConfig }) => {
             const linkedSource = linkConfigData?.enabled ? linkConfigData.source : null;
+            const syncSupported = linkConfigData?.syncSupported;
             return (
               <Fetch
                 {...Object.assign({}, apis.tenant.orgList)}
@@ -48,11 +49,19 @@ const OrgInner = createWithRemoteLoader({
                         companyName={global.tenant?.tenantCompany?.name || global.tenant.name}
                         onSuccess={reload}
                         linkedSource={linkedSource}
+                        linkSettingProps={syncSupported ? {
+                          tenantId: global.tenant?.id,
+                          envArgs: global.tenant?.tenantSetting?.args || [],
+                          onLinkChange: () => {
+                            reloadLinkConfig();
+                            reload();
+                          }
+                        } : null}
                         onViewUsers={
                           allowViewUsers
                             ? org => {
                                 const query = filterToUrlParams([
-                                  { name: 'tenantOrgId', label: 'tenantOrgId', value: { label: org.name || '', value: String(org.id) } },
+                                  { name: 'tenantOrgId', label: 'tenantOrgId', value: { label: org.name || '', value: String(org.id) } }
                                 ]);
                                 navigate(`${baseUrl}/user?${query.toString()}`);
                               }
@@ -63,7 +72,11 @@ const OrgInner = createWithRemoteLoader({
                           save: allowSave && Object.assign({}, apis.tenant.orgSave),
                           remove: allowRemove && Object.assign({}, apis.tenant.orgRemove),
                           userList: Object.assign({}, apis.tenant.userList),
-                          import: allowImport && Object.assign({}, apis.tenant.orgBatchImport)
+                          import: allowImport && Object.assign({}, apis.tenant.orgBatchImport),
+                          orgLinkConfig: Object.assign({}, apis.tenant.orgLinkConfig),
+                          orgLinkSave: Object.assign({}, apis.tenant.orgLinkSave),
+                          orgLinkSync: Object.assign({}, apis.tenant.orgLinkSync),
+                          orgLinkCancel: Object.assign({}, apis.tenant.orgLinkCancel)
                         }}
                       />
                     </Flex>

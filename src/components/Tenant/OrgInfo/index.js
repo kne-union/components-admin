@@ -1,5 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Tree, App, Card, Button, Space, Modal, Upload, Typography, Table, Avatar, Divider, Checkbox, Tag, Badge, Tooltip, Drawer } from 'antd';
+import { Flex, Tree, App, Card, Button, Space, Modal, Upload, Typography, Table, Divider, Checkbox, Tag, Badge, Tooltip, Drawer } from 'antd';
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import OrgChart from '@kne/react-org-chart';
 import merge from 'lodash/merge';
@@ -13,7 +13,6 @@ import {
   DownloadOutlined,
   TeamOutlined,
   UserOutlined,
-  CloudOutlined,
   EditOutlined,
   LinkOutlined
 } from '@ant-design/icons';
@@ -29,10 +28,7 @@ import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 import '@kne/react-org-chart/dist/index.css';
 
-const SOURCE_LABEL_MAP = {
-  wecom: '企业微信',
-  dingtalk: '钉钉'
-};
+import { getSourceIcon, SOURCE_LABEL_MAP } from '../constants';
 
 /** SuperSelect object-output-value 回显需 { id, name }，不能只传 id 字符串 */
 const mapOrgToFormData = org => {
@@ -56,7 +52,7 @@ const OrgSourceTag = ({ source }) => {
   const label = SOURCE_LABEL_MAP[source] || source;
   return (
     <Tooltip title={formatMessage({ id: 'OrgSourceFrom' }, { source: label })}>
-      <Tag className={style['org-source-tag']} icon={<CloudOutlined />} color="processing">
+      <Tag className={style['org-source-tag']} icon={getSourceIcon(source)} color="processing">
         {label}
       </Tag>
     </Tooltip>
@@ -71,7 +67,7 @@ const OrgOptions = createWithRemoteLoader({
   const formModal = useFormModal();
   const { formatMessage } = useIntl();
   const { message } = App.useApp();
-  const isExternalSource = linkedSource && data.source === linkedSource;
+  const isExternalSource = data.synced && data.syncSource;
   return (
     <ButtonGroup
       itemClassName="btn-no-padding"
@@ -170,13 +166,16 @@ const OrgOptions = createWithRemoteLoader({
                 onSubmit: async formData => {
                   const { data: resData } = await ajax(
                     merge({}, apis.save, {
-                      data: Object.assign({}, {
-                        id: data.id,
-                        parentId: data.parentId,
-                        name: data.name,
-                        description: data.description,
-                        leaderUserId: normalizeLeaderUserIdForSubmit(formData.leaderUserId)
-                      })
+                      data: Object.assign(
+                        {},
+                        {
+                          id: data.id,
+                          parentId: data.parentId,
+                          name: data.name,
+                          description: data.description,
+                          leaderUserId: normalizeLeaderUserIdForSubmit(formData.leaderUserId)
+                        }
+                      )
                     })
                   );
                   if (resData.code !== 0) {
@@ -227,7 +226,6 @@ const OrgLeaderMeta = createWithRemoteLoader({
 
   const name = String(leader.name);
   const initial = name.trim().charAt(0);
-  const avatarSrc = leader.avatar || leader.avatarUrl || leader.leaderAvatar;
 
   return (
     <div className={`${style['org-leader-meta']} ${style[`org-leader-meta-${variant}`]}`}>
@@ -391,7 +389,7 @@ const GraphOrg = createWithRemoteLoader({
           extra={<OrgOptions data={node} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} showLength={0} />}>
           <Flex align="center" gap={8} wrap="wrap" className={style['tree-node-title-row']}>
             <div className={style['tree-node-title']}>{node.name}</div>
-            <OrgSourceTag source={linkedSource && node.source === linkedSource ? node.source : null} />
+            <OrgSourceTag source={node.syncSource} />
             <OrgNodeUserCount count={node.userCount} />
           </Flex>
           {node.description && <div className={style['tree-node-description']}>{node.description}</div>}
@@ -484,7 +482,7 @@ const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers, linkedSource }) => {
             <Flex className={style['tree-node-main']} align="center" wrap="nowrap">
               <Flex align="center" gap={8} wrap="wrap" className={style['tree-node-title-row']}>
                 <span className={style['tree-node-title']}>{nodeData.name}</span>
-                <OrgSourceTag source={linkedSource && nodeData.source === linkedSource ? nodeData.source : null} />
+                <OrgSourceTag source={nodeData.syncSource} />
                 <OrgNodeUserCount count={nodeData.userCount} />
               </Flex>
               <span className={style['tree-node-options']}>
@@ -787,9 +785,7 @@ const OrgInfo = createWithRemoteLoader({
         />
         <Space>
           {linkSettingProps ? (
-            <Button
-              icon={linkedSource ? <CloudOutlined /> : <LinkOutlined />}
-              onClick={() => setLinkDrawerOpen(true)}>
+            <Button icon={linkedSource ? getSourceIcon(linkedSource) : <LinkOutlined />} onClick={() => setLinkDrawerOpen(true)}>
               {linkedSource ? `${SOURCE_LABEL_MAP[linkedSource] || linkedSource}` : formatMessage({ id: 'OrgLinkTitle' })}
             </Button>
           ) : null}
@@ -817,6 +813,7 @@ const OrgInfo = createWithRemoteLoader({
           width={480}
           destroyOnClose>
           <OrgLinkSetting
+            apis={apis}
             tenantId={linkSettingProps.tenantId}
             envArgs={linkSettingProps.envArgs}
             onSuccess={() => {
@@ -936,56 +933,60 @@ const OrgInfo = createWithRemoteLoader({
               <Typography.Paragraph type="secondary" style={{ marginBottom: 8 }}>
                 {formatMessage({ id: 'ImportSelectedCount' }, { selected: importSelectedRowKeys.length, total: parsedRows.length })}
               </Typography.Paragraph>
-                <div className={style.importPreviewPanel}>
-                  <Table
-                    className={style.importPreviewTable}
-                    size="small"
-                    bordered
-                    rowKey="key"
-                    columns={previewOrgColumns}
-                    dataSource={importPreviewGroups}
-                    pagination={false}
-                    scroll={{ x: 'max-content', y: 320 }}
-                    defaultExpandAllRows
-                    expandable={{
-                      rowExpandable: record => record.users.length > 0,
-                      expandedRowRender: record =>
-                        record.users.length ? (
-                          <div className={style.importPreviewExpand}>
-                            <Flex align="center" gap={12} className={style.importPreviewExpandHeader}>
-                              <Flex align="center" gap={8} className={style.importPreviewExpandHeaderLabel}>
-                                <UserOutlined className={style.importPreviewExpandIcon} />
-                                <span>{formatMessage({ id: 'ImportNestedUsers' })}</span>
-                              </Flex>
-                              <Badge
-                                count={record.users.length}
-                                overflowCount={99}
-                                color="var(--primary-color)"
-                                className={style.importPreviewExpandBadge}
-                              />
+              <div className={style.importPreviewPanel}>
+                <Table
+                  className={style.importPreviewTable}
+                  size="small"
+                  bordered
+                  rowKey="key"
+                  columns={previewOrgColumns}
+                  dataSource={importPreviewGroups}
+                  pagination={false}
+                  scroll={{ x: 'max-content', y: 320 }}
+                  defaultExpandAllRows
+                  expandable={{
+                    rowExpandable: record => record.users.length > 0,
+                    expandedRowRender: record =>
+                      record.users.length ? (
+                        <div className={style.importPreviewExpand}>
+                          <Flex align="center" gap={12} className={style.importPreviewExpandHeader}>
+                            <Flex align="center" gap={8} className={style.importPreviewExpandHeaderLabel}>
+                              <UserOutlined className={style.importPreviewExpandIcon} />
+                              <span>{formatMessage({ id: 'ImportNestedUsers' })}</span>
                             </Flex>
-                            <Table
-                              className={style.importPreviewNestedTable}
-                              size="small"
-                              bordered
-                              rowKey="key"
-                              columns={previewUserColumns}
-                              dataSource={record.users}
-                              pagination={false}
-                              showHeader
+                            <Badge
+                              count={record.users.length}
+                              overflowCount={99}
+                              color="var(--primary-color)"
+                              className={style.importPreviewExpandBadge}
                             />
-                          </div>
-                        ) : null
-                    }}
-                  />
-                </div>
+                          </Flex>
+                          <Table
+                            className={style.importPreviewNestedTable}
+                            size="small"
+                            bordered
+                            rowKey="key"
+                            columns={previewUserColumns}
+                            dataSource={record.users}
+                            pagination={false}
+                            showHeader
+                          />
+                        </div>
+                      ) : null
+                  }}
+                />
+              </div>
             </div>
           ) : null}
         </Flex>
       </Modal>
       <div className={style['org']}>
-        {activeKey === 'tree' && <TreeOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />}
-        {activeKey === 'graph' && <GraphOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />}
+        {activeKey === 'tree' && (
+          <TreeOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />
+        )}
+        {activeKey === 'graph' && (
+          <GraphOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />
+        )}
       </div>
     </Flex>
   );

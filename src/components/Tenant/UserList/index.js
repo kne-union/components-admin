@@ -1,18 +1,20 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useRef, useEffect, useMemo } from 'react';
-import { Flex } from 'antd';
+import merge from 'lodash/merge';
+import { useRef, useEffect, useMemo, useCallback } from 'react';
+import { Flex, Button } from 'antd';
 import Actions from './Actions';
 import Create from './Actions/Create';
+import SendMessage from './Actions/SendMessage';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import useRefCallback from '@kne/use-ref-callback';
 
 import useFilterList from './useFilterList';
 import useColumns from './useColumns';
-import useListApi from './useListApi';
+import get from 'lodash/get';
 
 const UserList = createWithRemoteLoader({
-  modules: ['components-core:Table@TablePage', 'components-core:Filter', 'components-core:Global@usePreset']
+  modules: ['components-core:Table', 'components-core:Filter', 'components-core:Global@usePreset']
 })(
   withLocale(
     ({
@@ -20,31 +22,49 @@ const UserList = createWithRemoteLoader({
       apis,
       topOptionsSize,
       onMount,
+      getActions,
       children,
       initialTenantOrgId,
       initialOrgName,
       initialUserId,
       allowQueryIdForUserFilter
     }) => {
-      const [TablePage, Filter, usePreset] = remoteModules;
-      const { ajax } = usePreset();
+      const [Table, Filter, usePreset] = remoteModules;
+      const { TablePage, useSelectedRow } = Table;
       const tableRef = useRef();
       const { formatMessage } = useIntl();
       const {
-        SearchInput, getFilterValue, createFilterValueMapper,
-        useUrlFilter, createUrlFilterReader, multiSelectInterceptor, fields: filterFields
+        SearchInput,
+        getFilterValue,
+        createFilterValueMapper,
+        useUrlFilter,
+        createUrlFilterReader,
+        multiSelectInterceptor,
+        fields: filterFields
       } = Filter;
       const { InputFilterItem, AdvancedSelectFilterItem, SuperSelectFilterItem } = filterFields;
       const { plugins } = usePreset();
 
-      const mapFilterValue = useMemo(() => createFilterValueMapper({
-        id: 'string',
-        roles: 'multi',
-        tenantOrgId: 'single'
-      }), [createFilterValueMapper]);
+      const selectedRow = useSelectedRow();
+      const { selectedRowKeys, selectedRows, setSelectedRows } = selectedRow;
+
+      const clearSelection = useCallback(() => {
+        setSelectedRows([]);
+      }, [setSelectedRows]);
+
+      const mapFilterValue = useMemo(
+        () =>
+          createFilterValueMapper({
+            id: 'string',
+            roles: 'multi',
+            tenantOrgId: 'single',
+            synced: 'single'
+          }),
+        [createFilterValueMapper]
+      );
 
       const [filter, setFilter] = useUrlFilter({
-        readUrlParams: (searchParams) => {
+        readUrlParams: searchParams => {
           const reader = createUrlFilterReader(searchParams);
           const tenantOrgEntry = reader.takeFilterEntry('tenantOrgId');
           let userEntry = reader.takeFilterEntry('userId');
@@ -65,7 +85,7 @@ const UserList = createWithRemoteLoader({
             orgName,
             userId,
             tenantOrgEntry,
-            userEntry: userId ? (userEntry || { label: String(userId), value: String(userId) }) : null
+            userEntry: userId ? userEntry || { label: String(userId), value: String(userId) } : null
           };
         },
         buildFilter: ({ tenantOrgId, orgName, tenantOrgEntry, userEntry }) => {
@@ -95,13 +115,40 @@ const UserList = createWithRemoteLoader({
       });
 
       const filterValue = useMemo(() => mapFilterValue(filter, getFilterValue), [filter, getFilterValue, mapFilterValue]);
-      const filterList = useFilterList({ formatMessage, apis, InputFilterItem, AdvancedSelectFilterItem, SuperSelectFilterItem, multiSelectInterceptor });
+      const filterList = useFilterList({
+        formatMessage,
+        apis,
+        InputFilterItem,
+        AdvancedSelectFilterItem,
+        SuperSelectFilterItem,
+        multiSelectInterceptor
+      });
       const columns = useColumns({ formatMessage, apis, plugins });
-      const listApi = useListApi({ apis, filterValue, ajax });
+
+      const hasExternalSelected = selectedRows.some(row => row.syncSource);
 
       const topOptions = (
-        <Flex gap={8}>
+        <Flex gap={8} align="center">
+          {selectedRowKeys.length > 0 ? (
+            <Flex align="center" style={{ fontSize: 14, color: '#666', whiteSpace: 'nowrap' }}>
+              {formatMessage({ id: 'SelectedCount' }, { count: selectedRowKeys.length })}
+              <Button type="link" size="small" onClick={clearSelection}>
+                {formatMessage({ id: 'DeselectAll' })}
+              </Button>
+            </Flex>
+          ) : null}
           <SearchInput size={topOptionsSize} name="keyword" label={formatMessage({ id: 'Keyword' })} />
+          {apis.sendOrgMessage && hasExternalSelected && (
+            <SendMessage
+              size={topOptionsSize}
+              apis={apis}
+              selectedRows={selectedRows}
+              onSuccess={() => {
+                clearSelection();
+                tableRef.current.reload();
+              }}
+            />
+          )}
           {apis.create && (
             <Create type="primary" size={topOptionsSize} apis={apis} onSuccess={() => tableRef.current.reload()}>
               {formatMessage({ id: 'Add' })}
@@ -111,7 +158,11 @@ const UserList = createWithRemoteLoader({
       );
 
       const tableOptions = {
-        ...listApi,
+        ...merge({}, apis.list, {
+          params: {
+            filter: filterValue
+          }
+        }),
         ref: tableRef,
         columns: [
           ...columns,
@@ -120,21 +171,20 @@ const UserList = createWithRemoteLoader({
             type: 'options',
             title: formatMessage({ id: 'Operation' }),
             fixed: 'right',
-            valueOf: item => ({
-              children: (
-                <Actions
-                  itemClassName="btn-no-padding"
-                  moreType="link"
-                  data={item}
-                  apis={apis}
-                  onSuccess={() => tableRef.current.reload()}
-                />
-              )
-            })
+            valueOf: item => {
+              return {
+                children: (
+                  <Actions itemClassName="btn-no-padding" moreType="link" data={item} apis={apis} onSuccess={() => tableRef.current.reload()}>
+                    {getActions}
+                  </Actions>
+                )
+              };
+            }
           }
         ],
         name: 'tenant-user-list',
-        pagination: { paramsType: 'params' }
+        pagination: { paramsType: 'params' },
+        rowSelection: selectedRow
       };
 
       const handlerMount = useRefCallback(() => {
@@ -143,7 +193,7 @@ const UserList = createWithRemoteLoader({
 
       useEffect(() => {
         handlerMount();
-      }, [handlerMount, filter]);
+      }, [handlerMount, filter, selectedRowKeys]);
 
       if (typeof children === 'function') {
         return children({ filter: { value: filter, onChange: setFilter }, filterList, topOptions, tableOptions });

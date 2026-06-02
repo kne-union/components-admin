@@ -22,7 +22,8 @@ const User = createWithRemoteLoader({
           remove: Object.assign({}, apis.tenantAdmin.userRemove, { data: { tenantId: tenant.id } }),
           setStatus: Object.assign({}, apis.tenantAdmin.userSetStatus, { data: { tenantId: tenant.id } }),
           inviteToken: Object.assign({}, apis.tenantAdmin.userInviteToken, { params: { tenantId: tenant.id } }),
-          userInviteMessage: Object.assign({}, apis.tenantAdmin.userInviteMessage, { data: { tenantId: tenant.id } })
+          userInviteMessage: Object.assign({}, apis.tenantAdmin.userInviteMessage, { data: { tenantId: tenant.id } }),
+          sendOrgMessage: Object.assign({}, apis.tenantAdmin.sendOrgMessage, { data: { tenantId: tenant.id } })
         },
         pluginApis
       )}

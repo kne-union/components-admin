@@ -52,7 +52,7 @@ const Edit = createWithRemoteLoader({
               onSuccess && onSuccess();
             }
           },
-          children: <FormInner apis={apis} />
+          children: <FormInner apis={apis} data={data} />
         });
       }}
     />

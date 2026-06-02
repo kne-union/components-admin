@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 import get from 'lodash/get';
+import { Tag } from 'antd';
 import UserOrgTags from './UserOrgTags';
 import buildRolesTitle from '../Role/buildRolesTitle';
+
+import { getSourceIcon, SOURCE_LABEL_MAP } from '../constants';
 
 const getColumns = ({ formatMessage }) => {
   return [
@@ -26,16 +29,6 @@ const getColumns = ({ formatMessage }) => {
       hover: false
     },
     {
-      name: 'phone',
-      title: formatMessage({ id: 'PhoneTitle' }),
-      type: 'other'
-    },
-    {
-      name: 'email',
-      title: formatMessage({ id: 'Email' }),
-      type: 'other'
-    },
-    {
       name: 'roles',
       title: formatMessage({ id: 'UserRole' }),
       valueOf: item => buildRolesTitle(item) || formatMessage({ id: 'DefaultRole' })
@@ -56,6 +49,32 @@ const getColumns = ({ formatMessage }) => {
         type: item.status === 'open' ? 'success' : 'default',
         text: item.status === 'open' ? formatMessage({ id: 'Open' }) : formatMessage({ id: 'Close' })
       })
+    },
+    {
+      name: 'syncSource',
+      title: formatMessage({ id: 'IsSynced' }),
+      type: 'other',
+      valueOf: item => {
+        if (!item.syncSource) {
+          return formatMessage({ id: 'SyncedInternal' });
+        }
+        const label = SOURCE_LABEL_MAP[item.syncSource] || item.syncSource;
+        return (
+          <Tag icon={getSourceIcon(item.syncSource)} color="processing">
+            {label}
+          </Tag>
+        );
+      }
+    },
+    {
+      name: 'phone',
+      title: formatMessage({ id: 'PhoneTitle' }),
+      type: 'other'
+    },
+    {
+      name: 'email',
+      title: formatMessage({ id: 'Email' }),
+      type: 'other'
     },
     {
       name: 'description',
