@@ -80,6 +80,9 @@ const locale = {
   OrgLinkSaveSuccess: '关联配置保存成功',
   OrgLinkCancelSuccess: '已取消关联',
   OrgLinkSyncSuccess: '同步成功',
+  OrgLinkStatus: '同步状态',
+  OrgLinkSyncPendingTip: '首次同步尚未完成，请等待同步完成后再手动同步',
+  OrgLinkSyncRunningTip: '正在同步中，请等待完成后再操作',
   OrgSourceFrom: '来源：{source}',
   EditOrgLeader: '修改负责人',
 };

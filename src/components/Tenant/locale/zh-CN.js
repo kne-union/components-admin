@@ -25,6 +25,11 @@ const locale = {
   // UserList
   FilterUserId: 'ID',
   FilterStatus: '状态',
+  FilterSynced: '外部来源',
+  SyncedExternal: '外部同步',
+  SyncedLocal: '手动添加',
+  SyncedInternal: '系统内部',
+  IsSynced: '来源',
   Keyword: '关键字',
   Add: '添加',
   Operation: '操作',
@@ -235,6 +240,22 @@ const locale = {
   OrgLinkSyncSuccess: '同步成功',
   OrgSourceFrom: '来源：{source}',
   EditOrgLeader: '修改负责人',
+
+  // SendMessage
+  SendOrgMessage: '发送{type}消息',
+  SendOrgMessageTitle: '发送{type}消息',
+  SendMessageTarget: '接收人',
+  SendMessageContent: '消息内容',
+  SendMessageType: '消息类型',
+  SendMessageTypeText: '文本',
+  SendMessageTypeMarkdown: 'Markdown',
+  SendMessagePlaceholder: '请输入消息内容',
+  SendMessageContentRequired: '请输入消息内容',
+  SendMessageSuccess: '已成功发送给 {count} 人',
+  SendMessageFailed: '发送失败',
+  Send: '发送',
+  SelectedCount: '已选: {count} 项',
+  DeselectAll: '取消',
 };
 
 export default locale;

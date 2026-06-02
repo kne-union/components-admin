@@ -20,6 +20,9 @@
 | titleExtra | 标题额外内容 | ReactNode | null |
 | children | 自定义渲染函数 | Function | - |
 | onMount | 组件挂载回调 | Function | - |
+| filter | 外部筛选状态（受控），传入后 BizUnit 使用该值代替内部 useState | Array | - |
+| onFilterChange | 外部筛选变更回调，与 filter 配合使用 | Function | - |
+| urlFilterValue | URL 筛选参数映射，传入后 BizUnit 自动从 URL 初始化 filter。支持数组 `['id', 'status']` 或对象 `{ id: true, status: { multi: true } }` 格式，详见 `Filter.useUrlFilterValue` | Array \| Object | - |
 
 ### apis 配置
 

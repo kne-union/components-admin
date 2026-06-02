@@ -26,6 +26,7 @@ const locale = {
   ErrorDetail: 'Error Detail',
   ViewResult: 'View Result',
   ViewLogs: 'View Logs',
+  ViewInputParams: 'View Input',
   BatchRetry: 'Batch Retry',
   // Status Enums
   Pending: 'Pending',
@@ -48,6 +49,7 @@ const locale = {
   OutputResult: 'Output Result',
   // Modal Titles
   ErrorDetailTitle: 'Error Detail',
+  InputParamsTitle: 'Input Parameters',
   TaskResultTitle: 'Task Result',
   ViewLogsTitle: 'Execution Logs',
   // ViewLogs

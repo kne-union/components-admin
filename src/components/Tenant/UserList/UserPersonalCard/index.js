@@ -2,13 +2,14 @@ import '@kne/react-box/dist/index.css';
 import classnames from 'classnames';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { PersonalCard } from '@kne/react-box';
-import { Typography } from 'antd';
+import { Typography, Tag } from 'antd';
 import get from 'lodash/get';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../../withLocale';
 import getUserOrgDisplayItems from '../getUserOrgDisplayItems';
 import buildRolesTitle from '../../Role/buildRolesTitle';
 import style from './style.module.scss';
+import { getSourceIcon, SOURCE_LABEL_MAP } from '../../constants';
 
 /** 副标题单行省略，悬停展示完整内容 */
 const renderEllipsisTitle = text => {
@@ -76,9 +77,15 @@ const buildPersonalCardProps = (data, context = {}) => {
   let moreInfo = buildMoreInfo(data, { formatMessage });
   moreInfo = applyPlugins(moreInfo, data, { formatMessage, plugins });
 
+  const sourceTag = data?.syncSource ? (
+    <Tag icon={getSourceIcon(data.syncSource)} color="processing" style={{ marginLeft: 6, verticalAlign: 'middle' }}>
+      {SOURCE_LABEL_MAP[data.syncSource] || data.syncSource}
+    </Tag>
+  ) : null;
+
   return {
     mode: 'horizontal',
-    name: data?.name,
+    name: data?.name ? <>{data.name}{sourceTag}</> : data?.name,
     email: data?.email,
     phone: data?.phone,
     description: data?.description,

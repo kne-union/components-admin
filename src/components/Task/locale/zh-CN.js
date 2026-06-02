@@ -26,6 +26,7 @@ const locale = {
   ErrorDetail: '错误详情',
   ViewResult: '查看结果',
   ViewLogs: '查看日志',
+  ViewInputParams: '查看参数',
   BatchRetry: '批量重试',
   // Status Enums
   Pending: '等待执行',
@@ -48,6 +49,7 @@ const locale = {
   OutputResult: '输出结果',
   // Modal Titles
   ErrorDetailTitle: '错误详情',
+  InputParamsTitle: '输入参数',
   TaskResultTitle: '任务结果',
   ViewLogsTitle: '执行日志',
   // ViewLogs

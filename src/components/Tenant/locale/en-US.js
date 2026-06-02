@@ -25,6 +25,11 @@ const locale = {
   // UserList
   FilterUserId: 'ID',
   FilterStatus: 'Status',
+  FilterSynced: 'External Source',
+  SyncedExternal: 'Synced',
+  SyncedLocal: 'Manual',
+  SyncedInternal: 'Internal',
+  IsSynced: 'Source',
   Keyword: 'Keyword',
   Add: 'Add',
   Operation: 'Operation',

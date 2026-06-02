@@ -2,7 +2,8 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import UserList from '../UserList';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import get from 'lodash/get';
 
 const User = createWithRemoteLoader({
   modules: [
@@ -16,13 +17,18 @@ const User = createWithRemoteLoader({
 })(({ remoteModules, menu, children, pageProps: originPageProps, apis: extraApis = {} }) => {
   const [Page, usePreset, Permissions, usePermissionsPass, TablePage, FilterProvider] = remoteModules;
   const { formatMessage } = useIntl();
-  const { apis } = usePreset();
+  const { apis, plugins } = usePreset();
+  const getActions = get(plugins, 'tenant.getUserListActions');
   const [target, setTarget] = useState({});
   const filter = Object.assign({}, { value: [] }, target.filter);
   const allowCreate = usePermissionsPass({ request: ['setting:user-manager:create'] });
   const allowSave = usePermissionsPass({ request: ['setting:user-manager:edit'] });
   const allowRemove = usePermissionsPass({ request: ['setting:user-manager:remove'] });
   const allowInvite = usePermissionsPass({ request: ['setting:user-manager:invite'] });
+
+  const handleMount = useCallback(data => {
+    setTarget(data);
+  }, []);
 
   const pageProps = Object.assign({}, originPageProps, {
     menu,
@@ -33,7 +39,8 @@ const User = createWithRemoteLoader({
       <Permissions request={['setting:user-manager:view']} type="error">
         <UserList
           allowQueryIdForUserFilter
-          onMount={setTarget}
+          onMount={handleMount}
+          getActions={getActions}
           apis={Object.assign(
             {},
             {
@@ -45,6 +52,7 @@ const User = createWithRemoteLoader({
               setStatus: allowSave && Object.assign({}, apis.tenant.userSetStatus),
               inviteToken: allowInvite && Object.assign({}, apis.tenant.userInviteToken),
               userInviteMessage: Object.assign({}, apis.tenant.userInviteMessage),
+              sendOrgMessage: Object.assign({}, apis.tenant.sendOrgMessage),
               roleList: Object.assign({}, apis.tenant.role.list)
             },
             extraApis
