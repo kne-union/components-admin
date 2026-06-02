@@ -1,9 +1,11 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Button } from 'antd';
+import { Flex, Button, Tag } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Authenticate from './Authenticate';
 import withLocale from './withLocale';
 import { useIntl } from '@kne/react-intl';
+
+import { getSourceIcon, SOURCE_LABEL_MAP } from './constants';
 
 const AfterTenantLoginLayout = createWithRemoteLoader({
   modules: ['components-admin:Authenticate@MainLayout', 'components-admin:UserTool']
@@ -27,7 +29,9 @@ const AfterTenantLoginLayout = createWithRemoteLoader({
                 },
                 rightOptions: (
                   <UserTool
-                    name={tenantUserInfo.name}
+                    name={tenantUserInfo.syncSource ? (
+                      <>{tenantUserInfo.name}<Tag icon={getSourceIcon(tenantUserInfo.syncSource)} color="processing" style={{ marginLeft: 6, verticalAlign: 'middle' }}>{SOURCE_LABEL_MAP[tenantUserInfo.syncSource] || tenantUserInfo.syncSource}</Tag></>
+                    ) : tenantUserInfo.name}
                     email={tenantUserInfo.email || tenantUserInfo.phone}
                     avatar={tenantUserInfo.avatar}
                     list={[

@@ -1,7 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState, useEffect, useMemo } from 'react';
 import { Flex } from 'antd';
-import useRefCallback from '@kne/use-ref-callback';
 import merge from 'lodash/merge';
 import Actions from './Actions';
 import Create from './Actions/Create';
@@ -25,7 +24,10 @@ const BizUnit = createWithRemoteLoader({
       getActionList,
       allowKeywordSearch = true,
       onMount,
-      options
+      options,
+      filter: outerFilter,
+      onFilterChange: outerOnFilterChange,
+      urlFilterValue
     }) => {
       const { formatMessage } = useIntl();
       options = merge(
@@ -51,12 +53,14 @@ const BizUnit = createWithRemoteLoader({
         options
       );
       const [TablePage, Filter] = remoteModules;
-      const ref = useRef();
-      const { SearchInput, getFilterValue } = Filter;
-      const [filter, setFilter] = useState([]);
+      const { SearchInput, getFilterValue, useUrlFilterValue } = Filter;
+      const ref = useRef(null);
+      const [urlFilter] = useUrlFilterValue(urlFilterValue || []);
+
+      const [filter, setFilter] = useState(urlFilter);
+
       const filterValue = options.mapFilterValue ? options.mapFilterValue(filter, getFilterValue) : getFilterValue(filter);
-      const filterParamsKey = useMemo(() => JSON.stringify(filterValue), [filterValue]);
-      const isFirstFilterEffect = useRef(true);
+
       const topOptions = (
         <Flex gap={8}>
           {allowKeywordSearch && <SearchInput size={topOptionsSize} name={options.keywordFilterName} label={options.keywordFilterLabel} />}
@@ -106,27 +110,6 @@ const BizUnit = createWithRemoteLoader({
         name
       });
 
-      const handlerMount = useRefCallback(() => {
-        onMount &&
-          onMount({
-            filter: { value: filter, onChange: setFilter },
-            filterList,
-            topOptions,
-            tableOptions
-          });
-      });
-
-      useEffect(() => {
-        handlerMount();
-      }, [handlerMount, filter]);
-
-      useEffect(() => {
-        if (isFirstFilterEffect.current) {
-          isFirstFilterEffect.current = false;
-          return;
-        }
-        ref.current?.reload?.();
-      }, [filterParamsKey]);
       if (typeof children === 'function') {
         return children({
           filter: { value: filter, onChange: setFilter, list: filterList },

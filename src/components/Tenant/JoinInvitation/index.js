@@ -20,12 +20,7 @@ const companyInitial = name => {
 };
 
 const JoinInvitation = createWithRemoteLoader({
-  modules: [
-    'components-core:Layout@Page',
-    'components-core:Global@usePreset',
-    'components-core:LoadingButton',
-    'components-core:Image'
-  ]
+  modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:LoadingButton', 'components-core:Image']
 })(({ remoteModules, baseUrl = '', token: propsToken, children }) => {
   const [Page, usePreset, LoadingButton, Image] = remoteModules;
   const [current, setCurrent] = useState(0);
@@ -59,9 +54,7 @@ const JoinInvitation = createWithRemoteLoader({
         <Typography.Title level={4} className={style.headerTitle}>
           {formatMessage({ id: 'InviteYouJoin' }, { name: company?.name || '' })}
         </Typography.Title>
-        <Typography.Paragraph className={style.headerSubtitle}>
-          {formatMessage({ id: 'InviteJoinSubtitle' })}
-        </Typography.Paragraph>
+        <Typography.Paragraph className={style.headerSubtitle}>{formatMessage({ id: 'InviteJoinSubtitle' })}</Typography.Paragraph>
       </div>
     </header>
   );
@@ -72,9 +65,7 @@ const JoinInvitation = createWithRemoteLoader({
         {...Object.assign({}, apis.tenant.parseJoinToken, {
           data: { token }
         })}
-        error={error =>
-          renderError(error || formatMessage({ id: 'InviteLinkExpired' }), formatMessage({ id: 'ContactAdmin' }))
-        }
+        error={error => renderError(error || formatMessage({ id: 'InviteLinkExpired' }), formatMessage({ id: 'ContactAdmin' }))}
         render={({ data }) => {
           const { tenant, tenantUser } = data;
           if (!(tenant && tenant.status === 'open' && tenantUser && tenantUser.status === 'open')) {
@@ -153,52 +144,40 @@ const JoinInvitation = createWithRemoteLoader({
                 {renderHeader(data.company)}
                 <div className={style.content}>
                   <div className={style.stepsWrap}>
-                    <Steps
-                      current={current}
-                      size="small"
-                      orientation="horizontal"
-                      titlePlacement="vertical"
-                      responsive={false}
-                      items={stepItems}
-                    />
+                    <Steps current={current} size="small" orientation="horizontal" titlePlacement="vertical" responsive={false} items={stepItems} />
                   </div>
                   <main className={style.main}>
                     {current === 0 && (
-                    <div className={classnames(style.stepPanel, style.stepPanelCompany)}>
-                      <CompanyInfo.Detail data={data.company} />
-                    </div>
-                  )}
-                  {current === 1 && (
-                    <div className={classnames(style.stepPanel, style.stepPanelEmployee)}>
-                      <Typography.Paragraph className={style.stepHint}>
-                        {formatMessage({ id: 'ConfirmEmployeeInfoHint' })}
-                      </Typography.Paragraph>
-                      <TenantUserPersonalCard
-                        data={tenantUser}
-                        positionList={data.positionList}
-                      />
-                    </div>
-                  )}
-                  {current === 2 && (
-                    <div className={classnames(style.stepPanel, style.stepPanelSuccess)}>
-                      <CheckCircleFilled className={style.successIcon} />
-                      <Typography.Title level={4} className={style.successTitle}>
-                        {formatMessage({ id: 'WelcomeJoin' }, { name: data.company.name })}
-                      </Typography.Title>
-                      <Typography.Paragraph className={style.successSub}>
-                        <span className={style.countdownNum}>
-                          <CountDown
-                            duration={5}
-                            format="s"
-                            onComplete={() => {
-                              window.location.href = `${baseUrl}/tenant`;
-                            }}
-                          />
-                        </span>
-                        {formatMessage({ id: 'AutoJump' })}
-                      </Typography.Paragraph>
-                    </div>
-                  )}
+                      <div className={classnames(style.stepPanel, style.stepPanelCompany)}>
+                        <CompanyInfo.Detail data={data.company} />
+                      </div>
+                    )}
+                    {current === 1 && (
+                      <div className={classnames(style.stepPanel, style.stepPanelEmployee)}>
+                        <Typography.Paragraph className={style.stepHint}>{formatMessage({ id: 'ConfirmEmployeeInfoHint' })}</Typography.Paragraph>
+                        <TenantUserPersonalCard data={tenantUser} positionList={data.positionList} />
+                      </div>
+                    )}
+                    {current === 2 && (
+                      <div className={classnames(style.stepPanel, style.stepPanelSuccess)}>
+                        <CheckCircleFilled className={style.successIcon} />
+                        <Typography.Title level={4} className={style.successTitle}>
+                          {formatMessage({ id: 'WelcomeJoin' }, { name: data.company.name })}
+                        </Typography.Title>
+                        <Typography.Paragraph className={style.successSub}>
+                          <span className={style.countdownNum}>
+                            <CountDown
+                              duration={5}
+                              format="s"
+                              onComplete={() => {
+                                window.location.href = `${baseUrl}/tenant`;
+                              }}
+                            />
+                          </span>
+                          {formatMessage({ id: 'AutoJump' })}
+                        </Typography.Paragraph>
+                      </div>
+                    )}
                   </main>
                 </div>
                 {footerNode ? <footer className={footerClassName}>{footerNode}</footer> : null}

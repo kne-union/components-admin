@@ -36,6 +36,21 @@ const useFilterList = ({ formatMessage, apis, InputFilterItem, AdvancedSelectFil
               ]
             })
           }}
+        />,
+        <AdvancedSelectFilterItem
+          key="synced"
+          label={formatMessage({ id: 'FilterSynced' })}
+          name="synced"
+          single
+          allowClear
+          api={{
+            loader: () => ({
+              pageData: [
+                { label: formatMessage({ id: 'Yes' }), value: 'true' },
+                { label: formatMessage({ id: 'No' }), value: 'false' }
+              ]
+            })
+          }}
         />
       ]
     ],
