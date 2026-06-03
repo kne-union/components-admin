@@ -13,7 +13,7 @@ const Dashboard = createWithRemoteLoader({
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {} }) => {
     const [usePreset, Page] = remoteModules;
-    const { apis } = usePreset();
+    const { apis, ajax } = usePreset();
     const { formatMessage } = useIntl();
 
     return (
@@ -24,7 +24,7 @@ const Dashboard = createWithRemoteLoader({
         children={
           <div className={style.dashboardRoot}>
             <div className={`${style.sectionPanel} ${style.realtimeSectionWrap}`}>
-              <RealtimeSection apis={apis} baseUrl={baseUrl} />
+              <RealtimeSection apis={apis} ajax={ajax} baseUrl={baseUrl} />
             </div>
             <Divider className={style.sectionDivider} />
             <div className={style.sectionPanel}>

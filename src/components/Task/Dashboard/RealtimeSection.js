@@ -64,7 +64,7 @@ const buildTodayHourlySlots = raw => {
 const RealtimeSection = createWithRemoteLoader({
   modules: ['components-thirdparty:Echart', 'components-core:Enum']
 })(
-  withLocale(({ remoteModules, apis, baseUrl }) => {
+  withLocale(({ remoteModules, apis, ajax, baseUrl }) => {
     const [Echart, Enum] = remoteModules;
     const { formatMessage } = useIntl();
     const navigate = useNavigate();
@@ -87,7 +87,7 @@ const RealtimeSection = createWithRemoteLoader({
       [goMyTasks, myTaskPath]
     );
     const sseUrl = apis?.task?.statistics?.sse?.url;
-    const { realtimeData, isConnected, lastUpdatedAt } = useRealtimeStatisticsSSE(sseUrl);
+    const { realtimeData, isConnected, lastUpdatedAt } = useRealtimeStatisticsSSE(sseUrl, ajax);
     /** 执行时间统计三张卡 + 按类型耗时图：全部 | 手动 | 自动（todayDuration / byTypeByRunnerType） */
     const [durationByTypeRunnerMode, setDurationByTypeRunnerMode] = useState('all');
 

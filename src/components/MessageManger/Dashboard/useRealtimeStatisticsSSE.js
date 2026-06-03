@@ -1,8 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getToken } from '@kne/token-storage';
-import { buildUrlWithParams } from './constants';
 import { getClientIanaTimezone } from '../utils';
-import useManagedEventSource from '../../../utils/useManagedEventSource';
 
 const isLikelyStatisticsPayload = obj =>
   obj &&
@@ -40,36 +38,40 @@ const unwrapStatisticsPayload = parsed => {
   return null;
 };
 
-const useRealtimeStatisticsSSE = sseUrl => {
+const useRealtimeStatisticsSSE = (sseUrl, ajax) => {
   const [realtimeData, setRealtimeData] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
 
-  const streamUrl = useMemo(() => {
-    if (!sseUrl) return null;
-    return buildUrlWithParams(sseUrl, {
-      interval: 5,
-      token: getToken('X-User-Token'),
-      timezone: getClientIanaTimezone()
-    });
-  }, [sseUrl]);
+  useEffect(() => {
+    if (!sseUrl || !ajax || typeof ajax.sse !== 'function') {
+      setIsConnected(false);
+      return undefined;
+    }
 
-  useManagedEventSource(streamUrl, {
-    onOpen: () => setIsConnected(true),
-    onError: () => setIsConnected(false),
-    onMessage: event => {
-      try {
-        const parsed = JSON.parse(event.data);
+    const connection = ajax.sse({
+      url: sseUrl,
+      params: {
+        interval: 5,
+        token: getToken('X-User-Token'),
+        timezone: getClientIanaTimezone()
+      },
+      onOpen: () => setIsConnected(true),
+      onError: () => setIsConnected(false),
+      onMessage: parsed => {
         const nextData = unwrapStatisticsPayload(parsed);
         if (!nextData) return;
         setRealtimeData(prev => (prev && typeof prev === 'object' ? { ...prev, ...nextData } : nextData));
         setLastUpdatedAt(Date.now());
         setIsConnected(true);
-      } catch {
-        // ignore parse errors
       }
-    }
-  });
+    });
+
+    return () => {
+      connection?.close?.();
+      setIsConnected(false);
+    };
+  }, [ajax, sseUrl]);
 
   return { realtimeData, isConnected, lastUpdatedAt };
 };
