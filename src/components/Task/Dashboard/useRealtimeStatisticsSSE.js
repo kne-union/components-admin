@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { getToken } from '@kne/token-storage';
-import { buildUrlWithParams } from './constants';
 import { getClientIanaTimezone } from '../utils';
 
 /** 任务实时统计 SSE：负载字段约定见 `src/components/Task/doc/api.md`「任务实时统计 SSE」。 */
@@ -45,43 +44,40 @@ const unwrapStatisticsPayload = parsed => {
   return null;
 };
 
-const useRealtimeStatisticsSSE = sseUrl => {
+const useRealtimeStatisticsSSE = (sseUrl, ajax) => {
   const [realtimeData, setRealtimeData] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
 
   useEffect(() => {
-    if (!sseUrl || typeof window === 'undefined' || typeof window.EventSource !== 'function') {
+    if (!sseUrl || !ajax || typeof ajax.sse !== 'function') {
+      setIsConnected(false);
       return undefined;
     }
 
-    const source = new EventSource(
-      buildUrlWithParams(sseUrl, {
+    const connection = ajax.sse({
+      url: sseUrl,
+      params: {
         interval: 5,
         token: getToken('X-User-Token'),
         timezone: getClientIanaTimezone()
-      })
-    );
-
-    source.onopen = () => setIsConnected(true);
-    source.onmessage = event => {
-      try {
-        const parsed = JSON.parse(event.data);
+      },
+      onOpen: () => setIsConnected(true),
+      onMessage: parsed => {
         const nextData = unwrapStatisticsPayload(parsed);
         if (!nextData) return;
         setRealtimeData(prev => (prev && typeof prev === 'object' ? { ...prev, ...nextData } : nextData));
         setLastUpdatedAt(Date.now());
         setIsConnected(true);
-      } catch {
-        // ignore parse errors
-      }
-    };
-    source.onerror = () => setIsConnected(false);
+      },
+      onError: () => setIsConnected(false)
+    });
 
     return () => {
-      source.close();
+      connection?.close?.();
+      setIsConnected(false);
     };
-  }, [sseUrl]);
+  }, [ajax, sseUrl]);
 
   return { realtimeData, isConnected, lastUpdatedAt };
 };

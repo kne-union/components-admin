@@ -109,11 +109,11 @@ const buildRealtimeDisplayStats = raw => {
 const RealtimeSection = createWithRemoteLoader({
   modules: ['components-thirdparty:Echart']
 })(
-  withLocale(({ remoteModules, apis }) => {
+  withLocale(({ remoteModules, apis, ajax }) => {
     const [Echart] = remoteModules;
     const { formatMessage } = useIntl();
     const sseUrl = apis?.messageManger?.statistics?.sse?.url;
-    const { realtimeData, isConnected, lastUpdatedAt } = useRealtimeStatisticsSSE(sseUrl);
+    const { realtimeData, isConnected, lastUpdatedAt } = useRealtimeStatisticsSSE(sseUrl, ajax);
 
     const displayStats = useMemo(() => buildRealtimeDisplayStats(realtimeData), [realtimeData]);
 
