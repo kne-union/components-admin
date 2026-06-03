@@ -1,51 +1,25 @@
 import React from 'react';
 import { preset as fetchPreset } from '@kne/react-fetch';
 import { Spin, Empty, message } from 'antd';
-import axios from 'axios';
+import createAjax from '@kne/axios-fetch';
 import { preset as remoteLoaderPreset } from '@kne/remote-loader';
-import omit from 'lodash/omit';
 
 window.PUBLIC_URL = window.runtimePublicUrl || process.env.PUBLIC_URL;
 
 export const globalInit = async () => {
-  const ajax = (() => {
-    const instance = axios.create({
-      validateStatus: function () {
-        return true;
+  const ajax = createAjax({
+    errorHandler: errorMessage => message.error(errorMessage || '请求发生错误'),
+    showResponseError: response => {
+      if (response.config.showError === false) {
+        return false;
       }
-    });
-
-    instance.interceptors.response.use(
-      response => {
-        if (response.status !== 200) {
-          response.showError !== false && response.config.showError !== false && message.error(response?.data?.msg || '请求发生错误');
-        }
-        return response;
-      },
-      error => {
-        message.error(error.message || '请求发生错误');
-        return Promise.reject(error);
-      }
-    );
-
-    return params => {
-      if (params.hasOwnProperty('loader') && typeof params.loader === 'function') {
-        return Promise.resolve(params.loader(omit(params, ['loader'])))
-          .then(data => ({
-            data: {
-              code: 0,
-              data
-            }
-          }))
-          .catch(err => {
-            message.error(err.message || '请求发生错误');
-            return { data: { code: 500, msg: err.message } };
-          });
-      }
-
-      return instance(params);
-    };
-  })();
+      return response.status !== 200;
+    },
+    getResponseError: response => response?.data?.msg,
+    validateStatus: function () {
+      return true;
+    }
+  });
   fetchPreset({
     ajax,
     loading: (

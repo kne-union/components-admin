@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.1.43",
+  "version": "1.1.44",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
@@ -85,6 +85,7 @@
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
     "@kne/app-children-router": "^0.1.7",
+    "@kne/axios-fetch": "^1.2.0",
     "@kne/column-split": "^1.0.5",
     "@kne/count-down": "^0.2.2",
     "@kne/is-empty": "^1.0.1",
