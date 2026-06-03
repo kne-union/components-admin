@@ -68,7 +68,7 @@ const useRealtimeStatisticsSSE = (sseUrl, ajax) => {
     });
 
     return () => {
-      connection?.close?.();
+      connection.then(({ close }) => close());
       setIsConnected(false);
     };
   }, [ajax, sseUrl]);
