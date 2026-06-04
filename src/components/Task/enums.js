@@ -1,20 +1,17 @@
-const TASK_STATUS_ENUM = [
-  { value: 'pending', description: '等待执行', type: 'info' },
-  {
-    value: 'running',
-    description: '执行中',
-    type: 'progress'
-  },
-  { value: 'waiting', description: '等待操作', type: 'info' },
-  {
-    value: 'success',
-    description: '成功',
-    type: 'success'
-  },
-  { value: 'failed', description: '失败', type: 'danger' },
-  { value: 'canceled', description: '取消' }
-];
+import { createFormatMessage } from './withLocale';
 
-const enums = { taskStatus: TASK_STATUS_ENUM };
+const taskStatus = ({ locale }) => {
+  const formatMessage = createFormatMessage(locale);
+  return [
+    { description: formatMessage({ id: 'Pending' }), value: 'pending', type: 'info' },
+    { description: formatMessage({ id: 'Running' }), value: 'running', type: 'progress' },
+    { description: formatMessage({ id: 'Waiting' }), value: 'waiting', type: 'info' },
+    { description: formatMessage({ id: 'Success' }), value: 'success', type: 'success' },
+    { description: formatMessage({ id: 'Failed' }), value: 'failed', type: 'danger' },
+    { description: formatMessage({ id: 'Canceled' }), value: 'canceled' }
+  ];
+};
+
+const enums = { taskStatus };
 
 export default enums;
