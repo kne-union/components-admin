@@ -1,4 +1,4 @@
-import { createWithIntlProvider } from '@kne/react-intl';
+import { createWithIntlProvider, createIntl } from '@kne/react-intl';
 import zhCN from './locale/zh-CN';
 import enUS from './locale/en-US';
 
@@ -10,5 +10,17 @@ const withLocale = createWithIntlProvider({
   },
   namespace: 'components-admin:Task'
 });
+
+export const createFormatMessage = locale => {
+  const { formatMessage } = createIntl({
+    locale,
+    messages: {
+      'zh-CN': zhCN,
+      'en-US': enUS
+    },
+    namespace: 'components-admin:Task'
+  });
+  return formatMessage;
+};
 
 export default withLocale;
