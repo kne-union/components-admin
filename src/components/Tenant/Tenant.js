@@ -24,6 +24,7 @@ const Tenant = createWithRemoteLoader({
                   navigation={{
                     base: `${baseUrl}/tenant`,
                     showIndex: false,
+                    defaultTitle: navigation.defaultTitle,
                     list: [
                       ...(navigation.list || []),
                       {

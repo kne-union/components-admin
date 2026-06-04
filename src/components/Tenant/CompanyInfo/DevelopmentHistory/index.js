@@ -2,6 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Empty } from 'antd';
 import dayjs from 'dayjs';
 import Timeline from '@kne/timeline';
+import ensureSlash from '@kne/ensure-slash';
 import withLocale from '../../withLocale';
 import style from '../style.module.scss';
 
@@ -16,7 +17,7 @@ const resolveImageSrc = (id, origin) => {
   if (typeof id === 'string' && /^https?:\/\//i.test(id)) {
     return id;
   }
-  return `${origin}/api/v1/static/file-id/${id}`;
+  return `${ensureSlash(origin) || window.location.origin}/api/v1/static/file-id/${id}`;
 };
 
 const DevelopmentHistory = createWithRemoteLoader({
@@ -31,8 +32,6 @@ const DevelopmentHistory = createWithRemoteLoader({
       return <Empty />;
     }
 
-    const origin = (typeof staticUrl === 'string' && staticUrl) || (typeof window !== 'undefined' ? window.location.origin : '');
-
     const timelineData = list.map(item => {
       const row = {
         title: formatTime(item.time),
@@ -40,7 +39,7 @@ const DevelopmentHistory = createWithRemoteLoader({
       };
       if (item.images && item.images.length > 0) {
         row.images = item.images.map(id => ({
-          src: resolveImageSrc(id, origin)
+          src: resolveImageSrc(id, staticUrl)
         }));
       }
       if (item.extra) {
