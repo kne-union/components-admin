@@ -1,4 +1,4 @@
-export const RANGE_OPTIONS = ['7d', '1m', '1y'];
+export const RANGE_OPTIONS = ['7d', '1m', '3m', '1y'];
 
 export const buildUrlWithParams = (url, params = {}) => {
   const query = Object.keys(params)

@@ -166,7 +166,7 @@ const getApis = options => {
       statistics: {
         /**
          * 历史统计看板（GET）。
-         * Query：`range`（7d|1m|1y）、`timezone`（IANA，与「今日」划界一致）。
+         * Query：`range`（7d|1m|3m|1y）、`timezone`（IANA，与「今日」划界一致）。
          * 响应字段约定见 `src/components/Task/doc/api.md`「任务统计 HTTP」。
          */
         getOverview: {
