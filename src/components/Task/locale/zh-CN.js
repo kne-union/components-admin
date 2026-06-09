@@ -93,6 +93,7 @@ const locale = {
   TotalTasks: '任务总数',
   Range_7d: '近7天',
   Range_1m: '近1个月',
+  Range_3m: '近3个月',
   Range_1y: '近1年',
   Refresh: '刷新',
   Dawn: '凌晨',
@@ -104,6 +105,7 @@ const locale = {
   HistoricalHourlyTrendTitle: '每小时趋势',
   HourlyTrendModeByType: '按任务类型',
   HourlyTrendModeByStatus: '按任务状态',
+  TaskTypeFilterPlaceholder: '全部',
   StatusDistribution: '任务状态分布',
   TaskTypeDistribution: '任务类型分布'
 };

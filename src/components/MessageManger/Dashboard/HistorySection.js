@@ -26,10 +26,47 @@ import SectionHeader from './SectionHeader';
 import { getClientIanaTimezone } from '../utils';
 import style from './dashboard.module.scss';
 
-const RANGE_DAY_COUNT = { '7d': 7, '1m': 30, '1y': 365 };
+const RANGE_DAY_COUNT = { '7d': 7, '1m': 30, '3m': 90, '1y': 365 };
+const RANGE_AXIS_UNIT = { '7d': 'day', '1m': 'month', '3m': 'month', '1y': 'year' };
+const RANGE_MONTH_COUNT = { '1m': 1, '3m': 3 };
 
-/** 本地日历上从 range 起点到今天的日期轴（YYYY-MM-DD） */
-const buildLocalDateAxisForRange = rangeKey => {
+const getAxisUnit = rangeKey => RANGE_AXIS_UNIT[rangeKey] || 'day';
+
+const formatAxisKey = (date, unit) => {
+  const value = String(date || '');
+  if (unit === 'year') return value.slice(0, 4);
+  if (unit === 'month') return value.slice(0, 7);
+  return value.slice(0, 10);
+};
+
+/** 本地日历上从 range 起点到今天的时间轴，随视图切换日/月/年粒度 */
+const buildLocalAxisForRange = rangeKey => {
+  const axisUnit = getAxisUnit(rangeKey);
+  if (axisUnit === 'year') {
+    const now = new Date();
+    const startYear = now.getFullYear() - 1;
+    return Array.from({ length: now.getFullYear() - startYear + 1 }, (_, i) => String(startYear + i));
+  }
+
+  if (axisUnit === 'month') {
+    const cursor = new Date();
+    cursor.setHours(0, 0, 0, 0);
+    cursor.setDate(1);
+    cursor.setMonth(cursor.getMonth() - (RANGE_MONTH_COUNT[rangeKey] || 1));
+    const end = new Date();
+    end.setHours(0, 0, 0, 0);
+    end.setDate(1);
+
+    const months = [];
+    while (cursor <= end) {
+      const y = cursor.getFullYear();
+      const m = String(cursor.getMonth() + 1).padStart(2, '0');
+      months.push(`${y}-${m}`);
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+    return months;
+  }
+
   const days = RANGE_DAY_COUNT[rangeKey] || 7;
   const dates = [];
   for (let i = days - 1; i >= 0; i -= 1) {
@@ -88,12 +125,17 @@ const HistorySection = createWithRemoteLoader({
           const trendOption = (() => {
             const recentTrend = data?.recentTrend || [];
             const recentTrendByType = data?.recentTrendByType || [];
-            const axisDates = recentTrend.length > 0 ? null : buildLocalDateAxisForRange(range);
+            const axisUnit = getAxisUnit(range);
+            const axisDates = recentTrend.length > 0 ? null : buildLocalAxisForRange(range);
 
             const dateMap = {};
             if (recentTrend.length > 0) {
               recentTrend.forEach(item => {
-                dateMap[item.date] = { date: item.date, total: item.count };
+                const date = formatAxisKey(item.date, axisUnit);
+                if (!dateMap[date]) {
+                  dateMap[date] = { date, total: 0 };
+                }
+                dateMap[date].total += Number(item.count) || 0;
               });
             } else {
               axisDates.forEach(d => {
@@ -101,11 +143,12 @@ const HistorySection = createWithRemoteLoader({
               });
             }
             recentTrendByType.forEach(item => {
-              if (!dateMap[item.date]) {
-                dateMap[item.date] = { date: item.date, total: 0 };
+              const date = formatAxisKey(item.date, axisUnit);
+              if (!dateMap[date]) {
+                dateMap[date] = { date, total: 0 };
               }
               const key = item.type === 0 ? 'email' : 'sms';
-              dateMap[item.date][key] = item.count;
+              dateMap[date][key] = (dateMap[date][key] || 0) + (Number(item.count) || 0);
             });
 
             const sorted = Object.values(dateMap).sort((a, b) => a.date.localeCompare(b.date));

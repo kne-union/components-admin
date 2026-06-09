@@ -93,6 +93,7 @@ const locale = {
   TotalTasks: 'Total Tasks',
   Range_7d: 'Last 7 Days',
   Range_1m: 'Last Month',
+  Range_3m: 'Last 3 Months',
   Range_1y: 'Last Year',
   Refresh: 'Refresh',
   Dawn: 'Dawn',
@@ -104,6 +105,7 @@ const locale = {
   HistoricalHourlyTrendTitle: 'Hourly trend',
   HourlyTrendModeByType: 'By task type',
   HourlyTrendModeByStatus: 'By task status',
+  TaskTypeFilterPlaceholder: 'All',
   StatusDistribution: 'Status Distribution',
   TaskTypeDistribution: 'Task Type Distribution'
 };

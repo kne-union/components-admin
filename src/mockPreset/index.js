@@ -119,7 +119,7 @@ const apis = merge({}, getApis(), {
         loader: ({ params }) => {
           const range = params?.range || '7d';
           const now = new Date();
-          const days = range === '1y' ? 365 : range === '1m' ? 30 : 7;
+          const days = range === '1y' ? 365 : range === '3m' ? 90 : range === '1m' ? 30 : 7;
           const recentTrend = [];
           const recentTrendByStatus = [];
           const recentTrendByType = [];
@@ -159,6 +159,16 @@ const apis = merge({}, getApis(), {
               byRunnerType: {
                 manual: { count: Math.floor(total * 0.4), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 },
                 system: { count: Math.ceil(total * 0.6), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
+              },
+              byTypeByRunnerType: {
+                manual: {
+                  export: { count: Math.floor(total * 0.25), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 },
+                  import: { count: Math.ceil(total * 0.15), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
+                },
+                system: {
+                  export: { count: Math.floor(total * 0.35), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 },
+                  import: { count: Math.ceil(total * 0.25), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
+                }
               }
             });
             ['import', 'export'].forEach(type => {
@@ -186,7 +196,7 @@ const apis = merge({}, getApis(), {
           const totalWaiting = recentTrendByStatus.filter(item => item.status === 'waiting').reduce((sum, item) => sum + item.count, 0);
           return {
             range,
-            rangeLabel: range === '7d' ? '近7天' : range === '1m' ? '近1个月' : '近1年',
+            rangeLabel: range === '7d' ? '近7天' : range === '1m' ? '近1个月' : range === '3m' ? '近3个月' : '近1年',
             totalTasks: totalSuccess + totalFailed + totalRunning + totalPending + totalCanceled + totalWaiting,
             byStatus: { success: totalSuccess, failed: totalFailed, running: totalRunning, pending: totalPending, canceled: totalCanceled, waiting: totalWaiting },
             byType: { export: Math.floor((totalSuccess + totalFailed) * 0.6), import: Math.ceil((totalSuccess + totalFailed) * 0.4) },
@@ -849,7 +859,7 @@ const apis = merge({}, getApis(), {
         loader: ({ params }) => {
           const range = params?.range || '7d';
           const now = new Date();
-          const days = range === '1y' ? 365 : range === '1m' ? 30 : 7;
+          const days = range === '1y' ? 365 : range === '3m' ? 90 : range === '1m' ? 30 : 7;
           const recentTrend = [];
           const recentTrendByType = [];
           for (let i = days - 1; i >= 0; i--) {
@@ -867,7 +877,7 @@ const apis = merge({}, getApis(), {
           const smsTotal = recentTrendByType.filter(item => item.type === 1).reduce((sum, item) => sum + item.count, 0);
           return {
             range,
-            rangeLabel: range === '7d' ? '近7天' : range === '1m' ? '近1个月' : '近1年',
+            rangeLabel: range === '7d' ? '近7天' : range === '1m' ? '近1个月' : range === '3m' ? '近3个月' : '近1年',
             totalRecords,
             byType: { '0': emailTotal, '1': smsTotal },
             byCode: { welcome: Math.floor(totalRecords * 0.4), verify: Math.floor(totalRecords * 0.3), notification: Math.floor(totalRecords * 0.2), alert: totalRecords - Math.floor(totalRecords * 0.4) - Math.floor(totalRecords * 0.3) - Math.floor(totalRecords * 0.2) },
