@@ -55,7 +55,7 @@ export const globalInit = async () => {
   const componentsCoreRemote = {
     ...registry,
     remote: 'components-core',
-    defaultVersion: '0.4.73'
+    defaultVersion: '0.5.0'
   };
   remoteLoaderPreset({
     remotes: {
@@ -71,7 +71,7 @@ export const globalInit = async () => {
         //url: 'http://localhost:3010',
         //tpl: '{{url}}',
         remote: 'components-thirdparty',
-        defaultVersion: '0.1.17'
+        defaultVersion: '0.1.24'
       },
       'components-admin':
         process.env.NODE_ENV === 'development'

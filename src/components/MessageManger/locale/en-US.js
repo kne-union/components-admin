@@ -54,6 +54,7 @@ const messages = {
   TotalCount: 'Total Count',
   Range_7d: 'Last 7 Days',
   Range_1m: 'Last Month',
+  Range_3m: 'Last 3 Months',
   Range_1y: 'Last Year',
   Refresh: 'Refresh',
   RealtimeConnected: 'Realtime Connected',

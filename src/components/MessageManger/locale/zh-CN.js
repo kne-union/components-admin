@@ -54,6 +54,7 @@ const messages = {
   TotalCount: '总数',
   Range_7d: '近7天',
   Range_1m: '近1个月',
+  Range_3m: '近3个月',
   Range_1y: '近1年',
   Refresh: '刷新',
   RealtimeConnected: '实时已连接',
