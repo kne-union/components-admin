@@ -18,7 +18,7 @@ const DeadLetterList = createWithRemoteLoader({
     const { formatMessage } = useIntl();
     const { apis } = usePreset();
     const { SearchInput, getFilterValue, fields: filterFields } = Filter;
-    const { InputFilterItem, AdvancedSelectFilterItem } = filterFields;
+    const { InputFilterItem, SuperSelectFilterItem } = filterFields;
     const ref = useRef(null);
     const [filter, setFilter] = useState([]);
     const [selected, setSelected] = useState({
@@ -92,7 +92,7 @@ const DeadLetterList = createWithRemoteLoader({
             list: [
               [
                 <InputFilterItem label={formatMessage({ id: 'Topic' })} name="topic" />,
-                <AdvancedSelectFilterItem
+                <SuperSelectFilterItem
                   label={formatMessage({ id: 'Replayed' })}
                   name="replayed"
                   single
