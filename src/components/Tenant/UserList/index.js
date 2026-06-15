@@ -42,7 +42,7 @@ const UserList = createWithRemoteLoader({
         multiSelectInterceptor,
         fields: filterFields
       } = Filter;
-      const { InputFilterItem, AdvancedSelectFilterItem, SuperSelectFilterItem } = filterFields;
+      const { InputFilterItem, SuperSelectFilterItem } = filterFields;
       const { plugins } = usePreset();
 
       const selectedRow = useSelectedRow();
@@ -119,7 +119,6 @@ const UserList = createWithRemoteLoader({
         formatMessage,
         apis,
         InputFilterItem,
-        AdvancedSelectFilterItem,
         SuperSelectFilterItem,
         multiSelectInterceptor
       });

@@ -19,7 +19,7 @@ const UserInner = createWithRemoteLoader({
   const pageProps = Object.assign({}, contextProps?.pageProps, propsPageProps);
   const [filter, setFilter] = useState([]);
   const { SearchInput, getFilterValue, fields: filterFields } = Filter;
-  const { InputFilterItem, AdvancedSelectFilterItem } = filterFields;
+  const { InputFilterItem, SuperSelectFilterItem } = filterFields;
   const { ajax, apis } = usePreset();
   const formModal = useFormModal();
   const { message } = App.useApp();
@@ -190,7 +190,7 @@ const UserInner = createWithRemoteLoader({
             [
               <InputFilterItem label={formatMessage({ id: 'FilterEmail' })} name="email" />,
               <InputFilterItem label={formatMessage({ id: 'FilterPhone' })} name="phone" />,
-              <AdvancedSelectFilterItem
+              <SuperSelectFilterItem
                 label={formatMessage({ id: 'FilterStatus' })}
                 name="status"
                 single
@@ -209,7 +209,7 @@ const UserInner = createWithRemoteLoader({
                   }
                 }}
               />,
-              <AdvancedSelectFilterItem
+              <SuperSelectFilterItem
                 label={formatMessage({ id: 'FilterIsAdmin' })}
                 name="isSuperAdmin"
                 single
