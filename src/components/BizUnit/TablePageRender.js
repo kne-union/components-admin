@@ -7,10 +7,14 @@ const TablePageRender = createWithRemoteLoader({
   return (
     <TablePage
       {...tableOptions}
-      page={{
-        filter,
-        titleExtra
-      }}
+      page={Object.assign(
+        {},
+        {
+          filter,
+          titleExtra
+        },
+        tableOptions.page
+      )}
     />
   );
 });

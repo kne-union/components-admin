@@ -3,7 +3,7 @@ import merge from 'lodash/merge';
 import DepartmentTreeFilterItem from './DepartmentTreeFilterItem';
 import getRoleListApi from '../Role/getRoleListApi';
 
-const useFilterList = ({ formatMessage, apis, InputFilterItem, AdvancedSelectFilterItem, SuperSelectFilterItem, multiSelectInterceptor }) => {
+const useFilterList = ({ formatMessage, apis, InputFilterItem, SuperSelectFilterItem, multiSelectInterceptor }) => {
   return useMemo(
     () => [
       [
@@ -23,7 +23,7 @@ const useFilterList = ({ formatMessage, apis, InputFilterItem, AdvancedSelectFil
           name="tenantOrgId"
           api={merge({}, apis.orgList, { params: apis.orgList?.params || {} })}
         />,
-        <AdvancedSelectFilterItem
+        <SuperSelectFilterItem
           key="status"
           label={formatMessage({ id: 'FilterStatus' })}
           name="status"
@@ -37,7 +37,7 @@ const useFilterList = ({ formatMessage, apis, InputFilterItem, AdvancedSelectFil
             })
           }}
         />,
-        <AdvancedSelectFilterItem
+        <SuperSelectFilterItem
           key="synced"
           label={formatMessage({ id: 'FilterSynced' })}
           name="synced"
@@ -54,7 +54,7 @@ const useFilterList = ({ formatMessage, apis, InputFilterItem, AdvancedSelectFil
         />
       ]
     ],
-    [formatMessage, apis.roleList, apis.orgList, InputFilterItem, AdvancedSelectFilterItem, SuperSelectFilterItem]
+    [formatMessage, apis.roleList, apis.orgList, InputFilterItem, SuperSelectFilterItem]
   );
 };
 

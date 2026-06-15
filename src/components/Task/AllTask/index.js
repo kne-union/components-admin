@@ -23,7 +23,7 @@ const AllTask = createWithRemoteLoader({
     const { formatMessage } = useIntl();
     const { apis, enums } = usePreset();
     const { SearchInput, getFilterValue, fields: filterFields } = Filter;
-    const { InputFilterItem, AdvancedSelectFilterItem, SuperSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
+    const { InputFilterItem, SuperSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
     const ref = useRef(null);
     const [filter, setFilter] = useState([]);
     const [sort, setSortChange] = useState([]);
@@ -174,7 +174,7 @@ const AllTask = createWithRemoteLoader({
                     );
                   }}
                 />,
-                <AdvancedSelectFilterItem
+                <SuperSelectFilterItem
                   label={formatMessage({ id: 'ExecutionMode' })}
                   name="runnerType"
                   single
