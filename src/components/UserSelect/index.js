@@ -1,4 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import merge from 'lodash/merge';
 
 const createComponent = (callback = item => item) => {
   return createWithRemoteLoader({
@@ -11,12 +12,13 @@ const createComponent = (callback = item => item) => {
     return (
       <Component
         {...props}
-        api={Object.assign(
+        pagination={{ paramsType: 'params' }}
+        api={merge(
           {},
           apis.admin.getUserList,
           {
-            data: {
-              filter: Object.assign(
+            params: {
+              filter: merge(
                 {},
                 Number.isInteger(status) && {
                   status
