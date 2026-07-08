@@ -1,14 +1,36 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useRef, useState } from 'react';
 import { Flex } from 'antd';
 import merge from 'lodash/merge';
-import Actions from './Actions';
 import Create from './Actions/Create';
+import Actions from './Actions';
 import withLocale from './withLocale';
 import { useIntl } from '@kne/react-intl';
 import TablePageRender from './TablePageRender';
+import buildOptionsColumn from './buildOptionsColumn';
+
+const isTablePageFilterConfig = value =>
+  value != null && typeof value === 'object' && !Array.isArray(value) && Array.isArray(value.list);
+
+const normalizeTableFilterList = list => {
+  if (!Array.isArray(list)) {
+    return list;
+  }
+  if (list.length > 0 && Array.isArray(list[0])) {
+    return list.flat();
+  }
+  return list;
+};
+
+const normalizeTableFilterConfig = filterConfig => {
+  const { displayLine, list, ...rest } = filterConfig;
+  return Object.assign({}, rest, {
+    list: normalizeTableFilterList(list)
+  });
+};
+
 const BizUnit = createWithRemoteLoader({
-  modules: ['components-core:Table@TablePage', 'components-core:Filter']
+  modules: ['components-core:Layout@TablePage', 'components-core:Table@TablePage', 'components-core:Filter']
 })(
   withLocale(
     ({
@@ -20,12 +42,13 @@ const BizUnit = createWithRemoteLoader({
       children,
       getColumns,
       getFormInner,
-      filterList = [],
+      filter,
+      filterList,
       getActionList,
       allowKeywordSearch = true,
-      onMount,
+      isNext = false,
+      page,
       options,
-      filter: outerFilter,
       onFilterChange: outerOnFilterChange,
       urlFilterValue
     }) => {
@@ -52,79 +75,143 @@ const BizUnit = createWithRemoteLoader({
         },
         options
       );
-      const [TablePage, Filter] = remoteModules;
+      const filterConfig = filter ?? filterList ?? [];
+      const [LayoutTablePage, LegacyTablePage, Filter] = remoteModules;
+      const TablePage = isNext ? LayoutTablePage : LegacyTablePage;
       const { SearchInput, getFilterValue, useUrlFilterValue } = Filter;
       const ref = useRef(null);
       const [urlFilter] = useUrlFilterValue(urlFilterValue || []);
 
-      const [filter, setFilter] = useState(urlFilter);
+      const [filterValue, setFilterValue] = useState(urlFilter);
 
-      const filterValue = options.mapFilterValue ? options.mapFilterValue(filter, getFilterValue) : getFilterValue(filter);
+      const legacyFilterList = isTablePageFilterConfig(filterConfig) ? filterConfig.list : filterConfig;
 
-      const topOptions = (
+      const filterValueForApi = options.mapFilterValue
+        ? options.mapFilterValue(filterValue, getFilterValue)
+        : getFilterValue(filterValue);
+
+      const reloadTable = () => {
+        ref.current?.reload();
+      };
+
+      const toolbarExtra = (
         <Flex gap={8}>
-          {allowKeywordSearch && <SearchInput size={topOptionsSize} name={options.keywordFilterName} label={options.keywordFilterLabel} />}
           {apis.create && (
             <Create
               getFormInner={getFormInner}
               apis={apis}
               options={options}
-              onSuccess={() => {
-                tableOptions.ref.current.reload();
-              }}
+              onSuccess={reloadTable}
             />
           )}
           {titleExtra}
         </Flex>
       );
 
-      const tableOptions = merge({}, options.tableProps, merge({}, apis.list, options.getFilterValue(filterValue)), {
-        ref,
-        columns: [
-          ...getColumns(),
-          {
-            name: 'options',
-            type: 'options',
-            title: formatMessage({ id: 'Operation' }),
-            fixed: 'right',
-            valueOf: (item, fetchOptions) => {
-              return {
-                children: (
-                  <Actions
-                    moreType="link"
-                    data={item}
-                    fetchOptions={fetchOptions}
-                    apis={apis}
-                    options={options}
-                    getActionList={getActionList}
-                    getFormInner={getFormInner}
-                    onSuccess={() => {
-                      tableOptions.ref.current.reload();
-                    }}
-                  />
-                )
-              };
-            }
+      const topOptions = (
+        <Flex gap={8}>
+          {allowKeywordSearch && <SearchInput size={topOptionsSize} name={options.keywordFilterName} label={options.keywordFilterLabel} />}
+          {toolbarExtra}
+        </Flex>
+      );
+
+      const resolveNextFilter = () => {
+        if (!isTablePageFilterConfig(filterConfig)) {
+          return null;
+        }
+        return merge(
+          {},
+          normalizeTableFilterConfig(filterConfig),
+          urlFilterValue ? { defaultValue: urlFilter } : {},
+          outerOnFilterChange ? { onChange: outerOnFilterChange } : {},
+          options.mapFilterValue
+            ? {
+                mapFilterValue: (value, getFv) => options.mapFilterValue(value, getFv || getFilterValue)
+              }
+            : {}
+        );
+      };
+
+      const nextFilter = isNext ? resolveNextFilter() : null;
+
+      const nextTableProps = isNext
+        ? {
+            isNext: true,
+            dataFormat: data => ({
+              list: data.pageData,
+              total: data.totalCount ?? data.total,
+              data
+            }),
+            pagination: merge(
+              {
+                open: true,
+                showSizeChanger: true,
+                showQuickJumper: true
+              },
+              options.tableProps?.pagination
+            ),
+            ...(allowKeywordSearch
+              ? {
+                  search: {
+                    name: options.keywordFilterName,
+                    label: options.keywordFilterLabel
+                  }
+                }
+              : {}),
+            ...(nextFilter ? { filter: nextFilter } : {}),
+            page: merge({}, page, { titleExtra: toolbarExtra })
           }
-        ],
-        name
-      });
+        : {};
+
+      const tableOptions = merge(
+        {},
+        isNext ? {} : options.tableProps,
+        isNext ? apis.list : merge({}, apis.list, options.getFilterValue(filterValueForApi)),
+        nextTableProps,
+        isNext ? options.tableProps : {},
+        {
+          ref,
+          columns: [
+            ...getColumns(),
+            buildOptionsColumn({
+              isNext,
+              formatMessage,
+              apis,
+              options,
+              getActionList,
+              getFormInner,
+              onReload: reloadTable
+            })
+          ],
+          name
+        }
+      );
 
       if (typeof children === 'function') {
         return children({
-          filter: { value: filter, onChange: setFilter, list: filterList },
-          topOptions,
-          titleExtra: (
-            <Filter.FilterProvider value={filter} onChange={setFilter}>
+          isNext,
+          filter: isNext
+            ? nextFilter
+            : { value: filterValue, onChange: setFilterValue, list: legacyFilterList },
+          topOptions: isNext ? toolbarExtra : topOptions,
+          titleExtra: isNext ? (
+            toolbarExtra
+          ) : (
+            <Filter.FilterProvider value={filterValue} onChange={setFilterValue}>
               {topOptions}
             </Filter.FilterProvider>
           ),
           tableOptions
         });
       }
+
+      if (isNext) {
+        return <TablePage {...tableOptions} />;
+      }
+
       return (
         <Flex vertical gap={8} flex={1}>
-          <Filter value={filter} onChange={setFilter} extra={topOptions} list={filterList} />
+          <Filter value={filterValue} onChange={setFilterValue} extra={topOptions} list={legacyFilterList} />
           <TablePage {...tableOptions} />
         </Flex>
       );
@@ -137,4 +224,5 @@ BizUnit.Actions = Actions;
 
 export default BizUnit;
 
-export { TablePageRender, Actions };
+export { default as TablePageRender } from './TablePageRender';
+export { default as Actions } from './Actions';

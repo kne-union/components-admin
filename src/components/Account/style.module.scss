@@ -1,3 +1,5 @@
+@use '@kne/responsive-utils/scss' as resp;
+
 .out-container {
   background: #ffffff;
   width: 1000px;
@@ -41,6 +43,7 @@
   margin: 80px auto;
 }
 
+// Legacy tablet breakpoint (1024px); unified tokens: lg=992, xl=1200
 @media (max-width: 1024px) {
   .out-container {
     width: 100vw;
