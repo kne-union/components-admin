@@ -1,4 +1,5 @@
-@use '@kne/responsive-utils/scss' as resp;
+@use '~@kne/responsive-utils/scss' as resp;
+@use '~@kne/responsive-utils/scss/viewport';
 
 .out-container {
   background: #ffffff;
@@ -7,9 +8,8 @@
   overflow: hidden;
   margin: 0 auto;
   border-radius: 12px;
-  --out-inner-height: 90vh;
-  --max-height: 640px;
-  //max-height: var(--max-height);
+  --out-inner-height: var(--kne-viewport-height);
+  --max-height: var(--kne-viewport-height);
 }
 
 .top-banner {
@@ -43,15 +43,7 @@
   margin: 80px auto;
 }
 
-// Legacy tablet breakpoint (1024px); unified tokens: lg=992, xl=1200
-@media (max-width: 1024px) {
-  .out-container {
-    width: 100vw;
-    height: 100vh;
-    border-radius: 0;
-    background: transparent;
-  }
-
+@mixin account-tablet-layout {
   .top-banner {
     display: block;
     position: relative;
@@ -78,11 +70,11 @@
   }
 
   .out-inner {
-    background: #FFFFFF;
+    background: #ffffff;
     position: absolute;
     width: 100%;
     bottom: 0;
-    min-height: calc(100% - 180px);
+    min-height: calc(var(--kne-viewport-height) - 180px);
     border-radius: 12px 12px 0 0;
   }
 
@@ -92,4 +84,57 @@
     padding: 0 24px;
     box-sizing: border-box;
   }
+}
+
+@mixin account-phone-layout {
+  .top-banner {
+    height: 160px;
+  }
+
+  .top-banner-inner {
+    top: 32px;
+    left: 24px;
+    transform: none;
+    font-size: 20px;
+  }
+
+  .out-inner {
+    min-height: calc(var(--kne-viewport-height) - 140px);
+  }
+
+  .form-inner {
+    padding: 0 16px;
+  }
+}
+
+@include resp.down(lg) {
+  .out-container {
+    width: var(--kne-viewport-width);
+    height: var(--kne-viewport-height);
+    border-radius: 0;
+    background: transparent;
+  }
+
+  @include account-tablet-layout;
+}
+
+@include resp.down(sm) {
+  @include account-phone-layout;
+}
+
+@include resp.container-down(lg) {
+  .out-container {
+    width: 100%;
+    max-width: 100%;
+    height: var(--kne-viewport-height);
+    min-height: var(--kne-viewport-height);
+    border-radius: 0;
+    background: transparent;
+  }
+
+  @include account-tablet-layout;
+}
+
+@include resp.container-down(sm) {
+  @include account-phone-layout;
 }

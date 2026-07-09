@@ -1,4 +1,5 @@
-@use '@kne/responsive-utils/scss' as resp;
+@use '~@kne/responsive-utils/scss' as resp;
+@use '~@kne/responsive-utils/scss/viewport';
 
 .out-left {
   //background: url('./account_bg.jpg') no-repeat;
@@ -56,11 +57,11 @@
   height: 100%;
 }
 
-// Legacy tablet breakpoint (1024px); unified tokens: lg=992, xl=1200
-@media (max-width: 1024px) {
+@mixin login-shell-tablet {
   .out-left {
     display: none;
   }
+
   .out-right {
     align-items: flex-start;
     justify-content: center;
@@ -72,4 +73,30 @@
     margin: 0;
     max-width: 600px;
   }
+}
+
+@mixin login-shell-phone {
+  .out-right {
+    padding: 32px 16px 20px;
+  }
+
+  .out-right-inner {
+    max-height: none;
+  }
+}
+
+@include resp.down(lg) {
+  @include login-shell-tablet;
+}
+
+@include resp.down(sm) {
+  @include login-shell-phone;
+}
+
+@include resp.container-down(lg) {
+  @include login-shell-tablet;
+}
+
+@include resp.container-down(sm) {
+  @include login-shell-phone;
 }

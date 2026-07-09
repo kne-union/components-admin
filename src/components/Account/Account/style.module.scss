@@ -1,5 +1,7 @@
+@use '~@kne/responsive-utils/scss/viewport';
+
 .layout-row {
-  height: 100vh;
+  height: var(--kne-viewport-height);
   width: 100vw;
   position: relative;
   background: var(--primary-color);
