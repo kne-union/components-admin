@@ -1,23 +1,19 @@
-const getColumns = ({formatMessage}) => {
+const getColumns = ({ formatMessage }) => {
   return [
     {
       name: 'id',
       title: 'ID',
-      type: 'serialNumber',
-      primary: false,
-      hover: false
+      renderType: 'small'
     },
     {
       name: 'name',
       title: formatMessage({ id: 'SharedGroupName' }),
-      type: 'mainInfo',
-      primary: false,
-      hover: false
+      renderType: 'main'
     },
     {
       name: 'description',
       title: formatMessage({ id: 'Description' }),
-      type: 'description',
+      renderType: 'description',
       ellipsis: true
     }
   ];

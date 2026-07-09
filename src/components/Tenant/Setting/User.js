@@ -4,23 +4,21 @@ import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import { useState, useCallback } from 'react';
 import get from 'lodash/get';
+import TablePageRender from '@components/BizUnit/TablePageRender';
 
 const User = createWithRemoteLoader({
   modules: [
     'components-core:Layout@Page',
     'components-core:Global@usePreset',
     'components-core:Permissions',
-    'components-core:Permissions@usePermissionsPass',
-    'components-core:Table@TablePage',
-    'components-core:Filter@FilterProvider'
+    'components-core:Permissions@usePermissionsPass'
   ]
 })(({ remoteModules, menu, children, pageProps: originPageProps, apis: extraApis = {} }) => {
-  const [Page, usePreset, Permissions, usePermissionsPass, TablePage, FilterProvider] = remoteModules;
+  const [Page, usePreset, Permissions, usePermissionsPass] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis, plugins } = usePreset();
   const getActions = get(plugins, 'tenant.getUserListActions');
   const [target, setTarget] = useState({});
-  const filter = Object.assign({}, { value: [] }, target.filter);
   const allowCreate = usePermissionsPass({ request: ['setting:user-manager:create'] });
   const allowSave = usePermissionsPass({ request: ['setting:user-manager:edit'] });
   const allowRemove = usePermissionsPass({ request: ['setting:user-manager:remove'] });
@@ -33,8 +31,7 @@ const User = createWithRemoteLoader({
   const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'UserManagement' }),
-    filter: Object.assign({}, filter, { list: target.filterList || [] }),
-    titleExtra: <FilterProvider {...filter}>{target.topOptions}</FilterProvider>,
+    titleExtra: target.topOptions,
     children: (
       <Permissions request={['setting:user-manager:view']} type="error">
         <UserList
@@ -57,7 +54,7 @@ const User = createWithRemoteLoader({
             },
             extraApis
           )}>
-          {({ tableOptions }) => <TablePage {...tableOptions} />}
+          {renderProps => <TablePageRender {...renderProps} />}
         </UserList>
       </Permissions>
     )

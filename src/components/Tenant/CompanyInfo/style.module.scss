@@ -4,6 +4,37 @@
   max-width: 960px;
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
+  @include resp.responsive-container;
+}
+
+.detailStack {
+  width: 100%;
+  min-width: 0;
+  @include resp.responsive-container;
+}
+
+.formActions {
+  width: 100%;
+}
+
+.metaList {
+  width: 100%;
+  min-width: 0;
+}
+
+.metaItem {
+  height: 100%;
+}
+
+.teamPanel {
+  width: 100%;
+  min-width: 0;
+}
+
+.teamCard {
+  width: 100%;
+  min-width: 0;
 }
 
 .basicPanel {
@@ -296,24 +327,6 @@
   color: #334155 !important;
 }
 
-@include resp.down(sm) {
-  .basicHeroInner {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .basicTitleBlock {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .basicTagsOnBanner {
-    justify-content: center;
-  }
-}
-
 .timelinePanel {
   padding: 40px 20px 20px;
   border: 1px solid #e8edf3;
@@ -353,12 +366,13 @@
 }
 
 .images {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   margin: 0 auto 24px;
 }
 
 .image-item {
-  width: 400px;
+  width: 100%;
   height: 200px;
   overflow: hidden;
   border-radius: 20px;
@@ -366,4 +380,260 @@
   img {
     object-fit: cover;
   }
+}
+
+@mixin company-info-mobile {
+  .company-info {
+    padding: 0 12px;
+  }
+
+  .detailStack {
+    gap: 16px !important;
+  }
+
+  .metaList {
+    :global(.ant-col) {
+      max-width: 100%;
+    }
+  }
+
+  .metaItem {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e8edf3;
+    box-sizing: border-box;
+  }
+
+  .basicMetaGrid {
+    padding: 4px 14px 16px;
+  }
+
+  .basicMetaRow {
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .basicMetaIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
+
+  .basicMetaLabel {
+    font-size: 11px;
+  }
+
+  .basicMetaValue {
+    font-size: 13px;
+    word-break: break-word;
+  }
+
+  .basicMetaValue :global(a) {
+    word-break: break-all;
+  }
+
+  .teamPanel {
+    :global(.ant-col) {
+      max-width: 100%;
+    }
+  }
+
+  .teamCard {
+    width: 100%;
+
+    :global(.kne-react-box_vGwKb) {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    :global(.kne-react-box_vGwKb .kne-react-box_N-U38) {
+      display: block;
+      -webkit-line-clamp: unset;
+      overflow: visible;
+      white-space: normal;
+      word-break: break-word;
+      text-align: center;
+    }
+  }
+
+  .basicPanel {
+    border-radius: 12px;
+  }
+
+  .basicHeroBanner {
+    min-height: 180px;
+  }
+
+  .basicHeroContent {
+    min-height: 180px;
+    padding: 16px 14px 18px;
+  }
+
+  .basicHeroInner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .basicTitleBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .basicTagsOnBanner {
+    justify-content: center;
+  }
+
+  .basicHeroBgImage,
+  .basicHeroSlideInner :global(img) {
+    min-height: 180px;
+  }
+
+  .basicNameOnBanner {
+    font-size: 20px !important;
+  }
+
+  .basicDescWrap {
+    padding: 16px 14px 0;
+  }
+
+  .basicDesc {
+    font-size: 14px;
+    padding-bottom: 16px;
+  }
+
+  .timelinePanel {
+    padding: 24px 12px 16px;
+    border-radius: 12px;
+  }
+
+  .images {
+    max-width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .image-item {
+    height: auto;
+    min-height: 140px;
+    max-height: 200px;
+    border-radius: 12px;
+  }
+}
+
+@mixin company-info-phone {
+  .company-info {
+    padding: 0 8px;
+  }
+
+  .detailStack {
+    gap: 12px !important;
+  }
+
+  .metaItem {
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .basicMetaGrid {
+    padding: 4px 12px 14px;
+  }
+
+  .basicMetaRow {
+    gap: 10px;
+  }
+
+  .teamPanel {
+    :global(.ant-row) {
+      row-gap: 10px !important;
+    }
+  }
+
+  .basicPanel {
+    border-radius: 10px;
+  }
+
+  .basicHeroBanner {
+    min-height: 160px;
+  }
+
+  .basicHeroContent {
+    min-height: 160px;
+    padding: 14px 12px 16px;
+  }
+
+  .basicHeroInner {
+    gap: 12px;
+  }
+
+  .basicLogo {
+    :global(.ant-avatar) {
+      width: 64px !important;
+      height: 64px !important;
+      line-height: 64px !important;
+      font-size: 24px !important;
+    }
+  }
+
+  .basicLogoPlaceholder {
+    width: 64px;
+    height: 64px;
+    font-size: 22px;
+    border-radius: 14px;
+  }
+
+  .basicNameOnBanner {
+    font-size: 18px !important;
+  }
+
+  .basicTagOnBanner {
+    font-size: 12px;
+    padding: 3px 10px !important;
+  }
+
+  .basicMetaGrid {
+    padding: 4px 12px 14px;
+  }
+
+  .basicMetaRow {
+    gap: 10px;
+  }
+
+  .timelinePanel {
+    padding: 20px 10px 14px;
+    border-radius: 10px;
+  }
+
+  .formActions {
+    flex-direction: column;
+    align-items: stretch;
+
+    :global(.ant-btn) {
+      width: 100%;
+    }
+  }
+
+  .image-item {
+    min-height: 120px;
+    border-radius: 10px;
+  }
+}
+
+@include resp.mobile {
+  @include company-info-mobile;
+}
+
+@include resp.container-down(md) {
+  @include company-info-mobile;
+}
+
+@include resp.down(sm) {
+  @include company-info-phone;
+}
+
+@include resp.container-down(sm) {
+  @include company-info-phone;
 }

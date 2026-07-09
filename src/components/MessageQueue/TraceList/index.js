@@ -16,7 +16,7 @@ const TraceList = createWithRemoteLoader({
     const [TablePage, usePreset, Filter, Enum] = remoteModules;
     const { formatMessage } = useIntl();
     const { apis } = usePreset();
-    const { SearchInput, getFilterValue, fields: filterFields } = Filter;
+    const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem } = filterFields;
     const [searchParams] = useSearchParams();
     const initialMessageId = searchParams.get('messageId');
@@ -36,6 +36,40 @@ const TraceList = createWithRemoteLoader({
 
     return (
       <TablePage
+        isNext
+        search={{
+          name: 'messageId',
+          label: formatMessage({ id: 'MessageId' })
+        }}
+        filter={{
+          value: filter,
+          onChange: setFilter,
+          list: [
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'MessageId' }), name: 'messageId' }
+            },
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'Topic' }), name: 'topic' }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'Event' }),
+                name: 'event',
+                single: true,
+                render: ({ children }) => {
+                  return (
+                    <Enum moduleName="traceEvent" format="option">
+                      {options => children({ options })}
+                    </Enum>
+                  );
+                }
+              }
+            }
+          ]
+        }}
         {...Object.assign({}, apis.mq.trace.list, {
           params: buildListParams(filterValue, ['topic', 'messageId', 'event'])
         })}
@@ -47,9 +81,9 @@ const TraceList = createWithRemoteLoader({
           {
             name: 'options',
             title: formatMessage({ id: 'Operation' }),
-            type: 'options',
+            renderType: 'options',
             fixed: 'right',
-            valueOf: item => {
+            getValueOf: item => {
               return {
                 children: <MessageDetail data={item} type="link" title={formatMessage({ id: 'Detail' })}>{formatMessage({ id: 'ViewDetail' })}</MessageDetail>
               };
@@ -57,29 +91,6 @@ const TraceList = createWithRemoteLoader({
           }
         ]}
         page={{
-          filter: {
-            value: filter,
-            onChange: setFilter,
-            list: [
-              [
-                <InputFilterItem label={formatMessage({ id: 'MessageId' })} name="messageId" />,
-                <InputFilterItem label={formatMessage({ id: 'Topic' })} name="topic" />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'Event' })}
-                  name="event"
-                  single
-                  render={({ children }) => {
-                    return (
-                      <Enum moduleName="traceEvent" format="option">
-                        {options => children({ options })}
-                      </Enum>
-                    );
-                  }}
-                />
-              ]
-            ]
-          },
-          titleExtra: <SearchInput name="messageId" label={formatMessage({ id: 'MessageId' })} />,
           menu: <Menu baseUrl={baseUrl} />,
           ...pageProps
         }}

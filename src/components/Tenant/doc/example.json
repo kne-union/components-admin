@@ -239,8 +239,36 @@
       ]
     },
     {
+      "title": "按组织选择成员（大量数据）",
+      "description": "模拟 10 个事业部、80 个团队共 90 个组织节点，每个组织 256 名成员，右侧列表每页 20 条并支持滚动加载",
+      "code": "./tenant-user-select-large-data.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactFetch",
+          "packageName": "@kne/react-fetch"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
       "title": "系统设置",
-      "description": "Setting 组件是系统设置的入口，包含公司信息、组织架构、权限管理、用户管理四个设置模块",
+      "description": "Setting 组件是系统设置的入口，包含公司信息、组织架构、权限管理、用户管理四个设置模块。示例环境已有外层 Router，使用 Routes 匹配子路由，勿嵌套 MemoryRouter。",
+      "isFull": true,
       "code": "./setting.js",
       "scope": [
         {

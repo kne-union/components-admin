@@ -208,6 +208,12 @@ const locale = {
   TenantUserSelectPlaceholder: '请选择成员',
   TenantUserSelectSelectOrgFirst: '请先在左侧选择组织',
   TenantUserSelectEmptyOrg: '暂无组织数据',
+  TenantUserSelectEmptyUser: '该组织暂无成员',
+  TenantUserSelectSelectedLabel: '已选 ({count})',
+  TenantUserSelectSelectedLabelSingle: '已选',
+  TenantUserSelectSelectedEmpty: '暂未选择成员',
+  TenantUserSelectOrgMemberTotal: '共 {count} 人',
+  TenantUserSelectSelectAll: '全选',
 
   // Role
   SystemType: '系统',

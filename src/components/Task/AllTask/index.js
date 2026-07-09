@@ -22,7 +22,7 @@ const AllTask = createWithRemoteLoader({
     const [TablePage, usePreset, Filter, Tooltip, Enum] = remoteModules;
     const { formatMessage } = useIntl();
     const { apis, enums } = usePreset();
-    const { SearchInput, getFilterValue, fields: filterFields } = Filter;
+    const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
     const ref = useRef(null);
     const [filter, setFilter] = useState([]);
@@ -40,6 +40,81 @@ const AllTask = createWithRemoteLoader({
 
     return (
       <TablePage
+        isNext
+        search={{
+          name: 'targetName',
+          label: formatMessage({ id: 'TargetName' })
+        }}
+        filter={{
+          value: filter,
+          onChange: setFilter,
+          list: [
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'TaskID' }), name: 'id' }
+            },
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'TargetID' }), name: 'targetId' }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'Type' }),
+                name: 'type',
+                single: true,
+                render: ({ children }) => {
+                  return (
+                    <Enum moduleName="taskType" format="option">
+                      {options => children({ options })}
+                    </Enum>
+                  );
+                }
+              }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'Status' }),
+                name: 'status',
+                single: true,
+                render: ({ children }) => {
+                  return (
+                    <Enum moduleName="taskStatus" format="option">
+                      {options => children({ options })}
+                    </Enum>
+                  );
+                }
+              }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'ExecutionMode' }),
+                name: 'runnerType',
+                single: true,
+                api: {
+                  loader: () => {
+                    return {
+                      pageData: [
+                        { label: formatMessage({ id: 'ManualExecution' }), value: 'manual' },
+                        { label: formatMessage({ id: 'AutomaticExecution' }), value: 'system' }
+                      ]
+                    };
+                  }
+                }
+              }
+            },
+            {
+              type: TypeDateRangePickerFilterItem,
+              props: { label: formatMessage({ id: 'CreatedAt' }), name: 'createdAt', allowEmpty: [true, true] }
+            },
+            {
+              type: TypeDateRangePickerFilterItem,
+              props: { label: formatMessage({ id: 'CompletedAt' }), name: 'completedAt', allowEmpty: [true, true] }
+            }
+          ]
+        }}
         {...Object.assign({}, apis.task.list, {
           params: {
             filter: Object.assign({}, filterValue, {
@@ -75,9 +150,9 @@ const AllTask = createWithRemoteLoader({
           {
             name: 'options',
             title: formatMessage({ id: 'Operation' }),
-            type: 'options',
+            renderType: 'options',
             fixed: 'right',
-            valueOf: item => {
+            getValueOf: item => {
               return {
                 children: (
                   <Actions
@@ -143,58 +218,6 @@ const AllTask = createWithRemoteLoader({
           </>
         }
         page={{
-          filter: {
-            value: filter,
-            onChange: setFilter,
-            list: [
-              [
-                <InputFilterItem label={formatMessage({ id: 'TaskID' })} name="id" />,
-                <InputFilterItem label={formatMessage({ id: 'TargetID' })} name="targetId" />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'Type' })}
-                  name="type"
-                  single
-                  render={({ children }) => {
-                    return (
-                      <Enum moduleName="taskType" format="option">
-                        {options => children({ options })}
-                      </Enum>
-                    );
-                  }}
-                />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'Status' })}
-                  name="status"
-                  single
-                  render={({ children }) => {
-                    return (
-                      <Enum moduleName="taskStatus" format="option">
-                        {options => children({ options })}
-                      </Enum>
-                    );
-                  }}
-                />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'ExecutionMode' })}
-                  name="runnerType"
-                  single
-                  api={{
-                    loader: () => {
-                      return {
-                        pageData: [
-                          { label: formatMessage({ id: 'ManualExecution' }), value: 'manual' },
-                          { label: formatMessage({ id: 'AutomaticExecution' }), value: 'system' }
-                        ]
-                      };
-                    }
-                  }}
-                />,
-                <TypeDateRangePickerFilterItem label={formatMessage({ id: 'CreatedAt' })} name="createdAt" allowEmpty={[true, true]} />,
-                <TypeDateRangePickerFilterItem label={formatMessage({ id: 'CompletedAt' })} name="completedAt" allowEmpty={[true, true]} />
-              ]
-            ]
-          },
-          titleExtra: <SearchInput name="targetName" label={formatMessage({ id: 'TargetName' })} />,
           menu: <Menu baseUrl={baseUrl} />,
           ...pageProps
         }}

@@ -1,18 +1,14 @@
 const getColumns = () => {
   return [
     {
-      name: ' id',
+      name: 'id',
       title: 'ID',
-      type: 'serialNumber',
-      hover: false,
-      primary: false
+      renderType: 'small'
     },
     {
       name: 'name',
       title: '名称',
-      type: 'mainInfo',
-      hover: false,
-      primary: false
+      renderType: 'main'
     },
     {
       name: 'code',
@@ -25,19 +21,15 @@ const getColumns = () => {
     {
       name: 'description',
       title: '描述',
-      type: 'description',
+      renderType: 'description',
       ellipsis: true
     },
     {
       name: 'status',
       title: '状态',
-      type: 'tag',
-      valueOf: ({ status }) =>
-        status && {
-          isEnum: true,
-          moduleName: 'openStatus',
-          name: status
-        }
+      renderType: 'enum',
+      moduleName: 'openStatus',
+      getValueOf: item => item.status
     }
   ];
 };

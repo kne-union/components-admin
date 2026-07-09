@@ -7,14 +7,14 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'id',
       title: formatMessage({ id: 'ID' }),
-      type: 'serialNumber'
+      renderType: 'small'
     },
     {
       name: 'topic',
       title: formatMessage({ id: 'Topic' }),
-      type: 'tag',
+      renderType: 'tag',
       ellipsis: true,
-      valueOf: ({ topic }) =>
+      getValueOf: ({ topic }) =>
         topic && {
           type: 'info',
           text: topic
@@ -23,19 +23,15 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'status',
       title: formatMessage({ id: 'Status' }),
-      type: 'tag',
-      valueOf: ({ status }) =>
-        status && {
-          isEnum: true,
-          moduleName: 'messageStatus',
-          name: status
-        }
+      renderType: 'enum',
+      moduleName: 'messageStatus',
+      getValueOf: item => item.status
     },
     {
       name: 'payload',
       title: formatMessage({ id: 'Payload' }),
       ellipsis: true,
-      valueOf: ({ payload }) => stringifyJson(payload)
+      getValueOf: ({ payload }) => stringifyJson(payload)
     },
     {
       name: 'retryCount',
@@ -66,27 +62,27 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'executeAt',
       title: formatMessage({ id: 'ExecuteAt' }),
-      type: 'datetime'
+      format: 'datetime'
     },
     {
       name: 'nextRetryAt',
       title: formatMessage({ id: 'NextRetryAt' }),
-      type: 'datetime'
+      format: 'datetime'
     },
     {
       name: 'lockedAt',
       title: formatMessage({ id: 'LockedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     },
     {
       name: 'createdAt',
       title: formatMessage({ id: 'CreatedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     },
     {
       name: 'updatedAt',
       title: formatMessage({ id: 'UpdatedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     }
   ];
 };

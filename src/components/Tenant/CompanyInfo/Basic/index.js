@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import { useIsMobile } from '@kne/responsive-utils';
 import { Carousel, Row, Col, Tag, Space, Typography } from 'antd';
 import { GlobalOutlined, EnvironmentOutlined, PhoneOutlined, MailOutlined, CalendarOutlined, BankOutlined, TeamOutlined } from '@ant-design/icons';
 import withLocale from '../../withLocale';
@@ -31,6 +32,7 @@ const Basic = createWithRemoteLoader({
   withLocale(({ remoteModules, data: raw }) => {
     const [Image] = remoteModules;
     const { formatMessage } = useIntl();
+    const isMobile = useIsMobile();
     const data = raw || {};
 
     const banners = data.banners;
@@ -111,6 +113,7 @@ const Basic = createWithRemoteLoader({
     const nameInitial = (name || '?').trim().charAt(0) || '?';
 
     const hasBodyContent = Boolean(description || metaItems.length > 0);
+    const metaColProps = isMobile ? { span: 24 } : { xs: 24, md: 12 };
 
     return (
       <div className={style.basicPanel}>
@@ -173,14 +176,16 @@ const Basic = createWithRemoteLoader({
 
             {metaItems.length > 0 ? (
               <div className={style.basicMetaGrid}>
-                <Row gutter={[20, 20]}>
+                <Row gutter={isMobile ? [0, 10] : [20, 20]} className={style.metaList}>
                   {metaItems.map(item => (
-                    <Col xs={24} sm={12} key={item.key}>
-                      <div className={style.basicMetaRow}>
-                        <span className={style.basicMetaIcon}>{item.icon}</span>
-                        <div className={style.basicMetaBody}>
-                          <div className={style.basicMetaLabel}>{item.label}</div>
-                          <div className={style.basicMetaValue}>{item.node}</div>
+                    <Col {...metaColProps} key={item.key}>
+                      <div className={style.metaItem}>
+                        <div className={style.basicMetaRow}>
+                          <span className={style.basicMetaIcon}>{item.icon}</span>
+                          <div className={style.basicMetaBody}>
+                            <div className={style.basicMetaLabel}>{item.label}</div>
+                            <div className={style.basicMetaValue}>{item.node}</div>
+                          </div>
                         </div>
                       </div>
                     </Col>

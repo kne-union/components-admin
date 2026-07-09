@@ -11,41 +11,36 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'id',
       title: 'ID',
-      type: 'serialNumber',
-      primary: false,
-      hover: false
+      renderType: 'small'
     },
     {
       name: 'avatar',
       title: formatMessage({ id: 'Avatar' }),
-      type: 'avatar',
-      valueOf: (item, { name }) => Object.assign({}, { id: item[name] })
+      renderType: 'avatar',
+      getValueOf: (item, { name }) => Object.assign({}, { id: item[name] })
     },
     {
       name: 'name',
       title: formatMessage({ id: 'UserName' }),
-      type: 'mainInfo',
-      primary: false,
-      hover: false
+      renderType: 'main'
     },
     {
       name: 'roles',
       title: formatMessage({ id: 'UserRole' }),
-      valueOf: item => buildRolesTitle(item) || formatMessage({ id: 'DefaultRole' })
+      getValueOf: item => buildRolesTitle(item) || formatMessage({ id: 'DefaultRole' })
     },
     {
       name: 'tenantOrg',
       title: formatMessage({ id: 'Department' }),
-      type: 'other',
       width: 260,
       disableColItem: true,
-      valueOf: item => <UserOrgTags item={item} />
+      getValueOf: item => <UserOrgTags item={item} />
     },
     {
       name: 'status',
       title: formatMessage({ id: 'FilterStatus' }),
-      type: 'tag',
-      valueOf: item => ({
+      renderType: 'tag',
+      getValueOf: item => ({
         type: item.status === 'open' ? 'success' : 'default',
         text: item.status === 'open' ? formatMessage({ id: 'Open' }) : formatMessage({ id: 'Close' })
       })
@@ -53,8 +48,7 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'syncSource',
       title: formatMessage({ id: 'IsSynced' }),
-      type: 'other',
-      valueOf: item => {
+      getValueOf: item => {
         if (!item.syncSource) {
           return formatMessage({ id: 'SyncedInternal' });
         }
@@ -68,17 +62,15 @@ const getColumns = ({ formatMessage }) => {
     },
     {
       name: 'phone',
-      title: formatMessage({ id: 'PhoneTitle' }),
-      type: 'other'
+      title: formatMessage({ id: 'PhoneTitle' })
     },
     {
       name: 'email',
-      title: formatMessage({ id: 'Email' }),
-      type: 'other'
+      title: formatMessage({ id: 'Email' })
     },
     {
       name: 'description',
-      type: 'description',
+      renderType: 'description',
       title: formatMessage({ id: 'UserDescription' }),
       ellipsis: true
     }

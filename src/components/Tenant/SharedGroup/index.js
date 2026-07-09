@@ -36,6 +36,7 @@ const SharedGroup = ({ apis, ...props }) => {
   const columns = getColumns({ formatMessage });
   return (
     <BizUnit
+      isNext
       {...props}
       apis={apis}
       getColumns={() => columns}

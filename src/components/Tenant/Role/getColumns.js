@@ -1,24 +1,20 @@
-const getColumns = ({formatMessage}) => {
+const getColumns = ({ formatMessage }) => {
   return [
     {
       name: 'id',
       title: 'ID',
-      type: 'serialNumber',
-      primary: false,
-      hover: false
+      renderType: 'small'
     },
     {
       name: 'name',
       title: formatMessage({ id: 'RoleName' }),
-      type: 'mainInfo',
-      primary: false,
-      hover: false
+      renderType: 'main'
     },
     {
       name: 'type',
       title: formatMessage({ id: 'SettingType' }),
-      type: 'tag',
-      valueOf: ({ type }) => {
+      renderType: 'tag',
+      getValueOf: ({ type }) => {
         return type === 'system'
           ? {
               type: 'default',
@@ -37,7 +33,7 @@ const getColumns = ({formatMessage}) => {
     {
       name: 'description',
       title: formatMessage({ id: 'Description' }),
-      type: 'description',
+      renderType: 'description',
       ellipsis: true
     }
   ];

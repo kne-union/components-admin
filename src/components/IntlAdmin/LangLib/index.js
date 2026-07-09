@@ -3,27 +3,18 @@ import BizUnit from '@components/BizUnit';
 import getColumns from './getColumns';
 
 const LangLib = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Layout@TablePage']
+  modules: ['components-core:Global@usePreset']
 })(({ remoteModules, menu, pageProps = {} }) => {
-  const [usePreset, TablePage] = remoteModules;
+  const [usePreset] = remoteModules;
   const { apis } = usePreset();
   return (
-    <BizUnit name="langLib" apis={apis.intlAdmin.langLib} getColumns={getColumns}>
-      {({ filter, topOptions, titleExtra, tableOptions }) => {
-        return (
-          <TablePage
-            {...Object.assign({}, tableOptions)}
-            page={{
-              ...pageProps,
-              menu,
-              filter,
-              titleExtra,
-              topOptions
-            }}
-          />
-        );
-      }}
-    </BizUnit>
+    <BizUnit
+      isNext
+      name="langLib"
+      apis={apis.intlAdmin.langLib}
+      getColumns={getColumns}
+      page={{ menu, ...pageProps }}
+    />
   );
 });
 

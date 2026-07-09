@@ -17,7 +17,7 @@ const DeadLetterList = createWithRemoteLoader({
     const [TablePage, usePreset, Filter] = remoteModules;
     const { formatMessage } = useIntl();
     const { apis } = usePreset();
-    const { SearchInput, getFilterValue, fields: filterFields } = Filter;
+    const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem } = filterFields;
     const ref = useRef(null);
     const [filter, setFilter] = useState([]);
@@ -29,6 +29,37 @@ const DeadLetterList = createWithRemoteLoader({
 
     return (
       <TablePage
+        isNext
+        search={{
+          name: 'topic',
+          label: formatMessage({ id: 'Topic' })
+        }}
+        filter={{
+          value: filter,
+          onChange: setFilter,
+          list: [
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'Topic' }), name: 'topic' }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'Replayed' }),
+                name: 'replayed',
+                single: true,
+                api: {
+                  loader: () => ({
+                    pageData: [
+                      { label: formatMessage({ id: 'Yes' }), value: true },
+                      { label: formatMessage({ id: 'No' }), value: false }
+                    ]
+                  })
+                }
+              }
+            }
+          ]
+        }}
         {...Object.assign({}, apis.mq.deadLetter.list, {
           params: buildListParams(filterValue, ['topic', 'replayed'])
         })}
@@ -40,9 +71,9 @@ const DeadLetterList = createWithRemoteLoader({
           {
             name: 'options',
             title: formatMessage({ id: 'Operation' }),
-            type: 'options',
+            renderType: 'options',
             fixed: 'right',
-            valueOf: item => {
+            getValueOf: item => {
               return {
                 children: (
                   <DeadLetterActions
@@ -86,29 +117,6 @@ const DeadLetterList = createWithRemoteLoader({
           </Space>
         }
         page={{
-          filter: {
-            value: filter,
-            onChange: setFilter,
-            list: [
-              [
-                <InputFilterItem label={formatMessage({ id: 'Topic' })} name="topic" />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'Replayed' })}
-                  name="replayed"
-                  single
-                  api={{
-                    loader: () => ({
-                      pageData: [
-                        { label: formatMessage({ id: 'Yes' }), value: true },
-                        { label: formatMessage({ id: 'No' }), value: false }
-                      ]
-                    })
-                  }}
-                />
-              ]
-            ]
-          },
-          titleExtra: <SearchInput name="topic" label={formatMessage({ id: 'Topic' })} />,
           menu: <Menu baseUrl={baseUrl} />,
           ...pageProps
         }}

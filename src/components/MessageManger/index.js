@@ -15,7 +15,7 @@ const TemplateList = createWithRemoteLoader({
     const [TablePage, usePreset, Filter, Enum] = remoteModules;
     const { apis } = usePreset();
     const { formatMessage } = useIntl();
-    const { SearchInput, getFilterValue, fields: filterFields } = Filter;
+    const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem } = filterFields;
     const ref = useRef(null);
     const [filter, setFilter] = useState([]);
@@ -23,6 +23,60 @@ const TemplateList = createWithRemoteLoader({
 
     return (
       <TablePage
+        isNext
+        search={{
+          name: 'code',
+          label: formatMessage({ id: 'Code' })
+        }}
+        filter={{
+          value: filter,
+          onChange: setFilter,
+          list: [
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'Code' }), name: 'code' }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'Type' }),
+                name: 'type',
+                single: true,
+                render: ({ children }) => (
+                  <Enum moduleName="messageManagerType" format="option">
+                    {options => children({ options })}
+                  </Enum>
+                )
+              }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'Level' }),
+                name: 'level',
+                single: true,
+                render: ({ children }) => (
+                  <Enum moduleName="messageTemplateLevel" format="option">
+                    {options => children({ options })}
+                  </Enum>
+                )
+              }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'Status' }),
+                name: 'status',
+                single: true,
+                render: ({ children }) => (
+                  <Enum moduleName="messageTemplateStatus" format="option">
+                    {options => children({ options })}
+                  </Enum>
+                )
+              }
+            }
+          ]
+        }}
         {...Object.assign({}, apis.messageManger.templates.list, {
           params: buildMessageParams(filterValue, ['type', 'code', 'level', 'status'])
         })}
@@ -31,46 +85,6 @@ const TemplateList = createWithRemoteLoader({
         name="message-manger-template-list"
         columns={getTemplateColumns({ formatMessage, onSuccess: () => ref.current?.refresh() })}
         page={{
-          filter: {
-            value: filter,
-            onChange: setFilter,
-            list: [
-              [
-                <InputFilterItem label={formatMessage({ id: 'Code' })} name="code" />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'Type' })}
-                  name="type"
-                  single
-                  render={({ children }) => (
-                    <Enum moduleName="messageManagerType" format="option">
-                      {options => children({ options })}
-                    </Enum>
-                  )}
-                />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'Level' })}
-                  name="level"
-                  single
-                  render={({ children }) => (
-                    <Enum moduleName="messageTemplateLevel" format="option">
-                      {options => children({ options })}
-                    </Enum>
-                  )}
-                />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'Status' })}
-                  name="status"
-                  single
-                  render={({ children }) => (
-                    <Enum moduleName="messageTemplateStatus" format="option">
-                      {options => children({ options })}
-                    </Enum>
-                  )}
-                />
-              ]
-            ]
-          },
-          titleExtra: <SearchInput name="code" label={formatMessage({ id: 'Code' })} />,
           menu: <MessageMenu baseUrl={baseUrl} />,
           ...pageProps
         }}
@@ -86,7 +100,7 @@ const RecordList = createWithRemoteLoader({
     const [TablePage, usePreset, Filter, Enum] = remoteModules;
     const { apis } = usePreset();
     const { formatMessage } = useIntl();
-    const { SearchInput, getFilterValue, fields: filterFields } = Filter;
+    const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem } = filterFields;
     const ref = useRef(null);
     const [filter, setFilter] = useState([]);
@@ -94,6 +108,38 @@ const RecordList = createWithRemoteLoader({
 
     return (
       <TablePage
+        isNext
+        search={{
+          name: 'name',
+          label: formatMessage({ id: 'Target' })
+        }}
+        filter={{
+          value: filter,
+          onChange: setFilter,
+          list: [
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'Code' }), name: 'code' }
+            },
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'Target' }), name: 'name' }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'Type' }),
+                name: 'type',
+                single: true,
+                render: ({ children }) => (
+                  <Enum moduleName="messageManagerType" format="option">
+                    {options => children({ options })}
+                  </Enum>
+                )
+              }
+            }
+          ]
+        }}
         {...Object.assign({}, apis.messageManger.records.list, {
           params: buildMessageParams(filterValue, ['type', 'code', 'name'])
         })}
@@ -102,27 +148,6 @@ const RecordList = createWithRemoteLoader({
         name="message-manger-record-list"
         columns={getRecordColumns({ formatMessage, onSuccess: () => ref.current?.refresh() })}
         page={{
-          filter: {
-            value: filter,
-            onChange: setFilter,
-            list: [
-              [
-                <InputFilterItem label={formatMessage({ id: 'Code' })} name="code" />,
-                <InputFilterItem label={formatMessage({ id: 'Target' })} name="name" />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'Type' })}
-                  name="type"
-                  single
-                  render={({ children }) => (
-                    <Enum moduleName="messageManagerType" format="option">
-                      {options => children({ options })}
-                    </Enum>
-                  )}
-                />
-              ]
-            ]
-          },
-          titleExtra: <SearchInput name="name" label={formatMessage({ id: 'Target' })} />,
           menu: <MessageMenu baseUrl={baseUrl} />,
           ...pageProps
         }}

@@ -24,6 +24,7 @@ const Role = createWithRemoteLoader({
   }), [createFilterValueMapper]);
   return (
     <BizUnit
+      isNext
       {...props}
       apis={apis}
       filter={filter}

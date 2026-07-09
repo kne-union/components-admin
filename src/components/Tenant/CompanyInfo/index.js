@@ -17,7 +17,7 @@ const CompanyDetail = createWithRemoteLoader({
   const [InfoPage] = remoteModules;
   const { formatMessage } = useIntl();
   return (
-    <Flex vertical gap={24}>
+    <Flex vertical gap={24} className={style.detailStack}>
       <InfoPage.Part>
         <Basic data={data} />
       </InfoPage.Part>
@@ -53,11 +53,11 @@ const CompanyInfo = createWithRemoteLoader({
             }
             setIsEdit(false);
           }}>
-          <Flex vertical gap={24}>
+          <Flex vertical gap={24} className={style.detailStack}>
             <BasicFormInner />
             <DevelopmentHistoryFormInner />
             <TeamDescriptionFormInner />
-            <Flex justify="center" gap={12}>
+            <Flex justify="center" gap={12} className={style.formActions}>
               <SubmitButton>{formatMessage({ id: 'Save' })}</SubmitButton>
               <CancelButton
                 onClick={() => {
