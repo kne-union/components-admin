@@ -2,102 +2,140 @@
   "isFull": false,
   "list": [
     {
-      "title": "基础用法",
-      "description": "展示 BizUnit 的基本使用方式，包含完整的 CRUD 功能：列表展示、关键字搜索、创建、编辑、删除和状态切换。通过配置 apis、getColumns、getFormInner 等属性快速实现业务模块。",
-      "code": "./base.js",
+      "title": "角色管理（基础 CRUD）",
+      "description": "场景：角色权限管理。覆盖 isNext、apis（含函数形式）、getColumns（renderType/tag/datetime/description）、getFormInner（create/edit）、page、onMount、options 按钮文案与 removeMessage、关键字搜索。",
+      "code": "./base-next.js",
       "scope": [
-        {
-          "name": "_BizUnit",
-          "packageName": "@components/BizUnit"
-        },
-        {
-          "name": "_mockPreset",
-          "packageName": "@root/mockPreset"
-        },
-        {
-          "name": "remoteLoader",
-          "packageName": "@kne/remote-loader"
-        }
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
       ]
     },
     {
-      "title": "自定义操作按钮",
-      "description": "通过 getActionList 函数自定义操作按钮。支持重置内置按钮配置（如根据条件隐藏系统类型角色的删除按钮），以及添加自定义操作按钮组件。",
-      "code": "./custom-actions.js",
+      "title": "员工档案（筛选与批量操作）",
+      "description": "场景：人力资源。覆盖 filter（Input/SuperSelect/DateRange）、options.mapFilterValue、tableProps.pagination/rowSelection/batchActions、列 format:date。",
+      "code": "./with-filter-next.js",
       "scope": [
-        {
-          "name": "_BizUnit",
-          "packageName": "@components/BizUnit"
-        },
-        {
-          "name": "_mockPreset",
-          "packageName": "@root/mockPreset"
-        },
-        {
-          "name": "remoteLoader",
-          "packageName": "@kne/remote-loader"
-        }
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
       ]
     },
     {
-      "title": "带筛选条件",
-      "description": "通过 filterList 属性添加筛选条件，配合 Filter 组件的 SelectItem 实现下拉筛选。适用于需要多条件筛选的业务场景。",
-      "code": "./with-filter.js",
+      "title": "产品目录（表单弹窗配置）",
+      "description": "场景：商品管理。覆盖 options.formSize、formProps、formModalProps、createFormModalProps、editFormModalProps、saveData。",
+      "code": "./form-options-next.js",
       "scope": [
-        {
-          "name": "_BizUnit",
-          "packageName": "@components/BizUnit"
-        },
-        {
-          "name": "_mockPreset",
-          "packageName": "@root/mockPreset"
-        },
-        {
-          "name": "remoteLoader",
-          "packageName": "@kne/remote-loader"
-        }
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
       ]
     },
     {
-      "title": "状态控制配置",
-      "description": "通过 options 配置自定义状态控制按钮。支持自定义状态值、按钮文案和确认提示信息，适用于不同业务场景的状态管理。",
-      "code": "./status-control.js",
+      "title": "销售订单（URL 筛选同步）",
+      "description": "场景：订单中心。覆盖 urlFilterValue、onFilterChange、filter 与关键字搜索联动、renderType:status。示例环境已有外层 Router，通过 useSearchParams 初始化 URL 参数，勿嵌套 MemoryRouter。",
+      "code": "./url-filter-next.js",
       "scope": [
-        {
-          "name": "_BizUnit",
-          "packageName": "@components/BizUnit"
-        },
-        {
-          "name": "_mockPreset",
-          "packageName": "@root/mockPreset"
-        },
-        {
-          "name": "remoteLoader",
-          "packageName": "@kne/remote-loader"
-        }
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "reactRouterDom", "packageName": "react-router-dom" },
+        { "name": "antd", "packageName": "antd" }
       ]
     },
     {
-      "title": "Actions 组件单独使用",
-      "description": "Actions 组件可以单独使用，用于自定义场景下的操作按钮区域。需要包裹 PureGlobal 提供国际化上下文。展示如何在不使用 BizUnit 完整功能时，单独使用操作按钮组件。",
+      "title": "供应商名录（关闭关键字搜索）",
+      "description": "场景：采购管理。覆盖 allowKeywordSearch={false}，仅通过 filter 筛选，只读列表（无 create API）。",
+      "code": "./search-options-next.js",
+      "scope": [
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
+      ]
+    },
+    {
+      "title": "权限角色（自定义行操作）",
+      "description": "场景：角色权限。覆盖 getActionList 重置内置按钮（hidden/reset）、buttonComponent 自定义操作，系统角色保护。",
+      "code": "./custom-actions-next.js",
+      "scope": [
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
+      ]
+    },
+    {
+      "title": "组织架构（Layout@TablePage 多页面）",
+      "isFull": true,
+      "description": "场景：部门与分类管理。AppChildrenRouter + components-core:Layout 多子路由；BizUnit isNext 默认渲染 Layout@TablePage（page.menu 侧栏导航）；覆盖 filter、tableProps.batchActions/rowSelection。",
+      "code": "./layout-next.js",
+      "scope": [
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "appChildrenRouter", "packageName": "@kne/app-children-router" },
+        { "name": "reactRouterDom", "packageName": "react-router-dom" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
+      "title": "人才管理（SystemLayout 综合场景）",
+      "isFull": true,
+      "description": "参考 ai-talent-saas TenantAdmin：AppChildrenRouter + SystemLayout + BizUnit isNext children；@kne/system-layout 的 Page 承载标题，TablePageRender 渲染新版 TablePage；覆盖 filter、tableProps.batchActions/rowSelection。",
+      "code": "./system-layout-next.js",
+      "scope": [
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "_systemLayout", "packageName": "@kne/system-layout" },
+        { "packageName": "@kne/system-layout/dist/index.css" },
+        { "name": "appChildrenRouter", "packageName": "@kne/app-children-router" },
+        { "name": "reactRouterDom", "packageName": "react-router-dom" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
+      "title": "订单中心（StateBarPage 自定义布局）",
+      "description": "场景：订单管理。StateBarPage 状态栏（按付款状态）+ BizUnit children + TablePageRender；行内启用/禁用（setStatus）、编辑、删除。",
+      "code": "./children-next.js",
+      "scope": [
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
+      "title": "项目管理（状态控制）",
+      "description": "场景：项目台账。覆盖 apis.setStatus、options.openStatus/closedStatus、openButtonProps/closeButtonProps、closeMessage、renderType:status。",
+      "code": "./status-control-next.js",
+      "scope": [
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
+      ]
+    },
+    {
+      "title": "Actions 子组件",
+      "description": "Actions 独立使用：默认渲染、getActionList 追加按钮、children 自定义按钮布局（moreType/itemClassName）。",
       "code": "./actions.js",
       "scope": [
-        {
-          "name": "_BizUnit",
-          "packageName": "@components/BizUnit"
-        },
-        {
-          "name": "_mockPreset",
-          "packageName": "@root/mockPreset"
-        },
-        {
-          "name": "remoteLoader",
-          "packageName": "@kne/remote-loader"
-        },
-        {
-          "name": "antd",
-          "packageName": "antd"
-        }
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
+      "title": "Legacy 用法（已废弃）",
+      "description": "【已废弃】旧版 API：filter、type/valueOf 列、getFilterValue、topOptionsSize。仅供维护旧代码对照。",
+      "code": "./legacy.js",
+      "scope": [
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
       ]
     }
   ]

@@ -1,3 +1,5 @@
+@use '~@kne/responsive-utils/scss' as resp;
+
 .dashboardRoot {
   width: 100%;
   max-width: none;
@@ -162,7 +164,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@include resp.down(md) {
   .periodStrip {
     flex-direction: column;
     flex-wrap: wrap;
@@ -241,13 +243,13 @@
   gap: 12px;
 }
 
-@media (max-width: 1200px) {
+@include resp.down(xl) {
   .historyStatsGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 576px) {
+@include resp.down(sm) {
   .historyStatsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

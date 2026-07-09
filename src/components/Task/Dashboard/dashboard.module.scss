@@ -1,3 +1,5 @@
+@use '~@kne/responsive-utils/scss' as resp;
+
 .dashboardRoot {
   width: 100%;
   max-width: none;
@@ -291,7 +293,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@include resp.down(md) {
   .periodStrip {
     flex-direction: column;
     flex-wrap: wrap;
@@ -518,7 +520,7 @@
   font-size: 13px;
 }
 
-@media (max-width: 576px) {
+@include resp.down(sm) {
   .historyBarRow {
     flex-direction: column;
   }

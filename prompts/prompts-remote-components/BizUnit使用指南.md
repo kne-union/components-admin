@@ -1,522 +1,577 @@
 # BizUnit 使用指南
 
-## 模块概述
+> **文档定位**：从「创建一个业务模块」的角度，指导 AI Agent 使用 `components-admin:BizUnit` 搭建标准 CRUD 列表页业务模块，并说明 BizUnit 与项目内其他模块（FormInfo、Filter、TablePage、Layout、Global、路由、国际化等）如何协作。
+>
+> BizUnit 组件本身的属性、列配置、筛选、操作按钮等 API 细节见 [`src/components/BizUnit/doc/api.md`](../../src/components/BizUnit/doc/api.md)，本文不重复展开，仅聚焦于「如何把它们组装成一个完整模块」。
 
-请根据以下规范生成一个完整的前端业务模块，该模块基于BizUnit架构模式，包含完整的CRUD功能、国际化支持、文档示例和可复用的组件结构。
+## 相关文档
 
-## 目录结构
+| 文档 | 职责 |
+|------|------|
+| [FormInfo使用指南.md](./FormInfo使用指南.md) | 表单字段、校验规则、弹窗表单 |
+| [组件示例编写提示词.md](./组件示例编写提示词.md) | Mock 数据配置、文档示例与复杂路由示例编写 |
+| [BizUnit doc/api.md](../../src/components/BizUnit/doc/api.md) | BizUnit 组件 API 与 isNext 配置说明 |
+| [BizUnit doc/](../../src/components/BizUnit/doc/) | 可运行示例（`base-next.js`、`with-filter-next.js` 等） |
+
+---
+
+## 一、BizUnit 是什么
+
+BizUnit 是一个**配置驱动的 CRUD 业务单元组件**：传入 `apis`（接口）、`getColumns`（列定义）、`getFormInner`（表单），即可自动生成「列表 + 关键字搜索 + 筛选 + 创建/编辑/删除/状态切换」的完整列表页，操作列由组件自动追加。
+
+**新业务模块必须使用 `isNext` 模式**（基于 `@kne/table-page` 的新版表格）。本文所有模板均基于 isNext。
+
+---
+
+## 二、模块协作关系
+
+创建一个业务模块，本质是把以下模块按职责组装起来。理解它们的边界，才能正确协作。
+
+### 2.1 协作全景
 
 ```
-src/components/[ModuleName]/
-├── index.js                          # 主入口文件，导出所有组件
-├── [ModuleName].js                   # 根组件，路由配置
-├── withLocale.js                     # 国际化HOC封装
-├── style.module.scss                 # 全局样式文件
-├── Actions/                          # 操作按钮组件目录
-│   ├── index.js                      # Actions主组件
-│   ├── Create.js                     # 新建按钮
-│   ├── Save.js                       # 编辑/保存按钮
-│   ├── Remove.js                     # 删除按钮
-│   └── SetStatus.js                  # 设置状态按钮
-├── Detail/                           # 详情页目录
-│   ├── index.js                      # 详情页主组件
-│   └── RightOptions.js               # 右侧操作按钮
-├── FormInner/                        # 表单内部组件目录
-│   └── index.js                      # 表单字段定义
-├── List/                             # 列表页目录
-│   ├── index.js                      # 列表页主组件
-│   └── getColumns.js                 # 列配置
-├── TabDetail/                        # Tab详情页目录
-│   ├── index.js                      # Tab详情页主组件
-│   └── [TabName]/                     # 各个Tab内容
-├── locale/                           # 国际化文件目录
-│   ├── zh-CN.js                      # 中文语言包
-│   └── en-US.js                      # 英文语言包
-├── doc/                              # 文档和示例目录
-│   ├── api.md                        # API文档
-│   ├── list.js                       # 列表示例
-│   ├── detail.js                     # 详情示例
-│   ├── form-inner.js                 # 表单示例
-│   ├── tab-detail.js                 # Tab详情示例
-│   ├── example.json                  # 示例数据
-│   ├── summary.md                    # 摘要说明
-│   └── style.scss                    # 文档样式
-└── README.md                         # 模块说明文档
+应用入口 (bootstrap.js / preset.js)
+  └─ remoteLoaderPreset 注册远程模块源 (components-core / components-admin / ...)
+  └─ PureGlobal 注入 preset (ajax / apis / enums / global)
+        │
+        └─ 业务模块 (你创建的 Module)
+             ├─ ChildrenRouter (@kne/app-children-router) —— 多子路由组织
+             ├─ withLocale (@kne/react-intl)            —— 国际化 Provider
+             ├─ Layout (components-core:Layout)          —— 页面外壳（isNext 必须在 Layout 内）
+             ├─ BizUnit (components-admin:BizUnit)       —— CRUD 列表页核心
+             │     ├─ 内部加载 Layout@TablePage / Table@TablePage / Filter
+             │     ├─ getColumns  → renderType 列渲染（tag/status/date...）
+             │     ├─ getFormInner → FormInfo 表单字段
+             │     ├─ filter → Filter.fields 筛选项
+             │     └─ 操作列     → 内置 编辑/删除/状态切换 按钮
+             └─ usePreset().apis → 获取在 getApis.js 中定义的接口配置
 ```
 
-## 核心组件实现规范
+### 2.2 各模块职责与加载方式
 
-### 1. 主入口文件 (index.js)
+| 模块 | 加载方式 | 职责 |
+|------|----------|------|
+| `components-admin:BizUnit` | `createWithRemoteLoader` 远程加载 | CRUD 列表页核心，组装表格/筛选/表单/操作 |
+| `components-core:Layout` | 远程加载 | 页面外壳与导航；isNext 依赖其 `Layout@TablePage` 上下文 |
+| `components-core:Filter` | 远程加载（BizUnit 内部加载，筛选项组件需自行解构） | 筛选项组件 `Filter.fields`、`SearchInput`、`useUrlFilterValue` |
+| `components-core:FormInfo` | 远程加载 | 表单字段定义（`FormInfo.fields`）、表单弹窗 |
+| `components-core:Global@usePreset` | 远程加载 | 获取全局 `preset`（`apis`、`ajax`、`enums`） |
+| `components-core:Global@PureGlobal` | 远程加载 | 注入 `preset`（含 mock），文档示例必备 |
+| `@kne/app-children-router` | **直接 import 包**（非远程） | `ChildrenRouter` 组织多子路由（模式 B/C） |
+| `@kne/react-intl` | 直接 import | `createWithIntlProvider`、`useIntl` |
+| `@kne/remote-loader` | 直接 import | `createWithRemoteLoader` 包装组件 |
 
-导出所有子组件，包括：
+### 2.3 关键协作约定
 
-- 默认导出：根组件
-- 命名导出：List, FormInner, Detail, TabDetail, Actions等
+- **API 不硬编码**：组件内通过 `usePreset().apis` 获取接口配置，URL 统一在 `getApis.js` 维护。
+- **远程模块不可通过 props 传递**：子组件需要 `FormInfo`/`Filter` 时应自行用 `createWithRemoteLoader` 加载，不要从父组件透传（见 [FormInfo使用指南.md](./FormInfo使用指南.md) 最佳实践）。
+- **isNext 必须在 `Layout` 内渲染**：BizUnit isNext 依赖 `Layout.TablePage` 上下文。
+- **筛选用 `filter`**：isNext 模式筛选用 `filter={{ list: [...] }}`（一维 `{ type, props }` 数组），筛选项组件从 `Filter.fields` 解构。**不要**使用 legacy 二维数组格式。
 
-### 2. 根组件 ([ModuleName].js)
+---
 
-- 使用 `createWithRemoteLoader` 进行远程模块加载
-- 使用 `ChildrenRouter` 或 `AppChildrenRouter` 进行路由配置
-- 配置路由路径和懒加载
-- 支持自定义 navigation 和 list 配置
+## 三、创建业务模块流程
 
-示例结构：
+### 步骤 1：需求分析与模式选型
+
+| 模式 | 适用场景 | 结构特征 |
+|------|----------|----------|
+| **A 单页 BizUnit** | 单一实体、一个列表页完成 CRUD | 直接渲染一个 BizUnit |
+| **B 多子模块 + 左菜单** | 多实体、左侧菜单切换 | `ChildrenRouter` + 各子模块 List，BizUnit isNext 默认渲染 `Layout@TablePage`，配合 `page.menu` |
+| **C SystemLayout 综合后台** | 系统管理类，需侧栏 + 多路由 + 自定义布局 | `SystemLayout` + `ChildrenRouter` + BizUnit `children` + `TablePageRender` + `Page` |
+
+确认：
+- [ ] 实体名称与字段清单
+- [ ] 是否需要筛选、自定义行操作、批量操作、状态切换、自定义布局
+- [ ] API 路径与请求/响应结构（列表返回 `{ pageData, totalCount }`）
+
+### 步骤 2：定义 API（`src/components/Apis/getApis.js`）
+
+在 `getApis` 返回的对象中，为实体新增接口。BizUnit 至少需要 `list`、`create`、`save`、`remove`，按需补充 `setStatus`、`detail`。
 
 ```javascript
-import ChildrenRouter from '@kne/app-children-router';
-import withLocale from './withLocale';
-
-const ModuleNameInner = ({baseUrl, ...props}) => {
-    return (
-        <ChildrenRouter
-            {...props}
-            baseUrl={`${baseUrl}/route-path`}
-            list={[
-                {index: true, loader: () => import('./List')},
-                {path: 'detail', loader: () => import('./Detail')},
-                {path: 'tab-detail', loader: () => import('./TabDetail')}
-            ]}
-        />
-    );
+// src/components/Apis/getApis.js
+const getApis = options => {
+  const { prefix } = Object.assign({}, { prefix: `/api/v1` }, options);
+  return {
+    // ...已有实体
+    myEntity: {
+      list: { url: `${prefix}/my-entity/list`, method: 'GET' },
+      create: { url: `${prefix}/my-entity/create`, method: 'POST' },
+      save: { url: `${prefix}/my-entity/save`, method: 'POST' },
+      remove: { url: `${prefix}/my-entity/remove`, method: 'POST' },
+      setStatus: { url: `${prefix}/my-entity/set-status`, method: 'POST' }
+    }
+  };
 };
-
-export default withLocale(ModuleNameInner);
 ```
 
-### 3. 国际化封装 (withLocale.js)
+- [ ] URL、`method` 与后端约定一致
+- [ ] 列表接口返回 `{ pageData: [...], totalCount: number }`（`total` 亦可）
+- [ ] 实体 key（如 `myEntity`）将作为 `usePreset().apis.myEntity` 的取值路径
 
-使用 `createWithIntlProvider` 创建国际化HOC：
+### 步骤 3：配置 Mock（本地开发 / 文档示例）
+
+在 `src/mockPreset/index.js` 中，用 `merge({}, getApis(), { ... })` 为接口补充 `loader`，覆盖真实请求。`usePreset().apis` 拿到的是合并后的结果。
 
 ```javascript
-import {createWithIntlProvider} from '@kne/react-intl';
+// src/mockPreset/index.js
+import merge from 'lodash/merge';
+import { getApis } from '@components/Apis';
+import myEntityList from './my-entity-list.json';
+
+const apis = merge({}, getApis(), {
+  myEntity: {
+    list: { loader: () => Promise.resolve(myEntityList) }, // 返回 { pageData, totalCount }
+    create: { loader: () => ({ code: 0, data: { id: Date.now() } }) },
+    save: { loader: () => ({ code: 0 }) },
+    remove: { loader: () => ({ code: 0 }) },
+    setStatus: { loader: () => ({ code: 0 }) }
+  }
+});
+
+const preset = { ajax, apis, enums, global };
+export default preset;
+```
+
+- [ ] 列表 `loader` 返回值须为 `{ pageData: [...], totalCount: number }`
+- [ ] JSON 用静态路径 `import('./xxx.json')`，禁止变量拼接
+- [ ] 字段名与 `getColumns` / `FormInner` 保持一致，枚举字段存编码而非文案
+- [ ] 详细规范见 [组件示例编写提示词.md](./组件示例编写提示词.md) §5
+
+### 步骤 4：创建模块骨架
+
+```
+src/components/MyModule/
+├── index.js                # 模块入口
+├── withLocale.js           # 国际化 Provider
+├── locale/
+│   ├── zh-CN.js
+│   └── en-US.js
+├── MyModule.js             # 模式 A：直接渲染 BizUnit
+│   # 或 模式 B/C：ChildrenRouter 组织子路由
+├── getColumns.js           # 列配置
+├── getTableFilter.js       # 筛选配置（有筛选时）
+├── FormInner/
+│   └── index.js            # 表单字段
+├── [SubModule/]            # 模式 B/C：各子模块独立目录
+│   ├── List/index.js
+│   ├── getColumns.js
+│   └── FormInner/index.js
+└── doc/                    # 文档示例
+```
+
+#### withLocale.js
+
+`namespace` 格式为 `[项目远程包名]:[ModuleName]`（与 `remoteLoaderPreset` 注册的 remote 名一致，本项目为 `components-admin`）。
+
+```javascript
+import { createWithIntlProvider } from '@kne/react-intl';
 import zhCN from './locale/zh-CN';
 import enUS from './locale/en-US';
 
 const withLocale = createWithIntlProvider({
-    defaultLocale: 'zh-CN',
-    messages: {
-        'zh-CN': zhCN,
-        'en-US': enUS
-    },
-    namespace: 'components-admin:ModuleName'
+  defaultLocale: 'zh-CN',
+  messages: { 'zh-CN': zhCN, 'en-US': enUS },
+  namespace: 'components-admin:MyModule'
 });
 
 export default withLocale;
 ```
 
-### 4. 列表页 (List/index.js)
-
-- 使用 `TablePage` 或 `Table` 组件
-- 集成 `Filter` 进行筛选
-- 使用 `StateBar` 进行状态切换
-- 定义 `getColumns` 配置表格列
-- 支持 `SearchInput` 关键字搜索
-- 支持分页、排序
-
-核心要素：
-
-- `usePreset()` 获取apis配置
-- `useIntl()` 获取formatMessage
-- `useRef()` 管理表格reload
-- `useState()` 管理筛选状态
-- `useNavigate()` 路由跳转
-
-### 5. 列配置 (List/getColumns.js)
-
-导出 `getColumns` 函数，接收 `{ navigate, formatMessage }` 参数
-列类型包括：
-
-- `serialNumber`: 序号
-- `mainInfo`: 主信息（可点击）
-- `tag`: 标签
-- `description`: 描述
-- `datetime`: 日期时间
-- `options`: 操作列
-
-### 6. 表单组件 (FormInner/index.js)
-
-- 使用 `FormInfo` 组件
-- **详细使用方法请参阅 [FormInfo使用指南.md](./FormInfo使用指南.md)**
-- 该指南包含：
-    - 完整的字段类型说明（基础输入、选择器、日期时间、业务专用、上传类等）
-    - 校验规则配置
-    - 列表组件使用
-    - 弹窗与抽屉表单
-    - 分步表单
-    - 表单上下文与API
-    - 多语言支持
-    - 最佳实践与完整示例
-
-### 7. 详情页 (Detail/index.js)
-
-- 使用 `Fetch` 组件获取详情数据
-- 使用 `Page` 和 `InfoPage` 组件
-- 使用 `Descriptions` 展示详情信息
-- 支持 `RightOptions` 操作按钮
-
-### 8. Tab详情页 (TabDetail/index.js)
-
-- 使用 `StateBarPage` 组件
-- 支持多个Tab切换
-- 使用 `PageHeader` 显示标题和标签
-- 使用 `StateTag` 显示状态标签
-- 根据 `searchParams.get('tab')` 切换内容
-
-### 9. Actions组件 (Actions/index.js)
-
-Actions 是一个**条件组合器**，根据业务状态动态组装可用 Action 列表，通过 `ButtonGroup` 统一渲染。
-
-#### 核心架构
-
-```
-Actions (组合器)
-  ├── 根据 data 条件组装 list 数组
-  ├── list 每项: { buttonComponent, data, children, onSuccess, ...props }
-  └── <ButtonGroup list={list} /> 或 children({ list }) 自定义渲染
-       └── 遍历 list → React.createElement(item.buttonComponent, item)
-           ├── Detail      → <Button onClick={modal(DetailContent)} />
-           ├── SendMessage  → <Button onClick={modal(Form)} />
-           ├── Remove       → <ConfirmButton onClick={ajax(remove)} />
-           └── ...
-```
-
-#### 实现规范
+#### locale/zh-CN.js
 
 ```javascript
-import { createWithRemoteLoader } from '@kne/remote-loader';
-import withLocale from '../withLocale';
-import { useIntl } from '@kne/react-intl';
-import Detail from './Detail';
-import SendMessage from './SendMessage';
-
-const ActionsInner = createWithRemoteLoader({
-  modules: ['components-core:ButtonGroup']
-})(({ remoteModules, children, data, onSuccess, moreType = 'link', itemClassName, ...props }) => {
-  const [ButtonGroup] = remoteModules;
-  const { formatMessage } = useIntl();
-  const list = [];
-
-  // 始终显示详情按钮
-  list.push({
-    ...props,
-    buttonComponent: Detail,
-    data,
-    children: formatMessage({ id: 'Detail' }),
-    onSuccess
-  });
-
-  // 条件显示：状态为启用时才显示发送按钮
-  if (Number(data.status) === 0) {
-    list.push({
-      ...props,
-      buttonComponent: SendMessage,
-      data,
-      children: formatMessage({ id: 'SendMessage' }),
-      onSuccess
-    });
-  }
-
-  // 支持自定义渲染
-  if (typeof children === 'function') {
-    return children({ list });
-  }
-
-  // 默认渲染 ButtonGroup
-  return <ButtonGroup itemClassName={itemClassName} list={list} moreType={moreType} />;
-});
-
-const Actions = withLocale(ActionsInner);
-export { Detail, SendMessage };
-export default Actions;
+export default {
+  ModuleTitle: '我的业务',
+  Name: '名称',
+  Status: '状态',
+  StatusActive: '启用',
+  StatusInactive: '禁用',
+  SearchPlaceholder: '请输入关键字'
+};
 ```
 
-#### 关键要点
+- [ ] 列标题、按钮、提示、表单标签均走 `formatMessage({ id })`
+- [ ] 中英文语言包 key 一一对应
 
-1. **`list` 项结构**：每项必须包含 `buttonComponent`（组件引用）+ `children`（按钮文字）+ `data` + `onSuccess` + `...props`
-2. **`...props` 透传机制**：让 `ButtonGroup` → 个体 Action 之间的属性传递自然流畅，按钮样式（`type="link"`）、`className` 等由上层注入
-3. **条件组合**：根据业务状态（如 `data.status`）动态决定显示哪些 Action
-4. **双渲染模式**：默认 `<ButtonGroup list={list} />` 自动渲染按钮组（按钮过多时折叠为"更多"下拉）；当 `children` 是函数时，`children({ list })` 让调用方完全掌控渲染
-5. **业务区分属性**：如需区分不同业务场景（模板/记录），使用 `detailType` 等语义化命名，**不要占用 `type` 属性**（`type` 专用于按钮样式，如 `type="link"`）
+### 步骤 5：实现列表列 — `getColumns.js`
 
-### 10. 各个Action按钮
-
-**核心原则：每个 Action 组件自己渲染自己的 Button，自己管理自己的 Modal/请求逻辑，不依赖外部提供 UI 容器。**
-
-#### 两种 Action 模式
-
-**模式 A — 展示型 Action（详情、错误详情等）**
-
-使用 `Button` + `useModal`，点击按钮打开弹窗展示内容：
+导出函数，接收 `{ formatMessage }`，返回 isNext 列配置数组（**不含操作列**）。
 
 ```javascript
-import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Button } from 'antd';
-import withLocale from '../withLocale';
-import { useIntl } from '@kne/react-intl';
-import DetailContent from '../DetailContent';
-
-const DetailInner = createWithRemoteLoader({
-  modules: ['components-core:Modal@useModal']
-})(({ remoteModules, data, ...props }) => {
-  const [useModal] = remoteModules;
-  const { formatMessage } = useIntl();
-  const modal = useModal();
-
-  return (
-    <Button
-      {...props}    // ← 关键：透传，让 ButtonGroup 控制按钮外观
-      onClick={() => {
-        modal({
-          title: formatMessage({ id: 'Detail' }),
-          width: 760,
-          footer: null,
-          children: <DetailContent data={data} />
-        });
-      }}
-    />
-  );
-});
-
-const Detail = withLocale(DetailInner);
-export default Detail;
-```
-
-**模式 B — 操作型 Action（删除、取消、重试等）**
-
-使用 `ConfirmButton`，点击后确认再执行 API 请求：
-
-```javascript
-import { createWithRemoteLoader } from '@kne/remote-loader';
-import { App } from 'antd';
-import withLocale from '../withLocale';
-import { useIntl } from '@kne/react-intl';
-
-const RemoveInner = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:ConfirmButton']
-})(({ remoteModules, data, onSuccess, ...props }) => {
-  const [usePreset, ConfirmButton] = remoteModules;
-  const { formatMessage } = useIntl();
-  const { apis, ajax } = usePreset();
-  const { message } = App.useApp();
-
-  return (
-    <ConfirmButton
-      {...props}    // ← 关键：透传
-      message={formatMessage({ id: 'DeleteConfirm' })}
-      isDelete={true}
-      onClick={async () => {
-        const { data: resData } = await ajax(
-          Object.assign({}, apis.moduleName.remove, {
-            data: { id: data.id }
-          })
-        );
-        if (resData.code !== 0) {
-          return;
-        }
-        message.success(formatMessage({ id: 'DeleteSuccess' }));
-        onSuccess && onSuccess();
-      }}
-    />
-  );
-});
-
-const Remove = withLocale(RemoveInner);
-export default Remove;
-```
-
-**模式 C — 表单型 Action（新建、编辑、发送等）**
-
-使用 `Button` + `useModal` + `Form`，点击按钮打开表单弹窗：
-
-```javascript
-import { createWithRemoteLoader } from '@kne/remote-loader';
-import { App, Button } from 'antd';
-import withLocale from '../withLocale';
-import { useIntl } from '@kne/react-intl';
-
-const SendMessageInner = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:FormInfo', 'components-core:Modal@useModal']
-})(({ remoteModules, data, onSuccess, ...props }) => {
-  const [usePreset, FormInfo, useModal] = remoteModules;
-  const { apis, ajax } = usePreset();
-  const { formatMessage } = useIntl();
-  const { message } = App.useApp();
-  const modal = useModal();
-  const { Form, FormGroup, FormItem, Input } = FormInfo;
-
-  return (
-    <Button
-      {...props}    // ← 关键：透传
-      onClick={() => {
-        modal({
-          title: formatMessage({ id: 'SendMessage' }),
-          width: 520,
-          children: (
-            <Form
-              onSubmit={async (formData) => {
-                const { data: resData } = await ajax(
-                  Object.assign({}, apis.moduleName.send, {
-                    data: { id: data.id, ...formData }
-                  })
-                );
-                if (resData.code !== 0) {
-                  return;
-                }
-                message.success(formatMessage({ id: 'SendMessageSuccess' }));
-                onSuccess && onSuccess();
-                return true; // 返回 true 关闭弹窗
-              }}
-            >
-              <FormGroup>
-                <FormItem name="name" label="名称" required>
-                  <Input />
-                </FormItem>
-              </FormGroup>
-            </Form>
-          )
-        });
-      }}
-    />
-  );
-});
-
-const SendMessage = withLocale(SendMessageInner);
-export default SendMessage;
-```
-
-#### Action 组件通用规范
-
-| 特性 | 说明 |
-|------|------|
-| `createWithRemoteLoader` | 声明远程模块依赖，框架异步加载后注入 `remoteModules` |
-| `withLocale` 包裹 | 注入 i18n 的 `formatMessage` 能力 |
-| 接收 `data` prop | 当前行的数据对象 |
-| 接收 `onSuccess` prop | 操作成功后的回调（刷新列表等） |
-| `...props` 透传 | **关键机制** — 让 ButtonGroup 能控制按钮外观和行为 |
-| **自己渲染自己的 Button** | 每个 Action 是完整自包含的组件，而非单纯的配置项 |
-| **独立可用** | 每个 Action 可以脱离 Actions 组合器独立使用（如批量操作场景） |
-
-#### 在 getColumns 中的集成方式
-
-操作列由 Actions 完全接管，不在 getColumns 中手动创建 Button：
-
-```javascript
-import Actions from './Actions';
-
-const getColumns = ({ formatMessage, onSuccess }) => [
-  // ... 数据列 ...
+const getColumns = ({ formatMessage }) => [
+  { name: 'id', title: formatMessage({ id: 'ID' }), width: 80, renderType: 'small' },
+  { name: 'name', title: formatMessage({ id: 'Name' }), width: 160, renderType: 'main' },
   {
-    name: 'options',
-    title: formatMessage({ id: 'Operation' }),
-    type: 'options',
-    fixed: 'right',
-    valueOf: item => ({
-      children: <Actions type="link" data={item} onSuccess={onSuccess} />
+    name: 'status',
+    title: formatMessage({ id: 'Status' }),
+    width: 100,
+    renderType: 'tag',
+    getValueOf: item => ({
+      type: item.status === 'active' ? 'success' : 'default',
+      text: formatMessage({ id: item.status === 'active' ? 'StatusActive' : 'StatusInactive' })
     })
+  },
+  { name: 'description', title: formatMessage({ id: 'Description' }), renderType: 'description', ellipsis: true }
+];
+
+export default getColumns;
+```
+
+- [ ] 使用 `renderType`、`getValueOf`、`format`（isNext），不用 legacy 的 `type`、`valueOf`
+- [ ] `tag`/`status` 列的 `getValueOf` 返回 `{ type, text }`
+- [ ] 日期列用 `format: 'date' | 'datetime'`
+- [ ] 完整列配置项见 [BizUnit doc/api.md](../../src/components/BizUnit/doc/api.md) `getColumns` 章节
+
+### 步骤 6：实现表单 — `FormInner/index.js`
+
+使用 `FormInfo` 及 `FormInfo.fields` 定义字段，自行远程加载 FormInfo。
+
+```javascript
+import { createWithRemoteLoader } from '@kne/remote-loader';
+import withLocale from '../withLocale';
+import { useIntl } from '@kne/react-intl';
+
+const FormInner = createWithRemoteLoader({
+  modules: ['components-core:FormInfo']
+})(
+  withLocale(({ remoteModules }) => {
+    const [FormInfo] = remoteModules;
+    const { Input, TextArea } = FormInfo.fields;
+    const { formatMessage } = useIntl();
+
+    return (
+      <FormInfo
+        title={formatMessage({ id: 'BasicInfo' })}
+        column={2}
+        list={[
+          <Input name="name" label={formatMessage({ id: 'Name' })} rule="REQ LEN-2-50" />,
+          <TextArea name="description" label={formatMessage({ id: 'Description' })} block rule="LEN-0-1000" />
+        ]}
+      />
+    );
+  })
+);
+
+export default FormInner;
+```
+
+- [ ] 字段类型与校验规则见 [FormInfo使用指南.md](./FormInfo使用指南.md)
+- [ ] 文本字段建议限制长度：`Input` 用 `LEN-0-100`，`TextArea` 用 `LEN-0-1000`；必填加 `REQ`
+- [ ] `getFormInner` 可接收 `{ action, apis, options }`，按 `action === 'edit'` 区分创建/编辑
+
+### 步骤 7：实现筛选 — `getTableFilter.js`（有筛选时）
+
+返回**一维** `{ type, props }` 数组，筛选项组件从 `Filter.fields` 解构，在 BizUnit 处用 `filter={{ list: ... }}` 传入。
+
+```javascript
+const getTableFilter = ({ formatMessage, InputFilterItem, SuperSelectFilterItem }) => [
+  { type: InputFilterItem, props: { name: 'name', label: formatMessage({ id: 'Name' }) } },
+  {
+    type: SuperSelectFilterItem,
+    props: {
+      name: 'status',
+      label: formatMessage({ id: 'Status' }),
+      single: true,
+      options: [
+        { label: formatMessage({ id: 'StatusActive' }), value: 'active' },
+        { label: formatMessage({ id: 'StatusInactive' }), value: 'inactive' }
+      ]
+    }
   }
 ];
+
+export default getTableFilter;
 ```
 
-**注意**：
-- 操作列不需要 `openDetail` 等外部回调，详情等展示型操作由 Action 组件自行管理
-- `type="link"` 控制按钮样式为链接型，与 Task 等组件保持一致
-- 业务区分属性（如模板/记录）使用 `detailType` 等语义化命名，不占用 `type`
+- [ ] 一维数组，**禁止** legacy 二维数组，**禁止** `displayLine`
+- [ ] 常用筛选项：`InputFilterItem`、`SuperSelectFilterItem`、`DateRangeFilterItem`
+- [ ] 筛选项 `name` 与列表接口筛选参数一致
 
-## 国际化文件规范
+### 步骤 8：路由与导航注册
 
-### zh-CN.js 和 en-US.js
+- [ ] 在应用路由入口为模块注册 `baseUrl` 与 `Route`
+- [ ] 在导航 / 菜单配置中补充文案
+- [ ] 模式 B/C：父级传入 `baseUrl`，子模块在此基础上拼接（如 `${baseUrl}/my-module`）
 
-包含以下类型键值：
+### 步骤 9：文档示例
 
-- 列表列标题：ID, Name, Status, Description, CreatedAt等
-- 操作按钮：Add, Edit, Delete, Save等
-- 成功提示：AddSuccess, SaveSuccess, DeleteSuccess等
-- 确认提示：DeleteConfirm等
-- 表单标签：字段名称
-- 详情页标题
+- [ ] 按 [组件示例编写提示词.md](./组件示例编写提示词.md) 编写 `doc/` 示例与 `example.json`
+- [ ] BizUnit 模块示例须在 `Layout` 内渲染，多路由模块用 `Routes` 包裹（示例环境已有外层 Router，勿再嵌套 `BrowserRouter`）
 
-## API集成规范
+---
 
-通过 `usePreset()` 获取 `apis` 对象，包含：
+## 四、核心代码模板
 
-- `list`: 列表接口
-- `detail`: 详情接口
-- `create`: 新建接口
-- `save`: 编辑接口
-- `remove`: 删除接口
-- 其他业务接口
-
-## 文档示例规范
-
-### doc/list.js
-
-使用 `PureGlobal` 提供mock数据：
+### 4.1 模式 A：单页 BizUnit
 
 ```javascript
-const {default: List} = _ModuleName;
-const {createWithRemoteLoader} = remoteLoader;
-const BaseExample = createWithRemoteLoader({
-    modules: ['components-core:Global@PureGlobal', 'components-core:Global@usePreset', 'components-core:Layout']
-})(({remoteModules}) => {
-    const [PureGlobal, usePreset, Layout] = remoteModules;
-    const {ajax} = usePreset();
+import { createWithRemoteLoader } from '@kne/remote-loader';
+import withLocale from './withLocale';
+import { useIntl } from '@kne/react-intl';
+import getColumns from './getColumns';
+import getTableFilter from './getTableFilter';
+import FormInner from './FormInner';
+
+const MyModule = createWithRemoteLoader({
+  modules: [
+    'components-admin:BizUnit',
+    'components-core:Filter',
+    'components-core:Layout',
+    'components-core:Global@usePreset'
+  ]
+})(
+  withLocale(({ remoteModules, ...props }) => {
+    const [BizUnit, Filter, Layout, usePreset] = remoteModules;
+    const { InputFilterItem, SuperSelectFilterItem } = Filter.fields;
+    const { formatMessage } = useIntl();
+    const { apis } = usePreset();
+
     return (
-        <PureGlobal preset={{ajax, apis: {testApi: {getList, add, save, remove}}}}>
-            <Layout navigation={{isFixed: false}}>
-                <List/>
-            </Layout>
-        </PureGlobal>
+      <Layout>
+        <BizUnit
+          {...props}
+          isNext
+          name="my-module"
+          page={{ title: formatMessage({ id: 'ModuleTitle' }) }}
+          apis={{
+            list: apis.myEntity.list,
+            create: apis.myEntity.create,
+            save: ({ formData, data }) =>
+              Object.assign({}, apis.myEntity.save, { data: { ...formData, id: data.id } }),
+            remove: ({ data }) =>
+              Object.assign({}, apis.myEntity.remove, { data: { id: data.id } })
+          }}
+          getColumns={() => getColumns({ formatMessage })}
+          getFormInner={() => <FormInner />}
+          filter={{
+            list: getTableFilter({ formatMessage, InputFilterItem, SuperSelectFilterItem })
+          }}
+          options={{
+            bizName: formatMessage({ id: 'ModuleTitle' }),
+            keywordFilterName: 'keyword',
+            keywordFilterLabel: formatMessage({ id: 'SearchPlaceholder' })
+          }}
+        />
+      </Layout>
     );
-});
-render(<BaseExample/>);
+  })
+);
+
+export default MyModule;
 ```
 
-### README.md
+### 4.2 模式 B：多子模块 + 左菜单
 
-包含：
+#### 入口 `index.js`（ChildrenRouter 直接 import）
 
-- 概述（模块功能说明）
-- 示例代码（列表、表单、详情、Tab详情）
-- API文档（属性说明表格）
+```javascript
+import ChildrenRouter from '@kne/app-children-router';
+import withLocale from './withLocale';
 
-## 样式规范
+const MyModuleInner = ({ baseUrl, ...props }) => {
+  return (
+    <ChildrenRouter
+      {...props}
+      baseUrl={`${baseUrl}/my-module`}
+      list={[
+        { index: true, loader: () => import('./SubA/List'), elementProps: { baseUrl } },
+        { path: 'sub-b', loader: () => import('./SubB/List'), elementProps: { baseUrl } }
+      ]}
+    />
+  );
+};
 
-- 使用 CSS Modules（`*.module.scss`）
-- 遵循 BEM 命名规范
-- 响应式设计支持
+export default withLocale(MyModuleInner);
+```
 
-## 技术栈
+#### 子模块 `SubA/List/index.js`
 
-- React 18+
-- React Router v6
-- Ant Design 5.x
-- @kne/remote-loader（远程模块加载）
-- @kne/react-intl（国际化）
-- @kne/react-fetch（数据请求）
-- @kne/app-children-router（路由组件）
+结构与模式 A 的 BizUnit 配置一致，`page` 可带 `menu` 实现侧栏导航。无需 `children` 时，BizUnit isNext 默认渲染 `Layout@TablePage`。
 
-## 生成要求
+```javascript
+// 关键差异：page 带 menu（侧栏），menu 由父级 Menu 组件提供
+<BizUnit
+  isNext
+  name="sub-a-list"
+  page={{ title: formatMessage({ id: 'SubATitle' }), menu }}
+  apis={...}
+  getColumns={() => getColumns({ formatMessage })}
+  getFormInner={() => <FormInner />}
+  filter={{ list: getTableFilter({ ... }) }}
+  options={{ bizName: formatMessage({ id: 'SubATitle' }) }}
+/>
+```
 
-1. 完整实现上述目录结构
-2. 所有组件使用 `createWithRemoteLoader` 加载依赖
-3. 所有组件使用 `withLocale` HOC进行国际化封装
-4. 实现完整的CRUD功能
-5. 提供完整的国际化文件（中英文）
-6. 提供完整的文档示例
-7. 代码风格统一，使用ESLint
-8. 注释清晰，易于维护
-9. 支持响应式设计
-10. 提供类型定义（TypeScript项目）
+### 4.3 模式 C：SystemLayout 综合后台
 
-## 上下文信息
+配合 `@kne/system-layout` 的 `SystemLayout` + `Page`，BizUnit 通过 `children` 回调 + `TablePageRender` 自定义布局。须引入 `@kne/system-layout/dist/index.css`。
 
-生成模块时需要提供：
+```javascript
+import { createWithRemoteLoader } from '@kne/remote-loader';
+import SystemLayout, { Page } from '@kne/system-layout';
+import '@kne/system-layout/dist/index.css';
+import ChildrenRouter from '@kne/app-children-router';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import withLocale from './withLocale';
+import { useIntl } from '@kne/react-intl';
 
-- 模块名称（ModuleName）
-- 业务字段定义
-- API接口路径
-- 特殊业务逻辑说明
-- 列表列配置要求
-- 表单字段配置要求
-- 详情页展示要求
-- Tab页配置要求（如需要）
+const MyModule = createWithRemoteLoader({
+  modules: [
+    'components-admin:BizUnit',
+    'components-core:Global@PureGlobal',
+    'components-core:Global@usePreset',
+    'components-core:Filter',
+    'components-core:FormInfo'
+  ]
+})(
+  withLocale(({ remoteModules, baseUrl }) => {
+    const [BizUnit, PureGlobal, usePreset, Filter, FormInfo] = remoteModules;
+    const { TablePageRender } = BizUnit;
+    const { formatMessage } = useIntl();
+    const { apis } = usePreset();
+
+    const renderPage = (title, renderProps) => (
+      <Page title={title} extra={renderProps.titleExtra}>
+        <TablePageRender {...renderProps} />
+      </Page>
+    );
+
+    return (
+      <PureGlobal preset={preset}>
+        <SystemLayout
+          userInfo={{ name: '管理员' }}
+          menu={{ base: baseUrl, items: [
+            { path: '/list', label: formatMessage({ id: 'ModuleTitle' }) }
+          ] }}
+        >
+          <Routes>
+            <Route
+              path={`${baseUrl}/*`}
+              element={
+                <ChildrenRouter
+                  baseUrl={baseUrl}
+                  list={[
+                    { index: true, element: <Navigate to="list" replace /> },
+                    {
+                      path: 'list',
+                      element: (
+                        <BizUnit
+                          isNext
+                          name="my-module-list"
+                          apis={apis.myEntity}
+                          getColumns={() => getColumns({ formatMessage })}
+                          getFormInner={() => <FormInner />}
+                          filter={{ list: getTableFilter({ ... }) }}
+                          options={{ bizName: formatMessage({ id: 'ModuleTitle' }) }}
+                        >
+                          {renderProps => renderPage(formatMessage({ id: 'ModuleTitle' }), renderProps)}
+                        </BizUnit>
+                      )
+                    }
+                  ]}
+                />
+              }
+            />
+            <Route path="*" element={<Navigate to={`${baseUrl}/list`} replace />} />
+          </Routes>
+        </SystemLayout>
+      </PureGlobal>
+    );
+  })
+);
+
+export default MyModule;
+```
+
+> **`children` 回调参数**：`{ isNext, filter, topOptions, titleExtra, tableOptions }`。`tableOptions` 透传给 `TablePageRender`；isNext 时 `TablePageRender` 渲染新版 `components-core:TablePage`，供 `Page` 等外层容器使用。完整说明见 [BizUnit doc/api.md](../../src/components/BizUnit/doc/api.md) `children` 章节。
+
+---
+
+## 五、模块协作详解
+
+### 5.1 BizUnit ↔ Global（preset / apis）
+
+- **应用启动时**：`bootstrap.js` 调用 `globalInit()`（`preset.js`），通过 `remoteLoaderPreset` 注册远程模块源，并准备好 `ajax`。
+- **preset 注入**：`PureGlobal` 接收 `preset`（含 `apis`、`ajax`、`enums`），通过 Context 向下提供。
+- **业务模块取用**：组件内 `const { apis } = usePreset()` 获取接口配置，传给 BizUnit 的 `apis` 属性。BizUnit 内部用 `ajax` 发请求。
+
+### 5.2 BizUnit ↔ FormInfo（表单）
+
+- BizUnit 的 `getFormInner` 返回由 `FormInfo` + `FormInfo.fields` 组成的表单 JSX。
+- 创建/编辑时，BizUnit 用表单弹窗承载 `FormInner`，提交数据传给 `apis.create` / `apis.save`。
+- **FormInfo 必须自行远程加载**，不可通过 props 透传。
+
+### 5.3 BizUnit ↔ Filter（筛选）
+
+- BizUnit 内部已加载 `Filter`，提供 `SearchInput`（关键字搜索）与 `useUrlFilterValue`（URL 筛选同步）。
+- 筛选项组件（`InputFilterItem`、`SuperSelectFilterItem`、`DateRangeFilterItem`）需在业务组件中从 `Filter.fields` 解构，组装成 `filter={{ list: [...] }}` 传给 BizUnit。
+- `options.mapFilterValue` 可对筛选值做二次映射（如日期区间拆为起止两个字段）。
+
+### 5.4 BizUnit ↔ Layout / TablePage
+
+- isNext 模式下，BizUnit 必须在 `components-core:Layout` 内渲染，依赖 `Layout.TablePage` 上下文。
+- 默认渲染 `Layout@TablePage`（含权限页与表格外壳）。
+- 通过 `children` + `TablePageRender` 可跳过 `Layout@TablePage` 外壳，直接渲染新版 `components-core:TablePage`，适配 `SystemLayout` / `StateBarPage` 等容器。
+
+### 5.5 BizUnit ↔ 路由（app-children-router / system-layout）
+
+- **单页**：直接渲染 BizUnit。
+- **多子模块**：`ChildrenRouter`（`@kne/app-children-router`，直接 import）按 `baseUrl` + `path` 懒加载子模块 List。父级传入 `baseUrl`，子模块拼接自己的子路径。
+- **SystemLayout**：`@kne/system-layout` 的 `SystemLayout` 提供侧栏，`Page` 承载标题与 `extra`，BizUnit `children` 回调把 `TablePageRender` 放进 `Page`。
+- **示例环境 Router**：示例运行环境已提供外层 Router，仅用 `Routes`/`Route`/`Navigate`/`useSearchParams`，**禁止**再渲染 `BrowserRouter`/`MemoryRouter`。
+
+### 5.6 BizUnit ↔ 国际化（react-intl）
+
+- `withLocale`（`createWithIntlProvider`）为模块注入语言包，`namespace` 取 `[远程包名]:[ModuleName]`。
+- `useIntl().formatMessage({ id })` 用于列标题、按钮文案、页面标题等。
+- BizUnit 自身也内置 `withLocale`，默认按钮文案（添加/编辑/删除等）已国际化。
+
+---
+
+## 六、完整检查清单
+
+### API 与 Mock
+- [ ] `getApis.js` 新增实体接口（`list`/`create`/`save`/`remove`，按需 `setStatus`）
+- [ ] 列表接口返回 `{ pageData, totalCount }`
+- [ ] `mockPreset/index.js` 为新实体补充 `loader`
+- [ ] 组件内通过 `usePreset().apis` 取接口，未硬编码 URL
+
+### 模块骨架
+- [ ] `withLocale.js` 的 `namespace` 为 `components-admin:ModuleName`
+- [ ] `locale/zh-CN.js`、`locale/en-US.js` key 对齐
+- [ ] `index.js` 导出根组件，模式 B/C 用 `ChildrenRouter`
+
+### BizUnit 配置
+- [ ] 使用 `isNext`
+- [ ] 在 `Layout` 内渲染
+- [ ] 用 `createWithRemoteLoader` 加载 `components-admin:BizUnit` 等远程模块
+- [ ] `page={{ title }}` 设置标题
+- [ ] `create`/`save` 需处理表单数据时用函数形式
+- [ ] 筛选用 `filter={{ list: [...] }}`（一维数组），勿用 legacy 二维数组
+
+### 列 / 表单 / 筛选
+- [ ] `getColumns` 用 `renderType`/`getValueOf`/`format`
+- [ ] `FormInner` 自行加载 `FormInfo`，字段有校验规则
+- [ ] `filter` 筛选项 `name` 与接口参数一致
+
+### 路由 / 文档
+- [ ] 注册模块路由 `baseUrl` 与导航菜单
+- [ ] 按 [组件示例编写提示词.md](./组件示例编写提示词.md) 编写 `doc/` 示例
+
+---
+
+## 七、技术栈
+
+- React 18+ / React Router v6 / Ant Design 5.x
+- `@kne/remote-loader`（远程模块加载）
+- `@kne/react-intl`（国际化）
+- `@kne/app-children-router`（多子路由，模式 B/C）
+- `@kne/system-layout`（系统级布局，模式 C）
+- `components-admin:BizUnit`（isNext）
+- `components-core:FormInfo` / `Filter` / `Layout` / `TablePage` / `Global`
+
+---
+
+实现前须先确认当前项目的 API 定义方式（`getApis.js`）、Mock 注入方式（`mockPreset`）、路由注册位置及分页/筛选参数约定。BizUnit 属性与高级用法（自定义操作 `getActionList`、批量操作 `tableProps.rowSelection`/`batchActions`、URL 筛选 `urlFilterValue`、自定义布局 `children`）见 [BizUnit doc/api.md](../../src/components/BizUnit/doc/api.md) 及 `doc/` 示例。

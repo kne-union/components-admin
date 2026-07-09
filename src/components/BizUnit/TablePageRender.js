@@ -1,20 +1,20 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import merge from 'lodash/merge';
 
 const TablePageRender = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage']
-})(({ remoteModules, filter, titleExtra, tableOptions }) => {
-  const [TablePage] = remoteModules;
+  modules: ['components-core:Layout@TablePage', 'components-core:TablePage']
+})(({ remoteModules, titleExtra, tableOptions, page }) => {
+  const [LayoutTablePage, NextTablePage] = remoteModules;
+
+  if (tableOptions?.isNext) {
+    const { page: layoutPage, isNext, ...nextTableOptions } = tableOptions;
+    return <NextTablePage {...nextTableOptions} />;
+  }
+
   return (
-    <TablePage
+    <LayoutTablePage
       {...tableOptions}
-      page={Object.assign(
-        {},
-        {
-          filter,
-          titleExtra
-        },
-        tableOptions.page
-      )}
+      page={merge({}, tableOptions.page, page, titleExtra ? { titleExtra } : {})}
     />
   );
 });
