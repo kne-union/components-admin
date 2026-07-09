@@ -1,7 +1,11 @@
 const { Setting } = _Tenant;
 const { default: mockPreset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
-const { MemoryRouter, Navigate, Route, Routes } = reactRouterDom;
+const { Route, Routes, Navigate } = reactRouterDom;
+
+const baseUrl = '/Tenant';
+const settingBaseUrl = `${baseUrl}/setting`;
+const pageProps = { menuFixed: false };
 
 const settingApis = {
   user: {
@@ -33,24 +37,13 @@ const SettingExample = createWithRemoteLoader({
   return (
     <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
-        <MemoryRouter initialEntries={['/Tenant/setting/company']}>
-          <Routes>
-            <Route
-              path="/Tenant/setting/*"
-              element={
-                <Setting
-                  pageProps={{
-                    menuFixed: false
-                  }}
-                  baseUrl="/Tenant"
-                  apis={settingApis}
-                />
-              }
-            />
-            <Route path="/Tenant" element={<Navigate to="/Tenant/setting/company" replace />} />
-            <Route path="*" element={<Navigate to="/Tenant/setting/company" replace />} />
-          </Routes>
-        </MemoryRouter>
+        <Routes>
+          <Route
+            path={`${settingBaseUrl}/*`}
+            element={<Setting pageProps={pageProps} baseUrl={baseUrl} apis={settingApis} />}
+          />
+          <Route path="*" element={<Navigate to={`${settingBaseUrl}/company`} replace />} />
+        </Routes>
       </Layout>
     </PureGlobal>
   );

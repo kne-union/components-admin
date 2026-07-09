@@ -3,7 +3,7 @@ const getColumns = ({ renderCopyInvokeUrl, renderCopySignature }) => {
     {
       name: 'id',
       title: 'ID',
-      type: 'serialNumber'
+      renderType: 'small'
     },
     {
       name: 'name',
@@ -12,16 +12,16 @@ const getColumns = ({ renderCopyInvokeUrl, renderCopySignature }) => {
     {
       name: 'url',
       title: '调用路径',
-      type: 'otherSmall',
-      valueOf: item => {
+      renderType: 'small',
+      getValueOf: item => {
         return renderCopyInvokeUrl(item);
       }
     },
     {
       name: 'signature',
       title: '签名',
-      type: 'otherSmall',
-      valueOf: item => {
+      renderType: 'small',
+      getValueOf: item => {
         return renderCopySignature(item);
       }
     },
@@ -36,7 +36,7 @@ const getColumns = ({ renderCopyInvokeUrl, renderCopySignature }) => {
     {
       name: 'shouldEncryptVerify',
       title: '是否验证完整性',
-      valueOf: item => {
+      getValueOf: item => {
         return item.shouldEncryptVerify ? '是' : '否';
       }
     }

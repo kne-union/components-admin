@@ -30,6 +30,7 @@ const Webhook = createWithRemoteLoader({
         !(current && data[current]) && setCurrent(list[0]);
         return (
           <TablePage
+            isNext
             {...props}
             params={{ current, data }}
             loader={({ params }) => {
@@ -68,10 +69,10 @@ const Webhook = createWithRemoteLoader({
               }),
               {
                 name: 'options',
-                type: 'options',
+                renderType: 'options',
                 title: '操作',
                 fixed: 'right',
-                valueOf: item => {
+                getValueOf: item => {
                   return [
                     {
                       children: '调用记录',

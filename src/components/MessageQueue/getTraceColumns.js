@@ -7,7 +7,7 @@ const getTraceColumns = ({ formatMessage }) => {
     {
       name: 'id',
       title: formatMessage({ id: 'ID' }),
-      type: 'serialNumber'
+      renderType: 'small'
     },
     {
       name: 'traceId',
@@ -18,8 +18,8 @@ const getTraceColumns = ({ formatMessage }) => {
     {
       name: 'topic',
       title: formatMessage({ id: 'Topic' }),
-      type: 'tag',
-      valueOf: ({ topic }) =>
+      renderType: 'tag',
+      getValueOf: ({ topic }) =>
         topic && {
           type: 'info',
           text: topic
@@ -28,12 +28,9 @@ const getTraceColumns = ({ formatMessage }) => {
     {
       name: 'event',
       title: formatMessage({ id: 'Event' }),
-      type: 'tag',
-      valueOf: ({ event }) => ({
-        isEnum: true,
-        moduleName: 'traceEvent',
-        name: event
-      })
+      renderType: 'enum',
+      moduleName: 'traceEvent',
+      getValueOf: item => item.event
     },
     {
       name: 'messageId',
@@ -46,12 +43,12 @@ const getTraceColumns = ({ formatMessage }) => {
       title: formatMessage({ id: 'Detail' }),
       ellipsis: true,
       width: 200,
-      valueOf: ({ detail }) => stringifyJson(detail)
+      getValueOf: ({ detail }) => stringifyJson(detail)
     },
     {
       name: 'createdAt',
       title: formatMessage({ id: 'CreatedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     }
   ];
 };

@@ -2,38 +2,35 @@ const getColumns = ({ formatMessage }) => {
   return [
     {
       name: 'appId',
-      title: 'AppId',
-      type: 'other'
+      title: 'AppId'
     },
     {
       name: 'secretKey',
-      title: 'SecretKey',
-      type: 'other'
+      title: 'SecretKey'
     },
     {
       name: 'user',
       title: formatMessage({ id: 'BelongUser' }),
-      type: 'other',
-      valueOf: ({ user }) => {
+      getValueOf: ({ user }) => {
         return user.nickname || user.email || user.phone;
       }
     },
     {
       name: 'description',
       title: formatMessage({ id: 'Description' }),
-      type: 'description'
+      renderType: 'description'
     },
     {
       name: 'lastVisitedAt',
       title: formatMessage({ id: 'LastVisitedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     },
     {
       name: 'status',
       title: formatMessage({ id: 'Status' }),
-      type: 'tag',
-      valueOf: (item, { name }) => {
-        if (item[name] === 0) {
+      renderType: 'tag',
+      getValueOf: item => {
+        if (item.status === 0) {
           return { type: 'success', text: formatMessage({ id: 'Enabled' }) };
         }
         return { type: 'danger', text: formatMessage({ id: 'Disabled' }) };
@@ -42,7 +39,7 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'createdAt',
       title: formatMessage({ id: 'CreatedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     }
   ];
 };

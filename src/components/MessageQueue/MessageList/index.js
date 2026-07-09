@@ -1,7 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Space } from 'antd';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 
@@ -18,7 +17,7 @@ const MessageList = createWithRemoteLoader({
     const [TablePage, usePreset, Filter, Enum] = remoteModules;
     const { formatMessage } = useIntl();
     const { apis } = usePreset();
-    const { SearchInput, getFilterValue, fields: filterFields } = Filter;
+    const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem } = filterFields;
     const navigate = useNavigate();
     const ref = useRef(null);
@@ -27,6 +26,40 @@ const MessageList = createWithRemoteLoader({
 
     return (
       <TablePage
+        isNext
+        search={{
+          name: 'topic',
+          label: formatMessage({ id: 'Topic' })
+        }}
+        filter={{
+          value: filter,
+          onChange: setFilter,
+          list: [
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'Topic' }), name: 'topic' }
+            },
+            {
+              type: InputFilterItem,
+              props: { label: formatMessage({ id: 'TraceId' }), name: 'traceId' }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                label: formatMessage({ id: 'Status' }),
+                name: 'status',
+                single: true,
+                render: ({ children }) => {
+                  return (
+                    <Enum moduleName="messageStatus" format="option">
+                      {options => children({ options })}
+                    </Enum>
+                  );
+                }
+              }
+            }
+          ]
+        }}
         {...Object.assign({}, apis.mq.message.list, {
           params: buildListParams(filterValue, ['topic', 'status', 'traceId'])
         })}
@@ -38,9 +71,9 @@ const MessageList = createWithRemoteLoader({
           {
             name: 'options',
             title: formatMessage({ id: 'Operation' }),
-            type: 'options',
+            renderType: 'options',
             fixed: 'right',
-            valueOf: item => {
+            getValueOf: item => {
               return {
                 children: (
                   <Actions
@@ -59,34 +92,7 @@ const MessageList = createWithRemoteLoader({
           }
         ]}
         page={{
-          filter: {
-            value: filter,
-            onChange: setFilter,
-            list: [
-              [
-                <InputFilterItem label={formatMessage({ id: 'Topic' })} name="topic" />,
-                <InputFilterItem label={formatMessage({ id: 'TraceId' })} name="traceId" />,
-                <SuperSelectFilterItem
-                  label={formatMessage({ id: 'Status' })}
-                  name="status"
-                  single
-                  render={({ children }) => {
-                    return (
-                      <Enum moduleName="messageStatus" format="option">
-                        {options => children({ options })}
-                      </Enum>
-                    );
-                  }}
-                />
-              ]
-            ]
-          },
-          titleExtra: (
-            <Space>
-              <SearchInput name="topic" label={formatMessage({ id: 'Topic' })} />
-              <PublishMessage onSuccess={() => ref.current?.reload?.()} />
-            </Space>
-          ),
+          titleExtra: <PublishMessage onSuccess={() => ref.current?.reload?.()} />,
           menu: <Menu baseUrl={baseUrl} />,
           ...pageProps
         }}

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Space, Button, App } from 'antd';
+import { Button, App } from 'antd';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 import { useProps } from '../context';
@@ -18,7 +18,7 @@ const UserInner = createWithRemoteLoader({
   const contextProps = useProps();
   const pageProps = Object.assign({}, contextProps?.pageProps, propsPageProps);
   const [filter, setFilter] = useState([]);
-  const { SearchInput, getFilterValue, fields: filterFields } = Filter;
+  const { getFilterValue, fields: filterFields } = Filter;
   const { InputFilterItem, SuperSelectFilterItem } = filterFields;
   const { ajax, apis } = usePreset();
   const formModal = useFormModal();
@@ -27,6 +27,65 @@ const UserInner = createWithRemoteLoader({
   const filterValue = getFilterValue(filter);
   return (
     <TablePage
+      isNext
+      search={{
+        name: 'nickname',
+        label: formatMessage({ id: 'Nickname' })
+      }}
+      filter={{
+        value: filter,
+        onChange: setFilter,
+        list: [
+          {
+            type: InputFilterItem,
+            props: { label: formatMessage({ id: 'FilterEmail' }), name: 'email' }
+          },
+          {
+            type: InputFilterItem,
+            props: { label: formatMessage({ id: 'FilterPhone' }), name: 'phone' }
+          },
+          {
+            type: SuperSelectFilterItem,
+            props: {
+              label: formatMessage({ id: 'FilterStatus' }),
+              name: 'status',
+              single: true,
+              api: {
+                loader: () => {
+                  return {
+                    pageData: [
+                      { label: formatMessage({ id: 'Normal' }), value: 0 },
+                      {
+                        label: formatMessage({ id: 'NotActivated' }),
+                        value: 10
+                      },
+                      { label: formatMessage({ id: 'Closed' }), value: 12 }
+                    ]
+                  };
+                }
+              }
+            }
+          },
+          {
+            type: SuperSelectFilterItem,
+            props: {
+              label: formatMessage({ id: 'FilterIsAdmin' }),
+              name: 'isSuperAdmin',
+              single: true,
+              api: {
+                loader: () => {
+                  return {
+                    pageData: [
+                      { label: formatMessage({ id: 'Yes' }), value: true },
+                      { label: formatMessage({ id: 'No' }), value: false }
+                    ]
+                  };
+                }
+              }
+            }
+          }
+        ]
+      }}
       {...Object.assign({}, apis.admin.getUserList, { params: { filter: filterValue } })}
       pagination={{ paramsType: 'params' }}
       name="user-list"
@@ -37,9 +96,9 @@ const UserInner = createWithRemoteLoader({
         {
           name: 'options',
           title: formatMessage({ id: 'Operation' }),
-          type: 'options',
+          renderType: 'options',
           fixed: 'right',
-          valueOf: item => {
+          getValueOf: item => {
             return [
               {
                 children: formatMessage({ id: 'EditUser' }),
@@ -183,54 +242,8 @@ const UserInner = createWithRemoteLoader({
         }
       ]}
       page={{
-        filter: {
-          value: filter,
-          onChange: setFilter,
-          list: [
-            [
-              <InputFilterItem label={formatMessage({ id: 'FilterEmail' })} name="email" />,
-              <InputFilterItem label={formatMessage({ id: 'FilterPhone' })} name="phone" />,
-              <SuperSelectFilterItem
-                label={formatMessage({ id: 'FilterStatus' })}
-                name="status"
-                single
-                api={{
-                  loader: () => {
-                    return {
-                      pageData: [
-                        { label: formatMessage({ id: 'Normal' }), value: 0 },
-                        {
-                          label: formatMessage({ id: 'NotActivated' }),
-                          value: 10
-                        },
-                        { label: formatMessage({ id: 'Closed' }), value: 12 }
-                      ]
-                    };
-                  }
-                }}
-              />,
-              <SuperSelectFilterItem
-                label={formatMessage({ id: 'FilterIsAdmin' })}
-                name="isSuperAdmin"
-                single
-                api={{
-                  loader: () => {
-                    return {
-                      pageData: [
-                        { label: formatMessage({ id: 'Yes' }), value: true },
-                        { label: formatMessage({ id: 'No' }), value: false }
-                      ]
-                    };
-                  }
-                }}
-              />
-            ]
-          ]
-        },
         titleExtra: (
-          <Space align="center">
-            <SearchInput name="nickname" label={formatMessage({ id: 'Nickname' })} />
-            <Button
+          <Button
               type="primary"
               onClick={() => {
                 const modalApi = formModal({
@@ -257,7 +270,6 @@ const UserInner = createWithRemoteLoader({
             >
               {formatMessage({ id: 'AddUser' })}
             </Button>
-          </Space>
         )
       }}
     />

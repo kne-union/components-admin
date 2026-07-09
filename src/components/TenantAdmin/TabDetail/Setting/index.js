@@ -47,7 +47,7 @@ const CustomComponentFormInner = createWithRemoteLoader({
 const Setting = createWithRemoteLoader({
   modules: [
     'components-core:Global@usePreset',
-    'components-core:Table',
+    'components-core:TablePage@Table',
     'components-core:FormInfo',
     'components-core:Modal@useModal',
     'components-core:Modal@ModalButton',
@@ -122,20 +122,19 @@ const Setting = createWithRemoteLoader({
           {
             name: 'value',
             title: formatMessage({ id: 'Value' }),
-            type: 'description'
+            renderType: 'description'
           },
           {
             name: 'secret',
             title: formatMessage({ id: 'IsSecret' }),
-            type: 'singleRow',
-            valueOf: item => String(item.secret !== void 0 ? item.secret : false)
+            getValueOf: item => String(item.secret !== void 0 ? item.secret : false)
           },
           {
             name: 'options',
-            type: 'options',
+            renderType: 'options',
             title: formatMessage({ id: 'Operation' }),
             fixed: 'right',
-            valueOf: item => {
+            getValueOf: item => {
               return [
                 {
                   children: formatMessage({ id: 'Delete' }),
@@ -230,14 +229,14 @@ const Setting = createWithRemoteLoader({
           {
             name: 'description',
             title: formatMessage({ id: 'Description' }),
-            type: 'description'
+            renderType: 'description'
           },
           {
             name: 'options',
-            type: 'options',
+            renderType: 'options',
             title: formatMessage({ id: 'Operation' }),
             fixed: 'right',
-            valueOf: item => {
+            getValueOf: item => {
               return [
                 {
                   buttonComponent: ModalButton,

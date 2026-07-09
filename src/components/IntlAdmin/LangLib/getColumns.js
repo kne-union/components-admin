@@ -3,16 +3,12 @@ const getColumns = () => {
     {
       name: 'id',
       title: 'ID',
-      type: 'serialNumber',
-      hover: false,
-      primary: false
+      renderType: 'small'
     },
     {
       name: 'namespace',
       title: '命名空间',
-      type: 'mainInfo',
-      hover: false,
-      primary: false
+      renderType: 'main'
     },
     {
       name: 'locale',
@@ -29,24 +25,16 @@ const getColumns = () => {
     {
       name: 'reviewStatus',
       title: '审核状态',
-      type: 'tag',
-      valueOf: ({ reviewStatus }) =>
-        reviewStatus && {
-          isEnum: true,
-          moduleName: 'reviewStatus',
-          name: reviewStatus
-        }
+      renderType: 'enum',
+      moduleName: 'reviewStatus',
+      getValueOf: item => item.reviewStatus
     },
     {
       name: 'status',
       title: '状态',
-      type: 'tag',
-      valueOf: ({ status }) =>
-        status && {
-          isEnum: true,
-          moduleName: 'openStatus',
-          name: status
-        }
+      renderType: 'enum',
+      moduleName: 'openStatus',
+      getValueOf: item => item.status
     }
   ];
 };

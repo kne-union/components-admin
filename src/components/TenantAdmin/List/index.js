@@ -4,7 +4,6 @@ import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 import getColumns from './getColumns';
 import { useRef, useState } from 'react';
-import { Space } from 'antd';
 import Create from '../Actions/Create';
 import Actions from '../Actions';
 
@@ -14,7 +13,7 @@ const ListInner = createWithRemoteLoader({
   const [TablePage, Filter, usePreset, StateBar] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
-  const { SearchInput, getFilterValue } = Filter;
+  const { getFilterValue } = Filter;
   const ref = useRef(null);
   const [filter, setFilter] = useState([]);
   const filterValue = getFilterValue(filter);
@@ -36,6 +35,15 @@ const ListInner = createWithRemoteLoader({
 
   return (
     <TablePage
+      isNext
+      search={{
+        name: 'keyword',
+        label: formatMessage({ id: 'Keyword' })
+      }}
+      filter={{
+        value: filter,
+        onChange: setFilter
+      }}
       {...Object.assign({}, apis.tenantAdmin.list, {
         params: Object.assign({}, { filter: filterValue })
       })}
@@ -56,10 +64,15 @@ const ListInner = createWithRemoteLoader({
               if (currentState.key === 'all') {
                 newFilter.splice(currentIndex, 1);
               } else if (currentIndex === -1) {
-                newFilter.push({ name: 'status', value: { label: currentState.tab, value: currentState.key } });
+                newFilter.push({
+                  name: 'status',
+                  label: formatMessage({ id: 'Status' }),
+                  value: { label: currentState.tab, value: currentState.key }
+                });
               } else {
                 newFilter.splice(currentIndex, 1, {
                   name: 'status',
+                  label: formatMessage({ id: 'Status' }),
                   value: { label: currentState.tab, value: currentState.key }
                 });
               }
@@ -70,17 +83,10 @@ const ListInner = createWithRemoteLoader({
         />
       }
       page={{
-        filter: {
-          value: filter,
-          onChange: setFilter
-        },
         titleExtra: (
-          <Space align="center">
-            <SearchInput name="keyword" label={formatMessage({ id: 'Keyword' })} />
-            <Create type="primary" onSuccess={() => ref.current?.reload()}>
-              {formatMessage({ id: 'AddTenant' })}
-            </Create>
-          </Space>
+          <Create type="primary" onSuccess={() => ref.current?.reload()}>
+            {formatMessage({ id: 'AddTenant' })}
+          </Create>
         )
       }}
       columns={[
@@ -88,9 +94,9 @@ const ListInner = createWithRemoteLoader({
         {
           name: 'options',
           title: formatMessage({ id: 'Operation' }),
-          type: 'options',
+          renderType: 'options',
           fixed: 'right',
-          valueOf: item => {
+          getValueOf: item => {
             return {
               children: <Actions data={item} onSuccess={() => ref.current?.reload()} />
             };

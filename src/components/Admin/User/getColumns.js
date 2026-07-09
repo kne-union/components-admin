@@ -3,37 +3,34 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'avatar',
       title: formatMessage({ id: 'Avatar' }),
-      type: 'avatar',
-      valueOf: (item, { name }) => Object.assign({}, { gender: item['gender'] || 'M' }, { id: item[name] })
+      renderType: 'avatar',
+      getValueOf: (item, { name }) => Object.assign({}, { gender: item['gender'] || 'M' }, { id: item[name] })
     },
     {
       name: 'nickname',
       title: formatMessage({ id: 'Nickname' }),
-      type: 'mainInfo'
+      renderType: 'main'
     },
     {
       name: 'email',
-      title: formatMessage({ id: 'Email' }),
-      type: 'other'
+      title: formatMessage({ id: 'Email' })
     },
     {
       name: 'phone',
-      title: formatMessage({ id: 'Phone' }),
-      type: 'serialNumber'
+      title: formatMessage({ id: 'Phone' })
     },
     {
       name: 'isSuperAdmin',
       title: formatMessage({ id: 'IsSuperAdmin' }),
-      type: 'other',
-      valueOf: (item, { name }) => {
+      getValueOf: (item, { name }) => {
         return item[name] === true ? formatMessage({ id: 'Yes' }) : formatMessage({ id: 'No' });
       }
     },
     {
       name: 'status',
       title: formatMessage({ id: 'Status' }),
-      type: 'tag',
-      valueOf: (item, { name }) => {
+      renderType: 'tag',
+      getValueOf: (item, { name }) => {
         if (item[name] === 0) {
           return { type: 'success', text: formatMessage({ id: 'Normal' }) };
         }
@@ -53,7 +50,7 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'description',
       title: formatMessage({ id: 'Description' }),
-      type: 'description'
+      renderType: 'description'
     }
   ];
 };

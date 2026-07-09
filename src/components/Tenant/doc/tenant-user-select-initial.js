@@ -11,7 +11,7 @@ const TenantUserSelectInitialExample = createWithRemoteLoader({
   return (
     <PureGlobal preset={mockPreset}>
       <Form
-        defaultValues={{
+        data={{
           approver: { id: 'user-2', name: '李娜' }
         }}
         onSubmit={data => {

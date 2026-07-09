@@ -15,51 +15,51 @@ const renderEnumTag = ({ formatMessage, value, moduleName }) => {
 };
 
 const getTemplateColumns = ({ formatMessage, onSuccess }) => [
-  { name: 'name', title: formatMessage({ id: 'Name' }), type: 'mainInfo' },
+  { name: 'name', title: formatMessage({ id: 'Name' }), renderType: 'main' },
   { name: 'code', title: formatMessage({ id: 'Code' }) },
   {
     name: 'type',
     title: formatMessage({ id: 'Type' }),
-    valueOf: item => renderEnumTag({ formatMessage, value: item.type, moduleName: 'messageManagerType' })
+    getValueOf: item => renderEnumTag({ formatMessage, value: item.type, moduleName: 'messageManagerType' })
   },
   {
     name: 'level',
     title: formatMessage({ id: 'Level' }),
-    valueOf: item => renderEnumTag({ formatMessage, value: item.level, moduleName: 'messageTemplateLevel' })
+    getValueOf: item => renderEnumTag({ formatMessage, value: item.level, moduleName: 'messageTemplateLevel' })
   },
   {
     name: 'status',
     title: formatMessage({ id: 'Status' }),
-    valueOf: item => renderEnumTag({ formatMessage, value: item.status, moduleName: 'messageTemplateStatus' })
+    getValueOf: item => renderEnumTag({ formatMessage, value: item.status, moduleName: 'messageTemplateStatus' })
   },
-  { name: 'createdAt', title: formatMessage({ id: 'CreatedAt' }), type: 'datetime' },
+  { name: 'createdAt', title: formatMessage({ id: 'CreatedAt' }), format: 'datetime' },
   {
     name: 'options',
     title: formatMessage({ id: 'Operation' }),
-    type: 'options',
+    renderType: 'options',
     fixed: 'right',
-    valueOf: item => ({
+    getValueOf: item => ({
       children: <Actions type="link" detailType="template" data={item} onSuccess={onSuccess} />
     })
   }
 ];
 
 const getRecordColumns = ({ formatMessage, onSuccess }) => [
-  { name: 'name', title: formatMessage({ id: 'Target' }), type: 'mainInfo' },
+  { name: 'name', title: formatMessage({ id: 'Target' }), renderType: 'main' },
   { name: 'code', title: formatMessage({ id: 'Code' }) },
   {
     name: 'type',
     title: formatMessage({ id: 'Type' }),
-    valueOf: item => renderEnumTag({ formatMessage, value: item.type, moduleName: 'messageManagerType' })
+    getValueOf: item => renderEnumTag({ formatMessage, value: item.type, moduleName: 'messageManagerType' })
   },
   { name: 'templateId', title: formatMessage({ id: 'TemplateId' }) },
-  { name: 'createdAt', title: formatMessage({ id: 'CreatedAt' }), type: 'datetime' },
+  { name: 'createdAt', title: formatMessage({ id: 'CreatedAt' }), format: 'datetime' },
   {
     name: 'options',
     title: formatMessage({ id: 'Operation' }),
-    type: 'options',
+    renderType: 'options',
     fixed: 'right',
-    valueOf: item => ({
+    getValueOf: item => ({
       children: <Actions type="link" detailType="record" data={item} onSuccess={onSuccess} />
     })
   }

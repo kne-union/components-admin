@@ -85,7 +85,7 @@
 
 ### TenantUserSelect 按组织选择租户用户
 
-参考 `UserSelect`，用于在表单中先选组织、再选租户成员。左侧为组织树，右侧为成员选择器（`SuperSelect`），成员列表按所选组织及其子组织过滤（`filter.tenantOrgId`）。
+参考 `UserSelect`，用于在表单中先选组织、再选租户成员。左侧为组织树，右侧为成员列表（支持滚动加载），成员列表按所选组织及其子组织过滤（`filter.tenantOrgId`）。
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
@@ -95,6 +95,8 @@
 | placeholder | 成员选择占位文本 | string | - |
 | single | 是否单选 | boolean | true |
 | disabled | 是否禁用 | boolean | false |
+| showSelectedFooter | 是否在底部展示已选成员，支持点击标签移除 | boolean | true |
+| allowSelectAll | 多选时是否展示全选 | boolean | true |
 | userStatus | 成员状态筛选：`open` / `closed`（兼容 `active` → `open`、`inactive` → `closed`） | string | - |
 | companyName | 组织树根节点（公司）名称 | string | - |
 | showOrgRoot | 是否展示公司根节点 | boolean | true |

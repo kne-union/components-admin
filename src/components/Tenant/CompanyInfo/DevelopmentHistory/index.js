@@ -39,7 +39,7 @@ const DevelopmentHistory = createWithRemoteLoader({
       };
       if (item.images && item.images.length > 0) {
         row.images = item.images.map(id => ({
-          src: resolveImageSrc(id, staticUrl)
+          src: resolveImageSrc(id, '')
         }));
       }
       if (item.extra) {
@@ -50,7 +50,7 @@ const DevelopmentHistory = createWithRemoteLoader({
 
     return (
       <div className={style.timelinePanel}>
-        <Timeline data={timelineData} />
+        <Timeline data={timelineData} compact/>
       </div>
     );
   })

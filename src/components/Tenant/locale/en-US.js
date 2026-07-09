@@ -212,6 +212,12 @@ const locale = {
   TenantUserSelectPlaceholder: 'Select a member',
   TenantUserSelectSelectOrgFirst: 'Select an organization on the left first',
   TenantUserSelectEmptyOrg: 'No organization data',
+  TenantUserSelectEmptyUser: 'No members in this organization',
+  TenantUserSelectSelectedLabel: 'Selected ({count})',
+  TenantUserSelectSelectedLabelSingle: 'Selected',
+  TenantUserSelectSelectedEmpty: 'No members selected',
+  TenantUserSelectOrgMemberTotal: '{count} members',
+  TenantUserSelectSelectAll: 'Select all',
 
   // Role
   SystemType: 'System',

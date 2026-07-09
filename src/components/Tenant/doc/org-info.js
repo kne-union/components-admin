@@ -3,47 +3,36 @@ const { default: mockPreset, tenantAdminData } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
 const Fetch = reactFetch.default;
 
-const OrgInfoInner = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset']
-})(({ remoteModules }) => {
-  const [usePreset] = remoteModules;
-  const { apis } = usePreset();
-  const tenant = tenantAdminData.tenantDetail;
-  return (
-    <Fetch
-      {...Object.assign({}, apis.tenantAdmin.orgList, {
-        params: {
-          tenantId: tenant.id
-        }
-      })}
-      render={({ data, reload }) => {
-        return (
-          <OrgInfo
-            data={data}
-            tenantId={tenant.id}
-            companyName={tenant?.tenantCompany?.name}
-            onSuccess={reload}
-            apis={{
-              create: Object.assign({}, apis.tenantAdmin.orgCreate, {
-                data: { tenantId: tenant.id }
-              }),
-              save: Object.assign({}, apis.tenantAdmin.orgSave, {
-                data: { tenantId: tenant.id }
-              }),
-              remove: Object.assign({}, apis.tenantAdmin.orgRemove, {
-                data: { tenantId: tenant.id }
-              }),
-              userList: Object.assign({}, apis.tenantAdmin.userList, {
-                params: { tenantId: tenant.id }
-              }),
-              import: apis.tenantAdmin.orgBatchImport
-            }}
-          />
-        );
-      }}
-    />
-  );
-});
+const tenant = tenantAdminData.tenantDetail;
+const tenantId = tenant.id;
+
+const orgApis = {
+  create: Object.assign({}, mockPreset.apis.tenantAdmin.orgCreate, {
+    data: { tenantId }
+  }),
+  save: Object.assign({}, mockPreset.apis.tenantAdmin.orgSave, {
+    data: { tenantId }
+  }),
+  remove: Object.assign({}, mockPreset.apis.tenantAdmin.orgRemove, {
+    data: { tenantId }
+  }),
+  userList: Object.assign({}, mockPreset.apis.tenantAdmin.userList, {
+    params: { tenantId }
+  }),
+  import: mockPreset.apis.tenantAdmin.orgBatchImport,
+  orgLinkConfig: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkConfig, {
+    params: { tenantId }
+  }),
+  orgLinkSave: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkSave, {
+    data: { tenantId }
+  }),
+  orgLinkSync: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkSync, {
+    data: { tenantId }
+  }),
+  orgLinkCancel: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkCancel, {
+    data: { tenantId }
+  })
+};
 
 const OrgInfoExample = createWithRemoteLoader({
   modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
@@ -52,7 +41,41 @@ const OrgInfoExample = createWithRemoteLoader({
   return (
     <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
-        <OrgInfoInner />
+        <Fetch
+          {...Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkConfig, {
+            params: { tenantId }
+          })}
+          render={({ data: linkConfigData, reload: reloadLinkConfig }) => {
+            const linkedSource = linkConfigData?.enabled ? linkConfigData.source : null;
+            const syncSupported = linkConfigData?.syncSupported;
+            return (
+              <Fetch
+                {...Object.assign({}, mockPreset.apis.tenantAdmin.orgList, {
+                  params: { tenantId }
+                })}
+                render={({ data, reload }) => (
+                  <OrgInfo
+                    data={data}
+                    tenantId={tenantId}
+                    companyName={tenant?.tenantCompany?.name}
+                    onSuccess={reload}
+                    linkedSource={linkedSource}
+                    linkSettingProps={
+                      syncSupported
+                        ? {
+                            tenantId,
+                            envArgs: tenant.tenantSetting?.args || [],
+                            onLinkChange: reloadLinkConfig
+                          }
+                        : null
+                    }
+                    apis={orgApis}
+                  />
+                )}
+              />
+            );
+          }}
+        />
       </Layout>
     </PureGlobal>
   );
