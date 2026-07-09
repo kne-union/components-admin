@@ -15,7 +15,7 @@ const Role = createWithRemoteLoader({
   const [Filter] = remoteModules;
   const { SuperSelectFilterItem, createFilterValueMapper } = Filter;
   const columns = getColumns({ formatMessage });
-  const filterList = useMemo(
+  const filter = useMemo(
     () => getFilterList({ formatMessage, SuperSelectFilterItem }),
     [formatMessage, SuperSelectFilterItem]
   );
@@ -26,7 +26,7 @@ const Role = createWithRemoteLoader({
     <BizUnit
       {...props}
       apis={apis}
-      filterList={filterList}
+      filter={filter}
       getColumns={() => columns}
       getFormInner={props => {
         return <FormInner {...props} />;
