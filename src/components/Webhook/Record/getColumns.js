@@ -3,34 +3,34 @@ const getColumns = () => {
     {
       name: 'id',
       title: 'ID',
-      type: 'serialNumber'
+      renderType: 'small'
     },
     {
       name: 'endTime',
       title: '结束时间',
-      type: 'datetime'
+      format: 'datetime'
     },
     {
       name: 'duration',
       title: '运行时间',
-      valueOf: item => {
+      getValueOf: item => {
         return `${new Date(item.endTime).getTime() - new Date(item.startTime).getTime()}ms`;
       }
     },
     {
       name: 'input',
       title: '调用参数',
-      type: 'description',
+      renderType: 'description',
       ellipsis: true,
-      valueOf: item => {
+      getValueOf: item => {
         return item.input && JSON.stringify(item.input);
       }
     },
     {
       name: 'status',
       title: '执行状态',
-      type: 'tag',
-      valueOf: item => {
+      renderType: 'tag',
+      getValueOf: item => {
         if (item.status === 'success') {
           return { type: 'success', text: '成功' };
         }
@@ -40,9 +40,9 @@ const getColumns = () => {
     {
       name: 'result',
       title: '执行结果',
-      type: 'description',
+      renderType: 'description',
       ellipsis: true,
-      valueOf: item => {
+      getValueOf: item => {
         return item.result && JSON.stringify(item.result);
       }
     }

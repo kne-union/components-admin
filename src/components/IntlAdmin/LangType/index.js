@@ -4,34 +4,22 @@ import getColumns from './getColumns';
 import FormInner from './FormInner';
 
 const LangType = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Layout@TablePage']
+  modules: ['components-core:Global@usePreset']
 })(({ remoteModules, menu, pageProps = {} }) => {
-  const [usePreset, TablePage] = remoteModules;
+  const [usePreset] = remoteModules;
   const { apis } = usePreset();
   return (
     <BizUnit
+      isNext
       name="langType"
       apis={apis.intlAdmin.langType}
       getColumns={getColumns}
       getFormInner={props => <FormInner {...props} />}
+      page={{ menu, ...pageProps }}
       options={{
         bizName: '语言种类'
-      }}>
-      {({ filter, topOptions, titleExtra, tableOptions }) => {
-        return (
-          <TablePage
-            {...Object.assign({}, tableOptions)}
-            page={{
-              ...pageProps,
-              menu,
-              filter,
-              titleExtra,
-              topOptions
-            }}
-          />
-        );
       }}
-    </BizUnit>
+    />
   );
 });
 

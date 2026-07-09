@@ -19,7 +19,7 @@ const getColumns = ({ navigate, formatMessage }) => {
     {
       name: 'id',
       title: 'ID',
-      type: 'serialNumber',
+      renderType: 'small',
       primary: true,
       hover: true,
       onClick: ({ colItem }) => {
@@ -29,7 +29,7 @@ const getColumns = ({ navigate, formatMessage }) => {
     {
       name: 'name',
       title: formatMessage({ id: 'Name' }),
-      type: 'mainInfo',
+      renderType: 'main',
       onClick: ({ colItem }) => {
         goTenantDetail(navigate, colItem);
       }
@@ -37,21 +37,21 @@ const getColumns = ({ navigate, formatMessage }) => {
     {
       name: 'status',
       title: formatMessage({ id: 'Status' }),
-      type: 'tag',
-      valueOf: item => {
+      renderType: 'tag',
+      getValueOf: item => {
         return item.status === 'open' ? { type: 'success', text: formatMessage({ id: 'Open' }) } : { type: 'danger', text: formatMessage({ id: 'Close' }) };
       }
     },
     {
       name: 'description',
       title: formatMessage({ id: 'Description' }),
-      type: 'description',
+      renderType: 'description',
       ellipsis: true
     },
     {
       name: 'createdAt',
       title: formatMessage({ id: 'CreatedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     }
   ];
 };

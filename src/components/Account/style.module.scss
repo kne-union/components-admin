@@ -8,8 +8,8 @@
   overflow: hidden;
   margin: 0 auto;
   border-radius: 12px;
-  --out-inner-height: var(--kne-viewport-height);
-  --max-height: var(--kne-viewport-height);
+  --out-inner-height: calc(var(--kne-viewport-height) * 0.9);
+  --max-height:calc(var(--kne-viewport-height) * 0.9);
 }
 
 .top-banner {
@@ -126,8 +126,8 @@
   .out-container {
     width: 100%;
     max-width: 100%;
-    height: var(--kne-viewport-height);
-    min-height: var(--kne-viewport-height);
+    height: calc(var(--kne-viewport-height) * 0.9);
+    min-height: 500px;
     border-radius: 0;
     background: transparent;
   }

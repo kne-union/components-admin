@@ -39,6 +39,15 @@ const collectOrgSubtreeIds = (orgs, rootId) => {
   return [...ids];
 };
 
+const orgLinkConfigMock = () => ({
+  enabled: false,
+  syncSupported: true,
+  sourceOptions: [
+    { value: 'wecom', label: '企业微信' },
+    { value: 'dingtalk', label: '钉钉' }
+  ]
+});
+
 const normalizeTenantUserStatusFilter = status => {
   const s = status != null ? String(status).trim() : '';
   if (s === 'active') return 'open';
@@ -74,7 +83,12 @@ const loadFilteredTenantUserList = ({ params } = {}) =>
         [item.name, item.email, item.phone].filter(Boolean).join(' ').toLowerCase().includes(keyword)
       );
     }
-    return { pageData, totalCount: pageData.length };
+    const totalCount = pageData.length;
+    const perPage = Number(params?.perPage) || pageData.length || 20;
+    const currentPage = Number(params?.currentPage) || 1;
+    const start = (currentPage - 1) * perPage;
+    pageData = pageData.slice(start, start + perPage);
+    return { pageData, totalCount };
   });
 
 const loadFilteredRoleList = ({ params } = {}) =>
@@ -505,6 +519,18 @@ const apis = merge({}, getApis(), {
         data: { createdOrgs: 2, createdUsers: 1, reusedUsers: 0, rowCount: 2 }
       })
     },
+    orgLinkConfig: {
+      loader: orgLinkConfigMock
+    },
+    orgLinkSave: {
+      loader: () => ({ code: 0 })
+    },
+    orgLinkCancel: {
+      loader: () => ({ code: 0 })
+    },
+    orgLinkSync: {
+      loader: () => ({ code: 0 })
+    },
     userList: {
       loader: loadFilteredTenantUserList
     },
@@ -714,6 +740,18 @@ const apis = merge({}, getApis(), {
         code: 0,
         data: { createdOrgs: 2, createdUsers: 1, reusedUsers: 0, rowCount: 2 }
       })
+    },
+    orgLinkConfig: {
+      loader: orgLinkConfigMock
+    },
+    orgLinkSave: {
+      loader: () => ({ code: 0 })
+    },
+    orgLinkCancel: {
+      loader: () => ({ code: 0 })
+    },
+    orgLinkSync: {
+      loader: () => ({ code: 0 })
     },
     userList: {
       loader: loadFilteredTenantUserList

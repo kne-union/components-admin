@@ -14,7 +14,7 @@ import useColumns from './useColumns';
 import get from 'lodash/get';
 
 const UserList = createWithRemoteLoader({
-  modules: ['components-core:Table', 'components-core:Filter', 'components-core:Global@usePreset']
+  modules: ['components-core:Layout@TablePage', 'components-core:Table', 'components-core:Filter', 'components-core:Global@usePreset']
 })(
   withLocale(
     ({
@@ -29,12 +29,11 @@ const UserList = createWithRemoteLoader({
       initialUserId,
       allowQueryIdForUserFilter
     }) => {
-      const [Table, Filter, usePreset] = remoteModules;
-      const { TablePage, useSelectedRow } = Table;
+      const [TablePage, Table, Filter, usePreset] = remoteModules;
+      const { useSelectedRow } = Table;
       const tableRef = useRef();
       const { formatMessage } = useIntl();
       const {
-        SearchInput,
         getFilterValue,
         createFilterValueMapper,
         useUrlFilter,
@@ -136,7 +135,6 @@ const UserList = createWithRemoteLoader({
               </Button>
             </Flex>
           ) : null}
-          <SearchInput size={topOptionsSize} name="keyword" label={formatMessage({ id: 'Keyword' })} />
           {apis.sendOrgMessage && hasExternalSelected && (
             <SendMessage
               size={topOptionsSize}
@@ -157,20 +155,30 @@ const UserList = createWithRemoteLoader({
       );
 
       const tableOptions = {
+        isNext: true,
         ...merge({}, apis.list, {
           params: {
             filter: filterValue
           }
         }),
         ref: tableRef,
+        search: {
+          name: 'keyword',
+          label: formatMessage({ id: 'Keyword' })
+        },
+        filter: {
+          value: filter,
+          onChange: setFilter,
+          list: filterList
+        },
         columns: [
           ...columns,
           {
             name: 'options',
-            type: 'options',
             title: formatMessage({ id: 'Operation' }),
+            renderType: 'options',
             fixed: 'right',
-            valueOf: item => {
+            getValueOf: item => {
               return {
                 children: (
                   <Actions itemClassName="btn-no-padding" moreType="link" data={item} apis={apis} onSuccess={() => tableRef.current.reload()}>
@@ -198,12 +206,7 @@ const UserList = createWithRemoteLoader({
         return children({ filter: { value: filter, onChange: setFilter }, filterList, topOptions, tableOptions });
       }
 
-      return (
-        <Flex vertical gap={8} flex={1}>
-          <Filter value={filter} onChange={setFilter} extra={topOptions} list={filterList} />
-          <TablePage {...tableOptions} />
-        </Flex>
-      );
+      return <TablePage {...tableOptions} page={{ titleExtra: topOptions }} />;
     }
   )
 );

@@ -7,14 +7,14 @@ const getDeadLetterColumns = ({ formatMessage }) => {
     {
       name: 'id',
       title: formatMessage({ id: 'ID' }),
-      type: 'serialNumber'
+      renderType: 'small'
     },
     {
       name: 'topic',
       title: formatMessage({ id: 'Topic' }),
-      type: 'tag',
+      renderType: 'tag',
       ellipsis: true,
-      valueOf: ({ topic }) =>
+      getValueOf: ({ topic }) =>
         topic && {
           type: 'info',
           text: topic
@@ -36,27 +36,24 @@ const getDeadLetterColumns = ({ formatMessage }) => {
       name: 'payload',
       title: formatMessage({ id: 'Payload' }),
       ellipsis: true,
-      valueOf: ({ payload }) => stringifyJson(payload)
+      getValueOf: ({ payload }) => stringifyJson(payload)
     },
     {
       name: 'replayed',
       title: formatMessage({ id: 'Replayed' }),
-      type: 'tag',
-      valueOf: ({ replayed }) => ({
-        isEnum: true,
-        moduleName: 'mqBoolean',
-        name: !!replayed
-      })
+      renderType: 'enum',
+      moduleName: 'mqBoolean',
+      getValueOf: item => !!item.replayed
     },
     {
       name: 'replayedAt',
       title: formatMessage({ id: 'ReplayedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     },
     {
       name: 'createdAt',
       title: formatMessage({ id: 'CreatedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     }
   ];
 };

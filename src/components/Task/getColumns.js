@@ -5,60 +5,52 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'id',
       title: formatMessage({ id: 'ID' }),
-      type: 'serialNumber'
+      renderType: 'small'
     },
     {
       name: 'type',
       title: formatMessage({ id: 'Type' }),
-      type: 'tag',
-      valueOf: ({ type }) =>
-        type && {
-          isEnum: true,
-          moduleName: 'taskType',
-          name: type
-        }
+      renderType: 'enum',
+      moduleName: 'taskType',
+      getValueOf: item => item.type
     },
     {
       name: 'status',
       title: formatMessage({ id: 'Status' }),
-      type: 'tag',
-      valueOf: ({ status }) =>
-        status && {
-          isEnum: true,
-          moduleName: 'taskStatus',
-          name: status
-        }
+      renderType: 'enum',
+      moduleName: 'taskStatus',
+      getValueOf: item => item.status
     },
     {
       name: 'name',
       title: formatMessage({ id: 'TargetName' }),
-      type: 'description',
-      valueOf: item => {
+      renderType: 'description',
+      getValueOf: item => {
         return item.input?.name;
       }
     },
     {
       name: 'runnerType',
       title: formatMessage({ id: 'ExecutionMode' }),
-      valueOf: item => {
+      getValueOf: item => {
         return item.runnerType === 'manual' ? formatMessage({ id: 'ManualExecution' }) : formatMessage({ id: 'AutomaticExecution' });
       }
     },
     {
       name: 'createdAt',
       title: formatMessage({ id: 'CreatedAt' }),
-      type: 'datetime'
+      format: 'datetime'
     },
     {
       name: 'completedAt',
       title: formatMessage({ id: 'CompletedAt' }),
-      type: 'datetime',
+      format: 'datetime',
       sort: true
     },
     {
       name: 'updatedAt',
       title: formatMessage({ id: 'UpdatedAt' }),
-      type: 'datetime',
+      format: 'datetime',
       sort: true
     }
   ];

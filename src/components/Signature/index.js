@@ -214,6 +214,7 @@ const Signature = createWithRemoteLoader({
 
     return (
       <BizUnit
+        isNext
         name="signature-list"
         apis={apis}
         getColumns={columnsGetColumns}

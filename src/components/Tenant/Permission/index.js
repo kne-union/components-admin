@@ -1,5 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useState } from 'react';
+import { Flex } from 'antd';
 import merge from 'lodash/merge';
 import Role from '../Role';
 import SharedGroup from '../SharedGroup';
@@ -28,7 +29,7 @@ const Permission = createWithRemoteLoader({
   );
 
   return (
-    <>
+    <Flex vertical gap={4}>
       {typeof children === 'function' ? null : stateBar}
       {activeKey === 'tenant-permission' && (
         <TenantPermission apis={apis.permission}>
@@ -70,7 +71,7 @@ const Permission = createWithRemoteLoader({
             : null}
         </SharedGroup>
       )}
-    </>
+    </Flex>
   );
 });
 

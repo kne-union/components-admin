@@ -54,47 +54,36 @@ const { default: mockPreset, tenantAdminData } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
 const Fetch = reactFetch.default;
 
-const OrgInfoInner = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset']
-})(({ remoteModules }) => {
-  const [usePreset] = remoteModules;
-  const { apis } = usePreset();
-  const tenant = tenantAdminData.tenantDetail;
-  return (
-    <Fetch
-      {...Object.assign({}, apis.tenantAdmin.orgList, {
-        params: {
-          tenantId: tenant.id
-        }
-      })}
-      render={({ data, reload }) => {
-        return (
-          <OrgInfo
-            data={data}
-            tenantId={tenant.id}
-            companyName={tenant?.tenantCompany?.name}
-            onSuccess={reload}
-            apis={{
-              create: Object.assign({}, apis.tenantAdmin.orgCreate, {
-                data: { tenantId: tenant.id }
-              }),
-              save: Object.assign({}, apis.tenantAdmin.orgSave, {
-                data: { tenantId: tenant.id }
-              }),
-              remove: Object.assign({}, apis.tenantAdmin.orgRemove, {
-                data: { tenantId: tenant.id }
-              }),
-              userList: Object.assign({}, apis.tenantAdmin.userList, {
-                params: { tenantId: tenant.id }
-              }),
-              import: apis.tenantAdmin.orgBatchImport
-            }}
-          />
-        );
-      }}
-    />
-  );
-});
+const tenant = tenantAdminData.tenantDetail;
+const tenantId = tenant.id;
+
+const orgApis = {
+  create: Object.assign({}, mockPreset.apis.tenantAdmin.orgCreate, {
+    data: { tenantId }
+  }),
+  save: Object.assign({}, mockPreset.apis.tenantAdmin.orgSave, {
+    data: { tenantId }
+  }),
+  remove: Object.assign({}, mockPreset.apis.tenantAdmin.orgRemove, {
+    data: { tenantId }
+  }),
+  userList: Object.assign({}, mockPreset.apis.tenantAdmin.userList, {
+    params: { tenantId }
+  }),
+  import: mockPreset.apis.tenantAdmin.orgBatchImport,
+  orgLinkConfig: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkConfig, {
+    params: { tenantId }
+  }),
+  orgLinkSave: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkSave, {
+    data: { tenantId }
+  }),
+  orgLinkSync: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkSync, {
+    data: { tenantId }
+  }),
+  orgLinkCancel: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkCancel, {
+    data: { tenantId }
+  })
+};
 
 const OrgInfoExample = createWithRemoteLoader({
   modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
@@ -103,7 +92,41 @@ const OrgInfoExample = createWithRemoteLoader({
   return (
     <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
-        <OrgInfoInner />
+        <Fetch
+          {...Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkConfig, {
+            params: { tenantId }
+          })}
+          render={({ data: linkConfigData, reload: reloadLinkConfig }) => {
+            const linkedSource = linkConfigData?.enabled ? linkConfigData.source : null;
+            const syncSupported = linkConfigData?.syncSupported;
+            return (
+              <Fetch
+                {...Object.assign({}, mockPreset.apis.tenantAdmin.orgList, {
+                  params: { tenantId }
+                })}
+                render={({ data, reload }) => (
+                  <OrgInfo
+                    data={data}
+                    tenantId={tenantId}
+                    companyName={tenant?.tenantCompany?.name}
+                    onSuccess={reload}
+                    linkedSource={linkedSource}
+                    linkSettingProps={
+                      syncSupported
+                        ? {
+                            tenantId,
+                            envArgs: tenant.tenantSetting?.args || [],
+                            onLinkChange: reloadLinkConfig
+                          }
+                        : null
+                    }
+                    apis={orgApis}
+                  />
+                )}
+              />
+            );
+          }}
+        />
       </Layout>
     </PureGlobal>
   );
@@ -395,7 +418,7 @@ const TenantUserSelectInitialExample = createWithRemoteLoader({
   return (
     <PureGlobal preset={mockPreset}>
       <Form
-        defaultValues={{
+        data={{
           approver: { id: 'user-2', name: '李娜' }
         }}
         onSubmit={data => {
@@ -464,15 +487,160 @@ render(<TenantUserSelectStatusExample />);
 
 ```
 
-- 系统设置
-- Setting 组件是系统设置的入口，包含公司信息、组织架构、权限管理、用户管理四个设置模块
+- 按组织选择成员（大量数据）
+- 模拟 10 个事业部、80 个团队共 90 个组织节点，每个组织 256 名成员，右侧列表每页 20 条并支持滚动加载
+- _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactFetch(@kne/react-fetch),antd(antd)
+
+```jsx
+const { TenantUserSelect } = _Tenant;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { Flex, Typography } = antd;
+
+const TOTAL_USERS = 256;
+const PAGE_SIZE = 20;
+const LOAD_DELAY_MS = 400;
+const ORG_ROOT_COUNT = 10;
+const TEAMS_PER_ORG = 8;
+
+const POSITIONS = ['前端工程师', '后端工程师', 'UI 设计师', '产品经理', '测试工程师', '运维工程师'];
+
+const buildLargeOrgList = () => {
+  const list = [];
+  for (let i = 1; i <= ORG_ROOT_COUNT; i++) {
+    const rootId = &#96;large-dept-${i}&#96;;
+    list.push({
+      id: rootId,
+      name: &#96;事业部 ${String(i).padStart(2, '0')}&#96;,
+      parentId: null
+    });
+    for (let j = 1; j <= TEAMS_PER_ORG; j++) {
+      list.push({
+        id: &#96;${rootId}-team-${j}&#96;,
+        name: &#96;团队 ${i}-${String(j).padStart(2, '0')}&#96;,
+        parentId: rootId
+      });
+    }
+  }
+  return list;
+};
+
+const largeOrgList = buildLargeOrgList();
+const orgNameMap = largeOrgList.reduce((map, item) => {
+  map[item.id] = item.name;
+  return map;
+}, {});
+
+const largeOrgListApi = {
+  loader: () =>
+    new Promise(resolve => {
+      setTimeout(() => {
+        resolve({
+          pageData: largeOrgList,
+          totalCount: largeOrgList.length
+        });
+      }, 200);
+    })
+};
+
+const largeUserListApi = {
+  loader: ({ params } = {}) => {
+    const perPage = Number(params?.perPage) || PAGE_SIZE;
+    const currentPage = Number(params?.currentPage) || 1;
+    const tenantOrgId = params?.filter?.tenantOrgId;
+
+    return new Promise(resolve => {
+      setTimeout(() => {
+        if (!tenantOrgId) {
+          resolve({ pageData: [], totalCount: 0 });
+          return;
+        }
+
+        const orgName = orgNameMap[tenantOrgId] || '当前组织';
+        const start = (currentPage - 1) * perPage;
+        const pageData = Array.from({ length: Math.min(perPage, Math.max(TOTAL_USERS - start, 0)) }, (_, index) => {
+          const order = start + index + 1;
+          return {
+            id: &#96;large-user-${tenantOrgId}-${order}&#96;,
+            name: &#96;成员 ${String(order).padStart(3, '0')}&#96;,
+            email: &#96;member${order}@tech-innovation.com&#96;,
+            phone: &#96;138${String(10000000 + order).slice(-8)}&#96;,
+            avatar: &#96;https://api.dicebear.com/7.x/avataaars/svg?seed=large-${tenantOrgId}-${order}&#96;,
+            position: POSITIONS[order % POSITIONS.length],
+            department: orgName,
+            tenantOrg: { id: tenantOrgId, name: orgName },
+            status: 'open'
+          };
+        });
+
+        resolve({
+          pageData,
+          totalCount: TOTAL_USERS
+        });
+      }, LOAD_DELAY_MS);
+    });
+  }
+};
+
+const TenantUserSelectLargeDataExample = createWithRemoteLoader({
+  modules: ['components-core:FormInfo', 'components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [FormInfo, PureGlobal] = remoteModules;
+  const { Form, SubmitButton } = FormInfo;
+  const { Input } = FormInfo.fields;
+  const { Text } = Typography;
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Flex vertical gap={16}>
+        <Text type="secondary">
+          模拟 {ORG_ROOT_COUNT} 个事业部、{ORG_ROOT_COUNT * TEAMS_PER_ORG} 个团队，共 {largeOrgList.length}{' '}
+          个组织节点；每个组织下 {TOTAL_USERS} 名成员，每页加载 {PAGE_SIZE} 条。请先在左侧选择组织，再在右侧列表中向下滚动以触发加载更多。
+        </Text>
+        <Form
+          onSubmit={data => {
+            console.log('大规模成员选择:', data);
+          }}>
+          <FormInfo
+            title="大规模成员选择"
+            column={1}
+            list={[<Input name="batchName" label="批次名称" rule="REQ" placeholder="例如：2026 Q2 全员培训" />]}
+          />
+          <TenantUserSelect
+            name="participants"
+            label="参训成员"
+            rule="REQ"
+            single={false}
+            companyName="科技创新有限公司"
+            orgApi={largeOrgListApi}
+            userApi={largeUserListApi}
+          />
+          <div style={{ marginTop: 24, textAlign: 'center' }}>
+            <SubmitButton type="primary">保存</SubmitButton>
+          </div>
+        </Form>
+      </Flex>
+    </PureGlobal>
+  );
+});
+
+render(<TenantUserSelectLargeDataExample />);
+
+```
+
+- 系统设置(全屏)
+- Setting 组件是系统设置的入口，包含公司信息、组织架构、权限管理、用户管理四个设置模块。示例环境已有外层 Router，使用 Routes 匹配子路由，勿嵌套 MemoryRouter。
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom)
 
 ```jsx
 const { Setting } = _Tenant;
 const { default: mockPreset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
-const { MemoryRouter, Navigate, Route, Routes } = reactRouterDom;
+const { Route, Routes, Navigate } = reactRouterDom;
+
+const baseUrl = '/Tenant';
+const settingBaseUrl = &#96;${baseUrl}/setting&#96;;
+const pageProps = { menuFixed: false };
 
 const settingApis = {
   user: {
@@ -504,24 +672,13 @@ const SettingExample = createWithRemoteLoader({
   return (
     <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
-        <MemoryRouter initialEntries={['/Tenant/setting/company']}>
-          <Routes>
-            <Route
-              path="/Tenant/setting/*"
-              element={
-                <Setting
-                  pageProps={{
-                    menuFixed: false
-                  }}
-                  baseUrl="/Tenant"
-                  apis={settingApis}
-                />
-              }
-            />
-            <Route path="/Tenant" element={<Navigate to="/Tenant/setting/company" replace />} />
-            <Route path="*" element={<Navigate to="/Tenant/setting/company" replace />} />
-          </Routes>
-        </MemoryRouter>
+        <Routes>
+          <Route
+            path={&#96;${settingBaseUrl}/*&#96;}
+            element={<Setting pageProps={pageProps} baseUrl={baseUrl} apis={settingApis} />}
+          />
+          <Route path="*" element={<Navigate to={&#96;${settingBaseUrl}/company&#96;} replace />} />
+        </Routes>
       </Layout>
     </PureGlobal>
   );
@@ -620,7 +777,7 @@ render(<SettingExample />);
 
 ### TenantUserSelect 按组织选择租户用户
 
-参考 `UserSelect`，用于在表单中先选组织、再选租户成员。左侧为组织树，右侧为成员选择器（`SuperSelect`），成员列表按所选组织及其子组织过滤（`filter.tenantOrgId`）。
+参考 `UserSelect`，用于在表单中先选组织、再选租户成员。左侧为组织树，右侧为成员列表（支持滚动加载），成员列表按所选组织及其子组织过滤（`filter.tenantOrgId`）。
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
@@ -630,6 +787,8 @@ render(<SettingExample />);
 | placeholder | 成员选择占位文本 | string | - |
 | single | 是否单选 | boolean | true |
 | disabled | 是否禁用 | boolean | false |
+| showSelectedFooter | 是否在底部展示已选成员，支持点击标签移除 | boolean | true |
+| allowSelectAll | 多选时是否展示全选 | boolean | true |
 | userStatus | 成员状态筛选：`open` / `closed`（兼容 `active` → `open`、`inactive` → `closed`） | string | - |
 | companyName | 组织树根节点（公司）名称 | string | - |
 | showOrgRoot | 是否展示公司根节点 | boolean | true |
