@@ -1,5 +1,4 @@
 import '@kne/react-box/dist/index.css';
-import classnames from 'classnames';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { PersonalCard } from '@kne/react-box';
 import { Typography, Tag } from 'antd';
@@ -84,8 +83,15 @@ const buildPersonalCardProps = (data, context = {}) => {
   ) : null;
 
   return {
-    mode: 'horizontal',
-    name: data?.name ? <>{data.name}{sourceTag}</> : data?.name,
+    mode: context.mode || 'horizontal',
+    name: data?.name ? (
+      <>
+        {data.name}
+        {sourceTag}
+      </>
+    ) : (
+      data?.name
+    ),
     email: data?.email,
     phone: data?.phone,
     description: data?.description,
@@ -94,10 +100,10 @@ const buildPersonalCardProps = (data, context = {}) => {
   };
 };
 
-/** 租户用户 PersonalCard（邀请弹窗、加入确认等场景共用） */
+/** 租户用户 PersonalCard（邀请弹窗、加入确认、移动端列表等场景共用） */
 const UserPersonalCard = createWithRemoteLoader({
   modules: ['components-core:Image', 'components-core:Global@usePreset']
-})(({ remoteModules, data, className }) => {
+})(({ remoteModules, data, className, mode = 'horizontal', extra, footer, selected }) => {
   const [Image, usePreset] = remoteModules;
   const { plugins } = usePreset();
   const { formatMessage } = useIntl();
@@ -107,12 +113,15 @@ const UserPersonalCard = createWithRemoteLoader({
   }
 
   return (
-    <div className={classnames(style.wrap, className)}>
-      <PersonalCard
-        {...buildPersonalCardProps(data, { Image, formatMessage, plugins })}
-      />
-    </div>
+    <PersonalCard
+      className={className}
+      extra={extra}
+      footer={footer}
+      selected={selected}
+      {...buildPersonalCardProps(data, { Image, formatMessage, plugins, mode })}
+    />
   );
 });
 
 export default withLocale(UserPersonalCard);
+export { buildPersonalCardProps };

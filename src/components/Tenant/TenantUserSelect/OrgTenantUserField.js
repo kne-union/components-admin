@@ -13,7 +13,8 @@ import OrgTreeNodeTitle from './OrgTreeNodeTitle';
 import TenantUserListPanel from './TenantUserListPanel';
 import TenantUserSelectedFooter from './TenantUserSelectedFooter';
 import SyncOrgList from './SyncOrgList';
-import resolveInitialOrg from './resolveInitialOrg';
+import resolveInitialSelection from './resolveInitialSelection';
+import mergeSelectedOrgIds, { applySelectedOrgIds } from './mergeSelectedOrgIds';
 import withLocale from '../withLocale';
 import style from './style.module.scss';
 
@@ -41,12 +42,14 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
     single,
     showSelectedFooter,
     allowSelectAll,
-    SimpleBar
+    SimpleBar,
+    initialSelectedMeta
   } = ctx;
   const [orgId, setOrgId] = useState(null);
   const [orgName, setOrgName] = useState('');
   const [orgUserTotal, setOrgUserTotal] = useState(null);
   const [orgList, setOrgList] = useState([]);
+  const [orgIdByUserId, setOrgIdByUserId] = useState({});
   const handleOrgListChange = useCallback(list => {
     setOrgList(list);
   }, []);
@@ -78,20 +81,58 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
   }, [orgId, userApi, userStatus]);
 
   const selectedList = useMemo(() => normalizeSelectedList(value, single), [value, single]);
+  const effectiveSelectedList = useMemo(
+    () => applySelectedOrgIds(selectedList, orgIdByUserId),
+    [orgIdByUserId, selectedList]
+  );
+
+  const handleChange = useCallback(
+    next => {
+      if (!single && Array.isArray(next)) {
+        setOrgIdByUserId(prev => {
+          const nextMap = {};
+          next.forEach(item => {
+            const id = String(item.id);
+            const orgIdValue = item.tenantOrgId != null ? String(item.tenantOrgId) : prev[id];
+            if (orgIdValue) {
+              nextMap[id] = orgIdValue;
+            }
+          });
+          return nextMap;
+        });
+      } else if (single && next?.id != null && next.tenantOrgId != null) {
+        setOrgIdByUserId({ [String(next.id)]: String(next.tenantOrgId) });
+      } else if (single && !next) {
+        setOrgIdByUserId({});
+      }
+      onChange(next);
+    },
+    [onChange, single]
+  );
+
+  useEffect(() => {
+    if (!initialSelectedMeta?.length) {
+      return;
+    }
+    setOrgIdByUserId(prev => mergeSelectedOrgIds(prev, initialSelectedMeta));
+  }, [initialSelectedMeta]);
+
+  useEffect(() => {
+    setOrgIdByUserId(prev => mergeSelectedOrgIds(prev, selectedList));
+  }, [selectedList]);
+
   const selectedCountInActiveOrg = useMemo(() => {
     if (!orgId || !orgList.length) {
       return 0;
     }
-    return getOrgSelectedCounts(orgList, selectedList, null).get(String(orgId)) || 0;
-  }, [orgId, orgList, selectedList]);
+    return getOrgSelectedCounts(orgList, effectiveSelectedList, null).get(String(orgId)) || 0;
+  }, [effectiveSelectedList, orgId, orgList]);
 
   useEffect(() => {
-    if (orgId || !orgList.length) {
-      return undefined;
-    }
-
-    if (!selectedList.length) {
-      initialOrgKeyRef.current = null;
+    if (orgId || !orgList.length || !selectedList.length) {
+      if (!selectedList.length) {
+        initialOrgKeyRef.current = null;
+      }
       return undefined;
     }
 
@@ -108,29 +149,29 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
 
     let cancelled = false;
 
-    resolveInitialOrg({ selected: selectedList, orgList, userApi }).then(result => {
-      if (cancelled || !result) {
+    resolveInitialSelection({
+      selected: applySelectedOrgIds(selectedList, mergeSelectedOrgIds({}, initialSelectedMeta || [])),
+      orgList,
+      userApi
+    }).then(result => {
+      if (cancelled || !result?.orgId) {
         return;
       }
 
       initialOrgKeyRef.current = key;
       setOrgId(result.orgId);
       setOrgName(result.orgName);
+      setOrgIdByUserId(prev => mergeSelectedOrgIds(prev, result.enrichedSelected));
 
       if (single && value && value.id != null && value.tenantOrgId == null) {
-        onChange(Object.assign({}, value, { tenantOrgId: result.orgId }));
+        handleChange(Object.assign({}, value, { tenantOrgId: result.orgId }));
         return;
       }
 
-      if (!single && Array.isArray(value)) {
-        const enriched = value.map(item => {
-          if (item.tenantOrgId != null || String(item.id) !== String(result.userId)) {
-            return item;
-          }
-          return Object.assign({}, item, { tenantOrgId: result.orgId });
-        });
+      if (!single && Array.isArray(value) && Array.isArray(result.enrichedSelected)) {
+        const enriched = result.enrichedSelected;
         if (enriched.some((item, index) => item.tenantOrgId !== value[index]?.tenantOrgId)) {
-          onChange(enriched);
+          handleChange(enriched);
         }
       }
     });
@@ -138,7 +179,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
     return () => {
       cancelled = true;
     };
-  }, [orgId, orgList, onChange, selectedList, single, userApi, value]);
+  }, [handleChange, initialSelectedMeta, orgId, orgList, selectedList, single, userApi, value]);
 
   return (
     <div className={style.shell}>
@@ -156,7 +197,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
                 const treeData = buildOrgTreeData(list, orgTreeOptions);
                 const orgSelectedCounts = getOrgSelectedCounts(
                   list,
-                  selectedList,
+                  effectiveSelectedList,
                   showOrgRoot ? orgTreeOptions.rootId : null
                 );
                 return (
@@ -193,7 +234,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
                             setOrgName(node?.name || '');
                             setOrgUserTotal(null);
                             if (single) {
-                              onChange(null);
+                              handleChange(null);
                             }
                           }}
                         />
@@ -231,7 +272,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
               single={single}
               disabled={disabled}
               value={value}
-              onChange={onChange}
+              onChange={handleChange}
               formatMessage={formatMessage}
               onTotalCountChange={setOrgUserTotal}
               selectedCountInActiveOrg={selectedCountInActiveOrg}
@@ -249,7 +290,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
         {showSelectedFooter ? (
           <TenantUserSelectedFooter
             value={value}
-            onChange={onChange}
+            onChange={handleChange}
             single={single}
             disabled={disabled}
             formatMessage={formatMessage}
@@ -264,7 +305,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
 const OrgTenantUserField = createWithRemoteLoader({
   modules: ['components-core:FormInfo@hooks', 'components-core:Common@SimpleBar']
 })(
-  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, ...props }) => {
+  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, ...props }) => {
     const [hooks, SimpleBar] = remoteModules;
     const { useDecorator } = hooks;
     const { formatMessage } = useIntl();
@@ -277,7 +318,8 @@ const OrgTenantUserField = createWithRemoteLoader({
       'showOrgRoot',
       'single',
       'showSelectedFooter',
-      'allowSelectAll'
+      'allowSelectAll',
+      'initialSelectedMeta'
     ]);
     const render = useDecorator(
       merge(
@@ -299,9 +341,10 @@ const OrgTenantUserField = createWithRemoteLoader({
         single,
         showSelectedFooter,
         allowSelectAll,
+        initialSelectedMeta,
         SimpleBar
       }),
-      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, SimpleBar]
+      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, SimpleBar]
     );
 
     return (
