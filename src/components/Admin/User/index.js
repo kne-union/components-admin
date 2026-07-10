@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Button, App } from 'antd';
 import { useIntl } from '@kne/react-intl';
@@ -7,6 +7,7 @@ import { useProps } from '../context';
 import getColumns from './getColumns';
 import FormInner from './FormInner';
 import ResetPasswordFormInner from './ResetPasswordFormInner';
+import UserMobileList from './UserMobileList';
 import md5 from 'md5';
 import get from 'lodash/get';
 
@@ -24,7 +25,163 @@ const UserInner = createWithRemoteLoader({
   const formModal = useFormModal();
   const { message } = App.useApp();
   const ref = useRef(null);
+  const mobileListRef = useRef([]);
   const filterValue = getFilterValue(filter);
+
+  const reloadTable = useCallback(() => {
+    ref.current?.reload();
+  }, []);
+
+  const getActions = useCallback(
+    item => {
+      return [
+        {
+          children: formatMessage({ id: 'EditUser' }),
+          onClick: () => {
+            const modalApi = formModal({
+              title: formatMessage({ id: 'EditUserInfo' }),
+              size: 'small',
+              children: <FormInner />,
+              formProps: {
+                data: Object.assign({}, item),
+                onSubmit: async data => {
+                  const { data: resData } = await ajax(
+                    Object.assign({}, apis.admin.saveUser, {
+                      data: Object.assign({}, data, { id: item.id })
+                    })
+                  );
+                  if (resData.code !== 0) {
+                    return;
+                  }
+                  message.success(formatMessage({ id: 'SaveSuccess' }));
+                  reloadTable();
+                  modalApi.close();
+                }
+              }
+            });
+          }
+        },
+        {
+          children: formatMessage({ id: 'ModifyPassword' }),
+          onClick: () => {
+            const modalApi = formModal({
+              title: formatMessage({ id: 'ModifyPassword' }),
+              size: 'small',
+              children: <ResetPasswordFormInner />,
+              formProps: {
+                onSubmit: async data => {
+                  const { data: resData } = await ajax(
+                    Object.assign({}, apis.admin.resetUserPassword, {
+                      data: {
+                        password: md5(data.password),
+                        userId: item.id
+                      }
+                    })
+                  );
+                  if (resData.code !== 0) {
+                    return;
+                  }
+                  message.success(formatMessage({ id: 'ModifyPasswordSuccess' }));
+                  modalApi.close();
+                }
+              }
+            });
+          }
+        },
+        get(item, 'isSuperAdmin') === true
+          ? {
+              children: formatMessage({ id: 'CancelSuperAdmin' }),
+              message: formatMessage({ id: 'CancelSuperAdminConfirm' }),
+              isDelete: false,
+              onClick: async () => {
+                const { data: resData } = await ajax(
+                  Object.assign({}, apis.admin.setSuperAdmin, {
+                    data: { status: false, userId: item.id }
+                  })
+                );
+                if (resData.code !== 0) {
+                  return;
+                }
+                message.success(formatMessage({ id: 'SetStatusSuccess' }));
+                reloadTable();
+              }
+            }
+          : {
+              children: formatMessage({ id: 'SetSuperAdmin' }),
+              message: formatMessage({ id: 'SetSuperAdminConfirm' }),
+              isDelete: false,
+              onClick: async () => {
+                const { data: resData } = await ajax(
+                  Object.assign({}, apis.admin.setSuperAdmin, {
+                    data: { status: true, userId: item.id }
+                  })
+                );
+                if (resData.code !== 0) {
+                  return;
+                }
+                message.success(formatMessage({ id: 'SetStatusSuccess' }));
+                reloadTable();
+              }
+            },
+        ...(() => {
+          const list = [];
+          if (item.status !== 0) {
+            list.push({
+              confirm: true,
+              children: formatMessage({ id: 'SetNormal' }),
+              message: formatMessage({ id: 'SetNormalConfirm' }),
+              isDelete: false,
+              onClick: async () => {
+                const { data: resData } = await ajax(
+                  Object.assign({}, apis.admin.setUserNormal, {
+                    data: {
+                      id: item.id
+                    }
+                  })
+                );
+                if (resData.code !== 0) {
+                  return;
+                }
+                message.success(formatMessage({ id: 'SetNormalSuccess' }));
+                reloadTable();
+              }
+            });
+          }
+          if (item.status !== 12) {
+            list.push({
+              isDelete: true,
+              confirm: true,
+              children: formatMessage({ id: 'CloseUser' }),
+              message: formatMessage({ id: 'CloseUserConfirm' }),
+              okText: formatMessage({ id: 'Confirm' }),
+              onClick: async () => {
+                const { data: resData } = await ajax(
+                  Object.assign({}, apis.admin.setUserClose, {
+                    data: {
+                      id: item.id
+                    }
+                  })
+                );
+                if (resData.code !== 0) {
+                  return;
+                }
+                message.success(formatMessage({ id: 'CloseUserSuccess' }));
+                reloadTable();
+              }
+            });
+          }
+          return list;
+        })()
+      ];
+    },
+    [ajax, apis.admin, formModal, formatMessage, message, reloadTable]
+  );
+
+  const renderMobile = useCallback(
+    ({ dataSource } = {}) => <UserMobileList dataSource={dataSource ?? mobileListRef.current} getActions={getActions} />,
+    [getActions]
+  );
+
   return (
     <TablePage
       isNext
@@ -87,10 +244,23 @@ const UserInner = createWithRemoteLoader({
         ]
       }}
       {...Object.assign({}, apis.admin.getUserList, { params: { filter: filterValue } })}
+      dataFormat={data => {
+        const format = typeof apis.admin.getUserList?.dataFormat === 'function' ? apis.admin.getUserList.dataFormat : null;
+        const formatted = format
+          ? format(data)
+          : {
+              list: data.pageData,
+              total: data.totalCount ?? data.total,
+              data
+            };
+        mobileListRef.current = formatted?.list || [];
+        return formatted;
+      }}
       pagination={{ paramsType: 'params' }}
       name="user-list"
       ref={ref}
       menuFixed={pageProps?.menuFixed}
+      renderMobile={renderMobile}
       columns={[
         ...getColumns({ formatMessage }),
         {
@@ -98,178 +268,38 @@ const UserInner = createWithRemoteLoader({
           title: formatMessage({ id: 'Operation' }),
           renderType: 'options',
           fixed: 'right',
-          getValueOf: item => {
-            return [
-              {
-                children: formatMessage({ id: 'EditUser' }),
-                onClick: () => {
-                  const modalApi = formModal({
-                    title: formatMessage({ id: 'EditUserInfo' }),
-                    size: 'small',
-                    children: <FormInner />,
-                    formProps: {
-                      data: Object.assign({}, item),
-                      onSubmit: async data => {
-                        const { data: resData } = await ajax(
-                          Object.assign({}, apis.admin.saveUser, {
-                            data: Object.assign({}, data, { id: item.id })
-                          })
-                        );
-                        if (resData.code !== 0) {
-                          return;
-                        }
-                        message.success(formatMessage({ id: 'SaveSuccess' }));
-                        ref.current.reload();
-                        modalApi.close();
-                      }
-                    }
-                  });
-                }
-              },
-              {
-                children: formatMessage({ id: 'ModifyPassword' }),
-                onClick: () => {
-                  const modalApi = formModal({
-                    title: formatMessage({ id: 'ModifyPassword' }),
-                    size: 'small',
-                    children: <ResetPasswordFormInner />,
-                    formProps: {
-                      onSubmit: async data => {
-                        const { data: resData } = await ajax(
-                          Object.assign({}, apis.admin.resetUserPassword, {
-                            data: {
-                              password: md5(data.password),
-                              userId: item.id
-                            }
-                          })
-                        );
-                        if (resData.code !== 0) {
-                          return;
-                        }
-                        message.success(formatMessage({ id: 'ModifyPasswordSuccess' }));
-                        modalApi.close();
-                      }
-                    }
-                  });
-                }
-              },
-              get(item, 'isSuperAdmin') === true
-                ? {
-                    children: formatMessage({ id: 'CancelSuperAdmin' }),
-                    message: formatMessage({ id: 'CancelSuperAdminConfirm' }),
-                    isDelete: false,
-                    onClick: async () => {
-                      const { data: resData } = await ajax(
-                        Object.assign({}, apis.admin.setSuperAdmin, {
-                          data: { status: false, userId: item.id }
-                        })
-                      );
-                      if (resData.code !== 0) {
-                        return;
-                      }
-                      message.success(formatMessage({ id: 'SetStatusSuccess' }));
-                      ref.current.reload();
-                    }
-                  }
-                : {
-                    children: formatMessage({ id: 'SetSuperAdmin' }),
-                    message: formatMessage({ id: 'SetSuperAdminConfirm' }),
-                    isDelete: false,
-                    onClick: async () => {
-                      const { data: resData } = await ajax(
-                        Object.assign({}, apis.admin.setSuperAdmin, {
-                          data: { status: true, userId: item.id }
-                        })
-                      );
-                      if (resData.code !== 0) {
-                        return;
-                      }
-                      message.success(formatMessage({ id: 'SetStatusSuccess' }));
-                      ref.current.reload();
-                    }
-                  },
-              ...(() => {
-                const list = [];
-                if (item.status !== 0) {
-                  list.push({
-                    confirm: true,
-                    children: formatMessage({ id: 'SetNormal' }),
-                    message: formatMessage({ id: 'SetNormalConfirm' }),
-                    isDelete: false,
-                    onClick: async () => {
-                      const { data: resData } = await ajax(
-                        Object.assign({}, apis.admin.setUserNormal, {
-                          data: {
-                            id: item.id
-                          }
-                        })
-                      );
-                      if (resData.code !== 0) {
-                        return;
-                      }
-                      message.success(formatMessage({ id: 'SetNormalSuccess' }));
-                      ref.current.reload();
-                    }
-                  });
-                }
-                if (item.status !== 12) {
-                  list.push({
-                    isDelete: true,
-                    confirm: true,
-                    children: formatMessage({ id: 'CloseUser' }),
-                    message: formatMessage({ id: 'CloseUserConfirm' }),
-                    okText: formatMessage({ id: 'Confirm' }),
-                    onClick: async () => {
-                      const { data: resData } = await ajax(
-                        Object.assign({}, apis.admin.setUserClose, {
-                          data: {
-                            id: item.id
-                          }
-                        })
-                      );
-                      if (resData.code !== 0) {
-                        return;
-                      }
-                      message.success(formatMessage({ id: 'CloseUserSuccess' }));
-                      ref.current.reload();
-                    }
-                  });
-                }
-                return list;
-              })()
-            ];
-          }
+          getValueOf: item => getActions(item)
         }
       ]}
       page={{
         titleExtra: (
           <Button
-              type="primary"
-              onClick={() => {
-                const modalApi = formModal({
-                  title: formatMessage({ id: 'AddUser' }),
-                  size: 'small',
-                  children: <FormInner />,
-                  formProps: {
-                    onSubmit: async data => {
-                      const { data: resData } = await ajax(
-                        Object.assign({}, apis.admin.addUser, {
-                          data: Object.assign({}, data)
-                        })
-                      );
-                      if (resData.code !== 0) {
-                        return;
-                      }
-                      message.success(formatMessage({ id: 'AddSuccess' }));
-                      ref.current.reload();
-                      modalApi.close();
+            type="primary"
+            onClick={() => {
+              const modalApi = formModal({
+                title: formatMessage({ id: 'AddUser' }),
+                size: 'small',
+                children: <FormInner />,
+                formProps: {
+                  onSubmit: async data => {
+                    const { data: resData } = await ajax(
+                      Object.assign({}, apis.admin.addUser, {
+                        data: Object.assign({}, data)
+                      })
+                    );
+                    if (resData.code !== 0) {
+                      return;
                     }
+                    message.success(formatMessage({ id: 'AddSuccess' }));
+                    reloadTable();
+                    modalApi.close();
                   }
-                });
-              }}
-            >
-              {formatMessage({ id: 'AddUser' })}
-            </Button>
+                }
+              });
+            }}
+          >
+            {formatMessage({ id: 'AddUser' })}
+          </Button>
         )
       }}
     />

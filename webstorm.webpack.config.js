@@ -7,7 +7,7 @@ module.exports = {
     extensions: ['.js', '.jsx', '.json'],
     alias: {
       "@root": path.resolve("./src"),
-      "@components": path.resolve("./src/components"),
+      "@components": path.resolve("./src/components")
     }
   }
 }

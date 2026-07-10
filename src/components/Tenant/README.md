@@ -401,7 +401,7 @@ render(<TenantUserSelectMultipleExample />);
 ```
 
 - 按组织选择成员（初始值）
-- 编辑场景为 TenantUserSelect 设置默认成员，值为 { id, name }
+- 编辑场景为 TenantUserSelect 设置默认成员，单选值为 { id, name }
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactFetch(@kne/react-fetch)
 
 ```jsx
@@ -439,6 +439,60 @@ const TenantUserSelectInitialExample = createWithRemoteLoader({
 });
 
 render(<TenantUserSelectInitialExample />);
+
+```
+
+- 按组织选择成员（多选初始值）
+- 编辑场景多选回填，值为 [{ id, name }, ...]，支持跨部门已选成员
+- _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactFetch(@kne/react-fetch)
+
+```jsx
+const { TenantUserSelect } = _Tenant;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+
+const TenantUserSelectInitialMultipleExample = createWithRemoteLoader({
+  modules: ['components-core:FormInfo', 'components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [FormInfo, PureGlobal] = remoteModules;
+  const { Form, SubmitButton } = FormInfo;
+  const { Input } = FormInfo.fields;
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Form
+        data={{
+          taskName: '官网改版评审',
+          collaborators: [
+            { id: 'user-2', name: '李娜' },
+            { id: 'user-3', name: '王强' },
+            { id: 'user-4', name: '刘芳' }
+          ]
+        }}
+        onSubmit={data => {
+          console.log('协作成员:', data);
+        }}>
+        <FormInfo
+          title="跨部门协作"
+          column={1}
+          list={[<Input name="taskName" label="任务名称" rule="REQ" placeholder="例如：官网改版评审" />]}
+        />
+        <TenantUserSelect
+          name="collaborators"
+          label="协作成员"
+          rule="REQ"
+          single={false}
+          companyName="科技创新有限公司"
+        />
+        <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <SubmitButton type="primary">保存</SubmitButton>
+        </div>
+      </Form>
+    </PureGlobal>
+  );
+});
+
+render(<TenantUserSelectInitialMultipleExample />);
 
 ```
 

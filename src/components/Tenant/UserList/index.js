@@ -5,6 +5,7 @@ import { Flex, Button } from 'antd';
 import Actions from './Actions';
 import Create from './Actions/Create';
 import SendMessage from './Actions/SendMessage';
+import UserMobileList from './UserMobileList';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import useRefCallback from '@kne/use-ref-callback';
@@ -32,6 +33,7 @@ const UserList = createWithRemoteLoader({
       const [TablePage, Table, Filter, usePreset] = remoteModules;
       const { useSelectedRow } = Table;
       const tableRef = useRef();
+      const mobileListRef = useRef([]);
       const { formatMessage } = useIntl();
       const {
         getFilterValue,
@@ -45,11 +47,22 @@ const UserList = createWithRemoteLoader({
       const { plugins } = usePreset();
 
       const selectedRow = useSelectedRow();
-      const { selectedRowKeys, selectedRows, setSelectedRows } = selectedRow;
+      const { selectedRowKeys, selectedRows, setSelectedRows, setSelectedRowKeys, type } = selectedRow;
 
       const clearSelection = useCallback(() => {
         setSelectedRows([]);
       }, [setSelectedRows]);
+
+      // TableView 需要 onChange；用 ref 取当前页数据，避免闭包过期
+      const rowSelection = useMemo(
+        () => ({
+          type,
+          selectedRowKeys,
+          allowSelectedAll: true,
+          onChange: keys => setSelectedRowKeys(keys, mobileListRef.current || [])
+        }),
+        [type, selectedRowKeys, setSelectedRowKeys]
+      );
 
       const mapFilterValue = useMemo(
         () =>
@@ -154,6 +167,23 @@ const UserList = createWithRemoteLoader({
         </Flex>
       );
 
+      const reloadTable = useCallback(() => {
+        tableRef.current?.reload();
+      }, []);
+
+      const renderMobile = useCallback(
+        ({ dataSource } = {}) => (
+          <UserMobileList
+            dataSource={dataSource ?? mobileListRef.current}
+            rowSelection={rowSelection}
+            apis={apis}
+            getActions={getActions}
+            onSuccess={reloadTable}
+          />
+        ),
+        [apis, getActions, reloadTable, rowSelection]
+      );
+
       const tableOptions = {
         isNext: true,
         ...merge({}, apis.list, {
@@ -161,6 +191,18 @@ const UserList = createWithRemoteLoader({
             filter: filterValue
           }
         }),
+        dataFormat: data => {
+          const format = typeof apis.list?.dataFormat === 'function' ? apis.list.dataFormat : null;
+          const formatted = format
+            ? format(data)
+            : {
+                list: data.pageData,
+                total: data.totalCount ?? data.total,
+                data
+              };
+          mobileListRef.current = formatted?.list || [];
+          return formatted;
+        },
         ref: tableRef,
         search: {
           name: 'keyword',
@@ -181,7 +223,7 @@ const UserList = createWithRemoteLoader({
             getValueOf: item => {
               return {
                 children: (
-                  <Actions itemClassName="btn-no-padding" moreType="link" data={item} apis={apis} onSuccess={() => tableRef.current.reload()}>
+                  <Actions itemClassName="btn-no-padding" moreType="link" data={item} apis={apis} onSuccess={reloadTable}>
                     {getActions}
                   </Actions>
                 )
@@ -191,7 +233,8 @@ const UserList = createWithRemoteLoader({
         ],
         name: 'tenant-user-list',
         pagination: { paramsType: 'params' },
-        rowSelection: selectedRow
+        rowSelection,
+        renderMobile
       };
 
       const handlerMount = useRefCallback(() => {
