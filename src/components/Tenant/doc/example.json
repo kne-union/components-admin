@@ -190,8 +190,31 @@
     },
     {
       "title": "按组织选择成员（初始值）",
-      "description": "编辑场景为 TenantUserSelect 设置默认成员，值为 { id, name }",
+      "description": "编辑场景为 TenantUserSelect 设置默认成员，单选值为 { id, name }",
       "code": "./tenant-user-select-initial.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactFetch",
+          "packageName": "@kne/react-fetch"
+        }
+      ]
+    },
+    {
+      "title": "按组织选择成员（多选初始值）",
+      "description": "编辑场景多选回填，值为 [{ id, name }, ...]，支持跨部门已选成员",
+      "code": "./tenant-user-select-initial-multiple.js",
       "scope": [
         {
           "name": "_Tenant",

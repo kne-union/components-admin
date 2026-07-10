@@ -163,28 +163,32 @@ const BizUnit = createWithRemoteLoader({
           }
         : {};
 
-      const tableOptions = merge(
-        {},
-        isNext ? {} : options.tableProps,
-        isNext ? apis.list : merge({}, apis.list, options.getFilterValue(filterValueForApi)),
-        nextTableProps,
-        isNext ? options.tableProps : {},
-        {
-          ref,
-          columns: [
-            ...getColumns(),
-            buildOptionsColumn({
-              isNext,
-              formatMessage,
-              apis,
-              options,
-              getActionList,
-              getFormInner,
-              onReload: reloadTable
-            })
-          ],
-          name
-        }
+      // lodash/merge 会深拷贝 ref（{ current }），导致 TablePage 绑到克隆对象上，
+      // reloadTable 读到的仍是原始 useRef（current 一直为 null），增删改后列表不刷新。
+      const tableOptions = Object.assign(
+        merge(
+          {},
+          isNext ? {} : options.tableProps,
+          isNext ? apis.list : merge({}, apis.list, options.getFilterValue(filterValueForApi)),
+          nextTableProps,
+          isNext ? options.tableProps : {},
+          {
+            columns: [
+              ...getColumns(),
+              buildOptionsColumn({
+                isNext,
+                formatMessage,
+                apis,
+                options,
+                getActionList,
+                getFormInner,
+                onReload: reloadTable
+              })
+            ],
+            name
+          }
+        ),
+        { ref }
       );
 
       if (typeof children === 'function') {

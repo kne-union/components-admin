@@ -1,14 +1,4 @@
-.wrap {
-  width: 100%;
-  min-width: 0;
-
-  :global(.kne-react-box) {
-    width: 100%;
-    min-width: 0;
-  }
-}
-
-.ellipsis-title {
+.ellipsisTitle {
   display: block !important;
   max-width: 100%;
   margin-bottom: 0 !important;
