@@ -54,7 +54,7 @@ const User = createWithRemoteLoader({
             },
             extraApis
           )}>
-          {renderProps => <TablePageRender {...renderProps} />}
+          {renderProps => <TablePageRender {...renderProps} withPage={false} />}
         </UserList>
       </Permissions>
     )
