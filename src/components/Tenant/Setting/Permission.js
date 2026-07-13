@@ -1,10 +1,26 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Role from '../Role';
 import SharedGroup from '../SharedGroup';
-import { useState } from 'react';
+import TablePageRender from '@components/BizUnit/TablePageRender';
+import { useEffect, useRef, useState } from 'react';
 import transform from 'lodash/transform';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
+
+/** SystemLayout / 外层 Page 需要把 BizUnit 的 titleExtra 提到 pageProps。
+ * BizUnit 每次 render 都会新建 titleExtra 节点，不能把它放进 effect 依赖，否则会 setState 死循环。
+ * 只在挂载/卸载时同步；切 Tab 时子树会卸载再挂载，或由 StateBar onChange 主动清空。 */
+const SyncTitleExtra = ({ titleExtra, onTitleExtra, children }) => {
+  const titleExtraRef = useRef(titleExtra);
+  titleExtraRef.current = titleExtra;
+
+  useEffect(() => {
+    onTitleExtra(titleExtraRef.current || null);
+    return () => onTitleExtra(null);
+  }, [onTitleExtra]);
+
+  return children;
+};
 
 const PermissionInner = createWithRemoteLoader({
   modules: [
@@ -27,6 +43,7 @@ const PermissionInner = createWithRemoteLoader({
   const allowSharedGroupEdit = usePermissionsPass({ request: ['setting:permission:shared-group:edit'] });
   const allowSharedGroupRemove = usePermissionsPass({ request: ['setting:permission:shared-group:remove'] });
   const [activeKey, setActiveKey] = useState(allowRole ? 'role' : 'sharedGroup');
+  const [titleExtra, setTitleExtra] = useState(null);
   const rolePermissions = {
     create: allowRoleCreate,
     save: allowRoleEdit,
@@ -43,16 +60,27 @@ const PermissionInner = createWithRemoteLoader({
     permissionList: true,
     userList: true
   };
+
+  const renderBizList = renderProps => (
+    <SyncTitleExtra titleExtra={renderProps.titleExtra} onTitleExtra={setTitleExtra}>
+      <TablePageRender {...renderProps} withPage={false} />
+    </SyncTitleExtra>
+  );
+
   const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'PermissionManagement' }),
+    titleExtra,
     children: (
       <>
         <Permissions request={['setting:permission:role', 'setting:permission:shared-group']}>
           <div style={{ marginBottom: 8 }}>
             <StateBar
               activeKey={activeKey}
-              onChange={setActiveKey}
+              onChange={key => {
+                setTitleExtra(null);
+                setActiveKey(key);
+              }}
               type={'radio'}
               stateOption={[
                 { tab: formatMessage({ id: 'Role' }), key: 'role' },
@@ -75,7 +103,9 @@ const PermissionInner = createWithRemoteLoader({
                 },
                 {}
               )}
-            />
+            >
+              {renderBizList}
+            </Role>
           </Permissions>
         )}
         {activeKey === 'sharedGroup' && (
@@ -93,7 +123,9 @@ const PermissionInner = createWithRemoteLoader({
                 },
                 {}
               )}
-            />
+            >
+              {renderBizList}
+            </SharedGroup>
           </Permissions>
         )}
       </>
