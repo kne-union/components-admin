@@ -380,6 +380,14 @@ const getApis = options => {
       }
     },
     tenant: {
+      thirdLogin: {
+        url: `${prefix}/tenant/third-login`,
+        method: 'POST'
+      },
+      thirdLoginResult: {
+        url: `${prefix}/tenant/third-login-result`,
+        method: 'POST'
+      },
       parseJoinToken: {
         url: `${prefix}/tenant/parse-join-token`,
         method: 'POST'

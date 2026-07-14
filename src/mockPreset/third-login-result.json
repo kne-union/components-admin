@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "data": {
+    "token": "mock-third-login-token",
+    "platform": "wecom",
+    "name": "张三",
+    "avatar": null,
+    "email": "zhangsan@tencent.com",
+    "phone": "13800138000"
+  }
+}

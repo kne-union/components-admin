@@ -87,6 +87,16 @@ const locale = {
   SwitchDefaultTenantSuccess: '切换默认租户成功',
   EnterTenant: '进入租户',
 
+  // ThirdLogin
+  ThirdLogin: '第三方登录',
+  FetchingTenantInfo: '正在获取租户信息…',
+  ThirdLoginSubtitle: '即将跳转到第三方平台完成登录',
+  ThirdLoginAuthenticating: '正在进行登录认证…',
+  ThirdLoginResultProcessing: '正在处理登录结果…',
+  ThirdLoginAuthSuccess: '授权登录成功',
+  ThirdLoginAuthFailed: '授权登录失败',
+  ThirdLoginParamsMissing: '登录参数缺失，请检查链接是否正确',
+
   // AfterTenantLoginLayout
   SwitchTenant: '切换租户',
 

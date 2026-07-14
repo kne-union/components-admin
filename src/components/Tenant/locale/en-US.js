@@ -87,6 +87,16 @@ const locale = {
   SwitchDefaultTenantSuccess: 'Switch default tenant successfully',
   EnterTenant: 'Enter Tenant',
 
+  // ThirdLogin
+  ThirdLogin: 'Third-party Login',
+  FetchingTenantInfo: 'Fetching tenant information…',
+  ThirdLoginSubtitle: 'You will be redirected to complete sign-in with the third-party platform',
+  ThirdLoginAuthenticating: 'Authenticating…',
+  ThirdLoginResultProcessing: 'Processing login result…',
+  ThirdLoginAuthSuccess: 'Authorization successful',
+  ThirdLoginAuthFailed: 'Authorization failed',
+  ThirdLoginParamsMissing: 'Login parameters are missing. Please check the link.',
+
   // AfterTenantLoginLayout
   SwitchTenant: 'Switch Tenant',
 
