@@ -35,6 +35,7 @@ const User = createWithRemoteLoader({
     children: (
       <Permissions request={['setting:user-manager:view']} type="error">
         <UserList
+          topOptionsSize="small"
           allowQueryIdForUserFilter
           onMount={handleMount}
           getActions={getActions}

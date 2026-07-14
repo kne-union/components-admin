@@ -45,7 +45,7 @@ const SearchOptionsNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '供应商名称', width: 240, renderType: 'main' },
     { name: 'code', title: '编码', width: 140 },
     {

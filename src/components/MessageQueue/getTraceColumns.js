@@ -7,7 +7,7 @@ const getTraceColumns = ({ formatMessage }) => {
     {
       name: 'id',
       title: formatMessage({ id: 'ID' }),
-      renderType: 'small'
+      renderType: 'id'
     },
     {
       name: 'traceId',

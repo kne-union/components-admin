@@ -35,7 +35,7 @@ const CustomActionsNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '角色名称', width: 160, renderType: 'main' },
     { name: 'code', title: '角色编码', width: 140 },
     {

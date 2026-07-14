@@ -60,17 +60,20 @@ const Actions = createWithRemoteLoader({
         save: {
           ...props,
           name: 'save',
+          type: 'link',
           buttonComponent: Edit
         },
         setStatusOpen: {
           ...props,
           name: 'setStatusOpen',
+          type: 'link',
           buttonComponent: SetStatus,
           hidden: props.data?.status === props.options?.openStatus || 'open'
         },
         setStatusClose: {
           ...props,
           name: 'setStatusClose',
+          type: 'link',
           buttonComponent: SetStatus,
           hidden: props.data?.status === props.options?.closedStatus || 'closed',
           confirmMessage: props.options?.closeMessage || formatMessage({ id: 'ConfirmClose' }, { bizName: props.options?.bizName }),
@@ -79,6 +82,7 @@ const Actions = createWithRemoteLoader({
         remove: {
           ...props,
           name: 'remove',
+          type: 'link',
           buttonComponent: Remove,
           confirmMessage: props.options?.removeMessage || formatMessage({ id: 'ConfirmDelete' }, { bizName: props.options?.bizName })
         }
@@ -109,7 +113,7 @@ const Actions = createWithRemoteLoader({
               return;
             }
           }
-          actionList.splice(item.index || 0, 0, Object.assign({}, buttonOtherPropsMap[item.name], item));
+          actionList.splice(item.index || 0, 0, Object.assign({ type: 'link' }, buttonOtherPropsMap[item.name], item));
         });
       }
 

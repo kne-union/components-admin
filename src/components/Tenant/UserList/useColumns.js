@@ -11,7 +11,7 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'id',
       title: 'ID',
-      renderType: 'small'
+      renderType: 'id'
     },
     {
       name: 'avatar',

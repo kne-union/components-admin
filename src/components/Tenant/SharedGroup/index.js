@@ -1,6 +1,8 @@
+import { useCallback } from 'react';
 import BizUnit from '@components/BizUnit';
 import getColumns from './getColumns';
 import FormInner from './FormInner';
+import SharedGroupMobileList from './SharedGroupMobileList';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import merge from 'lodash/merge';
@@ -34,6 +36,19 @@ const mapRowToForm = data => {
 const SharedGroup = ({ apis, ...props }) => {
   const { formatMessage } = useIntl();
   const columns = getColumns({ formatMessage });
+  const renderMobile = useCallback(
+    ({ dataSource, columns: mobileColumns, rowKey, context, empty } = {}) => (
+      <SharedGroupMobileList
+        dataSource={dataSource}
+        columns={mobileColumns}
+        rowKey={rowKey}
+        context={context}
+        empty={empty}
+        formatMessage={formatMessage}
+      />
+    ),
+    [formatMessage]
+  );
   return (
     <BizUnit
       isNext
@@ -47,6 +62,7 @@ const SharedGroup = ({ apis, ...props }) => {
       name="shared-group-list"
       options={{
         bizName: formatMessage({ id: 'SharedGroup' }),
+        createButtonProps: { size: 'small' },
         saveData: data => mapRowToForm(data),
         formProps: ({ action, formData, ...rest }) => {
           const base =
@@ -56,7 +72,8 @@ const SharedGroup = ({ apis, ...props }) => {
           return merge({}, rest, {
             data: merge({}, base, formData)
           });
-        }
+        },
+        tableProps: { renderMobile }
       }}
     />
   );

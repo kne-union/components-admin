@@ -1,5 +1,10 @@
+@use '~@kne/responsive-utils/scss' as resp;
+
 .tenant-permission {
   margin-top: 12px;
+  width: 100%;
+  min-width: 0;
+  @include resp.responsive-container;
 }
 
 .modules-menu {
@@ -18,7 +23,8 @@
 }
 
 .permission-panel-wrapper {
-
+  width: 100%;
+  min-width: 0;
 }
 
 .permission-panel-col {
@@ -39,4 +45,67 @@
 .permission-panel-scroller {
   border: 1px solid #f0f0f0;
   border-radius: 8px;
+  width: 100%;
+  min-width: 0;
+  @include resp.responsive-container;
+}
+
+@mixin permission-panel-mobile {
+  .permission-panel-wrapper {
+    flex-direction: column !important;
+  }
+
+  .permission-panel-col {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 0;
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      flex: none;
+      border-bottom: none;
+    }
+  }
+
+  .modules-menu {
+    min-width: 0;
+    width: 100%;
+    padding: 0 8px;
+
+    :global(.ant-menu-item) {
+      height: auto !important;
+      line-height: 1.4 !important;
+      margin-inline: 0 !important;
+      padding-block: 10px !important;
+      padding-inline: 8px !important;
+      white-space: normal;
+    }
+
+    :global(.ant-menu-title-content) {
+      width: 100%;
+    }
+  }
+
+  .permission-panel {
+    min-width: 0;
+    width: 100%;
+    padding: 4px 8px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    box-sizing: border-box;
+
+    :global(.ant-checkbox-wrapper) {
+      padding-block: 6px;
+    }
+  }
+
+  .empty {
+    padding: 16px 8px;
+  }
+}
+
+@include resp.mobile-container {
+  @include permission-panel-mobile;
 }

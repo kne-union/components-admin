@@ -8,7 +8,7 @@ const createComponent = (callback = item => item) => {
   return createWithRemoteLoader({
     modules: ['components-core:Global@usePreset']
   })(
-    withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, ...props }) => {
+    withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, ...props }) => {
       const [usePreset] = remoteModules;
       const { apis } = usePreset();
       const resolvedOrgApi = useMemo(() => merge({}, apis.tenant?.orgList, orgApi), [apis.tenant?.orgList, orgApi]);
@@ -24,6 +24,7 @@ const createComponent = (callback = item => item) => {
           companyName={companyName}
           userStatus={userStatus}
           initialSelectedMeta={initialSelectedMeta}
+          height={height}
           orgApi={resolvedOrgApi}
           userApi={resolvedUserApi}
         />

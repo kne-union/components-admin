@@ -30,6 +30,8 @@ const normalizeOrgList = data => {
 
 const TenantUserSelectFieldContext = createContext(null);
 
+const toCssSize = value => (typeof value === 'number' ? `${value}px` : value);
+
 const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
   const ctx = useContext(TenantUserSelectFieldContext);
   const {
@@ -43,8 +45,16 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
     showSelectedFooter,
     allowSelectAll,
     SimpleBar,
-    initialSelectedMeta
+    initialSelectedMeta,
+    height
   } = ctx;
+  const containerStyle = useMemo(() => {
+    if (height == null || height === '') {
+      return undefined;
+    }
+    const size = toCssSize(height);
+    return { height: size, minHeight: size, maxHeight: size };
+  }, [height]);
   const [orgId, setOrgId] = useState(null);
   const [orgName, setOrgName] = useState('');
   const [orgUserTotal, setOrgUserTotal] = useState(null);
@@ -183,7 +193,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
 
   return (
     <div className={style.shell}>
-      <div className={style.container}>
+      <div className={style.container} style={containerStyle}>
         <div className={style['org-panel']}>
           <Flex className={style['panel-header']} align="center" gap={8}>
             <ApartmentOutlined className={style['panel-header-icon']} />
@@ -305,7 +315,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
 const OrgTenantUserField = createWithRemoteLoader({
   modules: ['components-core:FormInfo@hooks', 'components-core:Common@SimpleBar']
 })(
-  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, ...props }) => {
+  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height, ...props }) => {
     const [hooks, SimpleBar] = remoteModules;
     const { useDecorator } = hooks;
     const { formatMessage } = useIntl();
@@ -319,7 +329,8 @@ const OrgTenantUserField = createWithRemoteLoader({
       'single',
       'showSelectedFooter',
       'allowSelectAll',
-      'initialSelectedMeta'
+      'initialSelectedMeta',
+      'height'
     ]);
     const render = useDecorator(
       merge(
@@ -342,9 +353,10 @@ const OrgTenantUserField = createWithRemoteLoader({
         showSelectedFooter,
         allowSelectAll,
         initialSelectedMeta,
+        height,
         SimpleBar
       }),
-      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, SimpleBar]
+      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, SimpleBar]
     );
 
     return (

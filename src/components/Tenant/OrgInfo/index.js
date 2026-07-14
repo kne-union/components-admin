@@ -76,6 +76,7 @@ const OrgOptions = createWithRemoteLoader({
         {
           icon: <UserOutlined />,
           type: 'link',
+          size: 'small',
           children: formatMessage({ id: 'ViewUsers' }),
           hidden: !(data.id && data.id !== 'root') || typeof onViewUsers !== 'function',
           onClick: () => {
@@ -85,6 +86,7 @@ const OrgOptions = createWithRemoteLoader({
         {
           icon: <Icon type="tianjia" />,
           type: 'link',
+          size: 'small',
           children: formatMessage({ id: 'AddSubOrg' }),
           hidden: !apis.create || isExternalSource,
           onClick: async () => {
@@ -123,6 +125,7 @@ const OrgOptions = createWithRemoteLoader({
         {
           icon: <Icon type="bianji" />,
           type: 'link',
+          size: 'small',
           children: formatMessage({ id: 'Edit' }),
           hidden: !(data.id && data.id !== 'root') || !apis.save || isExternalSource,
           onClick: async () => {
@@ -155,6 +158,7 @@ const OrgOptions = createWithRemoteLoader({
         {
           icon: <EditOutlined />,
           type: 'link',
+          size: 'small',
           children: formatMessage({ id: 'EditOrgLeader' }),
           hidden: !(data.id && data.id !== 'root') || !apis.save || !isExternalSource,
           onClick: async () => {
@@ -192,6 +196,7 @@ const OrgOptions = createWithRemoteLoader({
         {
           icon: <Icon type="shanchu" />,
           type: 'link',
+          size: 'small',
           children: formatMessage({ id: 'Delete' }),
           hidden: !(data.id && data.id !== 'root') || !apis.remove || isExternalSource,
           confirm: true,
@@ -351,18 +356,21 @@ const ControlPanel = ({ value, onChange }) => {
   return (
     <Space.Compact className={style['control-panel']}>
       <Button
+        size="small"
         icon={<ExpandOutlined />}
         onClick={() => {
           onChange(1);
         }}
       />
       <Button
+        size="small"
         icon={<PlusOutlined />}
         onClick={() => {
           onChange(value * 1.2);
         }}
       />
       <Button
+        size="small"
         icon={<MinusOutlined />}
         onClick={() => {
           onChange(value * 0.8);
@@ -785,13 +793,14 @@ const OrgInfo = createWithRemoteLoader({
         />
         <Space>
           {linkSettingProps ? (
-            <Button icon={linkedSource ? getSourceIcon(linkedSource) : <LinkOutlined />} onClick={() => setLinkDrawerOpen(true)}>
+            <Button size="small" icon={linkedSource ? getSourceIcon(linkedSource) : <LinkOutlined />} onClick={() => setLinkDrawerOpen(true)}>
               {linkedSource ? `${SOURCE_LABEL_MAP[linkedSource] || linkedSource}` : formatMessage({ id: 'OrgLinkTitle' })}
             </Button>
           ) : null}
           {apis.import ? (
             <Button
               type="primary"
+              size="small"
               onClick={() => {
                 setImportFile(null);
                 setParsedRows(null);
@@ -848,6 +857,7 @@ const OrgInfo = createWithRemoteLoader({
             </Typography.Paragraph>
             <Button
               type="default"
+              size="small"
               icon={<DownloadOutlined />}
               className={style.importModalDownload}
               onClick={() => {
@@ -913,6 +923,7 @@ const OrgInfo = createWithRemoteLoader({
             {importFile ? (
               <Button
                 type="link"
+                size="small"
                 onClick={() => {
                   setImportFile(null);
                   setParsedRows(null);

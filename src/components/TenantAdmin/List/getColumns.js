@@ -19,9 +19,7 @@ const getColumns = ({ navigate, formatMessage }) => {
     {
       name: 'id',
       title: 'ID',
-      renderType: 'small',
-      primary: true,
-      hover: true,
+      renderType: 'id',
       onClick: ({ colItem }) => {
         goTenantDetail(navigate, colItem);
       }
