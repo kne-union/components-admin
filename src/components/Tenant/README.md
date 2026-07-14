@@ -273,6 +273,66 @@ render(<LoginTenantExample />);
 
 ```
 
+- 第三方登录
+- ThirdLogin 组件用于第三方登录页，路由 path 为 third-login；根据 platform（wecom / dingtalk）展示对应平台 logo 与标题
+- _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom)
+
+```jsx
+const { ThirdLogin } = _Tenant;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { Route, Routes, Navigate } = reactRouterDom;
+
+const baseUrl = '/third-login';
+
+const ThirdLoginExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [PureGlobal] = remoteModules;
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Routes>
+        <Route path={baseUrl} element={<ThirdLogin />} />
+        <Route path="*" element={<Navigate to={&#96;${baseUrl}?platform=wecom&tenantId=1&#96;} replace />} />
+      </Routes>
+    </PureGlobal>
+  );
+});
+
+render(<ThirdLoginExample />);
+
+```
+
+- 第三方登录结果
+- ThirdLoginResult 组件用于第三方登录结果页，路由 path 为 third-login-result
+- _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom)
+
+```jsx
+const { ThirdLoginResult } = _Tenant;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { Route, Routes, Navigate } = reactRouterDom;
+
+const baseUrl = '/third-login-result';
+
+const ThirdLoginResultExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [PureGlobal] = remoteModules;
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Routes>
+        <Route path={baseUrl} element={<ThirdLoginResult />} />
+        <Route path="*" element={<Navigate to={&#96;${baseUrl}?platform=wecom&#96;} replace />} />
+      </Routes>
+    </PureGlobal>
+  );
+});
+
+render(<ThirdLoginResultExample />);
+
+```
+
 - 加入邀请
 - JoinInvitation 组件用于处理租户邀请加入流程，展示公司信息确认和员工信息确认步骤
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)

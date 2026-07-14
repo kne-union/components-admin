@@ -20,7 +20,21 @@ import deadLetterList from './dead-letter-list.json';
 import traceList from './trace-list.json';
 import messageMangerData from './message-manger-data.json';
 
-export { taskList, signatureList, intlAdminData, adminUserList, userInfo, superAdminInfo, groupList, tenantData, tenantAdminData, messageQueueList, deadLetterList, traceList, messageMangerData };
+export {
+  taskList,
+  signatureList,
+  intlAdminData,
+  adminUserList,
+  userInfo,
+  superAdminInfo,
+  groupList,
+  tenantData,
+  tenantAdminData,
+  messageQueueList,
+  deadLetterList,
+  traceList,
+  messageMangerData
+};
 
 const collectOrgSubtreeIds = (orgs, rootId) => {
   const ids = new Set([String(rootId)]);
@@ -79,9 +93,7 @@ const loadFilteredTenantUserList = ({ params } = {}) =>
     }
     if (filter.keyword) {
       const keyword = String(filter.keyword).toLowerCase();
-      pageData = pageData.filter(item =>
-        [item.name, item.email, item.phone].filter(Boolean).join(' ').toLowerCase().includes(keyword)
-      );
+      pageData = pageData.filter(item => [item.name, item.email, item.phone].filter(Boolean).join(' ').toLowerCase().includes(keyword));
     }
     const totalCount = pageData.length;
     const perPage = Number(params?.perPage) || pageData.length || 20;
@@ -100,10 +112,7 @@ const loadFilteredRoleList = ({ params } = {}) =>
     }
     if (filter.keyword) {
       const keyword = String(filter.keyword).toLowerCase();
-      pageData = pageData.filter(
-        item =>
-          [item.name, item.code, item.description].filter(Boolean).join(' ').toLowerCase().indexOf(keyword) >= 0
-      );
+      pageData = pageData.filter(item => [item.name, item.code, item.description].filter(Boolean).join(' ').toLowerCase().indexOf(keyword) >= 0);
     }
     if (filter.status) {
       pageData = pageData.filter(item => item.status === filter.status);
@@ -167,21 +176,61 @@ const apis = merge({}, getApis(), {
               avgExecutionTime: Math.floor(Math.random() * 8000) + 2000,
               avgTotalTime: Math.floor(Math.random() * 10000) + 3000,
               byType: {
-                export: { count: Math.floor(total * 0.6), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 },
-                import: { count: Math.ceil(total * 0.4), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
+                export: {
+                  count: Math.floor(total * 0.6),
+                  avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
+                  avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
+                  avgTotalTime: Math.floor(Math.random() * 8000) + 3000
+                },
+                import: {
+                  count: Math.ceil(total * 0.4),
+                  avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
+                  avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
+                  avgTotalTime: Math.floor(Math.random() * 8000) + 3000
+                }
               },
               byRunnerType: {
-                manual: { count: Math.floor(total * 0.4), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 },
-                system: { count: Math.ceil(total * 0.6), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
+                manual: {
+                  count: Math.floor(total * 0.4),
+                  avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
+                  avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
+                  avgTotalTime: Math.floor(Math.random() * 8000) + 3000
+                },
+                system: {
+                  count: Math.ceil(total * 0.6),
+                  avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
+                  avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
+                  avgTotalTime: Math.floor(Math.random() * 8000) + 3000
+                }
               },
               byTypeByRunnerType: {
                 manual: {
-                  export: { count: Math.floor(total * 0.25), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 },
-                  import: { count: Math.ceil(total * 0.15), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
+                  export: {
+                    count: Math.floor(total * 0.25),
+                    avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
+                    avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
+                    avgTotalTime: Math.floor(Math.random() * 8000) + 3000
+                  },
+                  import: {
+                    count: Math.ceil(total * 0.15),
+                    avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
+                    avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
+                    avgTotalTime: Math.floor(Math.random() * 8000) + 3000
+                  }
                 },
                 system: {
-                  export: { count: Math.floor(total * 0.35), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 },
-                  import: { count: Math.ceil(total * 0.25), avgWaitingTime: Math.floor(Math.random() * 2000) + 500, avgExecutionTime: Math.floor(Math.random() * 6000) + 2000, avgTotalTime: Math.floor(Math.random() * 8000) + 3000 }
+                  export: {
+                    count: Math.floor(total * 0.35),
+                    avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
+                    avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
+                    avgTotalTime: Math.floor(Math.random() * 8000) + 3000
+                  },
+                  import: {
+                    count: Math.ceil(total * 0.25),
+                    avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
+                    avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
+                    avgTotalTime: Math.floor(Math.random() * 8000) + 3000
+                  }
                 }
               }
             });
@@ -212,7 +261,14 @@ const apis = merge({}, getApis(), {
             range,
             rangeLabel: range === '7d' ? '近7天' : range === '1m' ? '近1个月' : range === '3m' ? '近3个月' : '近1年',
             totalTasks: totalSuccess + totalFailed + totalRunning + totalPending + totalCanceled + totalWaiting,
-            byStatus: { success: totalSuccess, failed: totalFailed, running: totalRunning, pending: totalPending, canceled: totalCanceled, waiting: totalWaiting },
+            byStatus: {
+              success: totalSuccess,
+              failed: totalFailed,
+              running: totalRunning,
+              pending: totalPending,
+              canceled: totalCanceled,
+              waiting: totalWaiting
+            },
             byType: { export: Math.floor((totalSuccess + totalFailed) * 0.6), import: Math.ceil((totalSuccess + totalFailed) * 0.4) },
             byRunnerType: { manual: Math.floor((totalSuccess + totalFailed) * 0.4), system: Math.ceil((totalSuccess + totalFailed) * 0.6) },
             byTargetType: { project: Math.floor((totalSuccess + totalFailed) * 0.5), document: Math.ceil((totalSuccess + totalFailed) * 0.5) },
@@ -473,6 +529,12 @@ const apis = merge({}, getApis(), {
     }
   },
   tenant: {
+    thirdLogin: {
+      loader: () => import('./third-login-info.json').then(({ default: data }) => data.data)
+    },
+    thirdLoginResult: {
+      loader: () => import('./third-login-result.json').then(({ default: data }) => data.data)
+    },
     availableList: {
       loader: () => {
         return import('./tenant-data.json').then(({ default: data }) => data.availableTenantList);
@@ -917,12 +979,23 @@ const apis = merge({}, getApis(), {
             range,
             rangeLabel: range === '7d' ? '近7天' : range === '1m' ? '近1个月' : range === '3m' ? '近3个月' : '近1年',
             totalRecords,
-            byType: { '0': emailTotal, '1': smsTotal },
-            byCode: { welcome: Math.floor(totalRecords * 0.4), verify: Math.floor(totalRecords * 0.3), notification: Math.floor(totalRecords * 0.2), alert: totalRecords - Math.floor(totalRecords * 0.4) - Math.floor(totalRecords * 0.3) - Math.floor(totalRecords * 0.2) },
+            byType: { 0: emailTotal, 1: smsTotal },
+            byCode: {
+              welcome: Math.floor(totalRecords * 0.4),
+              verify: Math.floor(totalRecords * 0.3),
+              notification: Math.floor(totalRecords * 0.2),
+              alert: totalRecords - Math.floor(totalRecords * 0.4) - Math.floor(totalRecords * 0.3) - Math.floor(totalRecords * 0.2)
+            },
             templateStats: {
               total: messageMangerData.templates.pageData.length,
-              byStatus: { '0': messageMangerData.templates.pageData.filter(t => Number(t.status) === 0).length, '1': messageMangerData.templates.pageData.filter(t => Number(t.status) === 1).length },
-              byType: { '0': messageMangerData.templates.pageData.filter(t => Number(t.type) === 0).length, '1': messageMangerData.templates.pageData.filter(t => Number(t.type) === 1).length }
+              byStatus: {
+                0: messageMangerData.templates.pageData.filter(t => Number(t.status) === 0).length,
+                1: messageMangerData.templates.pageData.filter(t => Number(t.status) === 1).length
+              },
+              byType: {
+                0: messageMangerData.templates.pageData.filter(t => Number(t.type) === 0).length,
+                1: messageMangerData.templates.pageData.filter(t => Number(t.type) === 1).length
+              }
             },
             recentTrend,
             recentTrendByType
@@ -948,8 +1021,12 @@ const apis = merge({}, getApis(), {
           return {
             date: now.toISOString().split('T')[0],
             totalRecords,
-            byType: { '0': emailTotal, '1': smsTotal },
-            byCode: { welcome: Math.floor(totalRecords * 0.4), verify: Math.floor(totalRecords * 0.3), notification: totalRecords - Math.floor(totalRecords * 0.4) - Math.floor(totalRecords * 0.3) },
+            byType: { 0: emailTotal, 1: smsTotal },
+            byCode: {
+              welcome: Math.floor(totalRecords * 0.4),
+              verify: Math.floor(totalRecords * 0.3),
+              notification: totalRecords - Math.floor(totalRecords * 0.4) - Math.floor(totalRecords * 0.3)
+            },
             hourlyTrend,
             hourlyTrendByType,
             intervalTrend: [],

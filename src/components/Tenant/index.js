@@ -10,4 +10,5 @@ export { default as Authenticate } from './Authenticate';
 export { default as AfterTenantLoginLayout } from './AfterTenantLoginLayout';
 export { default as Setting } from './Setting';
 export { default as TenantUserSelect } from './TenantUserSelect';
+export { default as ThirdLogin, ThirdLoginResult } from './ThirdLogin';
 export { default } from './Tenant';

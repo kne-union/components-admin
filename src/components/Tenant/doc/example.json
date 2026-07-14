@@ -120,6 +120,52 @@
       ]
     },
     {
+      "title": "第三方登录",
+      "description": "ThirdLogin 组件用于第三方登录页，路由 path 为 third-login；根据 platform（wecom / dingtalk）展示对应平台 logo 与标题",
+      "code": "./third-login.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        }
+      ]
+    },
+    {
+      "title": "第三方登录结果",
+      "description": "ThirdLoginResult 组件用于第三方登录结果页，路由 path 为 third-login-result",
+      "code": "./third-login-result.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        }
+      ]
+    },
+    {
       "title": "加入邀请",
       "description": "JoinInvitation 组件用于处理租户邀请加入流程，展示公司信息确认和员工信息确认步骤",
       "code": "./join-invitation.js",

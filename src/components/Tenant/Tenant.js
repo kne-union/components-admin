@@ -3,6 +3,7 @@ import AppChildrenRouter from '@kne/app-children-router';
 import AfterTenantLoginLayout from './AfterTenantLoginLayout';
 import withLocale from './withLocale';
 import { useIntl } from '@kne/react-intl';
+import ThirdLogin, { ThirdLoginResult } from './ThirdLogin';
 
 const Tenant = createWithRemoteLoader({
   modules: ['components-admin:Authenticate@AfterUserLoginLayout']
@@ -47,6 +48,14 @@ const Tenant = createWithRemoteLoader({
               ]}
             />
           )
+        },
+        {
+          path: 'third-login',
+          element: <ThirdLogin />
+        },
+        {
+          path: 'third-login-result',
+          element: <ThirdLoginResult />
         },
         {
           path: '*',
