@@ -134,6 +134,7 @@ const OrgLinkSetting = createWithRemoteLoader({
               <Alert type="info" showIcon message={formatMessage({ id: 'OrgLinkHint' })} />
               <Button
                 type="primary"
+                size="small"
                 icon={<LinkOutlined />}
                 onClick={() => {
                   formModal({
@@ -211,12 +212,12 @@ const OrgLinkSetting = createWithRemoteLoader({
             />
             <Flex gap={8} justify="flex-end">
               <Tooltip title={config.status === 'running' ? formatMessage({ id: 'OrgLinkSyncRunningTip' }) : null}>
-                <Button type="primary" icon={<CloudSyncOutlined />} loading={syncLoading || config.status === 'running'} disabled={config.status === 'running'} onClick={() => handleManualSync(reload)}>
+                <Button type="primary" size="small" icon={<CloudSyncOutlined />} loading={syncLoading || config.status === 'running'} disabled={config.status === 'running'} onClick={() => handleManualSync(reload)}>
                   {formatMessage({ id: 'OrgLinkManualSync' })}
                 </Button>
               </Tooltip>
               <Popconfirm title={formatMessage({ id: 'OrgLinkCancelConfirm' })} onConfirm={() => handleCancelLink(reload)}>
-                <Button danger icon={<DisconnectOutlined />}>
+                <Button danger size="small" icon={<DisconnectOutlined />}>
                   {formatMessage({ id: 'OrgLinkCancel' })}
                 </Button>
               </Popconfirm>

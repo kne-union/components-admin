@@ -113,7 +113,7 @@ const LayoutNextExample = createWithRemoteLoader({
   );
 
   const getDepartmentColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '部门名称', width: 160, renderType: 'main' },
     { name: 'code', title: '部门编码', width: 120 },
     { name: 'leader', title: '负责人', width: 120 },
@@ -129,7 +129,7 @@ const LayoutNextExample = createWithRemoteLoader({
   ];
 
   const getCategoryColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '分类名称', width: 160, renderType: 'main' },
     { name: 'parent', title: '上级分类', width: 140 },
     { name: 'sort', title: '排序', width: 80 },

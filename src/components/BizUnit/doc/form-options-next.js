@@ -48,7 +48,7 @@ const FormOptionsNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '产品名称', width: 200, renderType: 'main' },
     { name: 'sku', title: 'SKU', width: 160 },
     {

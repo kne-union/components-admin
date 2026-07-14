@@ -15,7 +15,7 @@ const StatusControlNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '项目名称', width: 180, renderType: 'main' },
     { name: 'code', title: '项目编码', width: 140 },
     {

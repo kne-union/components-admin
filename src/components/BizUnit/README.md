@@ -90,7 +90,7 @@ const BaseNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '角色名称', width: 160, renderType: 'main' },
     { name: 'code', title: '角色编码', width: 140 },
     {
@@ -240,7 +240,7 @@ const WithFilterNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '姓名', width: 120, renderType: 'main' },
     { name: 'employeeNo', title: '工号', width: 120 },
     {
@@ -433,7 +433,7 @@ const FormOptionsNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '产品名称', width: 200, renderType: 'main' },
     { name: 'sku', title: 'SKU', width: 160 },
     {
@@ -700,7 +700,7 @@ const SearchOptionsNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '供应商名称', width: 240, renderType: 'main' },
     { name: 'code', title: '编码', width: 140 },
     {
@@ -806,7 +806,7 @@ const CustomActionsNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '角色名称', width: 160, renderType: 'main' },
     { name: 'code', title: '角色编码', width: 140 },
     {
@@ -1017,7 +1017,7 @@ const LayoutNextExample = createWithRemoteLoader({
   );
 
   const getDepartmentColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '部门名称', width: 160, renderType: 'main' },
     { name: 'code', title: '部门编码', width: 120 },
     { name: 'leader', title: '负责人', width: 120 },
@@ -1033,7 +1033,7 @@ const LayoutNextExample = createWithRemoteLoader({
   ];
 
   const getCategoryColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '分类名称', width: 160, renderType: 'main' },
     { name: 'parent', title: '上级分类', width: 140 },
     { name: 'sort', title: '排序', width: 80 },
@@ -1370,7 +1370,7 @@ const SystemLayoutNextExample = createWithRemoteLoader({
   };
 
   const getEmployeeColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '姓名', width: 120, renderType: 'main' },
     { name: 'employeeNo', title: '工号', width: 120 },
     { name: 'department', title: '部门', width: 140 },
@@ -1842,7 +1842,7 @@ const StatusControlNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '项目名称', width: 180, renderType: 'main' },
     { name: 'code', title: '项目编码', width: 140 },
     {

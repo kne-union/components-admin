@@ -84,6 +84,7 @@ const Setting = createWithRemoteLoader({
         <Flex gap={8}>
           <Button
             type="primary"
+            size="small"
             onClick={() => {
               formModal({
                 title: formatMessage({ id: 'AddEnvironmentVariable' }),
@@ -165,6 +166,7 @@ const Setting = createWithRemoteLoader({
         <Flex gap={8}>
           <Button
             type="primary"
+            size="small"
             onClick={() => {
               const modalApi = modal({
                 title: formatMessage({ id: 'AddCustomComponent' }),

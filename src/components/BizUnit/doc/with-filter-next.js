@@ -72,7 +72,7 @@ const WithFilterNextExample = createWithRemoteLoader({
   };
 
   const getColumns = () => [
-    { name: 'id', title: 'ID', width: 80, renderType: 'small' },
+    { name: 'id', title: 'ID', width: 80, renderType: 'id' },
     { name: 'name', title: '姓名', width: 120, renderType: 'main' },
     { name: 'employeeNo', title: '工号', width: 120 },
     {

@@ -1,10 +1,11 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import BizUnit from '@components/BizUnit';
 import getColumns from './getColumns';
 import getFilterList from './getFilterList';
 import FormInner from './FormInner';
 import SetRolePermission from './Actions/SetRolePermission';
+import RoleMobileList from './RoleMobileList';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 
@@ -22,6 +23,19 @@ const Role = createWithRemoteLoader({
   const mapFilterValue = useMemo(() => createFilterValueMapper({
     type: 'single'
   }), [createFilterValueMapper]);
+  const renderMobile = useCallback(
+    ({ dataSource, columns: mobileColumns, rowKey, context, empty } = {}) => (
+      <RoleMobileList
+        dataSource={dataSource}
+        columns={mobileColumns}
+        rowKey={rowKey}
+        context={context}
+        empty={empty}
+        formatMessage={formatMessage}
+      />
+    ),
+    [formatMessage]
+  );
   return (
     <BizUnit
       isNext
@@ -53,7 +67,9 @@ const Role = createWithRemoteLoader({
       name="role-list"
       options={{
         bizName: formatMessage({ id: 'Role' }),
-        mapFilterValue
+        mapFilterValue,
+        createButtonProps: { size: 'small' },
+        tableProps: { renderMobile }
       }}
     />
   );

@@ -3,6 +3,7 @@ import Actions from './Actions';
 const buildOptionsColumn = ({ isNext, formatMessage, apis, options, getActionList, getFormInner, onReload }) => {
   const actionsProps = {
     moreType: 'link',
+    itemClassName: 'btn-no-padding',
     apis,
     options,
     getActionList,

@@ -1,6 +1,16 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { UserList } from '@components/Tenant';
+import TablePageRender from '@components/BizUnit/TablePageRender';
+import { Flex } from 'antd';
 import get from 'lodash/get';
+
+/** 嵌在 StateBarPage 内时不要再套 Layout@TablePage，避免覆盖外层 PageHeader */
+const renderUserList = ({ topOptions, tableOptions }) => (
+  <Flex vertical gap={8}>
+    {topOptions ? <Flex justify="flex-end">{topOptions}</Flex> : null}
+    <TablePageRender tableOptions={tableOptions} withPage={false} />
+  </Flex>
+);
 
 const User = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
@@ -12,6 +22,7 @@ const User = createWithRemoteLoader({
 
   return (
     <UserList
+      topOptionsSize="small"
       apis={Object.assign(
         {
           list: Object.assign({}, apis.tenantAdmin.userList, { params: { tenantId: tenant.id } }),
@@ -26,8 +37,9 @@ const User = createWithRemoteLoader({
           sendOrgMessage: Object.assign({}, apis.tenantAdmin.sendOrgMessage, { data: { tenantId: tenant.id } })
         },
         pluginApis
-      )}
-    />
+      )}>
+      {renderUserList}
+    </UserList>
   );
 });
 
