@@ -28,7 +28,7 @@ const ThirdLoginResultContent = createWithRemoteLoader({
     }
     setToken('X-Third-Login-Token', token);
     if (redirectUrl) {
-      window.location.href = redirectUrl;
+      window.location.href = decodeURIComponent(redirectUrl);
     }
   }, [token, redirectUrl]);
 

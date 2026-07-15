@@ -9,7 +9,7 @@
   margin: 0 auto;
   border-radius: 12px;
   --out-inner-height: calc(var(--kne-viewport-height) * 0.9);
-  --max-height:calc(var(--kne-viewport-height) * 0.9);
+  --max-height: calc(var(--kne-viewport-height) * 0.9);
 }
 
 .top-banner {
@@ -87,6 +87,11 @@
 }
 
 @mixin account-phone-layout {
+  .out-container {
+    width: var(--kne-viewport-width);
+    height: var(--kne-viewport-height);
+  }
+
   .top-banner {
     height: 160px;
   }
@@ -99,7 +104,7 @@
   }
 
   .out-inner {
-    min-height: calc(var(--kne-viewport-height) - 28%);
+    min-height: calc(var(--kne-viewport-height) - 140px);
   }
 
   .form-inner {

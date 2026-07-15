@@ -1,4 +1,4 @@
-import { LoginOuterContainer } from '@components/Account';
+import { LoginOuterContainer, Layout } from '@components/Account';
 import { Spin } from 'antd';
 import { useIntl } from '@kne/react-intl';
 import { SOURCE_LABEL_MAP, SOURCE_ICON_MAP, getSourceIcon } from '../constants';
@@ -12,9 +12,11 @@ export const usePlatformShell = platform => {
 };
 
 export const ThirdLoginPanel = ({ title, logo, children }) => (
-  <LoginOuterContainer title={title} logo={logo}>
-    <div className={style.panel}>{children}</div>
-  </LoginOuterContainer>
+  <Layout>
+    <LoginOuterContainer title={title} logo={logo}>
+      <div className={style.panel}>{children}</div>
+    </LoginOuterContainer>
+  </Layout>
 );
 
 export const ThirdLoginLoading = ({ title, logo, tip }) => (
