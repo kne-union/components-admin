@@ -1,4 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import { useIsMobile } from '@kne/responsive-utils';
 import { useMemo } from 'react';
 import { Col, Row, Space, Tag } from 'antd';
 import { BarChartOutlined, MailOutlined, MessageOutlined } from '@ant-design/icons';
@@ -112,6 +113,8 @@ const RealtimeSection = createWithRemoteLoader({
   withLocale(({ remoteModules, apis, ajax }) => {
     const [Echart] = remoteModules;
     const { formatMessage } = useIntl();
+    const isMobile = useIsMobile();
+    const chartHeight = isMobile ? 240 : 320;
     const sseUrl = apis?.messageManger?.statistics?.sse?.url;
     const { realtimeData, isConnected, lastUpdatedAt } = useRealtimeStatisticsSSE(sseUrl, ajax);
 
@@ -552,12 +555,12 @@ const RealtimeSection = createWithRemoteLoader({
             <Row gutter={[20, 24]} className={style.chartsRow}>
               <Col xs={24} lg={12} className={style.chartCol}>
                 <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'PeriodCompare' })} style={{ height: '100%' }}>
-                  <Echart style={{ height: 320 }} option={periodCompareOption} />
+                  <Echart style={{ height: chartHeight }} option={periodCompareOption} />
                 </BoxCard>
               </Col>
               <Col xs={24} lg={12} className={style.chartCol}>
                 <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'TodayHourlyTrend' })} style={{ height: '100%' }}>
-                  <Echart style={{ height: 320 }} option={hourlyOption} />
+                  <Echart style={{ height: chartHeight }} option={hourlyOption} />
                 </BoxCard>
               </Col>
             </Row>

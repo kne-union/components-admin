@@ -18,6 +18,11 @@
   width: 100%;
 }
 
+.formActionsRow {
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
 .metaList {
   width: 100%;
   min-width: 0;
@@ -383,12 +388,17 @@
 }
 
 @mixin company-info-mobile {
-  .company-info {
-    padding: 0 12px;
-  }
-
   .detailStack {
     gap: 16px !important;
+    padding-inline: 16px;
+    box-sizing: border-box;
+  }
+
+  .formActionsRow {
+    :global(.ant-btn) {
+      flex: 1;
+      min-width: 0;
+    }
   }
 
   .metaList {
@@ -525,12 +535,9 @@
 }
 
 @mixin company-info-phone {
-  .company-info {
-    padding: 0 8px;
-  }
-
   .detailStack {
     gap: 12px !important;
+    padding-inline: 12px;
   }
 
   .metaItem {
@@ -594,26 +601,9 @@
     padding: 3px 10px !important;
   }
 
-  .basicMetaGrid {
-    padding: 4px 12px 14px;
-  }
-
-  .basicMetaRow {
-    gap: 10px;
-  }
-
   .timelinePanel {
     padding: 20px 10px 14px;
     border-radius: 10px;
-  }
-
-  .formActions {
-    flex-direction: column;
-    align-items: stretch;
-
-    :global(.ant-btn) {
-      width: 100%;
-    }
   }
 
   .image-item {
@@ -622,16 +612,8 @@
   }
 }
 
-@include resp.mobile {
+@include resp.mobile-container {
   @include company-info-mobile;
-}
-
-@include resp.container-down(md) {
-  @include company-info-mobile;
-}
-
-@include resp.down(sm) {
-  @include company-info-phone;
 }
 
 @include resp.container-down(sm) {

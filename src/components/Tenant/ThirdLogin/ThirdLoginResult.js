@@ -88,12 +88,12 @@ const ThirdLoginResult = createWithRemoteLoader({
   const { apis } = usePreset();
   const [searchParams] = useSearchParams();
   const params = Object.fromEntries(searchParams.entries());
-  // code / message 由第三方回跳携带，不参与业务接口请求
-  const { code: _code, message: _message, ...others } = params;
+  // message 为中间页状态文案，不参与业务接口；钉钉 URL 上的 code 为状态码（如 200），真实 auth code 由 JSAPI 获取
+  const { message: _message, code: urlCode, ...others } = params;
   const platform = searchParams.get('platform');
   const { formatMessage, title, logo } = usePlatformShell(platform);
 
-  if (!others.tenantId) {
+  if (!platform || !others.tenantId) {
     return (
       <ThirdLoginError
         title={title}
@@ -104,23 +104,51 @@ const ThirdLoginResult = createWithRemoteLoader({
     );
   }
 
-  return (
+  const loading = <ThirdLoginLoading title={title} logo={logo} tip={formatMessage({ id: 'ThirdLoginResultProcessing' })} />;
+  const error = error => (
+    <ThirdLoginError
+      title={title}
+      logo={logo}
+      message={error || formatMessage({ id: 'ThirdLoginAuthFailed' })}
+      tip={formatMessage({ id: 'ContactAdmin' })}
+    />
+  );
+
+  const renderResult = props => (
     <Fetch
       {...Object.assign({}, apis.tenant.thirdLoginResult, {
-        data: Object.assign({}, others)
+        data: Object.assign({}, props)
       })}
-      loading={<ThirdLoginLoading title={title} logo={logo} tip={formatMessage({ id: 'ThirdLoginResultProcessing' })} />}
-      error={error => (
-        <ThirdLoginError
-          title={title}
-          logo={logo}
-          message={error || formatMessage({ id: 'ThirdLoginAuthFailed' })}
-          tip={formatMessage({ id: 'ContactAdmin' })}
-        />
-      )}
+      loading={loading}
+      error={error}
       render={({ data }) => <ThirdLoginResultContent data={data} />}
     />
   );
+
+  if (platform === 'dingtalk') {
+    return (
+      <Fetch
+        data={others}
+        loader={({ data }) => {
+          return import('./dingTalkCode').then(({ default: dingTalkCode }) => {
+            return dingTalkCode({
+              corpId: data.corpId,
+              clientId: data.clientId
+            });
+          });
+        }}
+        loading={loading}
+        error={error}
+        render={({ data }) => {
+          return renderResult(Object.assign({}, others, { code: data.code }));
+        }}
+      />
+    );
+  }
+
+  // 企业微信等：URL 上的 code 即为 OAuth auth code，需传给业务接口
+  return renderResult(Object.assign({}, others, urlCode ? { code: urlCode } : {}));
 });
+
 
 export default withLocale(ThirdLoginResult);

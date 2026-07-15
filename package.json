@@ -103,6 +103,7 @@
     "@kne/use-ref-callback": "^0.1.2",
     "@kne/use-refer-navigate": "^1.0.0",
     "dayjs": "^1.11.21",
+    "dingtalk-jsapi": "^3.2.9",
     "md5": "^2.3.0",
     "xlsx": "^0.18.5"
   }

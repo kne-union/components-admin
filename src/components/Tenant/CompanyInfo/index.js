@@ -32,10 +32,10 @@ const CompanyDetail = createWithRemoteLoader({
 });
 
 const CompanyInfo = createWithRemoteLoader({
-  modules: ['components-core:InfoPage', 'components-core:FormInfo']
+  modules: ['components-core:InfoPage', 'components-core:FormInfo', 'components-core:ButtonGroup@ButtonFooter']
 })(
   withLocale(({ remoteModules, data, onSubmit, hasEdit = true, apis }) => {
-    const [InfoPage, FormInfo] = remoteModules;
+    const [InfoPage, FormInfo, ButtonFooter] = remoteModules;
     const [isEdit, setIsEdit] = useState(false);
     const { formatMessage } = useIntl();
 
@@ -57,15 +57,17 @@ const CompanyInfo = createWithRemoteLoader({
             <BasicFormInner />
             <DevelopmentHistoryFormInner />
             <TeamDescriptionFormInner />
-            <Flex justify="center" gap={12} className={style.formActions}>
-              <SubmitButton>{formatMessage({ id: 'Save' })}</SubmitButton>
-              <CancelButton
-                onClick={() => {
-                  setIsEdit(false);
-                }}>
-                {formatMessage({ id: 'Cancel' })}
-              </CancelButton>
-            </Flex>
+            <ButtonFooter className={style.formActions} innerClassName={style.formActionsInner}>
+              <Flex justify="center" gap={12} className={style.formActionsRow}>
+                <CancelButton
+                  onClick={() => {
+                    setIsEdit(false);
+                  }}>
+                  {formatMessage({ id: 'Cancel' })}
+                </CancelButton>
+                <SubmitButton type="primary">{formatMessage({ id: 'Save' })}</SubmitButton>
+              </Flex>
+            </ButtonFooter>
           </Flex>
         </Form>
       );

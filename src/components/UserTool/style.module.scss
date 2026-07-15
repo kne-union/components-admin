@@ -37,6 +37,60 @@
 
 .user-tool {
   cursor: pointer;
+
+  &.is-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background 0.2s;
+
+    &:active {
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+}
+
+.mobile-modal {
+  :global {
+    .ant-modal-content {
+      padding: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .ant-modal-header {
+      margin: 0;
+      padding: 0;
+      min-height: 0;
+      border: none;
+    }
+
+    .ant-modal-close {
+      top: 10px;
+      inset-inline-end: 10px;
+      z-index: 1;
+    }
+  }
+
+  .content {
+    width: 100% !important;
+  }
+
+  .line {
+    max-width: 220px;
+    white-space: normal;
+    word-break: break-all;
+  }
+}
+
+.mobile-modal-body {
+  padding: 12px 0 4px;
 }
 
 .divider {

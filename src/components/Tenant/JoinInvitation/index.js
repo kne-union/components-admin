@@ -2,6 +2,7 @@ import '@kne/react-box/dist/index.css';
 import classnames from 'classnames';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useState } from 'react';
+import { useIsMobile } from '@kne/responsive-utils';
 import { Button, Steps, Result, Typography } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 import Fetch from '@kne/react-fetch';
@@ -24,6 +25,7 @@ const JoinInvitation = createWithRemoteLoader({
 })(({ remoteModules, baseUrl = '', token: propsToken, children }) => {
   const [Page, usePreset, LoadingButton, Image] = remoteModules;
   const [current, setCurrent] = useState(0);
+  const isMobile = useIsMobile();
   const { formatMessage } = useIntl();
   const { apis, ajax } = usePreset();
   const [searchParams] = useSearchParams();
@@ -155,7 +157,7 @@ const JoinInvitation = createWithRemoteLoader({
                     {current === 1 && (
                       <div className={classnames(style.stepPanel, style.stepPanelEmployee)}>
                         <Typography.Paragraph className={style.stepHint}>{formatMessage({ id: 'ConfirmEmployeeInfoHint' })}</Typography.Paragraph>
-                        <TenantUserPersonalCard data={tenantUser} positionList={data.positionList} />
+                        <TenantUserPersonalCard data={tenantUser} positionList={data.positionList} mode={isMobile ? 'vertical' : 'horizontal'} />
                       </div>
                     )}
                     {current === 2 && (

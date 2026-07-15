@@ -6,6 +6,7 @@ import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import Fetch from '@kne/react-fetch';
 import merge from 'lodash/merge';
+import dayjs from 'dayjs';
 
 const SYNC_INTERVAL_OPTIONS = [
   { value: 'daily', label: '每天' },
@@ -35,7 +36,7 @@ const STATUS_MAP = {
 const LinkFormInner = withLocale(
   createWithRemoteLoader({
     modules: ['components-core:FormInfo', 'components-core:Global@usePreset']
-  })(({ remoteModules, tenantId, envArgs, sourceOptions, onSuccess }) => {
+  })(({ remoteModules, envArgs, sourceOptions }) => {
     const [FormInfo, usePreset] = remoteModules;
     const { apis, ajax } = usePreset();
     const { formatMessage } = useIntl();
@@ -151,20 +152,11 @@ const OrgLinkSetting = createWithRemoteLoader({
                           return false;
                         }
                         message.success(formatMessage({ id: 'OrgLinkSaveSuccess' }));
+                        reload();
                         onSuccess && onSuccess();
                       }
                     },
-                    children: (
-                      <LinkFormInner
-                        apis={apis}
-                        envArgs={envArgs}
-                        sourceOptions={sourceOptions}
-                        onSuccess={() => {
-                          reload();
-                          onSuccess && onSuccess();
-                        }}
-                      />
-                    )
+                    children: <LinkFormInner envArgs={envArgs} sourceOptions={sourceOptions} />
                   });
                 }}>
                 {formatMessage({ id: 'OrgLinkEnable' })}
@@ -198,7 +190,7 @@ const OrgLinkSetting = createWithRemoteLoader({
                 {
                   key: 'lastSyncTime',
                   label: formatMessage({ id: 'OrgLinkLastSyncTime' }),
-                  children: config.lastSyncTime || '—'
+                  children: config.lastSyncTime && dayjs(config.lastSyncTime).isValid() ? dayjs(config.lastSyncTime).format('YYYY-MM-DD HH:mm:ss') : '—'
                 },
                 {
                   key: 'status',

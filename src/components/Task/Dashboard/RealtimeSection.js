@@ -1,4 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import { useIsMobile } from '@kne/responsive-utils';
 import { useMemo, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Col, Row, Segmented, Space, Tag } from 'antd';
@@ -67,6 +68,8 @@ const RealtimeSection = createWithRemoteLoader({
   withLocale(({ remoteModules, apis, ajax, baseUrl }) => {
     const [Echart, Enum] = remoteModules;
     const { formatMessage } = useIntl();
+    const isMobile = useIsMobile();
+    const chartHeight = isMobile ? 240 : 320;
     const navigate = useNavigate();
     const myTaskPath = useMemo(() => {
       if (baseUrl == null || baseUrl === '') return null;
@@ -662,6 +665,7 @@ const RealtimeSection = createWithRemoteLoader({
                     <Segmented
                       className={style.durationByTypeRunnerSegmented}
                       size="small"
+                      block={isMobile}
                       value={durationByTypeRunnerMode}
                       onChange={setDurationByTypeRunnerMode}
                       options={[
@@ -707,7 +711,7 @@ const RealtimeSection = createWithRemoteLoader({
                     className={`${style.chartCardSurface} ${style.durationByTypeCard}`}
                     title={formatMessage({ id: 'ExecutionTimeByTaskType' })}
                   >
-                    <Echart style={{ height: 320 }} option={resolvedDurationByTypeOption} />
+                    <Echart style={{ height: chartHeight }} option={resolvedDurationByTypeOption} />
                   </BoxCard>
 
                   <div className={style.periodStrip}>
@@ -776,12 +780,12 @@ const RealtimeSection = createWithRemoteLoader({
                   <Row gutter={[20, 24]} className={style.chartsRow}>
                     <Col xs={24} lg={12} className={style.chartCol}>
                       <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'PeriodCompare' })} style={{ height: '100%' }}>
-                        <Echart style={{ height: 320 }} option={periodCompareOption} />
+                        <Echart style={{ height: chartHeight }} option={periodCompareOption} />
                       </BoxCard>
                     </Col>
                     <Col xs={24} lg={12} className={style.chartCol}>
                       <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'TodayHourlyTrend' })} style={{ height: '100%' }}>
-                        <Echart style={{ height: 320 }} option={resolvedHourlyOption} />
+                        <Echart style={{ height: chartHeight }} option={resolvedHourlyOption} />
                       </BoxCard>
                     </Col>
                   </Row>

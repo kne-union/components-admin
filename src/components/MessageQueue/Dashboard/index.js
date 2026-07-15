@@ -1,13 +1,15 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
+import { useIsMobile } from '@kne/responsive-utils';
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Card, Col, Row, Space, Statistic, Table, Tag } from 'antd';
+import { Button, Card, Statistic, Tag } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import Menu from '../Menu';
 import { buildUrlWithParams, formatPercent, formatRate, getMetricTotal } from '../utils';
 import useManagedEventSource from '../../../utils/useManagedEventSource';
+import style from './dashboard.module.scss';
 
 const toTopicRows = current => {
   const topics = new Set([
@@ -32,8 +34,9 @@ const toTopicRows = current => {
   }));
 };
 
-const DashboardContent = withLocale(({ Page, baseUrl, pageProps, apis, initialData, reload }) => {
+const DashboardContent = withLocale(({ Page, TableView, baseUrl, pageProps, apis, initialData, reload }) => {
   const { formatMessage } = useIntl();
+  const isMobile = useIsMobile();
   const [data, setData] = useState(initialData);
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdatedAt, setLastUpdatedAt] = useState(initialData?.timestamp);
@@ -63,118 +66,136 @@ const DashboardContent = withLocale(({ Page, baseUrl, pageProps, apis, initialDa
   const current = data?.current || {};
   const rows = toTopicRows(current);
 
+  const topicColumns = useMemo(
+    () => [
+      {
+        name: 'topic',
+        title: formatMessage({ id: 'Topic' }),
+        renderType: 'main',
+        ellipsis: true
+      },
+      { name: 'queueDepth', title: formatMessage({ id: 'QueueDepth' }) },
+      { name: 'consumedTotal', title: formatMessage({ id: 'ConsumedTotal' }) },
+      { name: 'failedTotal', title: formatMessage({ id: 'FailedTotal' }) },
+      { name: 'dlqTotal', title: formatMessage({ id: 'DLQTotal' }) },
+      {
+        name: 'consumeRate',
+        title: formatMessage({ id: 'ConsumeRate' }),
+        getValueOf: item => `${formatRate(item.consumeRate)}/s`
+      },
+      {
+        name: 'failureRate',
+        title: formatMessage({ id: 'FailureRate' }),
+        getValueOf: item => `${formatRate(item.failureRate)}/s`
+      },
+      {
+        name: 'successRatio',
+        title: formatMessage({ id: 'SuccessRatio' }),
+        getValueOf: item => formatPercent(item.successRatio)
+      }
+    ],
+    [formatMessage]
+  );
+
+  const kpiItems = [
+    { key: 'queueDepth', title: formatMessage({ id: 'QueueDepth' }), value: getMetricTotal(current.queueDepth) },
+    { key: 'consumedTotal', title: formatMessage({ id: 'ConsumedTotal' }), value: getMetricTotal(current.consumedTotal) },
+    {
+      key: 'failedTotal',
+      title: formatMessage({ id: 'FailedTotal' }),
+      value: getMetricTotal(current.failedTotal),
+      valueStyle: { color: '#cf1322' }
+    },
+    {
+      key: 'dlqTotal',
+      title: formatMessage({ id: 'DLQTotal' }),
+      value: getMetricTotal(current.dlqTotal),
+      valueStyle: { color: '#faad14' }
+    },
+    {
+      key: 'consumeRate',
+      title: formatMessage({ id: 'ConsumeRate' }),
+      value: formatRate(current.consumeRate?.total),
+      suffix: '/s'
+    },
+    {
+      key: 'failureRate',
+      title: formatMessage({ id: 'FailureRate' }),
+      value: formatRate(current.failureRate?.total),
+      suffix: '/s',
+      valueStyle: { color: '#cf1322' }
+    },
+    {
+      key: 'dlqRate',
+      title: formatMessage({ id: 'DLQRate' }),
+      value: formatRate(current.dlqRate?.total),
+      suffix: '/s',
+      valueStyle: { color: '#faad14' }
+    },
+    {
+      key: 'successRatio',
+      title: formatMessage({ id: 'SuccessRatio' }),
+      value: formatPercent(current.successRatio),
+      valueStyle: { color: '#3f8600' }
+    }
+  ];
+
   return (
     <Page
       {...pageProps}
       title={formatMessage({ id: 'Dashboard' })}
       menu={<Menu baseUrl={baseUrl} />}
       titleExtra={
-        <Space>
+        <div className={style.titleExtra}>
           <Tag color={isConnected ? 'green' : 'default'}>{formatMessage({ id: isConnected ? 'RealtimeConnected' : 'RealtimeDisconnected' })}</Tag>
-          {lastUpdatedAt ? <span>{`${formatMessage({ id: 'LastUpdatedAt' })}: ${new Date(lastUpdatedAt).toLocaleString()}`}</span> : null}
+          {lastUpdatedAt ? (
+            <span className={style.titleExtraMeta}>{`${formatMessage({ id: 'LastUpdatedAt' })}: ${new Date(lastUpdatedAt).toLocaleString()}`}</span>
+          ) : null}
           <Button type="link" icon={<ReloadOutlined />} onClick={reload}>
             {formatMessage({ id: 'Refresh' })}
           </Button>
-        </Space>
+        </div>
       }
       children={
-        <>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic title={formatMessage({ id: 'QueueDepth' })} value={getMetricTotal(current.queueDepth)} />
+        <div className={style.dashboardRoot}>
+          <div className={style.kpiRow}>
+            {kpiItems.map(item => (
+              <Card key={item.key} className={style.kpiCard} size={isMobile ? 'small' : 'default'}>
+                <Statistic title={item.title} value={item.value} suffix={item.suffix} valueStyle={item.valueStyle} />
               </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic title={formatMessage({ id: 'ConsumedTotal' })} value={getMetricTotal(current.consumedTotal)} />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic
-                  title={formatMessage({ id: 'FailedTotal' })}
-                  value={getMetricTotal(current.failedTotal)}
-                  valueStyle={{ color: '#cf1322' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic title={formatMessage({ id: 'DLQTotal' })} value={getMetricTotal(current.dlqTotal)} valueStyle={{ color: '#faad14' }} />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic title={formatMessage({ id: 'ConsumeRate' })} value={formatRate(current.consumeRate?.total)} suffix="/s" />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic
-                  title={formatMessage({ id: 'FailureRate' })}
-                  value={formatRate(current.failureRate?.total)}
-                  suffix="/s"
-                  valueStyle={{ color: '#cf1322' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic
-                  title={formatMessage({ id: 'DLQRate' })}
-                  value={formatRate(current.dlqRate?.total)}
-                  suffix="/s"
-                  valueStyle={{ color: '#faad14' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic
-                  title={formatMessage({ id: 'SuccessRatio' })}
-                  value={formatPercent(current.successRatio)}
-                  valueStyle={{ color: '#3f8600' }}
-                />
-              </Card>
-            </Col>
-          </Row>
-          <Table
-            style={{ marginTop: 16 }}
-            bordered
-            rowKey="topic"
-            size="small"
-            pagination={false}
-            dataSource={rows}
-            columns={[
-              { title: formatMessage({ id: 'Topic' }), dataIndex: 'topic' },
-              { title: formatMessage({ id: 'QueueDepth' }), dataIndex: 'queueDepth' },
-              { title: formatMessage({ id: 'ConsumedTotal' }), dataIndex: 'consumedTotal' },
-              { title: formatMessage({ id: 'FailedTotal' }), dataIndex: 'failedTotal' },
-              { title: formatMessage({ id: 'DLQTotal' }), dataIndex: 'dlqTotal' },
-              { title: formatMessage({ id: 'ConsumeRate' }), dataIndex: 'consumeRate', render: value => `${formatRate(value)}/s` },
-              { title: formatMessage({ id: 'FailureRate' }), dataIndex: 'failureRate', render: value => `${formatRate(value)}/s` },
-              { title: formatMessage({ id: 'SuccessRatio' }), dataIndex: 'successRatio', render: formatPercent }
-            ]}
-          />
-        </>
+            ))}
+          </div>
+          <div className={style.topicTable}>
+            <TableView rowKey="topic" size="small" dataSource={rows} columns={topicColumns} renderMobile />
+          </div>
+        </div>
       }
     />
   );
 });
 
 const Dashboard = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Layout@Page']
+  modules: ['components-core:Global@usePreset', 'components-core:Layout@Page', 'components-core:TablePage@TableView']
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {} }) => {
-    const [usePreset, Page] = remoteModules;
+    const [usePreset, Page, TableView] = remoteModules;
     const { apis } = usePreset();
 
     return (
       <Fetch
         {...apis.mq.dashboard.getData}
         render={({ data, reload }) => {
-          return <DashboardContent Page={Page} baseUrl={baseUrl} pageProps={pageProps} apis={apis} initialData={data} reload={reload} />;
+          return (
+            <DashboardContent
+              Page={Page}
+              TableView={TableView}
+              baseUrl={baseUrl}
+              pageProps={pageProps}
+              apis={apis}
+              initialData={data}
+              reload={reload}
+            />
+          );
         }}
       />
     );

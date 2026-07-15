@@ -1,3 +1,5 @@
+@use '~@kne/responsive-utils/scss' as resp;
+
 .import-modal {
   width: 100%;
 }
@@ -249,8 +251,27 @@
   font-size: 12px;
 }
 
+.org-info {
+  width: 100%;
+  min-width: 0;
+  @include resp.responsive-container;
+}
+
+.org-toolbar {
+  width: 100%;
+  min-width: 0;
+}
+
+.org-toolbar-actions {
+  flex-wrap: wrap;
+}
+
 .org {
   padding: 12px 0;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  @include resp.responsive-container;
 
   :global(.ant-tree-node-content-wrapper):hover {
     background: var(--primary-color-1);
@@ -502,4 +523,129 @@
     background: #ffffff;
     border-radius: 50%;
   }
+}
+
+@mixin org-info-mobile {
+  .org-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .org-toolbar-actions {
+    justify-content: flex-end;
+  }
+
+  .org {
+    padding: 8px 0;
+  }
+
+  .org-tree {
+    :global {
+      .ant-tree-treenode {
+        width: 100%;
+      }
+
+      .ant-tree-node-content-wrapper {
+        flex: 1;
+        width: 100%;
+      }
+    }
+  }
+
+  .tree-node {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 2px 0;
+  }
+
+  .tree-node-main {
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: flex-start;
+    gap: 4px 8px;
+  }
+
+  .tree-node-title-row {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+  }
+
+  .tree-node-title {
+    word-break: break-word;
+  }
+
+  .tree-node-options {
+    opacity: 1;
+    visibility: visible;
+    flex: 1 1 100%;
+    margin-left: 0;
+    padding-top: 2px;
+  }
+
+  .tree-node-extra {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .tree-node-description {
+    max-width: 100%;
+    word-break: break-word;
+  }
+
+  .org-leader-meta {
+    max-width: 100%;
+  }
+
+  .org-source-tag {
+    font-size: 10px;
+    line-height: 16px;
+    padding: 0 4px;
+  }
+
+  .org-user-count {
+    font-size: 11px;
+    line-height: 18px;
+  }
+
+  .org-chart-outer {
+    border-radius: 8px;
+  }
+
+  .org-chart-inner {
+    min-height: 360px;
+    padding: 16px 12px 48px;
+  }
+
+  .control-panel {
+    top: 8px;
+    right: 8px;
+  }
+
+  .org-card {
+    width: 200px;
+
+    .tree-node-title {
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .tree-node-description {
+      padding: 8px;
+      font-size: 12px;
+    }
+  }
+
+  .import-preview-expand {
+    padding: 12px 10px 14px 16px;
+  }
+
+  .import-preview-nested-table {
+    overflow-x: auto;
+  }
+}
+
+@include resp.mobile-container {
+  @include org-info-mobile;
 }
