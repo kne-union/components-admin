@@ -64,6 +64,7 @@ const ThirdLogin = createWithRemoteLoader({
   const [searchParams] = useSearchParams();
   const platform = searchParams.get('platform');
   const tenantId = searchParams.get('tenantId');
+  const redirect = searchParams.get('redirect');
   const { formatMessage, title, logo } = usePlatformShell(platform);
 
   if (!platform || !tenantId) {
@@ -80,7 +81,7 @@ const ThirdLogin = createWithRemoteLoader({
   return (
     <Fetch
       {...Object.assign({}, apis.tenant.thirdLogin, {
-        data: { platform, tenantId }
+        data: { platform, tenantId, redirect }
       })}
       loading={<ThirdLoginLoading title={title} logo={logo} tip={formatMessage({ id: 'FetchingTenantInfo' })} />}
       error={error => (
