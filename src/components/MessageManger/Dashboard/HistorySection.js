@@ -1,5 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
+import { useIsMobile } from '@kne/responsive-utils';
 import { useState, useRef } from 'react';
 import { Button, Col, Row, Space, Segmented } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
@@ -87,6 +88,9 @@ const HistorySection = createWithRemoteLoader({
   withLocale(({ remoteModules, apis }) => {
     const [Echart] = remoteModules;
     const { formatMessage } = useIntl();
+    const isMobile = useIsMobile();
+    const trendChartHeight = isMobile ? 280 : 380;
+    const pieChartHeight = isMobile ? 240 : 320;
     const [range, setRange] = useState('7d');
     const reloadRef = useRef(() => {});
 
@@ -95,8 +99,9 @@ const HistorySection = createWithRemoteLoader({
         <SectionHeader
           title={formatMessage({ id: 'HistoricalData' })}
           extra={
-            <Space>
+            <Space className={style.historyHeaderExtra} wrap={isMobile}>
               <Segmented
+                block={isMobile}
                 options={RANGE_OPTIONS.map(r => ({
                   label: formatMessage({ id: `Range_${r}` }),
                   value: r
@@ -324,18 +329,18 @@ const HistorySection = createWithRemoteLoader({
               </div>
 
               <BoxCard className={`${style.chartCardSurface} ${style.historyTrendCard}`}>
-                <Echart style={{ height: 380 }} option={trendOption} />
+                <Echart style={{ height: trendChartHeight }} option={trendOption} />
               </BoxCard>
 
               <Row gutter={[20, 24]} className={style.historyPiesRow}>
                 <Col xs={24} lg={12} className={style.chartCol}>
                   <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'TypeDistribution' })} style={{ height: '100%' }}>
-                    {typePieOption ? <Echart style={{ height: 320 }} option={typePieOption} /> : null}
+                    {typePieOption ? <Echart style={{ height: pieChartHeight }} option={typePieOption} /> : null}
                   </BoxCard>
                 </Col>
                 <Col xs={24} lg={12} className={style.chartCol}>
                   <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'ByCodeStats' })} style={{ height: '100%' }}>
-                    <Echart style={{ height: 320 }} option={codePieOption} />
+                    <Echart style={{ height: pieChartHeight }} option={codePieOption} />
                   </BoxCard>
                 </Col>
               </Row>

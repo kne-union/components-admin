@@ -533,7 +533,16 @@ const apis = merge({}, getApis(), {
       loader: () => import('./third-login-info.json').then(({ default: data }) => data.data)
     },
     thirdLoginResult: {
-      loader: () => import('./third-login-result.json').then(({ default: data }) => data.data)
+      loader: ({ data } = {}) => {
+        return import('./third-login-result.json').then(({ default: res }) => {
+          // 示例页不自动跳转，便于观察登录成功态；redirect 仍会随请求传入
+          const base = data?.platform === 'dingtalk' ? res.dingtalk : res.data;
+          return Object.assign({}, base, {
+            platform: data?.platform || base.platform,
+            redirectUrl: null
+          });
+        });
+      }
     },
     availableList: {
       loader: () => {

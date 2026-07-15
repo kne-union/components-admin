@@ -6,6 +6,16 @@
     "name": "张三",
     "avatar": null,
     "email": "zhangsan@tencent.com",
-    "phone": "13800138000"
+    "phone": "13800138000",
+    "redirectUrl": null
+  },
+  "dingtalk": {
+    "token": "mock-dingtalk-login-token",
+    "platform": "dingtalk",
+    "name": "李四",
+    "avatar": null,
+    "email": "lisi@dingtalk.com",
+    "phone": "13900139000",
+    "redirectUrl": null
   }
 }

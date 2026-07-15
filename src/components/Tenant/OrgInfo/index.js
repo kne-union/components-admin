@@ -1,8 +1,9 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Tree, App, Card, Button, Space, Modal, Upload, Typography, Table, Divider, Checkbox, Tag, Badge, Tooltip, Drawer } from 'antd';
+import { Flex, Tree, App, Card, Button, Space, Modal, Upload, Typography, Table, Divider, Checkbox, Tag, Badge, Tooltip } from 'antd';
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import OrgChart from '@kne/react-org-chart';
 import merge from 'lodash/merge';
+import { useIsMobile } from '@kne/responsive-utils';
 import {
   PlusCircleOutlined,
   MinusCircleOutlined,
@@ -464,7 +465,7 @@ const GraphOrg = createWithRemoteLoader({
   );
 });
 
-const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers, linkedSource }) => {
+const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers, linkedSource, isMobile }) => {
   const [expandedKeys, setExpandedKeys] = useState(['root']);
 
   useEffect(() => {
@@ -487,14 +488,21 @@ const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers, linkedSource }) => {
       titleRender={nodeData => {
         return (
           <Flex vertical className={style['tree-node']}>
-            <Flex className={style['tree-node-main']} align="center" wrap="nowrap">
+            <Flex className={style['tree-node-main']} align="center" wrap={isMobile ? 'wrap' : 'nowrap'}>
               <Flex align="center" gap={8} wrap="wrap" className={style['tree-node-title-row']}>
                 <span className={style['tree-node-title']}>{nodeData.name}</span>
                 <OrgSourceTag source={nodeData.syncSource} />
                 <OrgNodeUserCount count={nodeData.userCount} />
               </Flex>
               <span className={style['tree-node-options']}>
-                <OrgOptions data={nodeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />
+                <OrgOptions
+                  data={nodeData}
+                  apis={apis}
+                  onSuccess={onSuccess}
+                  onViewUsers={onViewUsers}
+                  linkedSource={linkedSource}
+                  showLength={isMobile ? 2 : 3}
+                />
               </span>
             </Flex>
             {(nodeData.description || nodeData.leader?.name) && (
@@ -511,13 +519,13 @@ const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers, linkedSource }) => {
 };
 
 const OrgInfo = createWithRemoteLoader({
-  modules: ['components-core:StateBar', 'components-core:Global@usePreset']
+  modules: ['components-core:StateBar', 'components-core:Global@usePreset', 'components-core:Drawer@useDrawer']
 })(({ remoteModules, data, companyName, apis, onSuccess, tenantId, onViewUsers, linkedSource, linkSettingProps }) => {
-  const [StateBar, usePreset] = remoteModules;
+  const [StateBar, usePreset, useDrawer] = remoteModules;
   const { ajax } = usePreset();
+  const drawer = useDrawer();
   const [activeKey, setActiveKey] = useState('tree');
   const [importOpen, setImportOpen] = useState(false);
-  const [linkDrawerOpen, setLinkDrawerOpen] = useState(false);
   const [importLoading, setImportLoading] = useState(false);
   const [anchorOrgId, setAnchorOrgId] = useState(undefined);
   const [importFile, setImportFile] = useState(null);
@@ -526,6 +534,9 @@ const OrgInfo = createWithRemoteLoader({
   const [uploadKey, setUploadKey] = useState(0);
   const { formatMessage } = useIntl();
   const { message } = App.useApp();
+  const isMobile = useIsMobile();
+  const importPreviewOpen = parsedRows !== null;
+  const importModalWidth = isMobile ? 'calc(100vw - 32px)' : importPreviewOpen ? 1080 : 560;
   const importPreviewGroups = useMemo(() => buildImportPreviewGroups(parsedRows || []), [parsedRows]);
 
   const importSelectedKeySet = useMemo(() => new Set(importSelectedRowKeys.map(String)), [importSelectedRowKeys]);
@@ -780,8 +791,8 @@ const OrgInfo = createWithRemoteLoader({
   };
 
   return (
-    <Flex vertical>
-      <Flex justify="space-between" align="center" wrap="wrap" gap={8}>
+    <Flex vertical className={style['org-info']}>
+      <Flex className={style['org-toolbar']} justify="space-between" align="center" wrap="wrap" gap={8}>
         <StateBar
           activeKey={activeKey}
           onChange={setActiveKey}
@@ -791,9 +802,28 @@ const OrgInfo = createWithRemoteLoader({
             { tab: formatMessage({ id: 'Graph' }), key: 'graph' }
           ]}
         />
-        <Space>
+        <Space className={style['org-toolbar-actions']} wrap>
           {linkSettingProps ? (
-            <Button size="small" icon={linkedSource ? getSourceIcon(linkedSource) : <LinkOutlined />} onClick={() => setLinkDrawerOpen(true)}>
+            <Button
+              size="small"
+              icon={linkedSource ? getSourceIcon(linkedSource) : <LinkOutlined />}
+              onClick={() => {
+                drawer({
+                  title: formatMessage({ id: 'OrgLinkTitle' }),
+                  width: 480,
+                  footer: null,
+                  children: (
+                    <OrgLinkSetting
+                      apis={apis}
+                      tenantId={linkSettingProps.tenantId}
+                      envArgs={linkSettingProps.envArgs}
+                      onSuccess={() => {
+                        linkSettingProps.onLinkChange && linkSettingProps.onLinkChange();
+                      }}
+                    />
+                  )
+                });
+              }}>
               {linkedSource ? `${SOURCE_LABEL_MAP[linkedSource] || linkedSource}` : formatMessage({ id: 'OrgLinkTitle' })}
             </Button>
           ) : null}
@@ -814,23 +844,6 @@ const OrgInfo = createWithRemoteLoader({
           ) : null}
         </Space>
       </Flex>
-      {linkSettingProps ? (
-        <Drawer
-          title={formatMessage({ id: 'OrgLinkTitle' })}
-          open={linkDrawerOpen}
-          onClose={() => setLinkDrawerOpen(false)}
-          width={480}
-          destroyOnClose>
-          <OrgLinkSetting
-            apis={apis}
-            tenantId={linkSettingProps.tenantId}
-            envArgs={linkSettingProps.envArgs}
-            onSuccess={() => {
-              linkSettingProps.onLinkChange && linkSettingProps.onLinkChange();
-            }}
-          />
-        </Drawer>
-      ) : null}
       <Modal
         title={formatMessage({ id: 'OrgExcelImport' })}
         open={importOpen}
@@ -849,7 +862,7 @@ const OrgInfo = createWithRemoteLoader({
         }}
         confirmLoading={importLoading}
         destroyOnClose
-        width={parsedRows && parsedRows.length ? 1080 : 560}>
+        width={importModalWidth}>
         <Flex vertical gap={20} className={style.importModal}>
           <div className={style.importModalSection}>
             <Typography.Paragraph type="secondary" className={style.importModalHint}>
@@ -993,7 +1006,15 @@ const OrgInfo = createWithRemoteLoader({
       </Modal>
       <div className={style['org']}>
         {activeKey === 'tree' && (
-          <TreeOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />
+          <TreeOrg
+            ids={ids}
+            data={treeData}
+            apis={apis}
+            onSuccess={onSuccess}
+            onViewUsers={onViewUsers}
+            linkedSource={linkedSource}
+            isMobile={isMobile}
+          />
         )}
         {activeKey === 'graph' && (
           <GraphOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />

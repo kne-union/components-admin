@@ -7,6 +7,9 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  @include resp.responsive-container;
 }
 
 .shell {
@@ -14,6 +17,7 @@
   flex-direction: column;
   width: 100%;
   max-width: 900px;
+  min-width: 0;
   background: #fff;
   border-radius: 16px;
   border: 1px solid rgba(15, 23, 42, 0.06);
@@ -21,6 +25,7 @@
     0 4px 24px rgba(15, 23, 42, 0.06),
     0 1px 2px rgba(15, 23, 42, 0.04);
   overflow: hidden;
+  @include resp.responsive-container;
 }
 
 .shellError {
@@ -243,13 +248,15 @@
   min-width: 140px;
 }
 
-@include resp.down(sm) {
+@mixin join-invitation-mobile {
   .page {
     padding: 0;
   }
 
   .shell {
     border-radius: 12px;
+    border: none;
+    box-shadow: none;
   }
 
   .shellError {
@@ -325,6 +332,11 @@
   .stepPanelEmployee {
     padding: 12px;
     gap: 8px;
+
+    :global(.kne-react-box) {
+      width: 100%;
+      box-sizing: border-box;
+    }
   }
 
   .stepHint {
@@ -359,4 +371,39 @@
     width: 100%;
     min-width: 0;
   }
+}
+
+@mixin join-invitation-phone {
+  .shell {
+    border-radius: 0;
+  }
+
+  .header {
+    padding: 14px 12px 12px;
+  }
+
+  .content {
+    padding: 12px 12px 0;
+  }
+
+  .stepsWrap {
+    margin-bottom: 12px;
+    padding: 12px 10px 14px;
+  }
+
+  .stepPanelEmployee {
+    padding: 10px;
+  }
+
+  .footer {
+    margin: 10px 12px max(14px, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@include resp.mobile-container {
+  @include join-invitation-mobile;
+}
+
+@include resp.container-down(sm) {
+  @include join-invitation-phone;
 }

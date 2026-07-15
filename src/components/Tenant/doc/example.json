@@ -144,7 +144,7 @@
     },
     {
       "title": "第三方登录结果",
-      "description": "ThirdLoginResult 组件用于第三方登录结果页，路由 path 为 third-login-result",
+      "description": "ThirdLoginResult 组件用于第三方登录结果页，路由 path 为 third-login-result；企业微信需 platform/tenantId/code，钉钉另需 corpId/clientId",
       "code": "./third-login-result.js",
       "scope": [
         {
@@ -162,6 +162,14 @@
         {
           "name": "reactRouterDom",
           "packageName": "react-router-dom"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        },
+        {
+          "name": "icons",
+          "packageName": "@ant-design/icons"
         }
       ]
     },

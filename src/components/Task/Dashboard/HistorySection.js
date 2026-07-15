@@ -1,5 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
+import { useIsMobile } from '@kne/responsive-utils';
 import { useState, useRef } from 'react';
 import { Button, Col, Row, Select, Space, Segmented, Tag } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
@@ -181,6 +182,10 @@ const HistorySection = createWithRemoteLoader({
   withLocale(({ remoteModules, apis }) => {
     const [Echart, Enum] = remoteModules;
     const { formatMessage } = useIntl();
+    const isMobile = useIsMobile();
+    const trendChartHeight = isMobile ? 280 : 380;
+    const durationChartHeight = isMobile ? 240 : 320;
+    const hourlyChartHeight = isMobile ? 260 : 340;
     const [range, setRange] = useState('7d');
     /** 历史每小时趋势：按任务类型 | 按任务状态 */
     const [hourlyHistoryDim, setHourlyHistoryDim] = useState('type');
@@ -193,8 +198,9 @@ const HistorySection = createWithRemoteLoader({
         <SectionHeader
           title={formatMessage({ id: 'HistoricalData' })}
           extra={
-            <Space>
+            <Space className={style.historyHeaderExtra} wrap={isMobile}>
               <Segmented
+                block={isMobile}
                 options={RANGE_OPTIONS.map(r => ({
                   label: formatMessage({ id: `Range_${r}` }),
                   value: r
@@ -624,7 +630,7 @@ const HistorySection = createWithRemoteLoader({
                           return { ...s, name: typeLabelMap[s.name] || s.name };
                         })
                       };
-                      return <Echart style={{ height: 380 }} option={resolvedOption} />;
+                      return <Echart style={{ height: trendChartHeight }} option={resolvedOption} />;
                     }}
                   </Enum>
                 </BoxCard>
@@ -678,7 +684,7 @@ const HistorySection = createWithRemoteLoader({
                               </Tag>
                             );
                           }}
-                          style={{ minWidth: 180 }}
+                          style={isMobile ? { width: '100%', minWidth: 0 } : { minWidth: 180 }}
                         />
                       );
                     };
@@ -691,7 +697,7 @@ const HistorySection = createWithRemoteLoader({
                             title={formatMessage({ id: 'ManualExecution' })}
                             extra={renderTaskTypeSelect(effectiveManualDurationTypes, setManualDurationTypes, manualTaskTypeOptions)}
                           >
-                            <Echart style={{ height: 320 }} option={manualDurationOption} />
+                            <Echart style={{ height: durationChartHeight }} option={manualDurationOption} />
                           </BoxCard>
                         </Col>
                         <Col xs={24} lg={12} className={style.chartCol}>
@@ -700,7 +706,7 @@ const HistorySection = createWithRemoteLoader({
                             title={formatMessage({ id: 'AutomaticExecution' })}
                             extra={renderTaskTypeSelect(effectiveSystemDurationTypes, setSystemDurationTypes, systemTaskTypeOptions)}
                           >
-                            <Echart style={{ height: 320 }} option={systemDurationOption} />
+                            <Echart style={{ height: durationChartHeight }} option={systemDurationOption} />
                           </BoxCard>
                         </Col>
                       </Row>
@@ -905,6 +911,7 @@ const HistorySection = createWithRemoteLoader({
                           <Segmented
                             className={style.historyHourlyTrendSegmented}
                             size="small"
+                            block={isMobile}
                             value={hourlyHistoryDim}
                             onChange={setHourlyHistoryDim}
                             options={[
@@ -914,7 +921,7 @@ const HistorySection = createWithRemoteLoader({
                           />
                         }
                       >
-                        <Echart key={`${range}-${hourlyHistoryDim}`} style={{ height: 340 }} option={option} />
+                        <Echart key={`${range}-${hourlyHistoryDim}`} style={{ height: hourlyChartHeight }} option={option} />
                       </BoxCard>
                     );
                   }}

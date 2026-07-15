@@ -6,6 +6,7 @@
   margin: 0;
   padding: 8px 16px 32px;
   box-sizing: border-box;
+  @include resp.responsive-container;
 }
 
 .sectionPanel {
@@ -37,6 +38,15 @@
   margin-bottom: 14px;
 }
 
+.sectionHeaderExtra {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.historyHeaderExtra {
+  min-width: 0;
+}
+
 /* 实时区：标题 + 一行汇总 + 状态，提高头部信息密度 */
 .realtimeHeader {
   display: flex;
@@ -48,7 +58,7 @@
 }
 
 .realtimeHeaderMain {
-  flex: 1 1 200px;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -164,17 +174,6 @@
   }
 }
 
-@include resp.down(md) {
-  .periodStrip {
-    flex-direction: column;
-    flex-wrap: wrap;
-  }
-
-  .periodStripCell:not(:last-child) {
-    box-shadow: 0 1px 0 rgba(226, 232, 240, 0.95);
-  }
-}
-
 .periodStripLabel {
   font-size: 11px;
   font-weight: 600;
@@ -243,18 +242,6 @@
   gap: 12px;
 }
 
-@include resp.down(xl) {
-  .historyStatsGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@include resp.down(sm) {
-  .historyStatsGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 .historyStatCell {
   padding: 14px 14px 14px 16px;
   border-radius: 12px;
@@ -292,4 +279,199 @@
   padding: 44px 16px;
   color: #94a3b8;
   font-size: 14px;
+}
+
+@include resp.container-down(xl) {
+  .historyStatsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@include resp.mobile-container {
+  .dashboardRoot {
+    padding: 4px 12px 24px;
+  }
+
+  .realtimeSectionWrap {
+    padding: 12px 14px 16px;
+    border-radius: 10px;
+  }
+
+  .sectionDivider {
+    margin: 20px 0 !important;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .sectionHeaderExtra {
+    width: 100%;
+  }
+
+  .historyHeaderExtra {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sectionTitle {
+    font-size: 16px;
+  }
+
+  .realtimeHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .realtimeHeaderMain {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .realtimeTitle {
+    font-size: 15px;
+  }
+
+  /* 副标题与 KPI 重复，窄屏隐藏避免换行噪音 */
+  .realtimeSubline {
+    display: none;
+  }
+
+  .realtimeHeaderMeta {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .realtimeTime {
+    white-space: normal;
+  }
+
+  .kpiRow,
+  .kpiRowDense {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .kpiCard,
+  .kpiCardDense {
+    flex: none;
+    min-width: 0;
+    max-width: none;
+    width: auto;
+    padding: 12px !important;
+    gap: 6px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px -10px rgba(15, 23, 42, 0.12);
+
+    &:hover {
+      transform: none;
+      box-shadow: 0 8px 20px -10px rgba(15, 23, 42, 0.12);
+    }
+
+    /* ColorfulCard 首子节点为 icon */
+    > div:first-child {
+      width: 36px;
+      height: 36px;
+      font-size: 18px;
+      border-radius: 10px;
+    }
+  }
+
+  .kpiValueDense {
+    font-size: 1.35rem;
+  }
+
+  .kpiDescDense {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .periodStrip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex-direction: unset;
+    flex-wrap: unset;
+    margin-top: 12px;
+    border-radius: 10px;
+    gap: 1px;
+    background: rgba(226, 232, 240, 0.95);
+    overflow: hidden;
+  }
+
+  .periodStripCell {
+    padding: 10px 8px;
+    text-align: left;
+    background: #fff;
+    box-shadow: none !important;
+  }
+
+  .periodStripLabel {
+    justify-content: flex-start;
+    margin-bottom: 4px;
+  }
+
+  .periodStripLabelInner,
+  .periodStripMetaInner {
+    justify-content: flex-start !important;
+  }
+
+  .periodStripValue {
+    font-size: 1.15rem;
+  }
+
+  .periodStripMeta {
+    margin-top: 6px;
+    justify-content: flex-start;
+  }
+
+  .chartsRow {
+    margin-top: 16px;
+  }
+
+  .historyTrendCard {
+    margin-top: 14px;
+  }
+
+  .historyPiesRow {
+    margin-top: 16px;
+  }
+
+  .chartsRow,
+  .historyPiesRow {
+    :global(.ant-col) {
+      flex: 0 0 100% !important;
+      max-width: 100% !important;
+    }
+  }
+
+  .historyStatsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .historyStatCell {
+    padding: 10px 12px;
+  }
+
+  .historyStatValue {
+    font-size: 1.25rem;
+  }
+
+  /* @kne/react-box 卡片头部（.card-header > .header-left/.header-right 为哈希类名，
+     无法直接命中）：卡片头部是首个子 div，移动端改纵向堆叠并让 extra 占满整行 */
+  .chartCardSurface > div:first-child {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+
+    > div {
+      width: 100%;
+      flex: none;
+    }
+  }
 }
