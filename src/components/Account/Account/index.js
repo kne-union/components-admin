@@ -14,13 +14,11 @@ import withLocale from '../withLocale';
 
 const defaultLeftInner = <LoginIllustration />;
 
-const Layout = () => {
+export const Layout = ({ children }) => {
   return (
     <div className={classnames(style['layout-row'], 'account-layout')}>
       <div className={style['layout-inner']}>
-        <div className={style['layout-inner-wrapper']}>
-          <Outlet />
-        </div>
+        <div className={style['layout-inner-wrapper']}>{children || <Outlet />}</div>
       </div>
     </div>
   );

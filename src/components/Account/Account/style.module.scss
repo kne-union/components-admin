@@ -2,7 +2,7 @@
 
 .layout-row {
   height: var(--kne-viewport-height);
-  width: 100vw;
+  width: var(--kne-viewport-width);
   position: relative;
   background: var(--primary-color);
 }
