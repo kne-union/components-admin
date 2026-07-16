@@ -132,8 +132,8 @@ const ThirdLoginResult = createWithRemoteLoader({
         loader={({ data }) => {
           return import('./dingTalkCode').then(({ default: dingTalkCode }) => {
             return dingTalkCode({
-              corpId: data.corpId,
-              clientId: data.clientId
+              corpId: decodeURIComponent(data.corpId),
+              clientId: decodeURIComponent(data.clientId)
             });
           });
         }}
@@ -149,6 +149,5 @@ const ThirdLoginResult = createWithRemoteLoader({
   // 企业微信等：URL 上的 code 即为 OAuth auth code，需传给业务接口
   return renderResult(Object.assign({}, others, urlCode ? { code: urlCode } : {}));
 });
-
 
 export default withLocale(ThirdLoginResult);
