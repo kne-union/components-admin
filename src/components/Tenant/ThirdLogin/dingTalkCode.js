@@ -23,12 +23,19 @@ const dingTalkCode = ({ corpId, clientId }) => {
     const onFail = err => {
       reject(new Error(getErrorMessage(err)));
     };
-
+    console.log(corpId, clientId);
+    if (!corpId || !clientId) {
+      reject(new Error('缺少必要参数'));
+      return;
+    }
     try {
       const ret = dd.requestAuthCode({
         corpId,
         clientId,
-        onSuccess: resolve,
+        onSuccess: result => {
+          console.log(result);
+          resolve(result);
+        },
         onFail
       });
       // jsapi 会额外返回 Promise，未 catch 会在非钉钉环境产生 Uncaught (in promise)
@@ -36,6 +43,7 @@ const dingTalkCode = ({ corpId, clientId }) => {
         ret.then(resolve, onFail);
       }
     } catch (err) {
+      console.error(err);
       onFail(err);
     }
   });
