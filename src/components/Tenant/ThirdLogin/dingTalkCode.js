@@ -23,7 +23,6 @@ const dingTalkCode = ({ corpId, clientId }) => {
     const onFail = err => {
       reject(new Error(getErrorMessage(err)));
     };
-    console.log(corpId, clientId);
     if (!corpId || !clientId) {
       reject(new Error('缺少必要参数'));
       return;
@@ -33,7 +32,6 @@ const dingTalkCode = ({ corpId, clientId }) => {
         corpId,
         clientId,
         onSuccess: result => {
-          console.log(result);
           resolve(result);
         },
         onFail
@@ -43,7 +41,6 @@ const dingTalkCode = ({ corpId, clientId }) => {
         ret.then(resolve, onFail);
       }
     } catch (err) {
-      console.error(err);
       onFail(err);
     }
   });

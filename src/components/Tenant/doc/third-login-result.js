@@ -38,6 +38,46 @@ const PLATFORM_OPTIONS = [
   }
 ];
 
+const DocPanel = () => (
+  <Flex
+    vertical
+    gap={12}
+    style={{
+      padding: '14px 16px',
+      borderRadius: 12,
+      background: 'linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(248,250,252,0.96) 100%)',
+      border: '1px solid rgba(15, 23, 42, 0.08)',
+      boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)'
+    }}
+  >
+    <Typography.Text strong style={{ fontSize: 13, color: 'rgba(15,23,42,0.88)' }}>
+      对接说明（结果页 ThirdLoginResult）
+    </Typography.Text>
+    <Flex vertical gap={4}>
+      <Typography.Text strong style={{ fontSize: 12 }}>
+        企业微信
+      </Typography.Text>
+      <Typography.Text type="secondary" style={{ fontSize: 12, lineHeight: 1.7 }}>
+        对接要求：回跳 URL 必传 platform=wecom、tenantId、code（OAuth 授权码）；可选 redirect、message（中间页状态文案，不参与业务接口）。
+        <br />
+        对接流程：企微 OAuth 回跳 → URL 上的 code 即为 auth code → 调用 thirdLoginResult → 成功后写入 X-Third-Login-Token → 若有 redirect 则跳转业务页。
+      </Typography.Text>
+    </Flex>
+    <Flex vertical gap={4}>
+      <Typography.Text strong style={{ fontSize: 12 }}>
+        钉钉
+      </Typography.Text>
+      <Typography.Text type="secondary" style={{ fontSize: 12, lineHeight: 1.7 }}>
+        对接要求：回跳 URL 必传 platform=dingtalk、tenantId、corpId、clientId；可选 redirect、message。注意 URL 上的 code 为状态码（如
+        200），不是授权码；页面必须在钉钉客户端内打开。
+        <br />
+        对接流程：钉钉回跳结果页 → 用 corpId/clientId 调用 dingtalk-jsapi requestAuthCode 获取真实 auth code → 调用 thirdLoginResult →
+        写入 token → 若有 redirect 则跳转业务页。
+      </Typography.Text>
+    </Flex>
+  </Flex>
+);
+
 const PlatformSwitcher = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -82,6 +122,7 @@ const ThirdLoginResultExample = createWithRemoteLoader({
   return (
     <PureGlobal preset={mockPreset}>
       <Flex vertical gap={20} style={{ minHeight: '100%' }}>
+        <DocPanel />
         <PlatformSwitcher />
         <Routes>
           <Route path={baseUrl} element={<ThirdLoginResult />} />
