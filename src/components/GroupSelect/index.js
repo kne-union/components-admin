@@ -3,6 +3,9 @@ import { App, Button } from 'antd';
 import merge from 'lodash/merge';
 import { useIntl } from '@kne/react-intl';
 import withLocale from './withLocale';
+import GroupFolder from './GroupFolder';
+import GroupFolderToolbar from './GroupFolderToolbar';
+import GroupFormFields from './GroupFormFields';
 import style from './style.module.scss';
 
 const createComponent = (callback = item => item) => {
@@ -200,7 +203,10 @@ const createComponent = (callback = item => item) => {
 const GroupSelect = createComponent();
 
 GroupSelect.Field = createComponent(item => item.Field);
+GroupSelect.GroupFolder = GroupFolder;
+GroupSelect.GroupFolderToolbar = GroupFolderToolbar;
+GroupSelect.GroupFormFields = GroupFormFields;
 
-export { default as GroupFolder } from './GroupFolder';
+export { GroupFolder, GroupFolderToolbar, GroupFormFields };
 
 export default GroupSelect;

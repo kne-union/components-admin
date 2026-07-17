@@ -14,7 +14,7 @@ const SingleSelectExample = createWithRemoteLoader({
       <Form
         data={{
           name: '数据分析项目',
-          primaryGroup: 'ai'
+          primaryGroup: { code: 'ai', name: '人工智能' }
         }}
         onSubmit={(data) => {
           console.log('提交数据:', data);

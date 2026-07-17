@@ -82,7 +82,7 @@
     {
       "title": "人才管理（SystemLayout 综合场景）",
       "isFull": true,
-      "description": "参考 ai-talent-saas TenantAdmin：AppChildrenRouter + SystemLayout + BizUnit isNext children；@kne/system-layout 的 Page 承载标题，TablePageRender 渲染新版 TablePage；覆盖 filter、tableProps.batchActions/rowSelection。",
+      "description": "参考 ai-talent-saas TenantAdmin：AppChildrenRouter + SystemLayout + BizUnit isNext children；@kne/system-layout 的 Page 承载标题，TablePageRender 渲染新版 TablePage；员工档案支持表格/卡片视图切换，覆盖 filter、tableProps.renderCard/batchActions/rowSelection。",
       "code": "./system-layout-next.js",
       "scope": [
         { "name": "_BizUnit", "packageName": "@components/BizUnit" },

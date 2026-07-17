@@ -76,6 +76,52 @@
           "packageName": "@kne/remote-loader"
         }
       ]
+    },
+    {
+      "title": "分组工具栏",
+      "description": "树形选择 + 新建/编辑/删除；并排展示有父级（含 showColor 颜色选择）与无父级（showParent=false，扁平分组）",
+      "code": "./folder-toolbar.js",
+      "scope": [
+        {
+          "name": "_GroupSelect",
+          "packageName": "@components/GroupSelect"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "分组侧栏布局",
+      "description": "GroupFolder 左侧树 + 右侧内容区，用于按分组筛选列表页",
+      "code": "./folder-layout.js",
+      "scope": [
+        {
+          "name": "_GroupSelect",
+          "packageName": "@components/GroupSelect"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
     }
   ]
 }
