@@ -1,3 +1,18 @@
+@use '~@kne/responsive-utils/scss' as resp;
+
+.group-folder-layout {
+  @include resp.mobile-container {
+    flex-direction: column;
+
+    .group-folder {
+      flex: 0 0 auto !important;
+      width: 100%;
+      height: auto;
+      max-height: 240px;
+    }
+  }
+}
+
 .group-folder {
   background-color: #f5f5f5;
   border-radius: 8px;
@@ -19,6 +34,14 @@
         border-radius: 6px;
         transition: all 0.2s;
         width: 100%;
+        align-items: center;
+      }
+
+      .ant-tree-node-content-wrapper {
+        display: flex;
+        align-items: center;
+        min-height: 32px;
+        line-height: 32px;
       }
 
       .ant-tree-node-selected {
@@ -35,10 +58,28 @@
       }
 
       .ant-tree-switcher {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        align-self: stretch;
         line-height: 32px;
+
+        // antd 的 hover 背景（::before）固定 top: 0、高 24px，行高 32px 时偏上，下移使其居中
+        &::before {
+          top: 4px;
+        }
+
+        .ant-tree-switcher-icon {
+          display: inline-flex;
+          align-items: center;
+        }
       }
 
       .ant-tree-iconEle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 32px;
         line-height: 32px;
         margin-right: 4px;
       }
@@ -58,4 +99,195 @@
   padding: 24px 12px;
   color: #999;
   text-align: center;
+}
+
+.group-folder-toolbar {
+  flex-shrink: 0;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 999px;
+  padding: 4px 8px;
+
+  :global {
+    .select-input,
+    .select-input:hover,
+    .select-input:focus,
+    .select-input:focus-within,
+    .select-input:active,
+    .select-input.is-focus,
+    .select-input.is-focused,
+    .select-input.is-active,
+    .select-input.is-open,
+    .select-input.open,
+    .select-input[aria-expanded='true'] {
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+      transition: none !important;
+    }
+
+    .ant-btn::before,
+    .ant-btn::after,
+    .ant-wave,
+    .ant-click-animating-node {
+      display: none !important;
+      animation: none !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+.group-folder-toolbar-group {
+  min-width: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: #fff;
+  overflow: hidden;
+
+  :global {
+    .select-input,
+    .select-input:hover,
+    .select-input:focus,
+    .select-input:focus-within,
+    .select-input:active,
+    .select-input.is-focus,
+    .select-input.is-focused,
+    .select-input.is-active,
+    .select-input.is-open,
+    .select-input.open,
+    .select-input[aria-expanded='true'] {
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+.group-folder-toolbar-actions {
+  flex-shrink: 0;
+  border-left: 1px solid var(--border-color);
+  gap: 2px;
+  padding: 0 8px 0 4px;
+
+  :global {
+    .ant-btn {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border-radius: 6px;
+      border: none;
+      box-shadow: none;
+      transition: none;
+
+      &:hover,
+      &:focus,
+      &:focus-visible,
+      &:active {
+        border: none;
+        box-shadow: none;
+        outline: none;
+        transition: none;
+      }
+    }
+  }
+}
+
+.group-folder-toolbar-select {
+  min-width: 180px;
+}
+
+.group-folder-toolbar-select-compact {
+  min-width: 140px;
+}
+
+.group-folder-toolbar-color-icon {
+  flex-shrink: 0;
+}
+
+.group-folder-menu-item {
+  min-width: 0;
+
+  .group-folder-menu-item-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.group-folder-state-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+
+  .group-folder-state-icon-open {
+    display: none;
+  }
+}
+
+// 树节点展开时切换为打开的文件夹图标（类名由 antd Tree 自动添加）
+:global(.ant-tree-treenode-switcher-open) {
+  .group-folder-state-icon {
+    .group-folder-state-icon-closed {
+      display: none;
+    }
+
+    .group-folder-state-icon-open {
+      display: inline-flex;
+    }
+  }
+}
+
+.group-color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.group-color-swatch {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:focus,
+  &:focus-visible,
+  &:active {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &[data-active='true'] {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px var(--swatch-color), 0 0 0 3px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.group-folder-toolbar-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--font-color);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+
+  &:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background: var(--primary-color-1, rgba(0, 0, 0, 0.02));
+  }
 }

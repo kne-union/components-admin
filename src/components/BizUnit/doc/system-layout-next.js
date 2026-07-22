@@ -4,7 +4,7 @@ const { createWithRemoteLoader } = remoteLoader;
 const { default: SystemLayout, Page } = _systemLayout;
 const { default: AppChildrenRouter } = appChildrenRouter;
 const { Route, Routes, Navigate } = reactRouterDom;
-const { Modal, message } = antd;
+const { Card, Col, Flex, Modal, Row, Tag, message } = antd;
 
 const baseUrl = '/biz-unit-system-layout';
 
@@ -87,6 +87,28 @@ const positionStatusMap = {
   published: { type: 'success', text: '已发布' },
   draft: { type: 'default', text: '草稿' }
 };
+
+const renderEmployeeCard = ({ dataSource = [] }) => (
+  <Row gutter={[12, 12]}>
+    {dataSource.map(item => {
+      const status = employeeStatusMap[item.status] || { type: 'default', text: item.status };
+      return (
+        <Col span={12} key={item.id}>
+          <Card size="small" title={item.name} extra={<Tag color={status.type}>{status.text}</Tag>}>
+            <Flex vertical gap={8}>
+              <span>
+                {item.employeeNo} · {item.department}
+              </span>
+              <span>{item.position}</span>
+              <span>{item.email}</span>
+              <span>{item.phone}</span>
+            </Flex>
+          </Card>
+        </Col>
+      );
+    })}
+  </Row>
+);
 
 const SystemLayoutNextExample = createWithRemoteLoader({
   modules: [
@@ -230,7 +252,7 @@ const SystemLayoutNextExample = createWithRemoteLoader({
   };
 
   const renderBizPage = (title, renderProps) => (
-    <Page title={title} extra={renderProps.titleExtra}>
+    <Page title={title}>
       <TablePageRender {...renderProps} />
     </Page>
   );
@@ -248,6 +270,7 @@ const SystemLayoutNextExample = createWithRemoteLoader({
         keywordFilterLabel: '员工关键字',
         tableProps: {
           rowKey: 'id',
+          renderCard: renderEmployeeCard,
           rowSelection: getEmployeeRowSelection(employeeList),
           selectedRows: employeeSelectedRows,
           pagination: { pageSize: 10, showSizeChanger: true, showQuickJumper: true },

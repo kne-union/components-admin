@@ -108,6 +108,36 @@ const BizUnit = createWithRemoteLoader({
         </Flex>
       );
 
+      // isNext: 操作放到 TablePage 工具栏 buttonGroup（桌面端在 SearchInput 右侧，移动端为底部 ButtonFooter）
+      const resolveNextButtonGroup = () => {
+        const list = [];
+        if (apis.create) {
+          list.push({
+            buttonComponent: Create,
+            apis,
+            options,
+            getFormInner,
+            onSuccess: reloadTable
+          });
+        }
+        if (titleExtra) {
+          list.push(({ key, className }) => (
+            <Flex key={key} gap={8} align="center" className={className}>
+              {titleExtra}
+            </Flex>
+          ));
+        }
+        const userButtonGroup = options.tableProps?.buttonGroup;
+        const userList = Array.isArray(userButtonGroup?.list) ? userButtonGroup.list : [];
+        const mergedList = [...list, ...userList];
+        if (mergedList.length === 0) {
+          return null;
+        }
+        return Object.assign({}, userButtonGroup, { list: mergedList });
+      };
+
+      const nextButtonGroup = isNext ? resolveNextButtonGroup() : null;
+
       const topOptions = (
         <Flex gap={8}>
           {allowKeywordSearch && <SearchInput size={topOptionsSize} name={options.keywordFilterName} label={options.keywordFilterLabel} />}
@@ -159,7 +189,7 @@ const BizUnit = createWithRemoteLoader({
                 }
               : {}),
             ...(nextFilter ? { filter: nextFilter } : {}),
-            page: merge({}, page, { titleExtra: toolbarExtra })
+            page: merge({}, page)
           }
         : {};
 
@@ -188,7 +218,9 @@ const BizUnit = createWithRemoteLoader({
             name
           }
         ),
-        { ref }
+        { ref },
+        // buttonGroup.list 不能走 lodash/merge（数组按下标深合并会破坏配置），在此整体覆盖
+        isNext ? { buttonGroup: nextButtonGroup } : {}
       );
 
       if (typeof children === 'function') {
@@ -197,10 +229,9 @@ const BizUnit = createWithRemoteLoader({
           filter: isNext
             ? nextFilter
             : { value: filterValue, onChange: setFilterValue, list: legacyFilterList },
-          topOptions: isNext ? toolbarExtra : topOptions,
-          titleExtra: isNext ? (
-            toolbarExtra
-          ) : (
+          // isNext 时操作已并入 tableOptions.buttonGroup，不再单独提供顶部节点，避免重复渲染
+          topOptions: isNext ? null : topOptions,
+          titleExtra: isNext ? null : (
             <Filter.FilterProvider value={filterValue} onChange={setFilterValue}>
               {topOptions}
             </Filter.FilterProvider>

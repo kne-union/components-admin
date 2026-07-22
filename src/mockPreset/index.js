@@ -521,8 +521,76 @@ const apis = merge({}, getApis(), {
         return import('./group-list.json').then(({ default: data }) => data.data);
       }
     },
+    groupList: {
+      loader: ({ params } = {}) => {
+        const tree = [
+          {
+            id: 1,
+            code: 'frontend',
+            name: '前端开发',
+            description: '前端相关技能',
+            color: '#007AFF',
+            children: [
+              { id: 11, code: 'frontend-react', name: 'React', parentId: 1, description: 'React 生态', color: '#34C759' },
+              { id: 12, code: 'frontend-vue', name: 'Vue', parentId: 1, description: 'Vue 生态' }
+            ]
+          },
+          {
+            id: 2,
+            code: 'backend',
+            name: '后端开发',
+            description: '后端相关技能',
+            color: '#FF9500',
+            children: [
+              { id: 21, code: 'backend-java', name: 'Java', parentId: 2, description: 'Java 技术栈' },
+              { id: 22, code: 'backend-node', name: 'Node.js', parentId: 2, description: 'Node.js 技术栈' }
+            ]
+          },
+          {
+            id: 3,
+            code: 'ai',
+            name: '人工智能',
+            description: 'AI 相关技能',
+            color: '#AF52DE',
+            children: []
+          }
+        ];
+        if (params?.output === 'list') {
+          const flatten = (nodes, parentId = null) => {
+            const result = [];
+            (nodes || []).forEach(node => {
+              result.push({
+                id: node.id,
+                code: node.code,
+                name: node.name,
+                description: node.description,
+                color: node.color,
+                parentId: node.parentId != null ? node.parentId : parentId
+              });
+              if (node.children?.length) {
+                result.push(...flatten(node.children, node.id));
+              }
+            });
+            return result;
+          };
+          return flatten(tree);
+        }
+        return tree;
+      }
+    },
     create: {
-      loader: () => ({ id: Date.now(), code: Date.now() })
+      loader: ({ data } = {}) => ({
+        id: Date.now(),
+        code: data?.code || `g_${Date.now().toString(36)}`,
+        name: data?.name
+      })
+    },
+    save: {
+      loader: ({ data } = {}) => ({
+        id: data?.id || Date.now(),
+        code: data?.code || `g_${Date.now().toString(36)}`,
+        name: data?.name
+      })
     },
     remove: {
       loader: () => ({ code: 0 })

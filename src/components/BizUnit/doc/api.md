@@ -14,6 +14,7 @@
 | 筛选    | `filter`（`{ list }` 一维数组）       | `filter`（二维数组） |
 | 页面标题  | `page.title`                           | 自行布局               |
 | 关键字搜索 | TablePage 内置 `search`                  | 顶部 `SearchInput`   |
+| 操作按钮  | TablePage 工具栏 `buttonGroup`（移动端为底部 ButtonFooter） | 顶部创建按钮 |
 
 #### 属性
 
@@ -30,7 +31,7 @@
 | filter             | 筛选配置；isNext 为 `{ list }` 对象，Legacy 为二维数组 | Array \| Object | -     |
 | allowKeywordSearch | 是否显示关键字搜索                               | Boolean         | true  |
 | topOptionsSize     | Legacy 模式顶部搜索框尺寸                        | String          | -     |
-| titleExtra         | 标题区域额外内容（创建按钮旁）                         | ReactNode       | null  |
+| titleExtra         | 操作区额外内容（创建按钮旁）；isNext 渲染到工具栏 `buttonGroup`   | ReactNode       | null  |
 | children           | 自定义渲染函数，接管布局                            | Function        | -     |
 | onMount            | 组件挂载回调                                  | Function        | -     |
 | onFilterChange     | 筛选变更回调                                  | Function        | -     |
@@ -66,7 +67,7 @@ TablePage 所需的 `{ list, total }`。
 | removeButtonProps    | 删除按钮                                                         | Object            | `{ children: '删除' }`                       |
 | openButtonProps      | 开启按钮                                                         | Object            | `{ children: '开启' }`                       |
 | closeButtonProps     | 关闭按钮                                                         | Object            | `{ children: '关闭' }`                       |
-| tableProps           | 表格属性；isNext 下可传 `rowSelection`、`batchActions`、`pagination` 等 | Object            | `{ pagination: { paramsType: 'params' } }` |
+| tableProps           | 表格属性；isNext 下可传 `rowSelection`、`batchActions`、`pagination`、`buttonGroup`（`list` 追加在创建按钮之后）等 | Object            | `{ pagination: { paramsType: 'params' } }` |
 | keywordFilterName    | 关键字搜索字段名                                                     | String            | 'keyword'                                  |
 | keywordFilterLabel   | 关键字搜索标签                                                      | String            | '关键字'                                      |
 | formSize             | 表单弹窗尺寸                                                       | String            | 'small'                                    |
@@ -164,7 +165,7 @@ filter = {
    `Routes`，`AppChildrenRouter` 不设 `element`（若使用 `element` 布局壳，须在壳内渲染 `<Outlet />`）
 2. `SystemLayout` 提供侧栏菜单，包裹 `Routes` 与 `AppChildrenRouter`
 3. `BizUnit` 开启 `isNext`，通过 `children` 回调渲染
-4. `@kne/system-layout` 的 `Page` 承载 `title` / `extra`（对应 `titleExtra`）
+4. `@kne/system-layout` 的 `Page` 承载 `title`；操作按钮已并入 `tableOptions.buttonGroup`，随表格工具栏渲染，无需再传 `extra`
 5. `TablePageRender` 渲染新版 `components-core:TablePage`（`isNext` 时自动跳过 `Layout@TablePage` 外壳）
 
 须引入 `@kne/system-layout/dist/index.css`。无需 `children` 时，`BizUnit isNext` 默认渲染 `Layout@TablePage`，配合
@@ -176,9 +177,9 @@ filter = {
 |--------------|--------------------|-----------------------------|
 | isNext       | boolean            | boolean                     |
 | filter       | `filter` 配置对象 | `{ value, onChange, list }` |
-| topOptions   | 工具栏（含创建按钮）         | 顶部区域                        |
+| topOptions   | `null`（操作已在 `tableOptions.buttonGroup`） | 顶部区域                        |
 | titleExtra   | 同 topOptions       | FilterProvider 包裹的顶部        |
-| tableOptions | 传给 TablePage 的完整配置 | 同上                          |
+| tableOptions | 传给 TablePage 的完整配置（含 `buttonGroup` 操作按钮组） | 同上                          |
 
 ### Actions
 

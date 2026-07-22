@@ -1241,7 +1241,7 @@ render(<LayoutNextExample />);
 ```
 
 - 人才管理（SystemLayout 综合场景）(全屏)
-- 参考 ai-talent-saas TenantAdmin：AppChildrenRouter + SystemLayout + BizUnit isNext children；@kne/system-layout 的 Page 承载标题，TablePageRender 渲染新版 TablePage；覆盖 filter、tableProps.batchActions/rowSelection。
+- 参考 ai-talent-saas TenantAdmin：AppChildrenRouter + SystemLayout + BizUnit isNext children；@kne/system-layout 的 Page 承载标题，TablePageRender 渲染新版 TablePage；员工档案支持表格/卡片视图切换，覆盖 filter、tableProps.renderCard/batchActions/rowSelection。
 - _BizUnit(@components/BizUnit),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),_systemLayout(@kne/system-layout),(@kne/system-layout/dist/index.css),appChildrenRouter(@kne/app-children-router),reactRouterDom(react-router-dom),antd(antd)
 
 ```jsx
@@ -1251,7 +1251,7 @@ const { createWithRemoteLoader } = remoteLoader;
 const { default: SystemLayout, Page } = _systemLayout;
 const { default: AppChildrenRouter } = appChildrenRouter;
 const { Route, Routes, Navigate } = reactRouterDom;
-const { Modal, message } = antd;
+const { Card, Col, Flex, Modal, Row, Tag, message } = antd;
 
 const baseUrl = '/biz-unit-system-layout';
 
@@ -1334,6 +1334,28 @@ const positionStatusMap = {
   published: { type: 'success', text: '已发布' },
   draft: { type: 'default', text: '草稿' }
 };
+
+const renderEmployeeCard = ({ dataSource = [] }) => (
+  <Row gutter={[12, 12]}>
+    {dataSource.map(item => {
+      const status = employeeStatusMap[item.status] || { type: 'default', text: item.status };
+      return (
+        <Col span={12} key={item.id}>
+          <Card size="small" title={item.name} extra={<Tag color={status.type}>{status.text}</Tag>}>
+            <Flex vertical gap={8}>
+              <span>
+                {item.employeeNo} · {item.department}
+              </span>
+              <span>{item.position}</span>
+              <span>{item.email}</span>
+              <span>{item.phone}</span>
+            </Flex>
+          </Card>
+        </Col>
+      );
+    })}
+  </Row>
+);
 
 const SystemLayoutNextExample = createWithRemoteLoader({
   modules: [
@@ -1477,7 +1499,7 @@ const SystemLayoutNextExample = createWithRemoteLoader({
   };
 
   const renderBizPage = (title, renderProps) => (
-    <Page title={title} extra={renderProps.titleExtra}>
+    <Page title={title}>
       <TablePageRender {...renderProps} />
     </Page>
   );
@@ -1495,6 +1517,7 @@ const SystemLayoutNextExample = createWithRemoteLoader({
         keywordFilterLabel: '员工关键字',
         tableProps: {
           rowKey: 'id',
+          renderCard: renderEmployeeCard,
           rowSelection: getEmployeeRowSelection(employeeList),
           selectedRows: employeeSelectedRows,
           pagination: { pageSize: 10, showSizeChanger: true, showQuickJumper: true },
@@ -2385,6 +2408,7 @@ render(<LegacyExamples />);
 | 筛选    | `filter`（`{ list }` 一维数组）       | `filter`（二维数组） |
 | 页面标题  | `page.title`                           | 自行布局               |
 | 关键字搜索 | TablePage 内置 `search`                  | 顶部 `SearchInput`   |
+| 操作按钮  | TablePage 工具栏 `buttonGroup`（移动端为底部 ButtonFooter） | 顶部创建按钮 |
 
 #### 属性
 
@@ -2401,7 +2425,7 @@ render(<LegacyExamples />);
 | filter             | 筛选配置；isNext 为 `{ list }` 对象，Legacy 为二维数组 | Array \| Object | -     |
 | allowKeywordSearch | 是否显示关键字搜索                               | Boolean         | true  |
 | topOptionsSize     | Legacy 模式顶部搜索框尺寸                        | String          | -     |
-| titleExtra         | 标题区域额外内容（创建按钮旁）                         | ReactNode       | null  |
+| titleExtra         | 操作区额外内容（创建按钮旁）；isNext 渲染到工具栏 `buttonGroup`   | ReactNode       | null  |
 | children           | 自定义渲染函数，接管布局                            | Function        | -     |
 | onMount            | 组件挂载回调                                  | Function        | -     |
 | onFilterChange     | 筛选变更回调                                  | Function        | -     |
@@ -2437,7 +2461,7 @@ TablePage 所需的 `{ list, total }`。
 | removeButtonProps    | 删除按钮                                                         | Object            | `{ children: '删除' }`                       |
 | openButtonProps      | 开启按钮                                                         | Object            | `{ children: '开启' }`                       |
 | closeButtonProps     | 关闭按钮                                                         | Object            | `{ children: '关闭' }`                       |
-| tableProps           | 表格属性；isNext 下可传 `rowSelection`、`batchActions`、`pagination` 等 | Object            | `{ pagination: { paramsType: 'params' } }` |
+| tableProps           | 表格属性；isNext 下可传 `rowSelection`、`batchActions`、`pagination`、`buttonGroup`（`list` 追加在创建按钮之后）等 | Object            | `{ pagination: { paramsType: 'params' } }` |
 | keywordFilterName    | 关键字搜索字段名                                                     | String            | 'keyword'                                  |
 | keywordFilterLabel   | 关键字搜索标签                                                      | String            | '关键字'                                      |
 | formSize             | 表单弹窗尺寸                                                       | String            | 'small'                                    |
@@ -2535,7 +2559,7 @@ filter = {
    `Routes`，`AppChildrenRouter` 不设 `element`（若使用 `element` 布局壳，须在壳内渲染 `<Outlet />`）
 2. `SystemLayout` 提供侧栏菜单，包裹 `Routes` 与 `AppChildrenRouter`
 3. `BizUnit` 开启 `isNext`，通过 `children` 回调渲染
-4. `@kne/system-layout` 的 `Page` 承载 `title` / `extra`（对应 `titleExtra`）
+4. `@kne/system-layout` 的 `Page` 承载 `title`；操作按钮已并入 `tableOptions.buttonGroup`，随表格工具栏渲染，无需再传 `extra`
 5. `TablePageRender` 渲染新版 `components-core:TablePage`（`isNext` 时自动跳过 `Layout@TablePage` 外壳）
 
 须引入 `@kne/system-layout/dist/index.css`。无需 `children` 时，`BizUnit isNext` 默认渲染 `Layout@TablePage`，配合
@@ -2547,9 +2571,9 @@ filter = {
 |--------------|--------------------|-----------------------------|
 | isNext       | boolean            | boolean                     |
 | filter       | `filter` 配置对象 | `{ value, onChange, list }` |
-| topOptions   | 工具栏（含创建按钮）         | 顶部区域                        |
+| topOptions   | `null`（操作已在 `tableOptions.buttonGroup`） | 顶部区域                        |
 | titleExtra   | 同 topOptions       | FilterProvider 包裹的顶部        |
-| tableOptions | 传给 TablePage 的完整配置 | 同上                          |
+| tableOptions | 传给 TablePage 的完整配置（含 `buttonGroup` 操作按钮组） | 同上                          |
 
 ### Actions
 
