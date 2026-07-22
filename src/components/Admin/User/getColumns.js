@@ -4,7 +4,7 @@ const getColumns = ({ formatMessage }) => {
       name: 'avatar',
       title: formatMessage({ id: 'Avatar' }),
       renderType: 'avatar',
-      getValueOf: (item, { name }) => Object.assign({}, { gender: item['gender'] || 'M' }, { id: item[name] })
+      getValueOf: item => Object.assign({}, { gender: item['gender'] || 'M' }, { id: item.avatar })
     },
     {
       name: 'nickname',
@@ -22,25 +22,25 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'isSuperAdmin',
       title: formatMessage({ id: 'IsSuperAdmin' }),
-      getValueOf: (item, { name }) => {
-        return item[name] === true ? formatMessage({ id: 'Yes' }) : formatMessage({ id: 'No' });
+      getValueOf: item => {
+        return item.isSuperAdmin === true ? formatMessage({ id: 'Yes' }) : formatMessage({ id: 'No' });
       }
     },
     {
       name: 'status',
       title: formatMessage({ id: 'Status' }),
       renderType: 'tag',
-      getValueOf: (item, { name }) => {
-        if (item[name] === 0) {
+      getValueOf: item => {
+        if (item.status === 0) {
           return { type: 'success', text: formatMessage({ id: 'Normal' }) };
         }
-        if (item[name] === 10) {
+        if (item.status === 10) {
           return { text: formatMessage({ id: 'NotActivated' }) };
         }
-        if (item[name] === 11) {
+        if (item.status === 11) {
           return { type: 'danger', text: formatMessage({ id: 'Disabled' }) };
         }
-        if (item[name] === 12) {
+        if (item.status === 12) {
           return { type: 'danger', text: formatMessage({ id: 'Closed' }) };
         }
 

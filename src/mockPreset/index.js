@@ -581,14 +581,14 @@ const apis = merge({}, getApis(), {
     create: {
       loader: ({ data } = {}) => ({
         id: Date.now(),
-        code: data?.code || `group_${Date.now()}`,
+        code: data?.code || `g_${Date.now().toString(36)}`,
         name: data?.name
       })
     },
     save: {
       loader: ({ data } = {}) => ({
         id: data?.id || Date.now(),
-        code: data?.code || `group_${Date.now()}`,
+        code: data?.code || `g_${Date.now().toString(36)}`,
         name: data?.name
       })
     },

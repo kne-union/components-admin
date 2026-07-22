@@ -12,9 +12,11 @@ import GroupFormFields from './GroupFormFields';
 import {
   ALL_GROUP_VALUE,
   buildGroupSelectOptions,
+  createGroupCodeUniqueChecker,
   findGroupInTree,
   getAllGroupOption,
-  normalizeGroupParentId,
+  resolveGroupParentIdForSave,
+  resolveGroupPermissions,
   resolveGroupSelectValue,
   resolveGroupTreeData
 } from './groupHelpers';
@@ -42,6 +44,8 @@ const GroupFolderToolbar = createWithRemoteLoader({
       manageable = true,
       showParent = true,
       showColor = false,
+      permissions,
+      allowCustomCode = false,
       ...props
     }) => {
       const [value, onChange] = useControlValue(props);
@@ -58,8 +62,15 @@ const GroupFolderToolbar = createWithRemoteLoader({
 
       const groupApis = propsApis || presetApis?.group || {};
       const hasApis = propsApis !== undefined;
-      const showManage = manageable && (hasApis ? !!(propsApis?.create || propsApis?.save) : !!(presetApis?.group?.create || presetApis?.group?.save));
-      const showDelete = manageable && (hasApis ? !!propsApis?.remove : !!presetApis?.group?.remove);
+      const hasAddApi = hasApis ? !!(propsApis?.create || propsApis?.save) : !!(presetApis?.group?.create || presetApis?.group?.save);
+      const hasEditApi = hasApis ? !!(propsApis?.save || propsApis?.create) : !!(presetApis?.group?.save || presetApis?.group?.create);
+      const hasRemoveApi = hasApis ? !!propsApis?.remove : !!presetApis?.group?.remove;
+      const { showAdd, showEdit, showDelete } = resolveGroupPermissions(permissions, {
+        hasAddApi,
+        hasEditApi,
+        hasRemoveApi,
+        manageable
+      });
 
       const groupListApi = useMemo(
         () =>
@@ -106,14 +117,29 @@ const GroupFolderToolbar = createWithRemoteLoader({
             size: 'small',
             formProps: {
               data: formData,
+              rules:
+                allowCustomCode && !editingGroup
+                  ? {
+                      GROUP_CODE_UNIQUE: createGroupCodeUniqueChecker({
+                        ajax,
+                        api: groupApis.groupList,
+                        type,
+                        language,
+                        valueKey,
+                        duplicateMessage: formatMessage({ id: 'GroupSelectCodeDuplicate' })
+                      })
+                    }
+                  : undefined,
               onSubmit: async values => {
                 const payload = Object.assign({}, values, { type, language });
                 if (showParent) {
-                  payload.parentId = normalizeGroupParentId(values.parentId, valueKey);
+                  payload.parentId = resolveGroupParentIdForSave(values.parentId, treeData, valueKey);
                 }
                 if (editingGroup) {
                   payload.id = editingGroup.id;
                   payload.code = editingGroup.code || values.code;
+                } else if (!allowCustomCode) {
+                  delete payload.code;
                 }
                 const api = Object.assign({}, editingGroup ? groupApis.save || groupApis.create : groupApis.create || groupApis.save, {
                   data: payload
@@ -143,11 +169,27 @@ const GroupFolderToolbar = createWithRemoteLoader({
                 groupName={groupName}
                 showParent={showParent}
                 showColor={showColor}
+                allowCustomCode={allowCustomCode}
               />
             )
           });
         },
-        [ajax, allLabel, formModal, formatMessage, groupApis, groupName, labelKey, language, message, showColor, showParent, type, valueKey]
+        [
+          ajax,
+          allLabel,
+          allowCustomCode,
+          formModal,
+          formatMessage,
+          groupApis,
+          groupName,
+          labelKey,
+          language,
+          message,
+          showColor,
+          showParent,
+          type,
+          valueKey
+        ]
       );
 
       const handleDelete = useCallback(
@@ -224,9 +266,9 @@ const GroupFolderToolbar = createWithRemoteLoader({
                       onChange?.(item[valueKey] ?? item.code ?? item.id, item);
                     }}
                   />
-                  {selectedGroup && (showManage || showDelete) ? (
+                  {selectedGroup && (showEdit || showDelete) ? (
                     <Flex align="center" className={styles['group-folder-toolbar-actions']}>
-                      {showManage ? (
+                      {showEdit ? (
                         <Button
                           type="text"
                           size="small"
@@ -251,7 +293,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
                     </Flex>
                   ) : null}
                 </Flex>
-                {showManage ? (
+                {showAdd ? (
                   <button
                     type="button"
                     className={styles['group-folder-toolbar-add']}

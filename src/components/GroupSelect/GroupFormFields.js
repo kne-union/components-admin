@@ -6,11 +6,11 @@ import { FolderFilled } from '@ant-design/icons';
 import withLocale from './withLocale';
 import GroupColorPickerField from './GroupColorPickerField';
 import { createGroupItemContentRender, getGroupIconColor } from './GroupFolderIcon';
-import { buildGroupSelectOptions, DEFAULT_GROUP_COLOR, getAllGroupOption, resolveGroupTreeData } from './groupHelpers';
+import { buildGroupSelectOptions, DEFAULT_GROUP_COLOR, flattenGroupTree, getAllGroupOption, resolveGroupTreeData } from './groupHelpers';
 import styles from './style.module.scss';
 
 const GroupFormFields = createWithRemoteLoader({
-  modules: ['components-core:FormInfo']
+  modules: ['components-core:FormInfo', 'components-core:Global@usePreset']
 })(
   withLocale(
     ({
@@ -25,12 +25,14 @@ const GroupFormFields = createWithRemoteLoader({
       labelKey = 'name',
       groupName,
       showParent = true,
-      showColor = false
+      showColor = false,
+      allowCustomCode = true
     }) => {
-      const [FormInfo] = remoteModules;
+      const [FormInfo, usePreset] = remoteModules;
       const { formatMessage } = useIntl();
       const { fields } = FormInfo;
       const { Input, TextArea, SuperSelectTree } = fields;
+      const { ajax } = usePreset();
       const displayName = groupName || formatMessage({ id: 'GroupSelectDefaultName' });
       const allLabel = formatMessage({ id: 'GroupSelectAll' });
 
@@ -74,18 +76,54 @@ const GroupFormFields = createWithRemoteLoader({
           }
         : null;
 
+      const codeRule = allowCustomCode && !editingGroup ? 'REQ GROUP_CODE_UNIQUE' : allowCustomCode ? 'REQ' : undefined;
+
+      const codeUniqueChecker = async value => {
+        if (!value || editingGroup) {
+          return { result: true };
+        }
+        const api = merge({}, groupListApi || apis?.groupList || apis?.list, {
+          params: { type, language, output: 'list' }
+        });
+        if (!api || (!api.url && !api.loader && !api.data)) {
+          return { result: true };
+        }
+        try {
+          const { data: resData } = await ajax(api);
+          const raw = resData?.code === 0 ? resData.data : resData;
+          const list = resolveGroupTreeData(raw);
+          const flat = list.some(item => item?.children?.length) ? flattenGroupTree(list, null, valueKey) : list;
+          const exists = flat.some(item => String(item.code) === String(value));
+          return {
+            result: !exists,
+            errMsg: formatMessage({ id: 'GroupSelectCodeDuplicate' })
+          };
+        } catch (e) {
+          return { result: true };
+        }
+      };
+
       return (
         <FormInfo
           column={1}
+          rules={
+            allowCustomCode && !editingGroup
+              ? {
+                  GROUP_CODE_UNIQUE: codeUniqueChecker
+                }
+              : undefined
+          }
           list={[
-            <Input
-              key="code"
-              name="code"
-              label={formatMessage({ id: 'GroupSelectCode' })}
-              rule="REQ"
-              disabled={!!editingGroup}
-              placeholder={formatMessage({ id: 'GroupSelectCodePlaceholder' })}
-            />,
+            allowCustomCode ? (
+              <Input
+                key="code"
+                name="code"
+                label={formatMessage({ id: 'GroupSelectCode' })}
+                rule={codeRule}
+                disabled={!!editingGroup}
+                placeholder={formatMessage({ id: 'GroupSelectCodePlaceholder' })}
+              />
+            ) : null,
             <Input
               key="name"
               name="name"

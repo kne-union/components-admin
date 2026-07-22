@@ -1,5 +1,22 @@
 export const ALL_GROUP_VALUE = '__all__';
 
+export const DEFAULT_GROUP_PERMISSIONS = ['add', 'edit', 'delete'];
+
+export const resolveGroupPermissions = (
+  permissions,
+  { hasAddApi = false, hasEditApi = false, hasRemoveApi = false, manageable = true } = {}
+) => {
+  if (manageable === false) {
+    return { showAdd: false, showEdit: false, showDelete: false };
+  }
+  const list = Array.isArray(permissions) ? permissions : DEFAULT_GROUP_PERMISSIONS;
+  return {
+    showAdd: list.includes('add') && hasAddApi,
+    showEdit: list.includes('edit') && hasEditApi,
+    showDelete: list.includes('delete') && hasRemoveApi
+  };
+};
+
 export const GROUP_COLORS = [
   { key: 'red', value: '#FF3B30' },
   { key: 'orange', value: '#FF9500' },
@@ -142,4 +159,50 @@ export const buildGroupSelectOptions = (treeData, { valueKey = 'code', allLabel,
     return key == null || !excludeSet.has(String(key));
   });
   return [getAllGroupOption(allLabel, valueKey), ...flat];
+};
+
+/** 将父级选择值解析为后端需要的 id（优先 id） */
+export const resolveGroupParentIdForSave = (value, treeData = [], valueKey = 'code') => {
+  const raw = normalizeGroupParentId(value, valueKey);
+  if (raw == null) {
+    return null;
+  }
+  if (!treeData?.length) {
+    return raw;
+  }
+  const node = findGroupInTree(treeData, raw, valueKey);
+  return node?.id != null ? node.id : raw;
+};
+
+/** 表单自定义规则：校验编码在同 type/language 下唯一 */
+export const createGroupCodeUniqueChecker = ({
+  ajax,
+  api,
+  type,
+  language,
+  valueKey = 'code',
+  duplicateMessage = '编码已存在'
+} = {}) => {
+  return async value => {
+    if (!value || !ajax || !api) {
+      return { result: true };
+    }
+    try {
+      const { data: resData } = await ajax(
+        Object.assign({}, api, {
+          params: Object.assign({}, api.params, { type, language, output: 'list' })
+        })
+      );
+      const raw = resData?.code === 0 ? resData.data : resData;
+      const list = resolveGroupTreeData(raw);
+      const flat = list.some(item => item?.children?.length) ? flattenGroupTree(list, null, valueKey) : list;
+      const exists = flat.some(item => String(item.code) === String(value));
+      return {
+        result: !exists,
+        errMsg: duplicateMessage
+      };
+    } catch (e) {
+      return { result: true };
+    }
+  };
 };
