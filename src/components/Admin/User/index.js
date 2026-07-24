@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Button, App } from 'antd';
+import { App } from 'antd';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 import { useProps } from '../context';
@@ -271,11 +271,12 @@ const UserInner = createWithRemoteLoader({
           getValueOf: item => getActions(item)
         }
       ]}
-      page={{
-        titleExtra: (
-          <Button
-            type="primary"
-            onClick={() => {
+      buttonGroup={{
+        list: [
+          {
+            type: 'primary',
+            children: formatMessage({ id: 'AddUser' }),
+            onClick: () => {
               const modalApi = formModal({
                 title: formatMessage({ id: 'AddUser' }),
                 size: 'small',
@@ -296,11 +297,9 @@ const UserInner = createWithRemoteLoader({
                   }
                 }
               });
-            }}
-          >
-            {formatMessage({ id: 'AddUser' })}
-          </Button>
-        )
+            }
+          }
+        ]
       }}
     />
   );

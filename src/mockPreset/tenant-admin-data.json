@@ -72,6 +72,8 @@
     "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=tech",
     "themeColor": "#1890ff",
     "accountCount": 50,
+    "supportLanguage": ["zh-CN", "en-US"],
+    "defaultLanguage": "zh-CN",
     "serviceStartTime": "2024-01-01T00:00:00Z",
     "serviceEndTime": "2025-12-31T23:59:59Z",
     "createdAt": "2024-01-15T10:30:00Z",

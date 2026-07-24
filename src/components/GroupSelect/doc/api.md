@@ -23,6 +23,59 @@
 | permissions | 功能权限数组，可选 `'add'` / `'edit'` / `'delete'`；不传则三项全开（仍需有对应 API） | string[] | `['add','edit','delete']` |
 | allowCustomCode | 是否允许自定义编码；为 `true` 时表单显示编码并做重复校验；为 `false` 时不传 code，由后端自动生成 | boolean | `true` |
 
+## GroupSelectFilterItem 组件
+
+用 `Filter@withFieldItem` 包装 `GroupSelect.Field`，可直接放进 `Filter.list`。内置 `{code,name} ↔ {label,value}` 拦截器（可用 `interceptor` 覆盖）。
+
+远程加载：`components-admin:GroupSelect@GroupSelectFilterItem` 或 `GroupSelect.FilterItem`
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| name / label | Filter 字段名与展示标签 | string | - |
+| type | 分组类型，如技能标签 / 问题标签 | string | - |
+| single | 是否单选 | boolean | false |
+| valueKey / labelKey | 值与展示字段 | string | `'code'` / `'name'` |
+| interceptor | 覆盖默认 code/name 拦截器 | object | 内置 |
+| overlayWidth | 弹出层宽度（Filter 触发器很窄，需显式设置） | string \| number | `'800px'` |
+| 其余 | 透传 `GroupSelect.Field`（apis、permissions、groupName 等） | - | - |
+
+### 基本用法
+
+```jsx
+const { FilterItem: GroupSelectFilterItem } = GroupSelect;
+// 或 remote: components-admin:GroupSelect@GroupSelectFilterItem
+
+<Filter
+  value={filter}
+  onChange={setFilter}
+  list={[
+    [
+      <GroupSelectFilterItem label="技能标签" name="groups" type="skill" permissions={[]} />,
+      <GroupSelectFilterItem label="问题标签" name="tags" type="question_tag" single permissions={[]} />
+    ]
+  ]}
+/>
+```
+
+## GroupFolderFilterItem 组件
+
+分组树筛选（文件夹场景），基于 `SuperSelectTreeField` + Group API，默认单选。远程加载：`components-admin:GroupSelect@GroupFolderFilterItem`
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| name / label | Filter 字段名与展示标签 | string | - |
+| type | 分组类型 | string | - |
+| single | 是否单选 | boolean | true |
+| valueKey / labelKey | 值与展示字段 | string | `'code'` / `'name'` |
+| apis | 覆盖 `groupList` 等 | object | `preset.apis.group` |
+| showColor | 已选与下拉项是否按分组 `color` 显示文件夹图标 | boolean | `false` |
+| overlayWidth | 弹出层宽度 | string \| number | `'280px'` |
+| interceptor | 覆盖默认拦截器 | object | 内置 |
+
+```jsx
+<GroupFolderFilterItem label="文件夹" name="folder" type="skill" single />
+```
+
 ## GroupFolderToolbar 组件
 
 类似人才库「文件夹工具栏」：树形下拉选择当前分组，默认选中「全部」；选中具体分组后可编辑/删除；右侧圆形按钮新建分组。内部请求 `apis.group.groupList / create|save / remove`。
@@ -141,4 +194,5 @@ const Example = createWithRemoteLoader({
 - `components-core:FormInfo`
 - `components-core:FormInfo@useFormModal`
 - `components-core:Global@usePreset`
-- `components-core:Common@SuperSelectTreeField`（工具栏选择）
+- `components-core:Common@SuperSelectTreeField`（工具栏 / 文件夹筛选）
+- `components-core:Filter@withFieldItem`（FilterItem）

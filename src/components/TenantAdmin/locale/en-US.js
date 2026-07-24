@@ -38,6 +38,7 @@ const locale = {
 
   // Custom Components
   EnvironmentVariables: 'Environment Variables',
+  CustomComponents: 'Custom Components',
   AddEnvironmentVariable: 'Add Environment Variable',
   AddCustomComponent: 'Add Custom Component',
   Preview: 'Preview',
@@ -46,6 +47,16 @@ const locale = {
   CopySuccess: 'Copied successfully',
   ModifySuccess: 'Modified successfully',
   DeleteSuccess: 'Deleted successfully',
+  Cancel: 'Cancel',
+
+  // Language
+  LanguageSetting: 'Language Settings',
+  SystemLanguage: 'System Language',
+  DefaultTag: 'Default',
+  SetDefault: 'Set Default',
+  MoveUp: 'Move Up',
+  MoveDown: 'Move Down',
+  NoLanguageOptions: 'No available languages',
 
   // Detail
   TenantDetail: 'Tenant Detail',

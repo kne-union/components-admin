@@ -29,12 +29,13 @@ const TabDetailInner = createWithRemoteLoader({
     'components-core:InfoPage',
     'components-core:Descriptions'
   ]
-})(({ remoteModules, ...props }) => {
+})(({ remoteModules, showLanguageSetting, languageOptionsApi, showBuiltinLanguageOptions, ...props }) => {
   const [StateBarPage, usePreset, PageHeader, StateTag] = remoteModules;
   const { apis, plugins } = usePreset();
   const { formatMessage } = useIntl();
   const [searchParams, setSearchParams] = useSearchParams();
   const appendTabDetails = get(plugins, 'admin.tenant.appendTabDetails');
+  const settingProps = { showLanguageSetting, languageOptionsApi, showBuiltinLanguageOptions };
   return (
     <Fetch
       {...Object.assign({}, apis.tenantAdmin.detail, { params: { id: searchParams.get('id') } })}
@@ -97,7 +98,7 @@ const TabDetailInner = createWithRemoteLoader({
               },
               stateOption
             }}>
-            <ContentComponent tenant={data} reload={reload} />
+            <ContentComponent tenant={data} reload={reload} {...(activeKey === 'setting' ? settingProps : {})} />
           </StateBarPage>
         );
       }}

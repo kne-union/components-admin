@@ -253,7 +253,7 @@ const SystemLayoutNextExample = createWithRemoteLoader({
 
   const renderBizPage = (title, renderProps) => (
     <Page title={title}>
-      <TablePageRender {...renderProps} />
+      <TablePageRender {...renderProps} withPage={false} />
     </Page>
   );
 

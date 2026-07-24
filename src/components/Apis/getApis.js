@@ -199,6 +199,10 @@ const getApis = options => {
         url: `${prefix}/tenant/admin/save`,
         method: 'POST'
       },
+      saveLanguages: {
+        url: `${prefix}/tenant/admin/save-languages`,
+        method: 'POST'
+      },
       setStatus: {
         url: `${prefix}/tenant/admin/set-status`,
         method: 'POST'
@@ -408,6 +412,10 @@ const getApis = options => {
         url: `${prefix}/tenant/getUserInfo`,
         method: 'GET'
       },
+      getLanguages: {
+        url: `${prefix}/tenant/languages`,
+        method: 'GET'
+      },
       companyDetail: {
         url: `${prefix}/tenant/company-detail`,
         method: 'GET'
@@ -550,12 +558,6 @@ const getApis = options => {
     intlAdmin: {
       langType: {
         list: {
-          loader: () => {
-            return {
-              totalCount: 0,
-              pageData: []
-            };
-          },
           url: `${prefix}/intl-admin/lang-type/list`,
           method: 'GET'
         },
@@ -574,16 +576,26 @@ const getApis = options => {
         setStatus: {
           url: `${prefix}/intl-admin/lang-type/set-status`,
           method: 'POST'
+        },
+        setDefault: {
+          url: `${prefix}/intl-admin/lang-type/set-default`,
+          method: 'POST'
+        },
+        move: {
+          url: `${prefix}/intl-admin/lang-type/move`,
+          method: 'POST'
+        },
+        translateRemaining: {
+          url: `${prefix}/intl-admin/lang-type/translate-remaining`,
+          method: 'POST'
         }
       },
       langLib: {
+        namespaces: {
+          url: `${prefix}/intl-admin/lang-lib/namespaces`,
+          method: 'GET'
+        },
         list: {
-          loader: () => {
-            return {
-              totalCount: 0,
-              pageData: []
-            };
-          },
           url: `${prefix}/intl-admin/lang-lib/list`,
           method: 'GET'
         },
@@ -601,6 +613,30 @@ const getApis = options => {
         },
         remove: {
           url: `${prefix}/intl-admin/lang-lib/remove`,
+          method: 'POST'
+        },
+        review: {
+          url: `${prefix}/intl-admin/lang-lib/review`,
+          method: 'POST'
+        },
+        regenerate: {
+          url: `${prefix}/intl-admin/lang-lib/regenerate`,
+          method: 'POST'
+        },
+        copyToNamespace: {
+          url: `${prefix}/intl-admin/lang-lib/copy-to-namespace`,
+          method: 'POST'
+        },
+        messages: {
+          url: `${prefix}/intl-admin/lang-lib/messages`,
+          method: 'GET'
+        },
+        export: {
+          url: `${prefix}/intl-admin/lang-lib/export`,
+          method: 'GET'
+        },
+        import: {
+          url: `${prefix}/intl-admin/lang-lib/import`,
           method: 'POST'
         }
       }

@@ -1,4 +1,6 @@
 const locale = {
+  SecretKeyManagement: '密钥管理',
+
   // Columns
   AppId: 'AppId',
   SecretKey: 'SecretKey',

@@ -1500,7 +1500,7 @@ const SystemLayoutNextExample = createWithRemoteLoader({
 
   const renderBizPage = (title, renderProps) => (
     <Page title={title}>
-      <TablePageRender {...renderProps} />
+      <TablePageRender {...renderProps} withPage={false} />
     </Page>
   );
 
@@ -1831,7 +1831,7 @@ const ChildrenNextExample = createWithRemoteLoader({
               ]
             }}
           >
-            {renderProps => <TablePageRender {...renderProps} />}
+            {renderProps => <TablePageRender {...renderProps} withPage={false} />}
           </BizUnit>
         </StateBarPage>
       </Layout>

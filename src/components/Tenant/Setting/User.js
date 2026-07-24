@@ -2,7 +2,6 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import UserList from '../UserList';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
-import { useState, useCallback } from 'react';
 import get from 'lodash/get';
 import TablePageRender from '@components/BizUnit/TablePageRender';
 
@@ -18,26 +17,19 @@ const User = createWithRemoteLoader({
   const { formatMessage } = useIntl();
   const { apis, plugins } = usePreset();
   const getActions = get(plugins, 'tenant.getUserListActions');
-  const [target, setTarget] = useState({});
   const allowCreate = usePermissionsPass({ request: ['setting:user-manager:create'] });
   const allowSave = usePermissionsPass({ request: ['setting:user-manager:edit'] });
   const allowRemove = usePermissionsPass({ request: ['setting:user-manager:remove'] });
   const allowInvite = usePermissionsPass({ request: ['setting:user-manager:invite'] });
 
-  const handleMount = useCallback(data => {
-    setTarget(data);
-  }, []);
-
   const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'UserManagement' }),
-    titleExtra: target.topOptions,
     children: (
       <Permissions request={['setting:user-manager:view']} type="error">
         <UserList
           topOptionsSize="small"
           allowQueryIdForUserFilter
-          onMount={handleMount}
           getActions={getActions}
           apis={Object.assign(
             {},

@@ -10,16 +10,20 @@ import { useIntl } from '@kne/react-intl';
 import withLocale from './withLocale';
 import GroupFormFields from './GroupFormFields';
 import {
-  ALL_GROUP_VALUE,
   buildGroupSelectOptions,
   createGroupCodeUniqueChecker,
   findGroupInTree,
   getAllGroupOption,
+  getGroupColor,
+  applyGroupColorToPayload,
+  DEFAULT_GROUP_COLOR,
+  isAllGroupOption,
   resolveGroupParentIdForSave,
   resolveGroupPermissions,
   resolveGroupSelectValue,
   resolveGroupTreeData
 } from './groupHelpers';
+import useGroupTreeSync from './useGroupTreeSync';
 import styles from './style.module.scss';
 
 const GroupFolderToolbar = createWithRemoteLoader({
@@ -57,6 +61,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
       const { message } = App.useApp();
       const locale = useGlobalValue('locale');
       const language = propsLanguage || locale || 'zh-CN';
+      const [treeSyncKey, emitGroupTreeChange] = useGroupTreeSync(type, language);
       const groupName = propsGroupName || formatMessage({ id: 'GroupSelectDefaultName' });
       const allLabel = formatMessage({ id: 'GroupSelectAll' });
 
@@ -94,8 +99,11 @@ const GroupFolderToolbar = createWithRemoteLoader({
                 description: editingGroup.description
               }
             : {};
-          if (showColor && editingGroup?.color) {
-            formData.color = editingGroup.color;
+          if (showColor) {
+            const groupColor = getGroupColor(editingGroup);
+            if (groupColor) {
+              formData.color = groupColor;
+            }
           }
           if (showParent) {
             formData.parentId = parentNode
@@ -104,7 +112,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
                   id: parentNode.id,
                   code: parentNode.code,
                   name: parentNode.name,
-                  color: parentNode.color
+                  color: getGroupColor(parentNode)
                 }
               : getAllGroupOption(allLabel, valueKey);
           }
@@ -131,9 +139,15 @@ const GroupFolderToolbar = createWithRemoteLoader({
                     }
                   : undefined,
               onSubmit: async values => {
-                const payload = Object.assign({}, values, { type, language });
+                let payload = Object.assign({}, values, { type, language });
                 if (showParent) {
                   payload.parentId = resolveGroupParentIdForSave(values.parentId, treeData, valueKey);
+                }
+                if (showColor) {
+                  payload = applyGroupColorToPayload(payload, {
+                    color: values.color || DEFAULT_GROUP_COLOR,
+                    existingOptions: editingGroup?.options
+                  });
                 }
                 if (editingGroup) {
                   payload.id = editingGroup.id;
@@ -151,7 +165,9 @@ const GroupFolderToolbar = createWithRemoteLoader({
                 message.success(
                   formatMessage({ id: editingGroup ? 'GroupSelectEditSuccess' : 'GroupSelectAddSuccess' })
                 );
+                const action = editingGroup ? 'edit' : 'add';
                 await reload?.();
+                emitGroupTreeChange(action, payload);
                 modalApi.close();
                 return true;
               }
@@ -178,6 +194,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
           ajax,
           allLabel,
           allowCustomCode,
+          emitGroupTreeChange,
           formModal,
           formatMessage,
           groupApis,
@@ -208,8 +225,9 @@ const GroupFolderToolbar = createWithRemoteLoader({
             onChange?.(null, null);
           }
           await reload?.();
+          emitGroupTreeChange('delete', group);
         },
-        [ajax, formatMessage, groupApis.remove, message, onChange, type, value, valueKey]
+        [ajax, emitGroupTreeChange, formatMessage, groupApis.remove, message, onChange, type, value, valueKey]
       );
 
       if (!groupApis.groupList) {
@@ -222,14 +240,14 @@ const GroupFolderToolbar = createWithRemoteLoader({
 
       return (
         <Fetch
+          key={treeSyncKey}
           {...groupListApi}
           render={({ data, reload }) => {
             const treeData = resolveGroupTreeData(data);
             const options = buildGroupSelectOptions(treeData, { valueKey, allLabel });
-            const selectedGroup =
-              value == null || value === '' || value === ALL_GROUP_VALUE
-                ? null
-                : findGroupInTree(treeData, typeof value === 'object' ? value[valueKey] ?? value.code ?? value.id : value, valueKey);
+            const selectedGroup = isAllGroupOption(value, valueKey)
+              ? null
+              : findGroupInTree(treeData, typeof value === 'object' ? value[valueKey] ?? value.code ?? value.id : value, valueKey);
             const selectValue = resolveGroupSelectValue(value, options, { valueKey, labelKey, allLabel });
 
             const colorProps = showColor
@@ -259,7 +277,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
                     className={compact ? styles['group-folder-toolbar-select-compact'] : styles['group-folder-toolbar-select']}
                     onChange={selected => {
                       const item = Array.isArray(selected) ? selected[0] : selected;
-                      if (!item || item[valueKey] === ALL_GROUP_VALUE || item.code === ALL_GROUP_VALUE || item.id === ALL_GROUP_VALUE) {
+                      if (isAllGroupOption(item, valueKey)) {
                         onChange?.(null, null);
                         return;
                       }

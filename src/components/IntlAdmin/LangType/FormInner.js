@@ -1,22 +1,27 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import { useIntl } from '@kne/react-intl';
+import withLocale from '../withLocale';
 
 const FormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
-})(({ remoteModules, ...props }) => {
-  const [FormInfo] = remoteModules;
-  const { Input, TextArea } = FormInfo.fields;
-  return (
-    <FormInfo
-      column={1}
-      {...props}
-      list={[
-        <Input name="name" label="名称" rule="REQ LEN-0-100" />,
-        <Input name="code" label="编码" rule="REQ LEN-0-100" />,
-        <TextArea name="params" label="翻译参数" rule="LEN-0-1000" />,
-        <TextArea name="description" label="描述" rule="LEN-0-1000" />
-      ]}
-    />
-  );
-});
+})(
+  withLocale(({ remoteModules, action }) => {
+    const [FormInfo] = remoteModules;
+    const { formatMessage } = useIntl();
+    const { Input, TextArea } = FormInfo.fields;
+
+    return (
+      <FormInfo
+        column={1}
+        list={[
+          <Input name="name" label={formatMessage({ id: 'Name' })} rule="REQ LEN-0-100" />,
+          <Input name="code" label={formatMessage({ id: 'Code' })} rule="REQ LEN-0-100" disabled={action === 'edit'} />,
+          <TextArea name="params" label={formatMessage({ id: 'Params' })} rule="LEN-0-1000" />,
+          <TextArea name="description" label={formatMessage({ id: 'Description' })} rule="LEN-0-1000" />
+        ]}
+      />
+    );
+  })
+);
 
 export default FormInner;

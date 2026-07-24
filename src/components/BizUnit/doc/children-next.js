@@ -180,7 +180,7 @@ const ChildrenNextExample = createWithRemoteLoader({
               ]
             }}
           >
-            {renderProps => <TablePageRender {...renderProps} />}
+            {renderProps => <TablePageRender {...renderProps} withPage={false} />}
           </BizUnit>
         </StateBarPage>
       </Layout>

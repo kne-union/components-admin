@@ -3,12 +3,13 @@ import Fetch from '@kne/react-fetch';
 import classnames from 'classnames';
 import { Tree, Flex } from 'antd';
 import useControlValue from '@kne/use-control-value';
-import { FolderFilled, FolderOpenFilled } from '@ant-design/icons';
 import { useMemo } from 'react';
 import merge from 'lodash/merge';
 import { useIntl } from '@kne/react-intl';
 import withLocale from './withLocale';
+import GroupFolderStateIcon, { getGroupIconColor } from './GroupFolderIcon';
 import { resolveGroupTreeData } from './groupHelpers';
+import useGroupTreeSync from './useGroupTreeSync';
 import styles from './style.module.scss';
 
 const GroupFolder = createWithRemoteLoader({
@@ -36,6 +37,7 @@ const GroupFolder = createWithRemoteLoader({
       const locale = useGlobalValue('locale');
 
       const language = propsLanguage || locale || 'zh-CN';
+      const [treeSyncKey] = useGroupTreeSync(type, language);
       const displayRootTitle = rootTitle || formatMessage({ id: 'GroupSelectAll' });
       const groupApis = propsApis || presetApis?.group || {};
       const groupListApi = useMemo(
@@ -63,6 +65,7 @@ const GroupFolder = createWithRemoteLoader({
 
       return (
         <Fetch
+          key={treeSyncKey}
           {...groupListApi}
           render={({ data, loading }) => {
             if (loading) {
@@ -100,14 +103,11 @@ const GroupFolder = createWithRemoteLoader({
                   }
                   onChange(selectedKey, info?.selectedNodes?.[0] || null);
                 }}
-                icon={nodeProps => {
-                  const color = nodeProps.data?.color;
-                  const iconStyle = color ? { color } : undefined;
-                  if (nodeProps.key === 'root') {
-                    return <FolderFilled style={iconStyle} />;
-                  }
-                  return nodeProps.expanded ? <FolderOpenFilled style={iconStyle} /> : <FolderFilled style={iconStyle} />;
-                }}
+                icon={nodeProps => (
+                  <GroupFolderStateIcon
+                    color={getGroupIconColor(nodeProps.key === 'root' ? null : nodeProps.data, { valueKey })}
+                  />
+                )}
                 {...props}
               />
             );

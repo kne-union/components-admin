@@ -1,5 +1,3 @@
-export const ALL_GROUP_VALUE = '__all__';
-
 export const DEFAULT_GROUP_PERMISSIONS = ['add', 'edit', 'delete'];
 
 export const resolveGroupPermissions = (
@@ -29,21 +27,45 @@ export const GROUP_COLORS = [
 
 export const DEFAULT_GROUP_COLOR = '#007AFF';
 
+/** 分组颜色存在 options.color，兼容历史顶层 color */
+export const getGroupColor = item => item?.color ?? item?.options?.color;
+
+/** 表单 color → 持久化到 options.color */
+export const applyGroupColorToPayload = (payload, { color, existingOptions } = {}) => {
+  const next = Object.assign({}, payload);
+  const resolvedColor = color ?? next.color;
+  delete next.color;
+  if (resolvedColor == null || resolvedColor === '') {
+    return next;
+  }
+  next.options = Object.assign({}, existingOptions, next.options, { color: resolvedColor });
+  return next;
+};
+
+const hoistGroupColor = nodes =>
+  (nodes || []).map(node => {
+    const next = Object.assign({}, node, {
+      color: getGroupColor(node)
+    });
+    if (node.children?.length) {
+      next.children = hoistGroupColor(node.children);
+    }
+    return next;
+  });
+
 /** 兼容 Fetch / ajax 返回的多种分组树数据结构 */
 export const resolveGroupTreeData = data => {
+  let list = [];
   if (Array.isArray(data)) {
-    return data;
+    list = data;
+  } else if (Array.isArray(data?.data)) {
+    list = data.data;
+  } else if (Array.isArray(data?.results)) {
+    list = data.results;
+  } else if (Array.isArray(data?.pageData)) {
+    list = data.pageData;
   }
-  if (Array.isArray(data?.data)) {
-    return data.data;
-  }
-  if (Array.isArray(data?.results)) {
-    return data.results;
-  }
-  if (Array.isArray(data?.pageData)) {
-    return data.pageData;
-  }
-  return [];
+  return hoistGroupColor(list);
 };
 
 export const flattenGroupTree = (nodes, parentId = null, valueKey = 'code') => {
@@ -91,16 +113,42 @@ export const collectDescendantKeys = (node, valueKey = 'code') => {
   return keys;
 };
 
+/** 「全部 / 无父级」选项：用 isAll 标记，不用假 code */
+export const getAllGroupOption = (label, valueKey = 'code') => ({
+  [valueKey]: null,
+  code: null,
+  id: null,
+  name: label,
+  parentId: null,
+  isAll: true
+});
+
+export const isAllGroupOption = (item, valueKey = 'code') => {
+  if (item == null || item === '') {
+    return true;
+  }
+  if (typeof item !== 'object') {
+    return false;
+  }
+  if (item.isAll) {
+    return true;
+  }
+  return item[valueKey] == null && item.id == null && item.code == null;
+};
+
 export const normalizeGroupParentId = (value, valueKey = 'code') => {
-  if (value == null || value === '' || value === ALL_GROUP_VALUE) {
+  if (value == null || value === '') {
     return null;
   }
   if (Array.isArray(value)) {
     return normalizeGroupParentId(value[0], valueKey);
   }
   if (typeof value === 'object') {
+    if (isAllGroupOption(value, valueKey)) {
+      return null;
+    }
     const raw = value.id ?? value[valueKey] ?? value.value ?? value.code;
-    if (raw == null || raw === '' || raw === ALL_GROUP_VALUE) {
+    if (raw == null || raw === '') {
       return null;
     }
     return raw;
@@ -108,36 +156,26 @@ export const normalizeGroupParentId = (value, valueKey = 'code') => {
   return value;
 };
 
-export const getAllGroupOption = (label, valueKey = 'code') => ({
-  [valueKey]: ALL_GROUP_VALUE,
-  code: ALL_GROUP_VALUE,
-  id: ALL_GROUP_VALUE,
-  name: label,
-  parentId: null
-});
-
 export const resolveGroupSelectValue = (rawValue, options = [], { valueKey = 'code', labelKey = 'name', allLabel } = {}) => {
-  if (rawValue == null || rawValue === '' || rawValue === ALL_GROUP_VALUE) {
+  if (isAllGroupOption(rawValue, valueKey)) {
     return getAllGroupOption(allLabel, valueKey);
   }
 
   const normalized = Array.isArray(rawValue) ? rawValue[0] : rawValue;
-  if (normalized == null || normalized === '' || normalized === ALL_GROUP_VALUE) {
+  if (isAllGroupOption(normalized, valueKey)) {
     return getAllGroupOption(allLabel, valueKey);
   }
 
   if (typeof normalized === 'object') {
-    if (normalized[valueKey] === ALL_GROUP_VALUE || normalized.id === ALL_GROUP_VALUE || normalized.code === ALL_GROUP_VALUE) {
-      return getAllGroupOption(allLabel || normalized[labelKey] || normalized.name, valueKey);
-    }
     if (normalized[labelKey] || normalized.name) {
       return normalized;
     }
     return (
       options.find(
         option =>
-          String(option[valueKey]) === String(normalized[valueKey] ?? normalized.id ?? normalized.code) ||
-          String(option.id) === String(normalized.id)
+          !isAllGroupOption(option, valueKey) &&
+          (String(option[valueKey]) === String(normalized[valueKey] ?? normalized.id ?? normalized.code) ||
+            String(option.id) === String(normalized.id))
       ) || normalized
     );
   }
@@ -145,9 +183,10 @@ export const resolveGroupSelectValue = (rawValue, options = [], { valueKey = 'co
   return (
     options.find(
       option =>
-        String(option[valueKey]) === String(normalized) ||
-        String(option.id) === String(normalized) ||
-        String(option.code) === String(normalized)
+        !isAllGroupOption(option, valueKey) &&
+        (String(option[valueKey]) === String(normalized) ||
+          String(option.id) === String(normalized) ||
+          String(option.code) === String(normalized))
     ) || null
   );
 };
@@ -161,17 +200,18 @@ export const buildGroupSelectOptions = (treeData, { valueKey = 'code', allLabel,
   return [getAllGroupOption(allLabel, valueKey), ...flat];
 };
 
-/** 将父级选择值解析为后端需要的 id（优先 id） */
+/** 将父级选择值解析为后端需要的 id（优先 id）；无父级时返回 null，禁止传 "" */
 export const resolveGroupParentIdForSave = (value, treeData = [], valueKey = 'code') => {
   const raw = normalizeGroupParentId(value, valueKey);
-  if (raw == null) {
+  if (raw == null || raw === '') {
     return null;
   }
   if (!treeData?.length) {
     return raw;
   }
   const node = findGroupInTree(treeData, raw, valueKey);
-  return node?.id != null ? node.id : raw;
+  const id = node?.id != null ? node.id : raw;
+  return id === '' ? null : id;
 };
 
 /** 表单自定义规则：校验编码在同 type/language 下唯一 */
