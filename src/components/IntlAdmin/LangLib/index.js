@@ -134,9 +134,7 @@ const LangLib = createWithRemoteLoader({
             SuperSelectFilterItem,
             langTypeListApi: apis.intlAdmin.langType.list
           }),
-          // 用 defaultValue 而非 value：TablePage 受控 value 只回显 UI，
-          // 请求重置时只认 defaultValue，否则会出现「筛选已选中但列表未带该条件」
-          { defaultValue: filterValue }
+          { value: filterValue }
         ),
       [formatMessage, SuperSelectFilterItem, apis.intlAdmin.langType.list, filterValue]
     );

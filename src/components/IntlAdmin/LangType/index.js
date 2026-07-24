@@ -113,8 +113,7 @@ const LangType = createWithRemoteLoader({
         }}
         filter={{
           list: [],
-          // 与 LangLib 一致：勿用受控 value，否则 Tab/筛选 UI 与请求参数会脱节
-          defaultValue: filterValue
+          value: filterValue
         }}
         page={{
           title: formatMessage({ id: 'LangType' }),
