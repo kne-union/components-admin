@@ -11,7 +11,7 @@ const TabDetailExample = createWithRemoteLoader({
     <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
         <Routes>
-          <Route path="/detail" element={<TabDetail optionFixed={false} />} />
+          <Route path="/detail" element={<TabDetail optionFixed={false} showLanguageSetting />} />
           <Route path="*" element={<Navigate to="/detail?id=tenant-001" replace />} />
         </Routes>
       </Layout>

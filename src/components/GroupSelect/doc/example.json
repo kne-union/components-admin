@@ -122,6 +122,25 @@
           "packageName": "antd"
         }
       ]
+    },
+    {
+      "title": "Filter 筛选项",
+      "description": "GroupSelect.FilterItem（标签多选/单选）与 GroupFolderFilterItem（文件夹树选）接入 Filter",
+      "code": "./filter.js",
+      "scope": [
+        {
+          "name": "_GroupSelect",
+          "packageName": "@components/GroupSelect"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
     }
   ]
 }

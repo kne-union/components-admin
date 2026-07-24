@@ -6,7 +6,7 @@ import { FolderFilled } from '@ant-design/icons';
 import withLocale from './withLocale';
 import GroupColorPickerField from './GroupColorPickerField';
 import { createGroupItemContentRender, getGroupIconColor } from './GroupFolderIcon';
-import { buildGroupSelectOptions, DEFAULT_GROUP_COLOR, flattenGroupTree, getAllGroupOption, resolveGroupTreeData } from './groupHelpers';
+import { buildGroupSelectOptions, DEFAULT_GROUP_COLOR, flattenGroupTree, getAllGroupOption, getGroupColor, resolveGroupTreeData } from './groupHelpers';
 import styles from './style.module.scss';
 
 const GroupFormFields = createWithRemoteLoader({
@@ -151,7 +151,7 @@ const GroupFormFields = createWithRemoteLoader({
                 key="color"
                 name="color"
                 label={formatMessage({ id: 'GroupSelectColor' })}
-                defaultValue={editingGroup?.color || DEFAULT_GROUP_COLOR}
+                defaultValue={getGroupColor(editingGroup) || DEFAULT_GROUP_COLOR}
               />
             ) : null,
             <TextArea

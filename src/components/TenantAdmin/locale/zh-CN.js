@@ -38,6 +38,7 @@ const locale = {
 
   // Custom Components
   EnvironmentVariables: '环境变量',
+  CustomComponents: '自定义组件',
   AddEnvironmentVariable: '添加环境变量',
   AddCustomComponent: '添加自定义组件',
   Preview: '预览',
@@ -46,6 +47,16 @@ const locale = {
   CopySuccess: '复制成功',
   ModifySuccess: '修改成功',
   DeleteSuccess: '删除成功',
+  Cancel: '取消',
+
+  // Language
+  LanguageSetting: '语言设置',
+  SystemLanguage: '系统语言',
+  DefaultTag: '默认',
+  SetDefault: '设为默认',
+  MoveUp: '上移',
+  MoveDown: '下移',
+  NoLanguageOptions: '暂无可用语言',
 
   // Detail
   TenantDetail: '租户详情',

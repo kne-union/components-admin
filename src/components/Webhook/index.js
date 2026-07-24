@@ -1,7 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
 import { useState } from 'react';
-import { Button, App, Flex } from 'antd';
+import { App } from 'antd';
 import getColumns from './getColumns';
 import FormInner from './FormInner';
 import Record from './Record';
@@ -104,6 +104,50 @@ const Webhook = createWithRemoteLoader({
                 }
               }
             ]}
+            buttonGroup={{
+              list: [
+                {
+                  type: 'primary',
+                  children: '添加',
+                  onClick: () => {
+                    formModal({
+                      title: '添加Webhook调用端',
+                      size: 'small',
+                      autoClose: true,
+                      formProps: {
+                        onSubmit: async formData => {
+                          const { data: resData } = await ajax(
+                            Object.assign({}, apis.webhook.create, {
+                              data: Object.assign({}, formData, {
+                                type: current
+                              })
+                            })
+                          );
+
+                          if (resData.code !== 0) {
+                            return false;
+                          }
+
+                          message.success('添加成功');
+                          reload();
+                        }
+                      },
+                      children: <FormInner />
+                    });
+                  }
+                },
+                {
+                  children: '失败记录',
+                  onClick: () => {
+                    modal({
+                      title: '失败记录',
+                      footer: null,
+                      children: <Record type={current} />
+                    });
+                  }
+                }
+              ]
+            }}
             page={{
               menu: list.length > 0 && (
                 <Menu
@@ -117,53 +161,7 @@ const Webhook = createWithRemoteLoader({
                   })}
                 />
               ),
-              title: 'Webhook',
-              titleExtra: (
-                <Flex gap={8}>
-                  <Button
-                    type="primary"
-                    onClick={() => {
-                      formModal({
-                        title: '添加Webhook调用端',
-                        size: 'small',
-                        autoClose: true,
-                        formProps: {
-                          onSubmit: async formData => {
-                            const { data: resData } = await ajax(
-                              Object.assign({}, apis.webhook.create, {
-                                data: Object.assign({}, formData, {
-                                  type: current
-                                })
-                              })
-                            );
-
-                            if (resData.code !== 0) {
-                              return false;
-                            }
-
-                            message.success('添加成功');
-                            reload();
-                          }
-                        },
-                        children: <FormInner />
-                      });
-                    }}
-                  >
-                    添加
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      modal({
-                        title: '失败记录',
-                        footer: null,
-                        children: <Record type={current} />
-                      });
-                    }}
-                  >
-                    失败记录
-                  </Button>
-                </Flex>
-              )
+              title: 'Webhook'
             }}
           />
         );

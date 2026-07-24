@@ -1,37 +1,35 @@
-const getColumns = () => {
+const getColumns = ({ formatMessage } = {}) => {
+  const t = (id, fallback) => (formatMessage ? formatMessage({ id }) : fallback);
+
   return [
     {
-      name: 'id',
-      title: 'ID',
-      renderType: 'id'
+      name: 'code',
+      title: t('Code', '编码'),
+      renderType: 'main',
+      fixed: 'left'
     },
     {
       name: 'namespace',
-      title: '命名空间',
-      renderType: 'main'
+      title: t('Namespace', '命名空间')
     },
     {
       name: 'locale',
-      title: '语言'
-    },
-    {
-      name: 'code',
-      title: '编码'
+      title: t('Locale', '语言')
     },
     {
       name: 'target',
-      title: '目标值'
+      title: t('Target', '目标值')
     },
     {
       name: 'reviewStatus',
-      title: '审核状态',
+      title: t('ReviewStatus', '审核状态'),
       renderType: 'enum',
       moduleName: 'reviewStatus',
       getValueOf: item => item.reviewStatus
     },
     {
       name: 'status',
-      title: '状态',
+      title: t('Status', '状态'),
       renderType: 'enum',
       moduleName: 'openStatus',
       getValueOf: item => item.status

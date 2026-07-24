@@ -91,8 +91,16 @@ const MessageList = createWithRemoteLoader({
             }
           }
         ]}
+        buttonGroup={{
+          list: [
+            {
+              buttonComponent: PublishMessage,
+              type: 'primary',
+              onSuccess: () => ref.current?.reload?.()
+            }
+          ]
+        }}
         page={{
-          titleExtra: <PublishMessage onSuccess={() => ref.current?.reload?.()} />,
           menu: <Menu baseUrl={baseUrl} />,
           ...pageProps
         }}

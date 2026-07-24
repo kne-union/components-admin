@@ -82,12 +82,15 @@ const ListInner = createWithRemoteLoader({
           stateOption={stateType}
         />
       }
-      page={{
-        titleExtra: (
-          <Create type="primary" onSuccess={() => ref.current?.reload()}>
-            {formatMessage({ id: 'AddTenant' })}
-          </Create>
-        )
+      buttonGroup={{
+        list: [
+          {
+            buttonComponent: Create,
+            type: 'primary',
+            children: formatMessage({ id: 'AddTenant' }),
+            onSuccess: () => ref.current?.reload()
+          }
+        ]
       }}
       columns={[
         ...getColumns({ navigate, formatMessage }),

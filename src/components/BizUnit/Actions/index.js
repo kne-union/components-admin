@@ -113,7 +113,8 @@ const Actions = createWithRemoteLoader({
               return;
             }
           }
-          actionList.splice(item.index || 0, 0, Object.assign({ type: 'link' }, buttonOtherPropsMap[item.name], item));
+          // index 已从 item 解构出，必须用局部变量；item.index 恒为 undefined
+          actionList.splice(index ?? 0, 0, Object.assign({ type: 'link' }, buttonOtherPropsMap[item.name], item));
         });
       }
 

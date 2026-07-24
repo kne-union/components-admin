@@ -1,3 +1,25 @@
+.setting {
+  min-height: 400px;
+  align-items: stretch;
+}
+
+.setting-menu {
+  flex: none;
+  width: 200px;
+  border-right: 1px solid var(--border-color-split, #f0f0f0);
+  padding-right: 8px;
+  margin-right: 16px;
+}
+
+.setting-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.editor-wrap {
+  min-height: 560px;
+}
+
 .modal-wrap {
   :global {
     .modal-body-inner {

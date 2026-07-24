@@ -7,7 +7,8 @@
         "code": "zh-CN",
         "params": "count, name, date",
         "description": "简体中文语言包，适用于中国大陆地区",
-        "status": "open"
+        "status": "open",
+        "isDefault": true
       },
       {
         "id": 2,
@@ -15,7 +16,8 @@
         "code": "zh-TW",
         "params": "count, name, date",
         "description": "繁体中文语言包，适用于台湾、香港地区",
-        "status": "open"
+        "status": "open",
+        "isDefault": false
       },
       {
         "id": 3,
@@ -23,7 +25,8 @@
         "code": "en-US",
         "params": "count, name, date",
         "description": "美式英语语言包，适用于美国地区",
-        "status": "open"
+        "status": "open",
+        "isDefault": false
       },
       {
         "id": 4,
@@ -31,7 +34,8 @@
         "code": "ja-JP",
         "params": "count, name, date",
         "description": "日语语言包，适用于日本地区",
-        "status": "closed"
+        "status": "closed",
+        "isDefault": false
       },
       {
         "id": 5,
@@ -39,10 +43,101 @@
         "code": "ko-KR",
         "params": "count, name, date",
         "description": "韩语语言包，适用于韩国地区",
-        "status": "open"
+        "status": "open",
+        "isDefault": false
+      },
+      {
+        "id": 6,
+        "name": "Français",
+        "code": "fr-FR",
+        "params": "count, name, date",
+        "description": "法语语言包，适用于法国地区",
+        "status": "open",
+        "isDefault": false
+      },
+      {
+        "id": 7,
+        "name": "Deutsch",
+        "code": "de-DE",
+        "params": "count, name, date",
+        "description": "德语语言包，适用于德国地区",
+        "status": "open",
+        "isDefault": false
+      },
+      {
+        "id": 8,
+        "name": "Español",
+        "code": "es-ES",
+        "params": "count, name, date",
+        "description": "西班牙语语言包，适用于西班牙地区",
+        "status": "open",
+        "isDefault": false
+      },
+      {
+        "id": 9,
+        "name": "Português",
+        "code": "pt-BR",
+        "params": "count, name, date",
+        "description": "葡萄牙语语言包，适用于巴西地区",
+        "status": "closed",
+        "isDefault": false
+      },
+      {
+        "id": 10,
+        "name": "Русский",
+        "code": "ru-RU",
+        "params": "count, name, date",
+        "description": "俄语语言包，适用于俄罗斯地区",
+        "status": "open",
+        "isDefault": false
+      },
+      {
+        "id": 11,
+        "name": "Italiano",
+        "code": "it-IT",
+        "params": "count, name, date",
+        "description": "意大利语语言包，适用于意大利地区",
+        "status": "open",
+        "isDefault": false
+      },
+      {
+        "id": 12,
+        "name": "ไทย",
+        "code": "th-TH",
+        "params": "count, name, date",
+        "description": "泰语语言包，适用于泰国地区",
+        "status": "open",
+        "isDefault": false
+      },
+      {
+        "id": 13,
+        "name": "Tiếng Việt",
+        "code": "vi-VN",
+        "params": "count, name, date",
+        "description": "越南语语言包，适用于越南地区",
+        "status": "closed",
+        "isDefault": false
+      },
+      {
+        "id": 14,
+        "name": "العربية",
+        "code": "ar-SA",
+        "params": "count, name, date",
+        "description": "阿拉伯语语言包，适用于沙特地区",
+        "status": "open",
+        "isDefault": false
+      },
+      {
+        "id": 15,
+        "name": "हिन्दी",
+        "code": "hi-IN",
+        "params": "count, name, date",
+        "description": "印地语语言包，适用于印度地区",
+        "status": "open",
+        "isDefault": false
       }
     ],
-    "totalCount": 5
+    "totalCount": 15
   },
   "langLib": {
     "pageData": [
@@ -117,6 +212,114 @@
         "target": "Add Secret Key",
         "reviewStatus": "rejected",
         "status": "closed"
+      },
+      {
+        "id": 9,
+        "namespace": "components-admin:Webhook",
+        "locale": "zh-CN",
+        "code": "Name",
+        "target": "名称",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 10,
+        "namespace": "components-admin:Webhook",
+        "locale": "en-US",
+        "code": "Name",
+        "target": "Name",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 11,
+        "namespace": "components-admin:Task",
+        "locale": "zh-CN",
+        "code": "Title",
+        "target": "标题",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 12,
+        "namespace": "components-admin:Task",
+        "locale": "en-US",
+        "code": "Title",
+        "target": "Title",
+        "reviewStatus": "pending",
+        "status": "open"
+      },
+      {
+        "id": 13,
+        "namespace": "components-admin:Message",
+        "locale": "zh-CN",
+        "code": "Send",
+        "target": "发送",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 14,
+        "namespace": "components-admin:Message",
+        "locale": "en-US",
+        "code": "Send",
+        "target": "Send",
+        "reviewStatus": "approved",
+        "status": "closed"
+      },
+      {
+        "id": 15,
+        "namespace": "components-admin:Tenant",
+        "locale": "zh-CN",
+        "code": "TenantName",
+        "target": "租户名称",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 16,
+        "namespace": "components-admin:Tenant",
+        "locale": "en-US",
+        "code": "TenantName",
+        "target": "Tenant Name",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 17,
+        "namespace": "components-admin:Admin",
+        "locale": "zh-CN",
+        "code": "Login",
+        "target": "登录",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 18,
+        "namespace": "components-admin:Admin",
+        "locale": "en-US",
+        "code": "Login",
+        "target": "Login",
+        "reviewStatus": "pending",
+        "status": "open"
+      },
+      {
+        "id": 19,
+        "namespace": "components-admin:Filter",
+        "locale": "zh-CN",
+        "code": "Keyword",
+        "target": "关键字",
+        "reviewStatus": "approved",
+        "status": "open"
+      },
+      {
+        "id": 20,
+        "namespace": "components-admin:Filter",
+        "locale": "en-US",
+        "code": "Keyword",
+        "target": "Keyword",
+        "reviewStatus": "approved",
+        "status": "open"
       }
     ],
     "totalCount": 8

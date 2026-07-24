@@ -1,16 +1,10 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { UserList } from '@components/Tenant';
 import TablePageRender from '@components/BizUnit/TablePageRender';
-import { Flex } from 'antd';
 import get from 'lodash/get';
 
 /** 嵌在 StateBarPage 内时不要再套 Layout@TablePage，避免覆盖外层 PageHeader */
-const renderUserList = ({ topOptions, tableOptions }) => (
-  <Flex vertical gap={8}>
-    {topOptions ? <Flex justify="flex-end">{topOptions}</Flex> : null}
-    <TablePageRender tableOptions={tableOptions} withPage={false} />
-  </Flex>
-);
+const renderUserList = ({ tableOptions }) => <TablePageRender tableOptions={tableOptions} withPage={false} />;
 
 const User = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']

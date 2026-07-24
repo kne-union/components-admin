@@ -8,7 +8,7 @@ import { SOURCE_LABEL_MAP } from '../../constants';
 
 const SendMessage = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:FormInfo', 'components-admin:Editor', 'components-core:Global@usePreset']
-})(({ remoteModules, apis, selectedRows, onSuccess, size }) => {
+})(({ remoteModules, apis, selectedRows, onSuccess, size, ...props }) => {
   const [useFormModal, FormInfo, Editor, usePreset] = remoteModules;
   const { ajax } = usePreset();
   const formModal = useFormModal();
@@ -99,7 +99,7 @@ const SendMessage = createWithRemoteLoader({
   };
 
   return (
-    <Button size={size} disabled={externalUsers.length === 0} onClick={handleClick}>
+    <Button size={size} disabled={externalUsers.length === 0} {...props} onClick={handleClick}>
       {formatMessage({ id: 'SendOrgMessage' }, { type: sourceLabel })}
     </Button>
   );

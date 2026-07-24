@@ -138,34 +138,39 @@ const UserList = createWithRemoteLoader({
 
       const hasExternalSelected = selectedRows.some(row => row.syncSource);
 
-      const topOptions = (
-        <Flex gap={8} align="center">
-          {selectedRowKeys.length > 0 ? (
-            <Flex align="center" style={{ fontSize: 14, color: '#666', whiteSpace: 'nowrap' }}>
-              {formatMessage({ id: 'SelectedCount' }, { count: selectedRowKeys.length })}
-              <Button type="link" size="small" onClick={clearSelection}>
-                {formatMessage({ id: 'DeselectAll' })}
-              </Button>
-            </Flex>
-          ) : null}
-          {apis.sendOrgMessage && hasExternalSelected && (
-            <SendMessage
-              size={topOptionsSize}
-              apis={apis}
-              selectedRows={selectedRows}
-              onSuccess={() => {
-                clearSelection();
-                tableRef.current.reload();
-              }}
-            />
-          )}
-          {apis.create && (
-            <Create type="primary" size={topOptionsSize} apis={apis} onSuccess={() => tableRef.current.reload()}>
-              {formatMessage({ id: 'Add' })}
-            </Create>
-          )}
-        </Flex>
-      );
+      const buttonGroupList = [];
+      if (apis.create) {
+        buttonGroupList.push({
+          buttonComponent: Create,
+          type: 'primary',
+          size: topOptionsSize,
+          apis,
+          onSuccess: () => tableRef.current.reload(),
+          children: formatMessage({ id: 'Add' })
+        });
+      }
+      if (apis.sendOrgMessage && hasExternalSelected) {
+        buttonGroupList.push({
+          buttonComponent: SendMessage,
+          size: topOptionsSize,
+          apis,
+          selectedRows,
+          onSuccess: () => {
+            clearSelection();
+            tableRef.current.reload();
+          }
+        });
+      }
+      if (selectedRowKeys.length > 0) {
+        buttonGroupList.push(({ key, className }) => (
+          <Flex key={key} align="center" className={className} style={{ fontSize: 14, color: '#666', whiteSpace: 'nowrap' }}>
+            {formatMessage({ id: 'SelectedCount' }, { count: selectedRowKeys.length })}
+            <Button type="link" size="small" onClick={clearSelection}>
+              {formatMessage({ id: 'DeselectAll' })}
+            </Button>
+          </Flex>
+        ));
+      }
 
       const reloadTable = useCallback(() => {
         tableRef.current?.reload();
@@ -234,11 +239,12 @@ const UserList = createWithRemoteLoader({
         name: 'tenant-user-list',
         pagination: { paramsType: 'params' },
         rowSelection,
-        renderMobile
+        renderMobile,
+        ...(buttonGroupList.length > 0 ? { buttonGroup: { list: buttonGroupList } } : {})
       };
 
       const handlerMount = useRefCallback(() => {
-        onMount?.({ filter: { value: filter, onChange: setFilter }, filterList, topOptions, tableOptions });
+        onMount?.({ filter: { value: filter, onChange: setFilter }, filterList, tableOptions });
       });
 
       useEffect(() => {
@@ -246,10 +252,10 @@ const UserList = createWithRemoteLoader({
       }, [handlerMount, filter, selectedRowKeys]);
 
       if (typeof children === 'function') {
-        return children({ filter: { value: filter, onChange: setFilter }, filterList, topOptions, tableOptions });
+        return children({ filter: { value: filter, onChange: setFilter }, filterList, tableOptions });
       }
 
-      return <TablePage {...tableOptions} page={{ titleExtra: topOptions }} />;
+      return <TablePage {...tableOptions} />;
     }
   )
 );

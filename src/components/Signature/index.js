@@ -83,7 +83,7 @@ const CreateButton = createWithRemoteLoader({
     'components-core:InfoPage@CentralContent'
   ]
 })(
-  withLocale(({ remoteModules, onSuccess }) => {
+  withLocale(({ remoteModules, onSuccess, ...props }) => {
     const [FormInfo, useFormModal, usePreset, CentralContent] = remoteModules;
     const { formatMessage } = useIntl();
     const { ajax, apis } = usePreset();
@@ -94,6 +94,7 @@ const CreateButton = createWithRemoteLoader({
     return (
       <Button
         type="primary"
+        {...props}
         onClick={() => {
           const formModalApi = formModal({
             title: formatMessage({ id: 'AddSecretKey' }),
@@ -157,7 +158,7 @@ const CreateButton = createWithRemoteLoader({
 const Signature = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
 })(
-  withLocale(({ remoteModules }) => {
+  withLocale(({ remoteModules, pageProps = {} }) => {
     const [usePreset] = remoteModules;
     const { apis: presetApis } = usePreset();
     const { formatMessage } = useIntl();
@@ -209,23 +210,36 @@ const Signature = createWithRemoteLoader({
         children: formatMessage({ id: 'Disabled' })
       },
       closeMessage: formatMessage({ id: 'DisableSecretKeyMessage' }),
-      removeMessage: formatMessage({ id: 'ConfirmDelete' }, { bizName: '密钥' })
+      removeMessage: formatMessage({ id: 'ConfirmDelete' }, { bizName: '密钥' }),
+      tableProps: {
+        buttonGroup: {
+          list: [
+            {
+              buttonComponent: CreateButton,
+              onSuccess: () => tableRef.current?.current?.reload()
+            }
+          ]
+        }
+      }
     };
 
     return (
       <BizUnit
         isNext
         name="signature-list"
+        page={{
+          title: formatMessage({ id: 'SecretKeyManagement' }),
+          ...pageProps
+        }}
         apis={apis}
         getColumns={columnsGetColumns}
         getActionList={getActionList}
         options={options}
-        allowKeywordSearch={false}
-        onMount={({ tableOptions }) => {
-          tableRef.current = tableOptions.ref.current;
+        allowKeywordSearch={false}>
+        {props => {
+          tableRef.current = props.tableOptions?.ref;
+          return <TablePageRender {...props} />;
         }}
-        titleExtra={<CreateButton onSuccess={() => tableRef.current?.reload()} />}>
-        {props => <TablePageRender {...props} />}
       </BizUnit>
     );
   })

@@ -438,8 +438,31 @@ const apis = merge({}, getApis(), {
   intlAdmin: {
     langType: {
       list: {
-        loader: () => {
-          return import('./intl-admin-data.json').then(({ default: data }) => data.langType);
+        loader: ({ data, params } = {}) => {
+          const requestParams = params || data || {};
+          const currentPage = Number(requestParams.currentPage) || 1;
+          const perPage = Number(requestParams.perPage) || 10;
+          return import('./intl-admin-data.json').then(({ default: fileData }) => {
+            const pageData = fileData.langType.pageData || [];
+            const langLibRows = (fileData.langLib?.pageData || []).filter(item => item.locale);
+            const entryCountByLocale = {};
+            langLibRows.forEach(item => {
+              entryCountByLocale[item.locale] = (entryCountByLocale[item.locale] || 0) + 1;
+            });
+            const defaultLang = pageData.find(item => item.isDefault);
+            const defaultEntryCount = defaultLang ? entryCountByLocale[defaultLang.code] || 0 : 0;
+            const enriched = pageData.map(item =>
+              Object.assign({}, item, {
+                entryCount: entryCountByLocale[item.code] || 0,
+                defaultEntryCount
+              })
+            );
+            const start = (currentPage - 1) * perPage;
+            return {
+              pageData: enriched.slice(start, start + perPage),
+              totalCount: enriched.length
+            };
+          });
         }
       },
       create: {
@@ -453,12 +476,48 @@ const apis = merge({}, getApis(), {
       },
       setStatus: {
         loader: () => ({ code: 0 })
+      },
+      setDefault: {
+        loader: () => ({ code: 0 })
+      },
+      move: {
+        loader: () => ({ code: 0, data: { moved: true } })
+      },
+      translateRemaining: {
+        loader: () => ({ code: 0, data: { createdCount: 1 } })
       }
     },
     langLib: {
+      namespaces: {
+        loader: () =>
+          import('./intl-admin-data.json').then(({ default: fileData }) => {
+            const namespaces = [
+              ...new Set((fileData.langLib?.pageData || []).map(item => item.namespace).filter(Boolean))
+            ].sort();
+            return {
+              pageData: namespaces.map(namespace => ({ namespace })),
+              totalCount: namespaces.length
+            };
+          })
+      },
       list: {
-        loader: () => {
-          return import('./intl-admin-data.json').then(({ default: data }) => data.langLib);
+        loader: ({ data, params } = {}) => {
+          const requestParams = params || data || {};
+          const currentPage = Number(requestParams.currentPage) || 1;
+          const perPage = Number(requestParams.perPage) || 5;
+          const namespace = requestParams.namespace || requestParams.filter?.namespace;
+          return import('./intl-admin-data.json').then(({ default: fileData }) => {
+            // 与后端一致：返回扁平词条列表，树形由前端 transformData 组装
+            let pageData = (fileData.langLib.pageData || []).filter(item => item.locale);
+            if (namespace) {
+              pageData = pageData.filter(item => item.namespace === namespace);
+            }
+            const start = (currentPage - 1) * perPage;
+            return {
+              pageData: pageData.slice(start, start + perPage),
+              totalCount: pageData.length
+            };
+          });
         }
       },
       create: {
@@ -469,6 +528,18 @@ const apis = merge({}, getApis(), {
       },
       setStatus: {
         loader: () => ({ code: 0 })
+      },
+      remove: {
+        loader: () => ({ code: 0 })
+      },
+      review: {
+        loader: () => ({ code: 0 })
+      },
+      regenerate: {
+        loader: () => ({ code: 0 })
+      },
+      copyToNamespace: {
+        loader: () => ({ code: 0, data: { createdCount: 1, skippedCount: 0 } })
       }
     }
   },
@@ -627,6 +698,14 @@ const apis = merge({}, getApis(), {
           company: data.company,
           tenant: data.tenantList.pageData[0],
           userInfo: data.tenantUserInfo
+        }));
+      }
+    },
+    getLanguages: {
+      loader: () => {
+        return import('./tenant-admin-data.json').then(({ default: data }) => ({
+          supportLanguage: data.tenantDetail?.supportLanguage || ['zh-CN', 'en-US'],
+          defaultLanguage: data.tenantDetail?.defaultLanguage || 'zh-CN'
         }));
       }
     },
@@ -845,6 +924,15 @@ const apis = merge({}, getApis(), {
     },
     save: {
       loader: () => ({ code: 0 })
+    },
+    saveLanguages: {
+      loader: ({ data } = {}) => ({
+        code: 0,
+        data: {
+          supportLanguage: data?.supportLanguage || ['zh-CN'],
+          defaultLanguage: data?.defaultLanguage || 'zh-CN'
+        }
+      })
     },
     remove: {
       loader: () => ({ code: 0 })
