@@ -1,9 +1,16 @@
 import { useMemo } from 'react';
 import merge from 'lodash/merge';
-import DepartmentTreeFilterItem from './DepartmentTreeFilterItem';
 import getRoleListApi from '../Role/getRoleListApi';
 
-const useFilterList = ({ formatMessage, apis, InputFilterItem, SuperSelectFilterItem, multiSelectInterceptor }) => {
+const useFilterList = ({
+  formatMessage,
+  apis,
+  InputFilterItem,
+  SuperSelectFilterItem,
+  SelectTreeFilterItem,
+  multiSelectInterceptor,
+  singleSelectInterceptor
+}) => {
   return useMemo(
     () => [
       {
@@ -27,11 +34,16 @@ const useFilterList = ({ formatMessage, apis, InputFilterItem, SuperSelectFilter
         }
       },
       {
-        type: DepartmentTreeFilterItem,
+        type: SelectTreeFilterItem,
         props: {
           key: 'tenantOrgId',
           label: formatMessage({ id: 'Department' }),
           name: 'tenantOrgId',
+          single: true,
+          valueKey: 'id',
+          labelKey: 'name',
+          parentKey: 'parentId',
+          interceptor: singleSelectInterceptor,
           api: merge({}, apis.orgList, { params: apis.orgList?.params || {} })
         }
       },
@@ -71,7 +83,16 @@ const useFilterList = ({ formatMessage, apis, InputFilterItem, SuperSelectFilter
         }
       }
     ],
-    [formatMessage, apis.roleList, apis.orgList, InputFilterItem, SuperSelectFilterItem, multiSelectInterceptor]
+    [
+      formatMessage,
+      apis.roleList,
+      apis.orgList,
+      InputFilterItem,
+      SuperSelectFilterItem,
+      SelectTreeFilterItem,
+      multiSelectInterceptor,
+      singleSelectInterceptor
+    ]
   );
 };
 

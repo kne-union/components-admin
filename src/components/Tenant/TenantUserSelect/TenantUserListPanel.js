@@ -55,24 +55,36 @@ const TenantUserListPanel = createWithRemoteLoader({
     activeOrgId,
     onTotalCountChange,
     selectedCountInActiveOrg,
-    allowSelectAll = true
+    allowSelectAll = true,
+    valueKey = 'id',
+    labelKey = 'name'
   }) => {
     const [ScrollLoader] = remoteModules;
     const selectedIds = useMemo(() => getSelectedIds(value, single), [value, single]);
+
+    useEffect(() => {
+      console.log('[TenantUserSelect][list-panel]', {
+        activeOrgId,
+        valueKey,
+        selectedIds,
+        value
+      });
+    }, [activeOrgId, selectedIds, value, valueKey]);
 
     const handleSelect = item => {
       if (disabled) {
         return;
       }
-      const itemValue = mapUserToSelectedValue(item, activeOrgId);
+      const itemId = String(item?.[valueKey] ?? item?.id);
+      const itemValue = mapUserToSelectedValue(item, activeOrgId, { valueKey, labelKey });
       if (single) {
         onChange(itemValue);
         return;
       }
       const current = Array.isArray(value) ? value : [];
-      const exists = current.some(v => String(v.id) === String(item.id));
+      const exists = current.some(v => String(v.id) === String(itemId));
       onChange(
-        exists ? current.filter(v => String(v.id) !== String(item.id)) : [...current, itemValue]
+        exists ? current.filter(v => String(v.id) !== String(itemId)) : [...current, itemValue]
       );
     };
 
@@ -86,6 +98,20 @@ const TenantUserListPanel = createWithRemoteLoader({
             get(fetchApi.requestParams, [pagination.paramsType, pagination.pageSizeName]) || pagination.pageSize;
           const list = fetchApi.data?.pageData || [];
           const total = fetchApi.data?.totalCount || 0;
+
+          if (fetchApi.isComplete) {
+            console.log('[TenantUserSelect][list-data]', {
+              activeOrgId,
+              total,
+              selectedIds,
+              list: list.map(item => ({
+                id: item?.id,
+                name: item?.name,
+                tenantOrgId: item?.tenantOrgId ?? item?.tenantOrg?.id,
+                selected: selectedIds.includes(String(item?.id))
+              }))
+            });
+          }
 
           if (!fetchApi.isComplete && !list.length) {
             return <TotalCountReporter total={null} onTotalCountChange={onTotalCountChange} />;
@@ -117,6 +143,8 @@ const TenantUserListPanel = createWithRemoteLoader({
                   disabled={disabled}
                   formatMessage={formatMessage}
                   selectedCountInActiveOrg={selectedCountInActiveOrg}
+                  valueKey={valueKey}
+                  labelKey={labelKey}
                 />
               ) : null}
               <ScrollLoader
@@ -142,11 +170,13 @@ const TenantUserListPanel = createWithRemoteLoader({
                 <div className={style['user-list-scroll-inner']}>
                   <div className={style['user-list']}>
                     {list.map(item => {
-                    const selected = selectedIds.includes(String(item.id));
+                    const itemId = String(item?.[valueKey] ?? item?.id);
+                    const itemLabel = item?.[labelKey] ?? item?.name;
+                    const selected = selectedIds.includes(String(itemId));
                     const description = getUserDescription(item);
                     return (
                       <div
-                        key={item.id}
+                        key={itemId}
                         className={classnames(style['user-list-item'], {
                           [style['user-list-item-selected']]: selected,
                           [style['user-list-item-disabled']]: disabled
@@ -157,10 +187,10 @@ const TenantUserListPanel = createWithRemoteLoader({
                           <Checkbox className={style['user-list-checkbox']} checked={selected} disabled={disabled} />
                         ) : null}
                         <Avatar className={style['user-list-avatar']} src={item.avatar} size={36}>
-                          {item.name?.[0]}
+                          {itemLabel?.[0]}
                         </Avatar>
                         <Flex className={style['user-list-content']} vertical gap={2}>
-                          <div className={style['user-list-name']}>{item.name}</div>
+                          <div className={style['user-list-name']}>{itemLabel}</div>
                           {description ? <div className={style['user-list-desc']}>{description}</div> : null}
                         </Flex>
                         {single && selected ? <CheckOutlined className={style['user-list-check']} /> : null}

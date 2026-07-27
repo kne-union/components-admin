@@ -7,7 +7,9 @@ import style from './style.module.scss';
 export const usePlatformShell = platform => {
   const { formatMessage } = useIntl();
   const title = SOURCE_LABEL_MAP[platform] || formatMessage({ id: 'ThirdLogin' });
-  const logo = SOURCE_ICON_MAP[platform] ? getSourceIcon(platform) : null;
+  const icon = SOURCE_ICON_MAP[platform];
+  // LoginOuterContainer 支持 string URL 或 ReactNode
+  const logo = !icon ? null : typeof icon === 'string' ? icon : getSourceIcon(platform);
   return { formatMessage, title, logo };
 };
 

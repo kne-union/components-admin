@@ -41,9 +41,10 @@ const UserList = createWithRemoteLoader({
         useUrlFilter,
         createUrlFilterReader,
         multiSelectInterceptor,
+        singleSelectInterceptor,
         fields: filterFields
       } = Filter;
-      const { InputFilterItem, SuperSelectFilterItem } = filterFields;
+      const { InputFilterItem, SuperSelectFilterItem, SelectTreeFilterItem } = filterFields;
       const { plugins } = usePreset();
 
       const selectedRow = useSelectedRow();
@@ -132,7 +133,9 @@ const UserList = createWithRemoteLoader({
         apis,
         InputFilterItem,
         SuperSelectFilterItem,
-        multiSelectInterceptor
+        SelectTreeFilterItem,
+        multiSelectInterceptor,
+        singleSelectInterceptor
       });
       const columns = useColumns({ formatMessage, apis, plugins });
 

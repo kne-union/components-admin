@@ -8,7 +8,7 @@ import withLocale from '../../withLocale';
 import getUserOrgDisplayItems from '../getUserOrgDisplayItems';
 import buildRolesTitle from '../../Role/buildRolesTitle';
 import style from './style.module.scss';
-import { getSourceIcon, SOURCE_LABEL_MAP } from '../../constants';
+import { getSourceIcon, SOURCE_LABEL_MAP, SOURCE_TAG_CLASS } from '../../constants';
 
 /** 副标题单行省略，悬停展示完整内容 */
 const renderEllipsisTitle = text => {
@@ -77,7 +77,7 @@ const buildPersonalCardProps = (data, context = {}) => {
   moreInfo = applyPlugins(moreInfo, data, { formatMessage, plugins });
 
   const sourceTag = data?.syncSource ? (
-    <Tag icon={getSourceIcon(data.syncSource)} color="processing" style={{ marginLeft: 6, verticalAlign: 'middle' }}>
+    <Tag className={SOURCE_TAG_CLASS} icon={getSourceIcon(data.syncSource)} color="processing" style={{ marginLeft: 6, verticalAlign: 'middle' }}>
       {SOURCE_LABEL_MAP[data.syncSource] || data.syncSource}
     </Tag>
   ) : null;

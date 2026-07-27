@@ -57,6 +57,12 @@ const OrgInner = createWithRemoteLoader({
                             reload();
                           }
                         } : null}
+                        thirdLoginSettingProps={{
+                          envArgs: global.tenant?.tenantSetting?.args || [],
+                          onChange: () => {
+                            reloadLinkConfig();
+                          }
+                        }}
                         onViewUsers={
                           allowViewUsers
                             ? org => {
@@ -76,7 +82,10 @@ const OrgInner = createWithRemoteLoader({
                           orgLinkConfig: Object.assign({}, apis.tenant.orgLinkConfig),
                           orgLinkSave: Object.assign({}, apis.tenant.orgLinkSave),
                           orgLinkSync: Object.assign({}, apis.tenant.orgLinkSync),
-                          orgLinkCancel: Object.assign({}, apis.tenant.orgLinkCancel)
+                          orgLinkCancel: Object.assign({}, apis.tenant.orgLinkCancel),
+                          thirdLoginConfig: Object.assign({}, apis.tenant.thirdLoginConfig),
+                          thirdLoginConfigSave: Object.assign({}, apis.tenant.thirdLoginConfigSave),
+                          thirdLoginConfigCancel: Object.assign({}, apis.tenant.thirdLoginConfigCancel)
                         }}
                       />
                     </Flex>

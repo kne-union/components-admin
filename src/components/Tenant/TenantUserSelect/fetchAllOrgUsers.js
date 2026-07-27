@@ -1,9 +1,9 @@
 import { resolveUserOrgId } from './resolveUserOrgId';
 import fetchUserList from './fetchUserList';
 
-export const mapUserToSelectedValue = (item, activeOrgId) => ({
-  id: item.id,
-  name: item.name,
+export const mapUserToSelectedValue = (item, activeOrgId, { valueKey = 'id', labelKey = 'name' } = {}) => ({
+  id: item?.[valueKey] ?? item?.id,
+  name: item?.[labelKey] ?? item?.name,
   tenantOrgId: resolveUserOrgId(item, activeOrgId)
 });
 

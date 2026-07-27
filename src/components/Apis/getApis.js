@@ -259,6 +259,26 @@ const getApis = options => {
         url: `${prefix}/tenant/admin/org-link-sync`,
         method: 'POST'
       },
+      thirdLoginConfig: {
+        url: `${prefix}/tenant/admin/third-login-config`,
+        method: 'GET'
+      },
+      thirdLoginConfigSave: {
+        url: `${prefix}/tenant/admin/third-login-config-save`,
+        method: 'POST'
+      },
+      thirdLoginConfigCancel: {
+        url: `${prefix}/tenant/admin/third-login-config-cancel`,
+        method: 'POST'
+      },
+      thirdLoginBindToken: {
+        url: `${prefix}/tenant/admin/third-login-bind-token`,
+        method: 'POST'
+      },
+      thirdLoginUnbind: {
+        url: `${prefix}/tenant/admin/third-login-unbind`,
+        method: 'POST'
+      },
 
       userList: {
         url: `${prefix}/tenant/admin/user-list`,
@@ -460,8 +480,32 @@ const getApis = options => {
         url: `${prefix}/tenant/org-link-sync`,
         method: 'POST'
       },
+      thirdLoginConfig: {
+        url: `${prefix}/tenant/third-login-config`,
+        method: 'GET'
+      },
+      thirdLoginConfigSave: {
+        url: `${prefix}/tenant/third-login-config-save`,
+        method: 'POST'
+      },
+      thirdLoginConfigCancel: {
+        url: `${prefix}/tenant/third-login-config-cancel`,
+        method: 'POST'
+      },
+      thirdLoginBindToken: {
+        url: `${prefix}/tenant/third-login-bind-token`,
+        method: 'POST'
+      },
+      thirdLoginUnbind: {
+        url: `${prefix}/tenant/third-login-unbind`,
+        method: 'POST'
+      },
       userList: {
         url: `${prefix}/tenant/user-list`,
+        method: 'GET'
+      },
+      userListByDataPermission: {
+        url: `${prefix}/tenant/user-list-by-data-permission`,
         method: 'GET'
       },
       userCreate: {

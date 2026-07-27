@@ -43,7 +43,10 @@ const User = createWithRemoteLoader({
               inviteToken: allowInvite && Object.assign({}, apis.tenant.userInviteToken),
               userInviteMessage: Object.assign({}, apis.tenant.userInviteMessage),
               sendOrgMessage: Object.assign({}, apis.tenant.sendOrgMessage),
-              roleList: Object.assign({}, apis.tenant.role.list)
+              roleList: Object.assign({}, apis.tenant.role.list),
+              thirdLoginConfig: Object.assign({}, apis.tenant.thirdLoginConfig),
+              thirdLoginBindToken: allowSave && Object.assign({}, apis.tenant.thirdLoginBindToken),
+              thirdLoginUnbind: allowSave && Object.assign({}, apis.tenant.thirdLoginUnbind)
             },
             extraApis
           )}>
