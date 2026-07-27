@@ -3,7 +3,7 @@ import fetchUserList from './fetchUserList';
 
 const findOrgName = (orgList, orgId) => orgList.find(item => String(item.id) === String(orgId))?.name || '';
 
-const resolveInitialSelection = async ({ selected, orgList, userApi }) => {
+const resolveInitialSelection = async ({ selected, orgList, userApi, valueKey = 'id' }) => {
   if (!selected?.length) {
     return null;
   }
@@ -16,7 +16,7 @@ const resolveInitialSelection = async ({ selected, orgList, userApi }) => {
       perPage: 1000,
       currentPage: 1
     });
-    const userById = new Map(users.map(user => [String(user.id), user]));
+    const userById = new Map(users.map(user => [String(user?.[valueKey] ?? user?.id), user]));
 
     enriched.forEach(item => {
       if (item.tenantOrgId != null) {

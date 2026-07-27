@@ -3,8 +3,17 @@ import Edit from './Edit';
 import SetStatus from './SetStatus';
 import Invite from './Invite';
 import Remove from './Remove';
+import BindThirdLogin from './BindThirdLogin';
 import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
+
+const getBoundBinding = data => {
+  const binding = data?.options?.thirdLogin;
+  if (binding?.platform && binding?.sourceId) {
+    return binding;
+  }
+  return null;
+};
 
 const Actions = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
@@ -12,6 +21,7 @@ const Actions = createWithRemoteLoader({
   withLocale(({ remoteModules, moreType, children, itemClassName, ...props }) => {
     const [ButtonGroup] = remoteModules;
     const { formatMessage } = useIntl();
+    const bound = getBoundBinding(props.data);
     const actionList = [
       {
         ...props,
@@ -24,6 +34,12 @@ const Actions = createWithRemoteLoader({
         children: formatMessage({ id: 'InviteUser' }),
         buttonComponent: Invite,
         hidden: props.data?.userId
+      },
+      {
+        ...props,
+        children: bound ? formatMessage({ id: 'ThirdLoginUnbind' }) : formatMessage({ id: 'ThirdLoginBind' }),
+        buttonComponent: BindThirdLogin,
+        hidden: !props.apis.thirdLoginBindToken || !props.apis.thirdLoginConfig
       },
       {
         ...props,

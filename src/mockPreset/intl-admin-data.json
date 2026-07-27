@@ -143,7 +143,7 @@
     "pageData": [
       {
         "id": 1,
-        "namespace": "components-admin:User",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "AddUser",
         "target": "添加用户",
@@ -152,7 +152,7 @@
       },
       {
         "id": 2,
-        "namespace": "components-admin:User",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "AddUser",
         "target": "Add User",
@@ -161,7 +161,7 @@
       },
       {
         "id": 3,
-        "namespace": "components-admin:User",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "EditUser",
         "target": "编辑用户",
@@ -170,7 +170,7 @@
       },
       {
         "id": 4,
-        "namespace": "components-admin:User",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "EditUser",
         "target": "Edit User",
@@ -179,7 +179,7 @@
       },
       {
         "id": 5,
-        "namespace": "components-admin:Role",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "RoleName",
         "target": "角色名称",
@@ -188,7 +188,7 @@
       },
       {
         "id": 6,
-        "namespace": "components-admin:Role",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "RoleName",
         "target": "Role Name",
@@ -197,7 +197,7 @@
       },
       {
         "id": 7,
-        "namespace": "components-admin:Signature",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "AddSecretKey",
         "target": "添加密钥",
@@ -206,7 +206,7 @@
       },
       {
         "id": 8,
-        "namespace": "components-admin:Signature",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "AddSecretKey",
         "target": "Add Secret Key",
@@ -215,7 +215,7 @@
       },
       {
         "id": 9,
-        "namespace": "components-admin:Webhook",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "Name",
         "target": "名称",
@@ -224,7 +224,7 @@
       },
       {
         "id": 10,
-        "namespace": "components-admin:Webhook",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "Name",
         "target": "Name",
@@ -233,7 +233,7 @@
       },
       {
         "id": 11,
-        "namespace": "components-admin:Task",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "Title",
         "target": "标题",
@@ -242,7 +242,7 @@
       },
       {
         "id": 12,
-        "namespace": "components-admin:Task",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "Title",
         "target": "Title",
@@ -251,7 +251,7 @@
       },
       {
         "id": 13,
-        "namespace": "components-admin:Message",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "Send",
         "target": "发送",
@@ -260,7 +260,7 @@
       },
       {
         "id": 14,
-        "namespace": "components-admin:Message",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "Send",
         "target": "Send",
@@ -269,7 +269,7 @@
       },
       {
         "id": 15,
-        "namespace": "components-admin:Tenant",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "TenantName",
         "target": "租户名称",
@@ -278,7 +278,7 @@
       },
       {
         "id": 16,
-        "namespace": "components-admin:Tenant",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "TenantName",
         "target": "Tenant Name",
@@ -287,7 +287,7 @@
       },
       {
         "id": 17,
-        "namespace": "components-admin:Admin",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "Login",
         "target": "登录",
@@ -296,7 +296,7 @@
       },
       {
         "id": 18,
-        "namespace": "components-admin:Admin",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "Login",
         "target": "Login",
@@ -305,7 +305,7 @@
       },
       {
         "id": 19,
-        "namespace": "components-admin:Filter",
+        "namespace": "components-admin",
         "locale": "zh-CN",
         "code": "Keyword",
         "target": "关键字",
@@ -314,7 +314,7 @@
       },
       {
         "id": 20,
-        "namespace": "components-admin:Filter",
+        "namespace": "components-admin",
         "locale": "en-US",
         "code": "Keyword",
         "target": "Keyword",

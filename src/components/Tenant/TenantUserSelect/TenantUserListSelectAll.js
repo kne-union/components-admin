@@ -33,7 +33,9 @@ const TenantUserListSelectAllContainer = ({
   onChange,
   disabled,
   formatMessage,
-  selectedCountInActiveOrg
+  selectedCountInActiveOrg,
+  valueKey = 'id',
+  labelKey = 'name'
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -58,14 +60,14 @@ const TenantUserListSelectAllContainer = ({
     setLoading(true);
     try {
       const allUsers = await fetchAllOrgUsers(api, total);
-      const currentOrgIds = new Set(allUsers.map(item => String(item.id)));
+      const currentOrgIds = new Set(allUsers.map(item => String(item?.[valueKey] ?? item?.id)));
       if (!checked) {
         onChange(current.filter(item => !currentOrgIds.has(String(item.id))));
         return;
       }
       const merged = [...current];
       allUsers.forEach(item => {
-        const nextValue = mapUserToSelectedValue(item, activeOrgId);
+        const nextValue = mapUserToSelectedValue(item, activeOrgId, { valueKey, labelKey });
         if (!merged.some(existing => String(existing.id) === String(nextValue.id))) {
           merged.push(nextValue);
         }

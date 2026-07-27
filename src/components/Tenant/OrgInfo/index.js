@@ -15,13 +15,15 @@ import {
   TeamOutlined,
   UserOutlined,
   EditOutlined,
-  LinkOutlined
+  LinkOutlined,
+  LoginOutlined
 } from '@ant-design/icons';
 import FormInner from './FormInner';
 import LeaderFormInner from './LeaderFormInner';
 import { normalizeLeaderUserIdForSubmit } from './normalizeLeaderUserIdForSubmit';
 import OrgNodeUserCount from './OrgNodeUserCount';
 import OrgLinkSetting from './OrgLinkSetting';
+import ThirdLoginSetting from './ThirdLoginSetting';
 import { buildImportPreviewGroups, downloadOrgImportTemplate, parseOrgImportExcelFile, prepareImportRowsForSubmit } from './orgImportTemplate';
 import ImportAnchorOrgSelect from './ImportAnchorOrgSelect';
 import withLocale from '../withLocale';
@@ -29,7 +31,8 @@ import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 import '@kne/react-org-chart/dist/index.css';
 
-import { getSourceIcon, SOURCE_LABEL_MAP } from '../constants';
+import { getSourceIcon, SOURCE_LABEL_MAP, SOURCE_TAG_CLASS } from '../constants';
+import classnames from 'classnames';
 
 /** SuperSelect object-output-value 回显需 { id, name }，不能只传 id 字符串 */
 const mapOrgToFormData = org => {
@@ -53,7 +56,7 @@ const OrgSourceTag = ({ source }) => {
   const label = SOURCE_LABEL_MAP[source] || source;
   return (
     <Tooltip title={formatMessage({ id: 'OrgSourceFrom' }, { source: label })}>
-      <Tag className={style['org-source-tag']} icon={getSourceIcon(source)} color="processing">
+      <Tag className={classnames(style['org-source-tag'], SOURCE_TAG_CLASS)} icon={getSourceIcon(source)} color="processing">
         {label}
       </Tag>
     </Tooltip>
@@ -520,7 +523,7 @@ const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers, linkedSource, isMobi
 
 const OrgInfo = createWithRemoteLoader({
   modules: ['components-core:StateBar', 'components-core:Global@usePreset', 'components-core:Drawer@useDrawer']
-})(({ remoteModules, data, companyName, apis, onSuccess, tenantId, onViewUsers, linkedSource, linkSettingProps }) => {
+})(({ remoteModules, data, companyName, apis, onSuccess, tenantId, onViewUsers, linkedSource, linkSettingProps, thirdLoginSettingProps }) => {
   const [StateBar, usePreset, useDrawer] = remoteModules;
   const { ajax } = usePreset();
   const drawer = useDrawer();
@@ -825,6 +828,29 @@ const OrgInfo = createWithRemoteLoader({
                 });
               }}>
               {linkedSource ? `${SOURCE_LABEL_MAP[linkedSource] || linkedSource}` : formatMessage({ id: 'OrgLinkTitle' })}
+            </Button>
+          ) : null}
+          {thirdLoginSettingProps ? (
+            <Button
+              size="small"
+              icon={<LoginOutlined />}
+              onClick={() => {
+                drawer({
+                  title: formatMessage({ id: 'ThirdLoginConfigTitle' }),
+                  width: 480,
+                  footer: null,
+                  children: (
+                    <ThirdLoginSetting
+                      apis={apis}
+                      envArgs={thirdLoginSettingProps.envArgs}
+                      onSuccess={() => {
+                        thirdLoginSettingProps.onChange && thirdLoginSettingProps.onChange();
+                      }}
+                    />
+                  )
+                });
+              }}>
+              {formatMessage({ id: 'ThirdLoginConfigTitle' })}
             </Button>
           ) : null}
           {apis.import ? (

@@ -9,7 +9,7 @@
   margin: 0 auto;
   border-radius: 12px;
   --out-inner-height: calc(var(--kne-viewport-height) * 0.9);
-  --max-height: calc(var(--kne-viewport-height) * 0.9);
+  --max-height: 640px;
 }
 
 .top-banner {

@@ -46,7 +46,9 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
     allowSelectAll,
     SimpleBar,
     initialSelectedMeta,
-    height
+    height,
+    valueKey,
+    labelKey
   } = ctx;
   const containerStyle = useMemo(() => {
     if (height == null || height === '') {
@@ -90,11 +92,88 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
     });
   }, [orgId, userApi, userStatus]);
 
-  const selectedList = useMemo(() => normalizeSelectedList(value, single), [value, single]);
-  const effectiveSelectedList = useMemo(
-    () => applySelectedOrgIds(selectedList, orgIdByUserId),
-    [orgIdByUserId, selectedList]
+  const normalizedValue = useMemo(() => {
+    if (!value) {
+      return value;
+    }
+    if (single) {
+      if (value && typeof value === 'object') {
+        return Object.assign({}, value, {
+          id: value.id ?? value?.[valueKey],
+          name: value.name ?? value?.[labelKey]
+        });
+      }
+      return value;
+    }
+    if (Array.isArray(value)) {
+      return value.map(item => {
+        if (!item || typeof item !== 'object') {
+          if (typeof item === 'string' || typeof item === 'number') {
+            return { id: String(item), name: '' };
+          }
+          return item;
+        }
+        return Object.assign({}, item, {
+          id: item.id ?? item?.[valueKey],
+          name: item.name ?? item?.[labelKey]
+        });
+      });
+    }
+    return value;
+  }, [value, single, valueKey, labelKey]);
+
+  const normalizedInitialSelectedMeta = useMemo(() => {
+    if (!Array.isArray(initialSelectedMeta)) {
+      return initialSelectedMeta;
+    }
+    return initialSelectedMeta.map(item => {
+      if (!item || typeof item !== 'object') {
+        return item;
+      }
+      return Object.assign({}, item, {
+        id: item.id ?? item?.[valueKey],
+        name: item.name ?? item?.[labelKey]
+      });
+    });
+  }, [initialSelectedMeta, valueKey, labelKey]);
+
+  const selectedList = useMemo(() => normalizeSelectedList(normalizedValue, single), [normalizedValue, single]);
+  const initialSelectedList = useMemo(
+    () => normalizeSelectedList(single ? normalizedInitialSelectedMeta?.[0] : normalizedInitialSelectedMeta, single),
+    [normalizedInitialSelectedMeta, single]
   );
+  const effectiveValue = useMemo(() => {
+    if (selectedList.length > 0) {
+      return normalizedValue;
+    }
+    if (initialSelectedList.length === 0) {
+      return normalizedValue;
+    }
+    return single ? initialSelectedList[0] : initialSelectedList;
+  }, [initialSelectedList, normalizedValue, selectedList, single]);
+  const effectiveSelectedListForDisplay = useMemo(
+    () => (selectedList.length > 0 ? selectedList : initialSelectedList),
+    [initialSelectedList, selectedList]
+  );
+  const effectiveSelectedList = useMemo(
+    () => applySelectedOrgIds(effectiveSelectedListForDisplay, orgIdByUserId),
+    [effectiveSelectedListForDisplay, orgIdByUserId]
+  );
+
+  useEffect(() => {
+    console.log('[TenantUserSelect][field]', {
+      valueKey,
+      labelKey,
+      orgId,
+      orgName,
+      value,
+      selectedList,
+      initialSelectedMeta,
+      effectiveValue,
+      effectiveSelectedList,
+      orgIdByUserId
+    });
+  }, [effectiveSelectedList, effectiveValue, initialSelectedMeta, labelKey, orgId, orgIdByUserId, orgName, selectedList, value, valueKey]);
 
   const handleChange = useCallback(
     next => {
@@ -121,11 +200,18 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
   );
 
   useEffect(() => {
-    if (!initialSelectedMeta?.length) {
+    if (!normalizedInitialSelectedMeta?.length) {
       return;
     }
-    setOrgIdByUserId(prev => mergeSelectedOrgIds(prev, initialSelectedMeta));
-  }, [initialSelectedMeta]);
+    setOrgIdByUserId(prev => mergeSelectedOrgIds(prev, normalizedInitialSelectedMeta));
+  }, [normalizedInitialSelectedMeta]);
+
+  useEffect(() => {
+    if (selectedList.length > 0 || initialSelectedList.length === 0) {
+      return;
+    }
+    onChange(single ? initialSelectedList[0] : initialSelectedList);
+  }, [initialSelectedList, onChange, selectedList, single]);
 
   useEffect(() => {
     setOrgIdByUserId(prev => mergeSelectedOrgIds(prev, selectedList));
@@ -139,16 +225,16 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
   }, [effectiveSelectedList, orgId, orgList]);
 
   useEffect(() => {
-    if (orgId || !orgList.length || !selectedList.length) {
-      if (!selectedList.length) {
+    if (orgId || !orgList.length || !effectiveSelectedListForDisplay.length) {
+      if (!effectiveSelectedListForDisplay.length) {
         initialOrgKeyRef.current = null;
       }
       return undefined;
     }
 
     const key = single
-      ? String(value?.id)
-      : selectedList
+      ? String(effectiveValue?.id)
+      : effectiveSelectedListForDisplay
           .map(item => item.id)
           .sort()
           .join(',');
@@ -160,10 +246,16 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
     let cancelled = false;
 
     resolveInitialSelection({
-      selected: applySelectedOrgIds(selectedList, mergeSelectedOrgIds({}, initialSelectedMeta || [])),
+      selected: applySelectedOrgIds(effectiveSelectedListForDisplay, mergeSelectedOrgIds({}, normalizedInitialSelectedMeta || [])),
       orgList,
-      userApi
+      userApi,
+      valueKey
     }).then(result => {
+      console.log('[TenantUserSelect][resolveInitialSelection]', {
+        selected: effectiveSelectedListForDisplay,
+        orgListCount: orgList.length,
+        result
+      });
       if (cancelled || !result?.orgId) {
         return;
       }
@@ -173,14 +265,14 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
       setOrgName(result.orgName);
       setOrgIdByUserId(prev => mergeSelectedOrgIds(prev, result.enrichedSelected));
 
-      if (single && value && value.id != null && value.tenantOrgId == null) {
-        handleChange(Object.assign({}, value, { tenantOrgId: result.orgId }));
+      if (single && effectiveValue && effectiveValue.id != null && effectiveValue.tenantOrgId == null) {
+        handleChange(Object.assign({}, effectiveValue, { tenantOrgId: result.orgId }));
         return;
       }
 
-      if (!single && Array.isArray(value) && Array.isArray(result.enrichedSelected)) {
+      if (!single && Array.isArray(effectiveValue) && Array.isArray(result.enrichedSelected)) {
         const enriched = result.enrichedSelected;
-        if (enriched.some((item, index) => item.tenantOrgId !== value[index]?.tenantOrgId)) {
+        if (enriched.some((item, index) => item.tenantOrgId !== effectiveValue[index]?.tenantOrgId)) {
           handleChange(enriched);
         }
       }
@@ -189,7 +281,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
     return () => {
       cancelled = true;
     };
-  }, [handleChange, initialSelectedMeta, orgId, orgList, selectedList, single, userApi, value]);
+  }, [effectiveSelectedListForDisplay, effectiveValue, handleChange, normalizedInitialSelectedMeta, orgId, orgList, single, userApi, valueKey]);
 
   return (
     <div className={style.shell}>
@@ -281,12 +373,14 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
               activeOrgId={orgId}
               single={single}
               disabled={disabled}
-              value={value}
+              value={effectiveValue}
               onChange={handleChange}
               formatMessage={formatMessage}
               onTotalCountChange={setOrgUserTotal}
               selectedCountInActiveOrg={selectedCountInActiveOrg}
               allowSelectAll={allowSelectAll}
+              valueKey={valueKey}
+              labelKey={labelKey}
             />
           ) : (
             <div className={style['user-placeholder']}>
@@ -299,7 +393,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
         </div>
         {showSelectedFooter ? (
           <TenantUserSelectedFooter
-            value={value}
+            value={effectiveValue}
             onChange={handleChange}
             single={single}
             disabled={disabled}
@@ -315,7 +409,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
 const OrgTenantUserField = createWithRemoteLoader({
   modules: ['components-core:FormInfo@hooks', 'components-core:Common@SimpleBar']
 })(
-  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height, ...props }) => {
+  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', ...props }) => {
     const [hooks, SimpleBar] = remoteModules;
     const { useDecorator } = hooks;
     const { formatMessage } = useIntl();
@@ -330,7 +424,9 @@ const OrgTenantUserField = createWithRemoteLoader({
       'showSelectedFooter',
       'allowSelectAll',
       'initialSelectedMeta',
-      'height'
+      'height',
+      'valueKey',
+      'labelKey'
     ]);
     const render = useDecorator(
       merge(
@@ -354,9 +450,11 @@ const OrgTenantUserField = createWithRemoteLoader({
         allowSelectAll,
         initialSelectedMeta,
         height,
+        valueKey,
+        labelKey,
         SimpleBar
       }),
-      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, SimpleBar]
+      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey, labelKey, SimpleBar]
     );
 
     return (

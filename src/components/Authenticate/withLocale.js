@@ -8,7 +8,7 @@ const withLocale = createWithIntlProvider({
     'zh-CN': zhCN,
     'en-US': enUS
   },
-  namespace: 'components-admin:Authenticate'
+  namespace: 'components-admin'
 });
 
 export default withLocale;

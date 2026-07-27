@@ -60,7 +60,7 @@
 ```javascript
 {
   id: number,
-  namespace: string,       // 命名空间（如：components-admin:User）
+  namespace: string,       // 命名空间（如：components-admin）
   locale: string,          // 语言（如：zh-CN）
   code: string,            // 编码（如：AddUser）
   target: string,          // 目标值（翻译文本）

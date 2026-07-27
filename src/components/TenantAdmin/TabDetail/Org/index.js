@@ -42,6 +42,10 @@ const Org = createWithRemoteLoader({
                       envArgs: tenant.tenantSetting?.args || [],
                       onLinkChange: reloadLinkConfig
                     } : null}
+                    thirdLoginSettingProps={{
+                      envArgs: tenant.tenantSetting?.args || [],
+                      onChange: reloadLinkConfig
+                    }}
                     onViewUsers={org => {
                       const next = new URLSearchParams(searchParams);
                       next.set('tab', 'user');
@@ -81,6 +85,15 @@ const Org = createWithRemoteLoader({
                         data: { tenantId: tenant.id }
                       }),
                       orgLinkCancel: Object.assign({}, apis.tenantAdmin.orgLinkCancel, {
+                        data: { tenantId: tenant.id }
+                      }),
+                      thirdLoginConfig: Object.assign({}, apis.tenantAdmin.thirdLoginConfig, {
+                        params: { tenantId: tenant.id }
+                      }),
+                      thirdLoginConfigSave: Object.assign({}, apis.tenantAdmin.thirdLoginConfigSave, {
+                        data: { tenantId: tenant.id }
+                      }),
+                      thirdLoginConfigCancel: Object.assign({}, apis.tenantAdmin.thirdLoginConfigCancel, {
                         data: { tenantId: tenant.id }
                       })
                     }}

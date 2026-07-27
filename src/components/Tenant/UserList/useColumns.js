@@ -3,8 +3,7 @@ import get from 'lodash/get';
 import { Tag } from 'antd';
 import UserOrgTags from './UserOrgTags';
 import buildRolesTitle from '../Role/buildRolesTitle';
-
-import { getSourceIcon, SOURCE_LABEL_MAP } from '../constants';
+import { getSourceIcon, SOURCE_LABEL_MAP, SOURCE_TAG_CLASS } from '../constants';
 
 const getColumns = ({ formatMessage }) => {
   return [
@@ -54,7 +53,7 @@ const getColumns = ({ formatMessage }) => {
         }
         const label = SOURCE_LABEL_MAP[item.syncSource] || item.syncSource;
         return (
-          <Tag icon={getSourceIcon(item.syncSource)} color="processing">
+          <Tag className={SOURCE_TAG_CLASS} icon={getSourceIcon(item.syncSource)} color="processing">
             {label}
           </Tag>
         );
