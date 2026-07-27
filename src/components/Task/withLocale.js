@@ -8,7 +8,7 @@ const withLocale = createWithIntlProvider({
     'zh-CN': zhCN,
     'en-US': enUS
   },
-  namespace: 'components-admin:Task'
+  namespace: 'components-admin'
 });
 
 export const createFormatMessage = locale => {
@@ -18,7 +18,7 @@ export const createFormatMessage = locale => {
       'zh-CN': zhCN,
       'en-US': enUS
     },
-    namespace: 'components-admin:Task'
+    namespace: 'components-admin'
   });
   return formatMessage;
 };
