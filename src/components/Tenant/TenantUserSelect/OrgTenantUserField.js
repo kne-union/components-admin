@@ -44,7 +44,6 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
     single,
     showSelectedFooter,
     allowSelectAll,
-    SimpleBar,
     initialSelectedMeta,
     height,
     valueKey,
@@ -160,21 +159,6 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
     [effectiveSelectedListForDisplay, orgIdByUserId]
   );
 
-  useEffect(() => {
-    console.log('[TenantUserSelect][field]', {
-      valueKey,
-      labelKey,
-      orgId,
-      orgName,
-      value,
-      selectedList,
-      initialSelectedMeta,
-      effectiveValue,
-      effectiveSelectedList,
-      orgIdByUserId
-    });
-  }, [effectiveSelectedList, effectiveValue, initialSelectedMeta, labelKey, orgId, orgIdByUserId, orgName, selectedList, value, valueKey]);
-
   const handleChange = useCallback(
     next => {
       if (!single && Array.isArray(next)) {
@@ -251,11 +235,6 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
       userApi,
       valueKey
     }).then(result => {
-      console.log('[TenantUserSelect][resolveInitialSelection]', {
-        selected: effectiveSelectedListForDisplay,
-        orgListCount: orgList.length,
-        result
-      });
       if (cancelled || !result?.orgId) {
         return;
       }
@@ -312,7 +291,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
                         description={formatMessage({ id: 'TenantUserSelectEmptyOrg' })}
                       />
                     ) : (
-                      <SimpleBar className={`${style['panel-scroller']} ${style['org-panel-scroller']}`}>
+                      <div className={`${style['panel-scroller']} ${style['org-panel-scroller']}`}>
                         <Tree
                           className={style['org-tree']}
                           blockNode
@@ -320,13 +299,22 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
                           selectedKeys={orgId ? [orgId] : []}
                           fieldNames={{ title: 'name', key: 'id', children: 'children' }}
                           treeData={treeData}
-                          titleRender={node => (
-                            <OrgTreeNodeTitle
-                              name={node.name}
-                              selectedCount={orgSelectedCounts.get(String(node.id)) || 0}
-                              single={single}
-                            />
-                          )}
+                          titleRender={node => {
+                            let userCount = Number(node.userCount) || 0;
+                            if (showOrgRoot && String(node.id) === String(orgTreeOptions.rootId)) {
+                              userCount = list
+                                .filter(item => item.parentId == null || item.parentId === '')
+                                .reduce((sum, item) => sum + (Number(item.userCount) || 0), 0);
+                            }
+                            return (
+                              <OrgTreeNodeTitle
+                                name={node.name}
+                                userCount={userCount}
+                                selectedCount={orgSelectedCounts.get(String(node.id)) || 0}
+                                active={orgId != null && String(node.id) === String(orgId)}
+                              />
+                            );
+                          }}
                           onSelect={(keys, { node }) => {
                             const next = keys[0] != null ? String(keys[0]) : null;
                             if (!next || next === 'root' || next === orgId) {
@@ -340,7 +328,7 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
                             }
                           }}
                         />
-                      </SimpleBar>
+                      </div>
                     )}
                   </div>
                 );
@@ -407,10 +395,10 @@ const TenantUserSelectFieldControl = ({ value, onChange, disabled }) => {
 };
 
 const OrgTenantUserField = createWithRemoteLoader({
-  modules: ['components-core:FormInfo@hooks', 'components-core:Common@SimpleBar']
+  modules: ['components-core:FormInfo@hooks']
 })(
   withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', ...props }) => {
-    const [hooks, SimpleBar] = remoteModules;
+    const [hooks] = remoteModules;
     const { useDecorator } = hooks;
     const { formatMessage } = useIntl();
     const fieldProps = omit(props, [
@@ -451,10 +439,9 @@ const OrgTenantUserField = createWithRemoteLoader({
         initialSelectedMeta,
         height,
         valueKey,
-        labelKey,
-        SimpleBar
+        labelKey
       }),
-      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey, labelKey, SimpleBar]
+      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey, labelKey]
     );
 
     return (
