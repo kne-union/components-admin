@@ -62,15 +62,6 @@ const TenantUserListPanel = createWithRemoteLoader({
     const [ScrollLoader] = remoteModules;
     const selectedIds = useMemo(() => getSelectedIds(value, single), [value, single]);
 
-    useEffect(() => {
-      console.log('[TenantUserSelect][list-panel]', {
-        activeOrgId,
-        valueKey,
-        selectedIds,
-        value
-      });
-    }, [activeOrgId, selectedIds, value, valueKey]);
-
     const handleSelect = item => {
       if (disabled) {
         return;
@@ -98,20 +89,6 @@ const TenantUserListPanel = createWithRemoteLoader({
             get(fetchApi.requestParams, [pagination.paramsType, pagination.pageSizeName]) || pagination.pageSize;
           const list = fetchApi.data?.pageData || [];
           const total = fetchApi.data?.totalCount || 0;
-
-          if (fetchApi.isComplete) {
-            console.log('[TenantUserSelect][list-data]', {
-              activeOrgId,
-              total,
-              selectedIds,
-              list: list.map(item => ({
-                id: item?.id,
-                name: item?.name,
-                tenantOrgId: item?.tenantOrgId ?? item?.tenantOrg?.id,
-                selected: selectedIds.includes(String(item?.id))
-              }))
-            });
-          }
 
           if (!fetchApi.isComplete && !list.length) {
             return <TotalCountReporter total={null} onTotalCountChange={onTotalCountChange} />;
