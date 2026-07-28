@@ -4,7 +4,7 @@ const locale = {
   LangTypeBiz: '语言种类',
   LangLibBiz: '语言词条',
 
-  Name: '名称',
+  LangTypeName: '名称',
   Code: '编码',
   Sort: '排序',
   MoveUp: '上移',

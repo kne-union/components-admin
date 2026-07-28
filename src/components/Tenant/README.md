@@ -2,7 +2,7 @@
 
 ### 概述
 
-租户管理系统组件，提供公司信息管理、组织架构管理、用户管理、角色权限管理等完整的租户管理功能。子组件 `TenantUserSelect` 支持按组织树筛选并选择租户成员，适用于负责人指定、协作成员选择等表单场景。
+租户管理系统组件，提供公司信息管理、组织架构管理、用户管理、角色权限管理等完整的租户管理功能。子组件 `TenantUserSelect` 支持按组织树筛选并选择租户成员；默认双栏面板，另提供 `TenantUserSelect.Input`（SelectInput 下拉/弹窗）及对应 `.Field` 纯控件。
 
 
 ### 示例(全屏)
@@ -904,6 +904,151 @@ render(<TenantUserSelectLargeDataExample />);
 
 ```
 
+- 按组织选择成员（下拉 SelectInput）
+- TenantUserSelect.Input 基于 @kne/super-select SelectInput，isPopup 下拉展开组织+成员面板
+- _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader)
+
+```jsx
+const { TenantUserSelect } = _Tenant;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+
+const TenantUserSelectInputPopupExample = createWithRemoteLoader({
+  modules: ['components-core:FormInfo', 'components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [FormInfo, PureGlobal] = remoteModules;
+  const { Form, SubmitButton, CancelButton } = FormInfo;
+  const { Input } = FormInfo.fields;
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Form
+        onSubmit={data => {
+          console.log('提交数据:', data);
+        }}>
+        <FormInfo
+          title="下拉选择负责人（SelectInput isPopup）"
+          column={1}
+          list={[<Input name="projectName" label="项目名称" rule="REQ" placeholder="例如：Q2 产品迭代" />]}
+        />
+        <TenantUserSelect.Input
+          name="owner"
+          label="项目负责人"
+          rule="REQ"
+          isPopup
+          companyName="科技创新有限公司"
+        />
+        <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <CancelButton style={{ marginRight: 8 }}>取消</CancelButton>
+          <SubmitButton type="primary">提交</SubmitButton>
+        </div>
+      </Form>
+    </PureGlobal>
+  );
+});
+
+render(<TenantUserSelectInputPopupExample />);
+
+```
+
+- 按组织选择成员（弹窗 SelectInput）
+- TenantUserSelect.Input isPopup={false} 以弹窗完成组织成员选择，支持单选/多选切换
+- _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
+
+```jsx
+const { TenantUserSelect } = _Tenant;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { useState } = React;
+const { Flex, Switch, Typography } = antd;
+
+const TenantUserSelectInputModalExample = createWithRemoteLoader({
+  modules: ['components-core:FormInfo', 'components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [FormInfo, PureGlobal] = remoteModules;
+  const { Form, SubmitButton } = FormInfo;
+  const [single, setSingle] = useState(true);
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Flex vertical gap={16}>
+        <Flex align="center" gap={8}>
+          <Typography.Text>单选</Typography.Text>
+          <Switch checked={single} onChange={setSingle} />
+        </Flex>
+        <Form
+          key={single ? 'single' : 'multiple'}
+          onSubmit={data => {
+            console.log('弹窗选择结果:', data);
+          }}>
+          <TenantUserSelect.Input
+            name="members"
+            label={single ? '负责人' : '协作成员'}
+            rule="REQ"
+            isPopup={false}
+            single={single}
+            companyName="科技创新有限公司"
+            height={520}
+            overlayWidth={800}
+          />
+          <div style={{ marginTop: 24, textAlign: 'center' }}>
+            <SubmitButton type="primary">保存</SubmitButton>
+          </div>
+        </Form>
+      </Flex>
+    </PureGlobal>
+  );
+});
+
+render(<TenantUserSelectInputModalExample />);
+
+```
+
+- 按组织选择成员（SelectInput.Field）
+- TenantUserSelect.Input.Field 纯控件，不依赖 Form，value/onChange 受控
+- _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
+
+```jsx
+const { TenantUserSelect } = _Tenant;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { useState } = React;
+const { Flex, Button, Typography } = antd;
+
+const TenantUserSelectInputFieldExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [PureGlobal] = remoteModules;
+  const [value, setValue] = useState(null);
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Flex vertical gap={12} style={{ maxWidth: 480 }}>
+        <Typography.Text type="secondary">
+          TenantUserSelect.Input.Field 为纯控件，不依赖 Form，通过 value / onChange 受控
+        </Typography.Text>
+        <TenantUserSelect.Input.Field
+          value={value}
+          onChange={setValue}
+          isPopup
+          single
+          companyName="科技创新有限公司"
+          placeholder="请选择成员"
+        />
+        <Typography.Paragraph>
+          <Typography.Text strong>当前值：</Typography.Text>
+          <pre style={{ margin: '8px 0 0', whiteSpace: 'pre-wrap' }}>{JSON.stringify(value, null, 2)}</pre>
+        </Typography.Paragraph>
+        <Button onClick={() => setValue(null)}>清空</Button>
+      </Flex>
+    </PureGlobal>
+  );
+});
+
+render(<TenantUserSelectInputFieldExample />);
+
+```
+
 - 系统设置(全屏)
 - Setting 组件是系统设置的入口，包含公司信息、组织架构、权限管理、用户管理四个设置模块。示例环境已有外层 Router，使用 Routes 匹配子路由，勿嵌套 MemoryRouter。
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom)
@@ -1055,6 +1200,8 @@ render(<SettingExample />);
 
 参考 `UserSelect`，用于在表单中先选组织、再选租户成员。左侧为组织树，右侧为成员列表（支持滚动加载），成员列表按所选组织及其子组织过滤（`filter.tenantOrgId`）。
 
+默认形态为表单内常驻双栏面板；另提供 `TenantUserSelect.Input`（基于 `@kne/super-select` 的 `SelectInput`）以下拉或弹窗完成选择。
+
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | name | 表单字段名称 | string | - |
@@ -1068,8 +1215,38 @@ render(<SettingExample />);
 | userStatus | 成员状态筛选：`open` / `closed`（兼容 `active` → `open`、`inactive` → `closed`） | string | - |
 | companyName | 组织树根节点（公司）名称 | string | - |
 | showOrgRoot | 是否展示公司根节点 | boolean | true |
+| height | 面板高度 | number \| string | 面板版默认自适应；Input 版默认 `480` |
+| valueKey | 选中值唯一字段 | string | `'id'` |
+| labelKey | 选中值展示字段 | string | `'name'` |
 | orgApi | 自定义组织列表 API，默认 `apis.tenant.orgList` | object | - |
 | userApi | 自定义成员列表 API，默认 `apis.tenant.userList` | object | - |
+
+#### 子组件
+
+| 导出 | 说明 |
+| --- | --- |
+| `TenantUserSelect` | 表单字段（`useDecorator`），常驻双栏面板 |
+| `TenantUserSelect.Field` | 面板纯控件（`value` / `onChange`） |
+| `TenantUserSelect.Input` | 表单字段（`useOnChange`），`SelectInput` 下拉/弹窗 |
+| `TenantUserSelect.Input.Field` | SelectInput 纯控件（`value` / `onChange`） |
+
+#### TenantUserSelect.Input 额外属性
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| isPopup | `true` 下拉，`false` 弹窗 | boolean | true |
+| overlayWidth | 下拉/弹层面板宽度 | number \| string | `720` |
+
+```jsx
+// 表单：下拉
+<TenantUserSelect.Input name="owner" label="负责人" rule="REQ" isPopup companyName="示例公司" />
+
+// 表单：弹窗多选
+<TenantUserSelect.Input name="members" label="成员" single={false} isPopup={false} />
+
+// 非表单受控
+<TenantUserSelect.Input.Field value={value} onChange={setValue} isPopup />
+```
 
 ## API 配置说明
 

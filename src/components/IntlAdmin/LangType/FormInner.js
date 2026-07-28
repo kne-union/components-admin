@@ -14,7 +14,7 @@ const FormInner = createWithRemoteLoader({
       <FormInfo
         column={1}
         list={[
-          <Input name="name" label={formatMessage({ id: 'Name' })} rule="REQ LEN-0-100" />,
+          <Input name="name" label={formatMessage({ id: 'LangTypeName' })} rule="REQ LEN-0-100" />,
           <Input name="code" label={formatMessage({ id: 'Code' })} rule="REQ LEN-0-100" disabled={action === 'edit'} />,
           <TextArea name="params" label={formatMessage({ id: 'Params' })} rule="LEN-0-1000" />,
           <TextArea name="description" label={formatMessage({ id: 'Description' })} rule="LEN-0-1000" />

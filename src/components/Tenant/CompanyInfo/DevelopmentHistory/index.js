@@ -1,5 +1,4 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Empty } from 'antd';
 import dayjs from 'dayjs';
 import Timeline from '@kne/timeline';
 import ensureSlash from '@kne/ensure-slash';
@@ -29,7 +28,7 @@ const DevelopmentHistory = createWithRemoteLoader({
     const list = data.developmentHistory;
 
     if (!(list && list.length > 0)) {
-      return <Empty />;
+      return null;
     }
 
     const timelineData = list.map(item => {

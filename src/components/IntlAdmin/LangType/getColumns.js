@@ -9,7 +9,7 @@ const getColumns = ({ formatMessage } = {}) => {
     },
     {
       name: 'name',
-      title: t('Name', '名称'),
+      title: t('LangTypeName', '名称'),
       renderType: 'main'
     },
     {

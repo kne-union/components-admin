@@ -4,7 +4,7 @@ const locale = {
   LangTypeBiz: 'Language',
   LangLibBiz: 'Translation Entry',
 
-  Name: 'Name',
+  LangTypeName: 'Name',
   Code: 'Code',
   Sort: 'Sort',
   MoveUp: 'Move Up',

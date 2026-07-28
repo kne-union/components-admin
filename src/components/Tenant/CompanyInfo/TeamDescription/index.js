@@ -1,7 +1,7 @@
 import '@kne/react-box/dist/index.css';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useIsMobile } from '@kne/responsive-utils';
-import { Empty, Row, Col } from 'antd';
+import { Row, Col } from 'antd';
 import { PersonalCard } from '@kne/react-box';
 import style from '../style.module.scss';
 
@@ -12,7 +12,7 @@ const TeamDescription = createWithRemoteLoader({
   const isMobile = useIsMobile();
 
   if (!(data.teamDescription && data.teamDescription.length > 0)) {
-    return <Empty />;
+    return null;
   }
 
   const teamColProps = isMobile ? { span: 24 } : { xs: 24, md: 12, lg: 8 };

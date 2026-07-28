@@ -25,6 +25,10 @@ const FormInnerCore = createWithRemoteLoader({
             orgId ? { filter: { tenantOrgId: orgId } } : {}
           )
         })}
+        getSearchProps={({ searchText }) => ({
+          filter: { keyword: searchText }
+        })}
+        pagination={{ paramsType: 'params' }}
         description={
           orgId
             ? formatMessage({ id: 'OrgLeaderMustBeMember' })

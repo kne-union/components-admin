@@ -22,6 +22,10 @@ const LeaderFormInnerCore = createWithRemoteLoader({
             orgId ? { filter: { tenantOrgId: orgId } } : {}
           )
         })}
+        getSearchProps={({ searchText }) => ({
+          filter: { keyword: searchText }
+        })}
+        pagination={{ paramsType: 'params' }}
         description={formatMessage({ id: 'OrgLeaderMustBeMember' })}
         interceptor="object-output-value"
         valueKey="id"

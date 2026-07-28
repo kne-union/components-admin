@@ -39,6 +39,7 @@ const locale = {
   // Custom Components
   EnvironmentVariables: 'Environment Variables',
   CustomComponents: 'Custom Components',
+  CustomComponentName: 'Name',
   AddEnvironmentVariable: 'Add Environment Variable',
   AddCustomComponent: 'Add Custom Component',
   Preview: 'Preview',

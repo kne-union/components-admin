@@ -87,6 +87,8 @@
 
 参考 `UserSelect`，用于在表单中先选组织、再选租户成员。左侧为组织树，右侧为成员列表（支持滚动加载），成员列表按所选组织及其子组织过滤（`filter.tenantOrgId`）。
 
+默认形态为表单内常驻双栏面板；另提供 `TenantUserSelect.Input`（基于 `@kne/super-select` 的 `SelectInput`）以下拉或弹窗完成选择。
+
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | name | 表单字段名称 | string | - |
@@ -100,8 +102,38 @@
 | userStatus | 成员状态筛选：`open` / `closed`（兼容 `active` → `open`、`inactive` → `closed`） | string | - |
 | companyName | 组织树根节点（公司）名称 | string | - |
 | showOrgRoot | 是否展示公司根节点 | boolean | true |
+| height | 面板高度 | number \| string | 面板版默认自适应；Input 版默认 `480` |
+| valueKey | 选中值唯一字段 | string | `'id'` |
+| labelKey | 选中值展示字段 | string | `'name'` |
 | orgApi | 自定义组织列表 API，默认 `apis.tenant.orgList` | object | - |
 | userApi | 自定义成员列表 API，默认 `apis.tenant.userList` | object | - |
+
+#### 子组件
+
+| 导出 | 说明 |
+| --- | --- |
+| `TenantUserSelect` | 表单字段（`useDecorator`），常驻双栏面板 |
+| `TenantUserSelect.Field` | 面板纯控件（`value` / `onChange`） |
+| `TenantUserSelect.Input` | 表单字段（`useOnChange`），`SelectInput` 下拉/弹窗 |
+| `TenantUserSelect.Input.Field` | SelectInput 纯控件（`value` / `onChange`） |
+
+#### TenantUserSelect.Input 额外属性
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| isPopup | `true` 下拉，`false` 弹窗 | boolean | true |
+| overlayWidth | 下拉/弹层面板宽度 | number \| string | `720` |
+
+```jsx
+// 表单：下拉
+<TenantUserSelect.Input name="owner" label="负责人" rule="REQ" isPopup companyName="示例公司" />
+
+// 表单：弹窗多选
+<TenantUserSelect.Input name="members" label="成员" single={false} isPopup={false} />
+
+// 非表单受控
+<TenantUserSelect.Input.Field value={value} onChange={setValue} isPopup />
+```
 
 ## API 配置说明
 

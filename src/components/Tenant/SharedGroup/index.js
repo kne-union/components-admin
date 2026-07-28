@@ -7,7 +7,7 @@ import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import merge from 'lodash/merge';
 
-/** SuperSelect array-output-value 回显需 [{ id, name }]，不能只传 id 字符串 */
+/** TenantUserSelect.Input array-output-value 回显需 [{ id, name }]，不能只传 id 字符串 */
 const mapRelationUsersToSelectValue = items => {
   if (!Array.isArray(items)) {
     return [];
@@ -62,6 +62,7 @@ const SharedGroup = ({ apis, ...props }) => {
       name="shared-group-list"
       options={{
         bizName: formatMessage({ id: 'SharedGroup' }),
+        formSize: 'default',
         createButtonProps: { size: 'small' },
         saveData: data => mapRowToForm(data),
         formProps: ({ action, formData, ...rest }) => {

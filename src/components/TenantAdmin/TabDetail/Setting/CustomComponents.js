@@ -87,7 +87,7 @@ const CustomComponentFormInner = createWithRemoteLoader({
         column={1}
         list={[
           <Input name="key" label="KEY" rule="REQ LEN-0-100" disabled={isEdit} />,
-          <Input name="name" label={formatMessage({ id: 'Name' })} rule="REQ LEN-0-100" />,
+          <Input name="name" label={formatMessage({ id: 'CustomComponentName' })} rule="REQ LEN-0-100" />,
           <Input name="type" label={formatMessage({ id: 'Type' })} rule="REQ LEN-0-100" />,
           <TextArea name="description" label={formatMessage({ id: 'Description' })} rule="LEN-0-500" />
         ]}
@@ -177,7 +177,7 @@ const CustomComponents = createWithRemoteLoader({
             },
             {
               name: 'name',
-              title: formatMessage({ id: 'Name' })
+              title: formatMessage({ id: 'CustomComponentName' })
             },
             {
               name: 'type',
