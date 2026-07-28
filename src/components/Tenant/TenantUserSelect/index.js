@@ -2,18 +2,19 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import merge from 'lodash/merge';
 import { useMemo } from 'react';
 import OrgTenantUserField from './OrgTenantUserField';
+import OrgTenantUserSelectInput from './OrgTenantUserSelectInput';
 import withLocale from '../withLocale';
 
-const createComponent = (callback = item => item) => {
+const createComponent = (Target, callback = item => item) => {
   return createWithRemoteLoader({
     modules: ['components-core:Global@usePreset']
   })(
-    withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', ...props }) => {
+    withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', isPopup, overlayWidth, ...props }) => {
       const [usePreset] = remoteModules;
       const { apis } = usePreset();
       const resolvedOrgApi = useMemo(() => merge({}, apis.tenant?.orgList, orgApi), [apis.tenant?.orgList, orgApi]);
       const resolvedUserApi = useMemo(() => merge({}, apis.tenant?.userList, userApi), [apis.tenant?.userList, userApi]);
-      const Component = callback(OrgTenantUserField);
+      const Component = callback(Target);
       return (
         <Component
           {...props}
@@ -27,6 +28,8 @@ const createComponent = (callback = item => item) => {
           height={height}
           valueKey={valueKey}
           labelKey={labelKey}
+          isPopup={isPopup}
+          overlayWidth={overlayWidth}
           orgApi={resolvedOrgApi}
           userApi={resolvedUserApi}
         />
@@ -35,8 +38,11 @@ const createComponent = (callback = item => item) => {
   );
 };
 
-const TenantUserSelect = createComponent();
+const TenantUserSelect = createComponent(OrgTenantUserField);
 
-TenantUserSelect.Field = createComponent(item => item.Field);
+TenantUserSelect.Field = createComponent(OrgTenantUserField, item => item.Field);
+
+TenantUserSelect.Input = createComponent(OrgTenantUserSelectInput);
+TenantUserSelect.Input.Field = createComponent(OrgTenantUserSelectInput, item => item.Field);
 
 export default TenantUserSelect;

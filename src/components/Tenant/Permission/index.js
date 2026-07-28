@@ -54,6 +54,7 @@ const Permission = createWithRemoteLoader({
         <SharedGroup
           apis={merge({}, apis.sharedGroup, {
             permissionList: apis.permission?.list,
+            orgList: apis.orgList,
             userList: apis.userList
           })}>
           {useCustomRender ? wrapChildren : renderBizList}

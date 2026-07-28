@@ -39,6 +39,7 @@ const locale = {
   // Custom Components
   EnvironmentVariables: '环境变量',
   CustomComponents: '自定义组件',
+  CustomComponentName: '名称',
   AddEnvironmentVariable: '添加环境变量',
   AddCustomComponent: '添加自定义组件',
   Preview: '预览',

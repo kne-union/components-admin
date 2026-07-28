@@ -76,6 +76,7 @@ const OrgOptions = createWithRemoteLoader({
     <ButtonGroup
       itemClassName="btn-no-padding"
       moreType="link"
+      showLength={showLength}
       list={[
         {
           icon: <UserOutlined />,
@@ -384,12 +385,58 @@ const ControlPanel = ({ value, onChange }) => {
   );
 };
 
+const DEFAULT_COLLAPSE_THRESHOLD = 30;
+
+const getAutoCollapsedIds = (nodes, threshold = DEFAULT_COLLAPSE_THRESHOLD) => {
+  let level = nodes || [];
+  while (level.length) {
+    const next = [];
+    for (const node of level) {
+      if (node.children?.length) next.push(...node.children);
+    }
+    if (next.length > threshold) {
+      // 从超限层的上一级起，各级有子节点的组织都默认收起，避免展开一级后整棵子树展开
+      const collapsed = [];
+      const collect = list => {
+        (list || []).forEach(node => {
+          if (!node.children?.length) return;
+          collapsed.push(node.id);
+          collect(node.children);
+        });
+      };
+      collect(level);
+      return collapsed;
+    }
+    level = next;
+  }
+  return [];
+};
+
+const getAutoExpandedKeys = (nodes, threshold = DEFAULT_COLLAPSE_THRESHOLD) => {
+  const collapsed = new Set(getAutoCollapsedIds(nodes, threshold));
+  const expanded = [];
+  const walk = list => {
+    (list || []).forEach(node => {
+      if (!node.children?.length) return;
+      if (collapsed.has(node.id)) return;
+      expanded.push(node.id);
+      walk(node.children);
+    });
+  };
+  walk(nodes);
+  return expanded;
+};
+
 const GraphOrg = createWithRemoteLoader({
   modules: ['components-core:Common@SimpleBar']
-})(({ remoteModules, data, apis, onSuccess, onViewUsers, linkedSource }) => {
-  const [expandIds, setExpandIds] = useState([]);
+})(({ remoteModules, data, apis, onSuccess, onViewUsers, linkedSource, collapseThreshold = DEFAULT_COLLAPSE_THRESHOLD }) => {
+  const [expandIds, setExpandIds] = useState(() => getAutoCollapsedIds(data, collapseThreshold));
   const [scale, setScale] = useState(1);
   const { scrollRef, isDragging, onMouseDown, onTouchStart } = useDragToScroll();
+
+  useEffect(() => {
+    setExpandIds(getAutoCollapsedIds(data, collapseThreshold));
+  }, [data, collapseThreshold]);
   const renderNode = data => {
     return data.map(node => {
       const card = (
@@ -398,7 +445,7 @@ const GraphOrg = createWithRemoteLoader({
           hoverable
           size="small"
           className={style['org-card']}
-          extra={<OrgOptions data={node} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} showLength={0} />}>
+          extra={<OrgOptions data={node} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} showLength={1} />}>
           <Flex align="center" gap={8} wrap="wrap" className={style['tree-node-title-row']}>
             <div className={style['tree-node-title']}>{node.name}</div>
             <OrgSourceTag source={node.syncSource} />
@@ -468,12 +515,12 @@ const GraphOrg = createWithRemoteLoader({
   );
 });
 
-const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers, linkedSource, isMobile }) => {
-  const [expandedKeys, setExpandedKeys] = useState(['root']);
+const TreeOrg = ({ data, apis, onSuccess, onViewUsers, linkedSource, isMobile, collapseThreshold = DEFAULT_COLLAPSE_THRESHOLD }) => {
+  const [expandedKeys, setExpandedKeys] = useState(() => getAutoExpandedKeys(data, collapseThreshold));
 
   useEffect(() => {
-    ids && ids.length > 0 && setExpandedKeys(['root', ...ids]);
-  }, [ids]);
+    setExpandedKeys(getAutoExpandedKeys(data, collapseThreshold));
+  }, [data, collapseThreshold]);
 
   return (
     <Tree
@@ -523,7 +570,19 @@ const TreeOrg = ({ data, ids, apis, onSuccess, onViewUsers, linkedSource, isMobi
 
 const OrgInfo = createWithRemoteLoader({
   modules: ['components-core:StateBar', 'components-core:Global@usePreset', 'components-core:Drawer@useDrawer']
-})(({ remoteModules, data, companyName, apis, onSuccess, tenantId, onViewUsers, linkedSource, linkSettingProps, thirdLoginSettingProps }) => {
+})(({
+  remoteModules,
+  data,
+  companyName,
+  apis,
+  onSuccess,
+  tenantId,
+  onViewUsers,
+  linkedSource,
+  linkSettingProps,
+  thirdLoginSettingProps,
+  collapseThreshold = DEFAULT_COLLAPSE_THRESHOLD
+}) => {
   const [StateBar, usePreset, useDrawer] = remoteModules;
   const { ajax } = usePreset();
   const drawer = useDrawer();
@@ -683,7 +742,7 @@ const OrgInfo = createWithRemoteLoader({
     ],
     [formatMessage, importSelectedKeySet, toggleImportRowIndices, renderImportEmpty]
   );
-  const { treeData, ids } = useMemo(() => {
+  const treeData = useMemo(() => {
     const output = [
       {
         id: 'root',
@@ -704,7 +763,7 @@ const OrgInfo = createWithRemoteLoader({
     };
 
     const tree = parseTree(output);
-    const treeData = tree.map(root => {
+    return tree.map(root => {
       if (root.id !== 'root') {
         return root;
       }
@@ -714,11 +773,6 @@ const OrgInfo = createWithRemoteLoader({
         children
       });
     });
-
-    return {
-      treeData,
-      ids: data.map(item => item.id)
-    };
   }, [data, companyName, formatMessage]);
 
   const anchorOrgListApi = useMemo(() => {
@@ -1033,17 +1087,24 @@ const OrgInfo = createWithRemoteLoader({
       <div className={style['org']}>
         {activeKey === 'tree' && (
           <TreeOrg
-            ids={ids}
             data={treeData}
             apis={apis}
             onSuccess={onSuccess}
             onViewUsers={onViewUsers}
             linkedSource={linkedSource}
             isMobile={isMobile}
+            collapseThreshold={collapseThreshold}
           />
         )}
         {activeKey === 'graph' && (
-          <GraphOrg ids={ids} data={treeData} apis={apis} onSuccess={onSuccess} onViewUsers={onViewUsers} linkedSource={linkedSource} />
+          <GraphOrg
+            data={treeData}
+            apis={apis}
+            onSuccess={onSuccess}
+            onViewUsers={onViewUsers}
+            linkedSource={linkedSource}
+            collapseThreshold={collapseThreshold}
+          />
         )}
       </div>
     </Flex>

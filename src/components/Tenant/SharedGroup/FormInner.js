@@ -1,11 +1,11 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
-import { Flex, Spin } from 'antd';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 import SharedGroupModulesFormField from './SharedGroupModulesFormField';
+import TenantUserSelect from '../TenantUserSelect';
 
 const FormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
@@ -13,7 +13,7 @@ const FormInner = createWithRemoteLoader({
   withLocale(({ remoteModules, apis, action: _action }) => {
     const [FormInfo] = remoteModules;
     const { formatMessage } = useIntl();
-    const { Input, TextArea, SuperSelect } = FormInfo.fields;
+    const { Input, TextArea } = FormInfo.fields;
 
     return (
       <Fetch
@@ -35,31 +35,25 @@ const FormInner = createWithRemoteLoader({
                   rule="REQ"
                   block
                 />,
-                <SuperSelect
+                <TenantUserSelect.Input
                   name="dataSourceTenantUserIds"
                   label={formatMessage({ id: 'SharedGroupDataSources' })}
                   description={formatMessage({ id: 'SharedGroupDataSourcesDesc' })}
-                  api={merge({}, apis.userList, {
-                    params: {
-                      filter: { status: 'open' }
-                    }
-                  })}
-                  valueKey="id"
-                  labelKey="name"
-                  interceptor="array-output-value"
+                  single={false}
+                  userStatus="open"
+                  orgApi={apis.orgList}
+                  userApi={apis.userList}
+                  block
                 />,
-                <SuperSelect
+                <TenantUserSelect.Input
                   name="memberTenantUserIds"
                   label={formatMessage({ id: 'SharedGroupMembers' })}
                   description={formatMessage({ id: 'SharedGroupMembersDesc' })}
-                  api={merge({}, apis.userList, {
-                    params: {
-                      filter: { status: 'open' }
-                    }
-                  })}
-                  valueKey="id"
-                  labelKey="name"
-                  interceptor="array-output-value"
+                  single={false}
+                  userStatus="open"
+                  orgApi={apis.orgList}
+                  userApi={apis.userList}
+                  block
                 />
               ]}
             />

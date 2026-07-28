@@ -347,6 +347,71 @@
       ]
     },
     {
+      "title": "按组织选择成员（下拉 SelectInput）",
+      "description": "TenantUserSelect.Input 基于 @kne/super-select SelectInput，isPopup 下拉展开组织+成员面板",
+      "code": "./tenant-user-select-input-popup.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
+      "title": "按组织选择成员（弹窗 SelectInput）",
+      "description": "TenantUserSelect.Input isPopup={false} 以弹窗完成组织成员选择，支持单选/多选切换",
+      "code": "./tenant-user-select-input-modal.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "按组织选择成员（SelectInput.Field）",
+      "description": "TenantUserSelect.Input.Field 纯控件，不依赖 Form，value/onChange 受控",
+      "code": "./tenant-user-select-input-field.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
       "title": "系统设置",
       "description": "Setting 组件是系统设置的入口，包含公司信息、组织架构、权限管理、用户管理四个设置模块。示例环境已有外层 Router，使用 Routes 匹配子路由，勿嵌套 MemoryRouter。",
       "isFull": true,

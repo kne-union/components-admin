@@ -1,5 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { App } from 'antd';
 import { transform } from 'lodash';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
@@ -7,36 +8,69 @@ import { useIntl } from '@kne/react-intl';
 import getColumns from '../getColumns';
 import Menu from '../Menu';
 import Actions from '../Actions';
-import RetryTask from '../Actions/RetryTask';
 
 const AllTask = createWithRemoteLoader({
   modules: [
     'components-core:Layout@TablePage',
+    'components-core:TablePage@Table',
     'components-core:Global@usePreset',
     'components-core:Filter',
-    'components-core:Tooltip',
     'components-core:Enum'
   ]
 })(
   withLocale(({ remoteModules, baseUrl, getManualTaskAction, pageProps = {} }) => {
-    const [TablePage, usePreset, Filter, Tooltip, Enum] = remoteModules;
+    const [TablePage, Table, usePreset, Filter, Enum] = remoteModules;
     const { formatMessage } = useIntl();
-    const { apis, enums } = usePreset();
+    const { apis, ajax } = usePreset();
+    const { message, modal } = App.useApp();
     const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
     const ref = useRef(null);
+    const dataRef = useRef([]);
     const [filter, setFilter] = useState([]);
     const [sort, setSortChange] = useState([]);
-    const [selected, setSelected] = useState({
-      selectedRowKeys: [],
-      selectedRows: []
+    const { selectedRowKeys, selectedRows, setSelectedRowKeys, clearSelectedRows } = Table.useSelectedRow({
+      rowKey: 'id'
     });
 
     const filterValue = getFilterValue(filter);
 
-    const onSelectChange = (selectedRowKeys, selectedRows) => {
-      setSelected({ selectedRowKeys, selectedRows });
-    };
+    const rowSelection = useMemo(
+      () => ({
+        type: 'checkbox',
+        selectedRowKeys,
+        allowSelectedAll: false,
+        onChange: keys => {
+          setSelectedRowKeys(keys, dataRef.current || []);
+        }
+      }),
+      [selectedRowKeys, setSelectedRowKeys]
+    );
+
+    const handleBatchRetry = useCallback(
+      ({ selectedRowKeys: taskIds, reload }) => {
+        if (!taskIds?.length) {
+          return;
+        }
+        modal.confirm({
+          title: formatMessage({ id: 'ConfirmRetryTask' }),
+          onOk: async () => {
+            const { data: resData } = await ajax(
+              Object.assign({}, apis.task.retry, {
+                data: { taskIds }
+              })
+            );
+            if (resData.code !== 0) {
+              return;
+            }
+            message.success(formatMessage({ id: 'TaskModifiedToPending' }));
+            clearSelectedRows();
+            reload?.();
+          }
+        });
+      },
+      [ajax, apis.task.retry, clearSelectedRows, formatMessage, message, modal]
+    );
 
     return (
       <TablePage
@@ -138,6 +172,18 @@ const AllTask = createWithRemoteLoader({
               },
               {}
             )
+          },
+          dataFormat: data => {
+            const list = (data.pageData || []).map(item =>
+              Object.assign({}, item, {
+                disabled: item.status !== 'failed'
+              })
+            );
+            dataRef.current = list;
+            return {
+              list,
+              total: data.totalCount
+            };
           }
         })}
         ref={ref}
@@ -168,55 +214,15 @@ const AllTask = createWithRemoteLoader({
             }
           }
         ]}
-        rowSelection={{
-          type: 'checkbox',
-          hideSelectAll: true,
-          selectedRowKeys: selected.selectedRowKeys,
-          onChange: onSelectChange,
-          getCheckboxProps: record => {
-            return {
-              disabled: record.status !== 'failed' // Column configuration not to be checked
-            };
+        rowSelection={rowSelection}
+        selectedRows={selectedRows}
+        batchActions={[
+          {
+            key: 'batch-retry',
+            label: formatMessage({ id: 'BatchRetry' }),
+            onClick: handleBatchRetry
           }
-        }}
-        topArea={
-          <>
-            {formatMessage({ id: 'Selected' })}
-            {selected.selectedRowKeys?.length}
-            <Tooltip placement="topLeft" content={formatMessage({ id: 'BatchRetryTooltip' })}>
-              <RetryTask
-                size="small"
-                type="link"
-                disabled={!selected.selectedRows?.length}
-                taskIds={selected.selectedRowKeys}
-                onSuccess={() => {
-                  setSelected({
-                    selectedRowKeys: [],
-                    selectedRows: []
-                  });
-                  ref.current?.reload?.();
-                }}>
-                {formatMessage({ id: 'BatchRetry' })}
-              </RetryTask>
-              {/*<AddDigitalTask
-              size="small"
-              type="link"
-              data={{ language: selected.selectedRows?.[0]?.language, hasProbe: true }}
-              disabled={!selected.selectedRows?.length}
-              questionIds={selected.selectedRowKeys}
-              onSuccess={() => {
-                setSelected({
-                  selectedRowKeys: [],
-                  selectedRows: []
-                });
-                ref.current?.reload?.();
-              }}
-            >
-              批量添加数字人任务
-            </AddDigitalTask>*/}
-            </Tooltip>
-          </>
-        }
+        ]}
         page={{
           menu: <Menu baseUrl={baseUrl} />,
           ...pageProps

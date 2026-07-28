@@ -151,6 +151,22 @@
   @include resp.responsive-container;
 }
 
+.select-input {
+  width: 100%;
+}
+
+.select-input-overlay {
+  :global(.ant-dropdown-menu),
+  :global(.ant-modal-body) {
+    padding: 0;
+  }
+}
+
+.select-input-panel {
+  border: none;
+  border-radius: 0;
+}
+
 .container {
   display: flex;
   gap: 0;

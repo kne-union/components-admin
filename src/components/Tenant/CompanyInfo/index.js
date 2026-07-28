@@ -16,17 +16,23 @@ const CompanyDetail = createWithRemoteLoader({
 })(({ remoteModules, data }) => {
   const [InfoPage] = remoteModules;
   const { formatMessage } = useIntl();
+  const hasDevelopmentHistory = data.developmentHistory && data.developmentHistory.length > 0;
+  const hasTeamDescription = data.teamDescription && data.teamDescription.length > 0;
   return (
     <Flex vertical gap={24} className={style.detailStack}>
       <InfoPage.Part>
         <Basic data={data} />
       </InfoPage.Part>
-      <InfoPage.Part title={formatMessage({ id: 'DevelopmentHistory' })}>
-        <DevelopmentHistory data={data} />
-      </InfoPage.Part>
-      <InfoPage.Part title={formatMessage({ id: 'TeamDescription' })}>
-        <TeamDescription data={data} />
-      </InfoPage.Part>
+      {hasDevelopmentHistory && (
+        <InfoPage.Part title={formatMessage({ id: 'DevelopmentHistory' })}>
+          <DevelopmentHistory data={data} />
+        </InfoPage.Part>
+      )}
+      {hasTeamDescription && (
+        <InfoPage.Part title={formatMessage({ id: 'TeamDescription' })}>
+          <TeamDescription data={data} />
+        </InfoPage.Part>
+      )}
     </Flex>
   );
 });
@@ -48,7 +54,14 @@ const CompanyInfo = createWithRemoteLoader({
           type="inner"
           data={data}
           onSubmit={async formData => {
-            if ((await onSubmit(formData)) === false) {
+            // 表单默认 filterEmpty 会丢掉空数组，导致清空列表字段时后端按 patch 语义跳过更新
+            const payload = Object.assign({}, formData, {
+              banners: formData.banners || [],
+              companyTags: formData.companyTags || [],
+              developmentHistory: formData.developmentHistory || [],
+              teamDescription: formData.teamDescription || []
+            });
+            if ((await onSubmit(payload)) === false) {
               return;
             }
             setIsEdit(false);

@@ -42,6 +42,7 @@ const PermissionInner = createWithRemoteLoader({
     setStatus: allowSharedGroupEdit,
     remove: allowSharedGroupRemove,
     permissionList: true,
+    orgList: true,
     userList: true
   };
 
@@ -90,6 +91,7 @@ const PermissionInner = createWithRemoteLoader({
               apis={transform(
                 Object.assign({}, apis.tenant.sharedGroup, {
                   permissionList: apis.tenant.permission.list,
+                  orgList: apis.tenant.orgList,
                   userList: apis.tenant.userList
                 }),
                 (result, value, key) => {
