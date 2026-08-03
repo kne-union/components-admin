@@ -23,11 +23,10 @@ const ImportAnchorOrgSelect = createWithRemoteLoader({
     if (orgListApi?.url) {
       return merge({}, orgListApi);
     }
+    // SelectTree 的 parseTreeData 需要扁平数组；loader 经 Fetch 后会作为 render 的 data 直接传入
+    const list = Array.isArray(data) ? data : data?.pageData || [];
     return {
-      loader: () =>
-        Promise.resolve({
-          pageData: Array.isArray(data) ? data : []
-        })
+      loader: () => Promise.resolve(list)
     };
   }, [data, orgListApi]);
 

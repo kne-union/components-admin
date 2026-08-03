@@ -74,6 +74,9 @@ const Org = createWithRemoteLoader({
                       userList: Object.assign({}, apis.tenantAdmin.userList, {
                         params: { tenantId: tenant.id }
                       }),
+                      orgList: Object.assign({}, apis.tenantAdmin.orgList, {
+                        params: { tenantId: tenant.id }
+                      }),
                       import: apis.tenantAdmin.orgBatchImport,
                       orgLinkConfig: Object.assign({}, apis.tenantAdmin.orgLinkConfig, {
                         params: { tenantId: tenant.id }

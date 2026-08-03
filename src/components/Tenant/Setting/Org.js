@@ -78,6 +78,7 @@ const OrgInner = createWithRemoteLoader({
                           save: allowSave && Object.assign({}, apis.tenant.orgSave),
                           remove: allowRemove && Object.assign({}, apis.tenant.orgRemove),
                           userList: Object.assign({}, apis.tenant.userList),
+                          orgList: Object.assign({}, apis.tenant.orgList),
                           import: allowImport && Object.assign({}, apis.tenant.orgBatchImport),
                           orgLinkConfig: Object.assign({}, apis.tenant.orgLinkConfig),
                           orgLinkSave: Object.assign({}, apis.tenant.orgLinkSave),
