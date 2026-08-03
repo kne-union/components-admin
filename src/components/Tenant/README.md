@@ -70,6 +70,9 @@ const orgApis = {
   userList: Object.assign({}, mockPreset.apis.tenantAdmin.userList, {
     params: { tenantId }
   }),
+  orgList: Object.assign({}, mockPreset.apis.tenantAdmin.orgList, {
+    params: { tenantId }
+  }),
   import: mockPreset.apis.tenantAdmin.orgBatchImport,
   orgLinkConfig: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkConfig, {
     params: { tenantId }
