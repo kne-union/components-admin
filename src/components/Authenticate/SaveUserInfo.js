@@ -16,7 +16,7 @@ const SaveUserInfoInner = createWithRemoteLoader({
   return children({
     onClick: () => {
       const modalApi = formModal({
-        title: formatMessage({ id: 'EditUserInfo' }),
+        title: formatMessage({ id: 'EditPersonalInfo' }),
         size: 'small',
         formProps: {
           data: global.value,

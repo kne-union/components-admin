@@ -430,7 +430,7 @@ const LangLib = createWithRemoteLoader({
               )
             });
           }
-          message.success(formatMessage({ id: 'ImportSuccess' }, { created, updated }));
+          message.success(formatMessage({ id: 'ImportEntriesSuccess' }, { created, updated }));
           await syncNamespacesToGroup({ ajax, apis, language });
           reloadAfterChange();
         } catch (e) {

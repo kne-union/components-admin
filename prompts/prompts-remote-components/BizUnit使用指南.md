@@ -53,7 +53,7 @@ BizUnit 是一个**配置驱动的 CRUD 业务单元组件**：传入 `apis`（�
 |------|----------|------|
 | `components-admin:BizUnit` | `createWithRemoteLoader` 远程加载 | CRUD 列表页核心，组装表格/筛选/表单/操作 |
 | `components-core:Layout` | 远程加载 | 页面外壳与导航；isNext 依赖其 `Layout@TablePage` 上下文 |
-| `components-core:Filter` | 远程加载（BizUnit 内部加载，筛选项组件需自行解构） | 筛选项组件 `Filter.fields`、`SearchInput`、`useUrlFilterValue` |
+| `components-core:Filter` | 远程加载（BizUnit 内部加载，筛选项组件需自行解构） | 筛选项组件 `Filter.fields`、`SearchInput`、`useSearchParamsValue` |
 | `components-core:FormInfo` | 远程加载 | 表单字段定义（`FormInfo.fields`）、表单弹窗 |
 | `components-core:Global@usePreset` | 远程加载 | 获取全局 `preset`（`apis`、`ajax`、`enums`） |
 | `components-core:Global@PureGlobal` | 远程加载 | 注入 `preset`（含 mock），文档示例必备 |
@@ -505,7 +505,7 @@ export default MyModule;
 
 ### 5.3 BizUnit ↔ Filter（筛选）
 
-- BizUnit 内部已加载 `Filter`，提供 `SearchInput`（关键字搜索）与 `useUrlFilterValue`（URL 筛选同步）。
+- BizUnit 内部已加载 `Filter`，提供 `SearchInput`（关键字搜索）；配置 `searchParamsValue` 时用 `useSearchParamsValue` / TablePage `filter.searchParamsValue` 从 URL 种子化初始筛选。
 - 筛选项组件（`InputFilterItem`、`SuperSelectFilterItem`、`DateRangeFilterItem`）需在业务组件中从 `Filter.fields` 解构，组装成 `filter={{ list: [...] }}` 传给 BizUnit。
 - `options.mapFilterValue` 可对筛选值做二次映射（如日期区间拆为起止两个字段）。
 
@@ -574,4 +574,4 @@ export default MyModule;
 
 ---
 
-实现前须先确认当前项目的 API 定义方式（`getApis.js`）、Mock 注入方式（`mockPreset`）、路由注册位置及分页/筛选参数约定。BizUnit 属性与高级用法（自定义操作 `getActionList`、批量操作 `tableProps.rowSelection`/`batchActions`、URL 筛选 `urlFilterValue`、自定义布局 `children`）见 [BizUnit doc/api.md](../../src/components/BizUnit/doc/api.md) 及 `doc/` 示例。
+实现前须先确认当前项目的 API 定义方式（`getApis.js`）、Mock 注入方式（`mockPreset`）、路由注册位置及分页/筛选参数约定。BizUnit 属性与高级用法（自定义操作 `getActionList`、批量操作 `tableProps.rowSelection`/`batchActions`、URL 筛选 `searchParamsValue`、自定义布局 `children`）见 [BizUnit doc/api.md](../../src/components/BizUnit/doc/api.md) 及 `doc/` 示例。

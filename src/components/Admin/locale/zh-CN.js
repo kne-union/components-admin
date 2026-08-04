@@ -3,10 +3,10 @@ const locale = {
   Avatar: '头像',
   Nickname: '昵称',
   Email: '邮箱',
-  Phone: '电话',
+  Phone: '手机',
   IsSuperAdmin: '是否超级管理员',
   Status: '状态',
-  Description: '个人简介',
+  Bio: '个人简介',
 
   // Status values
   Yes: '是',
@@ -32,7 +32,6 @@ const locale = {
   UserNickname: '昵称',
   UserEmail: '邮箱',
   UserPhone: '手机',
-  UserDescription: '个人简介',
 
   // Reset Password
   Password: '密码',
@@ -50,13 +49,13 @@ const locale = {
   SetNormalConfirm: '确定要设置账号为正常吗？',
   SetNormalSuccess: '账号已开启',
   CloseUser: '关闭',
-  CloseUserConfirm: '确定要关闭该账号吗？',
+  CloseAccountConfirm: '确定要关闭该账号吗？',
   CloseUserSuccess: '账号已关闭',
   SetStatusSuccess: '设置成功',
 
   // Filter labels
   FilterEmail: '邮箱',
-  FilterPhone: '电话',
+  FilterPhone: '手机',
   FilterStatus: '状态',
   FilterIsAdmin: '是否管理员',
 

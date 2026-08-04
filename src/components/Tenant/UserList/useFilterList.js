@@ -16,9 +16,9 @@ const useFilterList = ({
       {
         type: InputFilterItem,
         props: {
-          key: 'id',
+          key: 'userId',
           label: formatMessage({ id: 'FilterUserId' }),
-          name: 'id'
+          name: 'userId'
         }
       },
       {

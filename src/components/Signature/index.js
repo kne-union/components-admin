@@ -207,7 +207,7 @@ const Signature = createWithRemoteLoader({
         children: formatMessage({ id: 'Enabled' })
       },
       closeButtonProps: {
-        children: formatMessage({ id: 'Disabled' })
+        children: formatMessage({ id: 'Disable' })
       },
       closeMessage: formatMessage({ id: 'DisableSecretKeyMessage' }),
       removeMessage: formatMessage({ id: 'ConfirmDelete' }, { bizName: '密钥' }),

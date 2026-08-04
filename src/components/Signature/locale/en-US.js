@@ -12,6 +12,7 @@ const locale = {
 
   // Status values
   Enabled: 'Enabled',
+  Disable: 'Disable',
   Disabled: 'Disabled',
 
   // Actions

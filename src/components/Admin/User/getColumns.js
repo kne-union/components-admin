@@ -49,7 +49,7 @@ const getColumns = ({ formatMessage }) => {
     },
     {
       name: 'description',
-      title: formatMessage({ id: 'Description' }),
+      title: formatMessage({ id: 'Bio' }),
       renderType: 'description'
     }
   ];

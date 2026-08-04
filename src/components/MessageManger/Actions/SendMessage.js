@@ -44,7 +44,7 @@ const SendMessageInner = createWithRemoteLoader({
               if (resData.code !== 0) {
                 return false;
               }
-              message.success(formatMessage({ id: 'SendMessageSuccess' }));
+              message.success(formatMessage({ id: 'MessageSent' }));
               handleSuccess();
             }
           },

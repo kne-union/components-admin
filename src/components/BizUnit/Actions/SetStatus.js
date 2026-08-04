@@ -34,7 +34,7 @@ const SetStatus = createWithRemoteLoader({
           if (resData.code !== 0) {
             return;
           }
-          message.success(formatMessage({ id: 'ModifySuccess' }, { bizName: options.bizName }));
+          message.success(formatMessage({ id: 'ModifyNamedSuccess' }, { bizName: options.bizName }));
           onSuccess && onSuccess();
         }}
       />

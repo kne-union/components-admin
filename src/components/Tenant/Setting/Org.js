@@ -12,11 +12,10 @@ const OrgInner = createWithRemoteLoader({
     'components-core:Global@usePreset',
     'components-core:Global@useGlobalContext',
     'components-core:Permissions',
-    'components-core:Permissions@usePermissionsPass',
-    'components-core:Filter@filterToUrlParams'
+    'components-core:Permissions@usePermissionsPass'
   ]
 })(({ remoteModules, menu, pageProps: originPageProps, baseUrl, children, ...props }) => {
-  const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass, filterToUrlParams] = remoteModules;
+  const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
   const { global } = useGlobalContext('userInfo');
@@ -66,9 +65,11 @@ const OrgInner = createWithRemoteLoader({
                         onViewUsers={
                           allowViewUsers
                             ? org => {
-                                const query = filterToUrlParams([
-                                  { name: 'tenantOrgId', label: 'tenantOrgId', value: { label: org.name || '', value: String(org.id) } }
-                                ]);
+                                const query = new URLSearchParams();
+                                query.set('tenantOrgId', String(org.id));
+                                if (org.name != null && org.name !== '') {
+                                  query.set('tenantOrgName', String(org.name));
+                                }
                                 navigate(`${baseUrl}/user?${query.toString()}`);
                               }
                             : undefined

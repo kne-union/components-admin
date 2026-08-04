@@ -70,7 +70,7 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'description',
       renderType: 'description',
-      title: formatMessage({ id: 'UserDescription' }),
+      title: formatMessage({ id: 'UserRemark' }),
       ellipsis: true
     }
   ];

@@ -18,7 +18,7 @@ const getColumns = ({ formatMessage } = {}) => {
     },
     {
       name: 'target',
-      title: t('Target', '目标值')
+      title: t('TargetValue', '目标值')
     },
     {
       name: 'reviewStatus',

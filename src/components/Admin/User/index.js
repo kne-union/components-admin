@@ -26,7 +26,6 @@ const UserInner = createWithRemoteLoader({
   const { message } = App.useApp();
   const ref = useRef(null);
   const mobileListRef = useRef([]);
-  const filterValue = getFilterValue(filter);
 
   const reloadTable = useCallback(() => {
     ref.current?.reload();
@@ -152,7 +151,7 @@ const UserInner = createWithRemoteLoader({
               isDelete: true,
               confirm: true,
               children: formatMessage({ id: 'CloseUser' }),
-              message: formatMessage({ id: 'CloseUserConfirm' }),
+              message: formatMessage({ id: 'CloseAccountConfirm' }),
               okText: formatMessage({ id: 'Confirm' }),
               onClick: async () => {
                 const { data: resData } = await ajax(
@@ -192,6 +191,10 @@ const UserInner = createWithRemoteLoader({
       filter={{
         value: filter,
         onChange: setFilter,
+        // 接口参数在 params.filter 下；由 TablePage reload 合并，勿再抬升到 props.params.filter（lodash.merge 清不掉嵌套旧值）
+        mapFilterValue: (filterValue, getFv) => ({
+          filter: (getFv || getFilterValue)(filterValue || [])
+        }),
         list: [
           {
             type: InputFilterItem,
@@ -243,7 +246,7 @@ const UserInner = createWithRemoteLoader({
           }
         ]
       }}
-      {...Object.assign({}, apis.admin.getUserList, { params: { filter: filterValue } })}
+      {...apis.admin.getUserList}
       dataFormat={data => {
         const format = typeof apis.admin.getUserList?.dataFormat === 'function' ? apis.admin.getUserList.dataFormat : null;
         const formatted = format

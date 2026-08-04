@@ -16,7 +16,7 @@ const FormInner = createWithRemoteLoader({
         <Input name="nickname" label={formatMessage({ id: 'UserNickname' })} rule="LEN-0-100" />,
         <Input name="email" label={formatMessage({ id: 'UserEmail' })} rule="EMAIL ACCOUNT_IS_EXISTS" realtime />,
         <PhoneNumber name="phone" label={formatMessage({ id: 'UserPhone' })} rule="ACCOUNT_IS_EXISTS" format="string" />,
-        <TextArea name="description" label={formatMessage({ id: 'UserDescription' })} />
+        <TextArea name="description" label={formatMessage({ id: 'Bio' })} />
       ]}
     />
   );

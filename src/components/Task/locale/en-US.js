@@ -29,7 +29,7 @@ const locale = {
   ViewInputParams: 'View Input',
   BatchRetry: 'Batch Retry',
   // Status Enums
-  Pending: 'Pending',
+  PendingExecution: 'Pending Execution',
   Running: 'Running',
   Waiting: 'Waiting',
   Success: 'Success',

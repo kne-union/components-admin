@@ -35,7 +35,7 @@
     },
     {
       "title": "销售订单（URL 筛选同步）",
-      "description": "场景：订单中心。覆盖 urlFilterValue、onFilterChange、filter 与关键字搜索联动、renderType:status。示例环境已有外层 Router，通过 useSearchParams 初始化 URL 参数，勿嵌套 MemoryRouter。",
+      "description": "场景：订单中心。覆盖 searchParamsValue、onFilterChange、filter 与关键字搜索联动、renderType:status。示例环境已有外层 Router，通过 useSearchParams 初始化 URL 参数，勿嵌套 MemoryRouter。",
       "code": "./url-filter-next.js",
       "scope": [
         { "name": "_BizUnit", "packageName": "@components/BizUnit" },

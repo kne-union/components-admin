@@ -1,6 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo, useCallback } from 'react';
 import { Flex } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import merge from 'lodash/merge';
 import Create from './Actions/Create';
 import Actions from './Actions';
@@ -29,6 +30,57 @@ const normalizeTableFilterConfig = filterConfig => {
   });
 };
 
+/** 归一 field：保留 name / label / labelKey */
+const normalizeSearchParamsField = item => {
+  if (typeof item === 'string') {
+    return { name: item, label: item };
+  }
+  const next = { name: item.name, label: item.label || item.name };
+  if (item.labelKey) {
+    next.labelKey = item.labelKey;
+  }
+  return next;
+};
+
+/** 归一 searchParamsValue：支持 fields 数组简写，或与 Filter 同参的对象 */
+const normalizeSearchParamsValueProp = prop => {
+  if (!prop) {
+    return null;
+  }
+  if (Array.isArray(prop)) {
+    return {
+      fields: prop.map(normalizeSearchParamsField)
+    };
+  }
+  if (typeof prop === 'object') {
+    const fields = Array.isArray(prop.fields) ? prop.fields : [];
+    return {
+      fields: fields.map(normalizeSearchParamsField),
+      searchParams: prop.searchParams,
+      setSearchParams: prop.setSearchParams
+    };
+  }
+  return null;
+};
+
+/** 仅序列化 fields 描述，忽略 searchParams 实例引用，避免父级每次 render 传入新数组导致下游 filter 引用抖动 */
+const serializeSearchParamsFieldsKey = prop => {
+  if (!prop) {
+    return '';
+  }
+  const fields = Array.isArray(prop) ? prop : Array.isArray(prop.fields) ? prop.fields : [];
+  return JSON.stringify(
+    fields.map(item => {
+      if (typeof item === 'string') {
+        return { name: item, label: item };
+      }
+      return { name: item?.name, label: item?.label || item?.name, labelKey: item?.labelKey };
+    })
+  );
+};
+
+const readWindowSearchParams = () => new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+
 const BizUnit = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Table@TablePage', 'components-core:Filter']
 })(
@@ -50,7 +102,7 @@ const BizUnit = createWithRemoteLoader({
       page,
       options,
       onFilterChange: outerOnFilterChange,
-      urlFilterValue
+      searchParamsValue: searchParamsValueProp
     }) => {
       const { formatMessage } = useIntl();
       options = merge(
@@ -78,11 +130,46 @@ const BizUnit = createWithRemoteLoader({
       const filterConfig = filter ?? filterList ?? [];
       const [LayoutTablePage, LegacyTablePage, Filter] = remoteModules;
       const TablePage = isNext ? LayoutTablePage : LegacyTablePage;
-      const { SearchInput, getFilterValue, useUrlFilterValue } = Filter;
+      const { SearchInput, getFilterValue, useSearchParamsValue } = Filter;
       const ref = useRef(null);
-      const [urlFilter] = useUrlFilterValue(urlFilterValue || []);
+      const navigate = useNavigate();
 
-      const [filterValue, setFilterValue] = useState(urlFilter);
+      // 不要用 useSearchParams()：筛选/分页写 URL 会迫使 BizUnit 整树重渲染，
+      // children 里的 TablePage 被反复换 props，表现为表格区域卸载白屏。
+      const searchFieldsKey = serializeSearchParamsFieldsKey(searchParamsValueProp);
+      const normalizedSearchParamsValue = useMemo(
+        () => normalizeSearchParamsValueProp(searchParamsValueProp),
+        // 只在 fields 描述变化时重算；忽略父级每次 render 的新数组引用
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [searchFieldsKey]
+      );
+      const searchFields = normalizedSearchParamsValue?.fields || [];
+      const initialSearchParamsRef = useRef(null);
+      if (initialSearchParamsRef.current === null) {
+        initialSearchParamsRef.current = normalizedSearchParamsValue?.searchParams || readWindowSearchParams();
+      }
+      const resolvedSetSearchParams = useCallback(
+        (next, opts) => {
+          if (typeof normalizedSearchParamsValue?.setSearchParams === 'function') {
+            return normalizedSearchParamsValue.setSearchParams(next, opts);
+          }
+          const current = readWindowSearchParams();
+          const resolved = typeof next === 'function' ? next(current) : next;
+          const raw = resolved && typeof resolved.toString === 'function' ? resolved.toString() : '';
+          const search = raw ? `?${raw.replace(/^\?/, '')}` : '';
+          navigate({ search }, { replace: opts?.replace !== false });
+        },
+        [navigate, normalizedSearchParamsValue?.setSearchParams]
+      );
+
+      // isNext 时由 TablePage filter.searchParamsValue 负责解析与清理；legacy 仍用 hook seed
+      const fromSearchParams = useSearchParamsValue({
+        searchParams: initialSearchParamsRef.current,
+        setSearchParams: isNext ? undefined : resolvedSetSearchParams,
+        fields: searchFields
+      });
+
+      const [filterValue, setFilterValue] = useState(fromSearchParams);
 
       const legacyFilterList = isTablePageFilterConfig(filterConfig) ? filterConfig.list : filterConfig;
 
@@ -145,16 +232,44 @@ const BizUnit = createWithRemoteLoader({
         </Flex>
       );
 
+      // 挂载期 snapshot，避免 URL 变化时换 searchParams 引用 → filter 引用抖动 → 下游卸载
+      const searchParamsValueConfig = useMemo(() => {
+        if (!searchFields.length) {
+          return null;
+        }
+        return {
+          searchParams: initialSearchParamsRef.current,
+          setSearchParams: resolvedSetSearchParams,
+          fields: searchFields
+        };
+      }, [searchFields, resolvedSetSearchParams]);
+
+      /**
+       * isNext 筛选项来源：顶层 filter/filterList，或 options.tableProps.filter（业务更常见）。
+       * 原先只认顶层 filter，导致 BizUnit.searchParamsValue 配了也不进 TablePage。
+       */
+      const resolveNextFilterBase = () => {
+        if (isTablePageFilterConfig(filterConfig)) {
+          return filterConfig;
+        }
+        if (isTablePageFilterConfig(options.tableProps?.filter)) {
+          return options.tableProps.filter;
+        }
+        return null;
+      };
+
       const resolveNextFilter = () => {
-        if (!isTablePageFilterConfig(filterConfig)) {
+        const baseFilter = resolveNextFilterBase();
+        if (!baseFilter && !searchParamsValueConfig) {
           return null;
         }
         return merge(
           {},
-          normalizeTableFilterConfig(filterConfig),
-          urlFilterValue ? { defaultValue: urlFilter } : {},
+          baseFilter ? normalizeTableFilterConfig(baseFilter) : { list: [] },
+          searchParamsValueConfig ? { searchParamsValue: searchParamsValueConfig } : {},
           outerOnFilterChange ? { onChange: outerOnFilterChange } : {},
-          options.mapFilterValue
+          // tableProps.filter 已带 mapFilterValue 时不要用 options.mapFilterValue 覆盖（否则清空筛选会丢自定义清参逻辑）
+          options.mapFilterValue && typeof baseFilter?.mapFilterValue !== 'function'
             ? {
                 mapFilterValue: (value, getFv) => options.mapFilterValue(value, getFv || getFilterValue)
               }
@@ -223,11 +338,21 @@ const BizUnit = createWithRemoteLoader({
         isNext ? { buttonGroup: nextButtonGroup } : {}
       );
 
+      // options.tableProps 后合并可能冲掉 searchParamsValue；最终再挂回，保证 URL 种子进 TablePage
+      if (isNext && searchParamsValueConfig) {
+        const mergedFilter = isTablePageFilterConfig(tableOptions.filter)
+          ? normalizeTableFilterConfig(tableOptions.filter)
+          : { list: Array.isArray(tableOptions.filter?.list) ? tableOptions.filter.list : [] };
+        tableOptions.filter = Object.assign({}, mergedFilter, {
+          searchParamsValue: searchParamsValueConfig
+        });
+      }
+
       if (typeof children === 'function') {
         return children({
           isNext,
           filter: isNext
-            ? nextFilter
+            ? tableOptions.filter || nextFilter
             : { value: filterValue, onChange: setFilterValue, list: legacyFilterList },
           // isNext 时操作已并入 tableOptions.buttonGroup，不再单独提供顶部节点，避免重复渲染
           topOptions: isNext ? null : topOptions,

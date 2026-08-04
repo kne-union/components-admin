@@ -31,7 +31,7 @@ const Edit = createWithRemoteLoader({
               return false;
             }
 
-            message.success(formatMessage({ id: 'SaveSuccess' }, { bizName: options.bizName }));
+            message.success(formatMessage({ id: 'SaveNamedSuccess' }, { bizName: options.bizName }));
             onSuccess && onSuccess();
           };
           formModal(

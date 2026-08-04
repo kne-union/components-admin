@@ -3,7 +3,7 @@ import { createFormatMessage } from './withLocale';
 const taskStatus = ({ locale }) => {
   const formatMessage = createFormatMessage(locale);
   return [
-    { description: formatMessage({ id: 'Pending' }), value: 'pending', type: 'info' },
+    { description: formatMessage({ id: 'PendingExecution' }), value: 'pending', type: 'info' },
     { description: formatMessage({ id: 'Running' }), value: 'running', type: 'progress' },
     { description: formatMessage({ id: 'Waiting' }), value: 'waiting', type: 'info' },
     { description: formatMessage({ id: 'Success' }), value: 'success', type: 'success' },

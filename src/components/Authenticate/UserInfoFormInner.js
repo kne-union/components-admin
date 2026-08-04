@@ -18,7 +18,7 @@ const UserInfoFormInner = createWithRemoteLoader({
         </Flex>,
         <Input name="email" label={formatMessage({ id: 'Email' })} rule="REQ" />,
         <Input name="nickname" label={formatMessage({ id: 'Nickname' })} />,
-        <TextArea name="description" label={formatMessage({ id: 'Description' })} rule="LEN-0-500" />
+        <TextArea name="description" label={formatMessage({ id: 'Bio' })} rule="LEN-0-500" />
       ]}
     />
   );

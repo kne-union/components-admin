@@ -4,7 +4,7 @@
 
 - **配置驱动**：仅凭 `apis`、`getColumns`、`getFormInner` 三项核心配置即可生成完整 CRUD 列表页，操作列由组件自动追加
 - **isNext 新版表格**：基于 `@kne/table-page`，支持 `renderType`、`getValueOf`、`format` 等现代化列配置，内置关键字搜索与分页
-- **灵活筛选**：`filter` 配置筛选项，isNext 为一维数组，支持输入框、下拉、日期区间等，可配合 `urlFilterValue` 实现 URL 参数同步
+- **灵活筛选**：`filter` 配置筛选项，isNext 为一维数组，支持输入框、下拉、日期区间等，可配合 `searchParamsValue` 从 URL 平铺参数种子化初始筛选
 - **自定义布局**：通过 `children` 回调接管渲染，配合 `TablePageRender` 适配 `SystemLayout`、`StateBarPage` 等多种容器
 - **可扩展操作**：`getActionList` 支持重置内置按钮、追加自定义按钮，行内操作灵活可控
 
