@@ -71,7 +71,7 @@ const FormInnerInner = createWithRemoteLoader({
       />,
       <PhoneNumber name="phone" label={formatMessage({ id: 'Phone' })} format="string" disabled={isSynced} />,
       <Input name="email" label={formatMessage({ id: 'Email' })} rule="EMAIL LEN-0-100" disabled={isSynced} />,
-      <TextArea name="description" label={formatMessage({ id: 'UserDescription' })} block disabled={isSynced} />
+      <TextArea name="description" label={formatMessage({ id: 'UserRemark' })} block disabled={isSynced} />
     ];
     const UserFormInner = get(plugins, 'tenantAdmin.UserFormInner');
     if (UserFormInner && (UserFormInner.$$typeof || typeof UserFormInner.type === 'function')) {

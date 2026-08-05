@@ -24,7 +24,7 @@ const MyTask = createWithRemoteLoader({
         label: formatMessage({ id: 'Status' }),
         value: {
           value: 'pending',
-          label: formatMessage({ id: 'Pending' })
+          label: formatMessage({ id: 'PendingExecution' })
         }
       }
     ]);

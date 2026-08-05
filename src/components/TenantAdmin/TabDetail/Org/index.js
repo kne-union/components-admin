@@ -2,17 +2,15 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { OrgInfo } from '@components/Tenant';
 import Fetch from '@kne/react-fetch';
 import { useSearchParams } from 'react-router-dom';
-import { useIntl } from '@kne/react-intl';
 import withLocale from '../../withLocale';
 import { Flex } from 'antd';
 
 const Org = createWithRemoteLoader({
-  modules: ['components-core:Filter@filterToUrlParams', 'components-core:Global@usePreset']
+  modules: ['components-core:Global@usePreset']
 })(
   withLocale(({ remoteModules, tenant }) => {
-    const [filterToUrlParams, usePreset] = remoteModules;
+    const [usePreset] = remoteModules;
     const { apis } = usePreset();
-    const { formatMessage } = useIntl();
     const [searchParams, setSearchParams] = useSearchParams();
     return (
       <Fetch
@@ -49,16 +47,10 @@ const Org = createWithRemoteLoader({
                     onViewUsers={org => {
                       const next = new URLSearchParams(searchParams);
                       next.set('tab', 'user');
-                      const filterParams = filterToUrlParams([
-                        {
-                          name: 'tenantOrgId',
-                          label: formatMessage({ id: 'Department' }),
-                          value: { label: org.name || String(org.id), value: String(org.id) }
-                        }
-                      ]);
-                      filterParams.forEach((value, key) => {
-                        next.set(key, value);
-                      });
+                      next.set('tenantOrgId', String(org.id));
+                      if (org.name != null && org.name !== '') {
+                        next.set('tenantOrgName', String(org.name));
+                      }
                       setSearchParams(next);
                     }}
                     apis={{

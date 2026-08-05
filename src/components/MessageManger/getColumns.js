@@ -6,7 +6,7 @@ import Actions from './Actions';
 
 const renderEnumTag = ({ formatMessage, value, moduleName }) => {
   if (moduleName === 'messageManagerType') {
-    return <Tag color={MESSAGE_TYPE_COLORS[value] || 'default'}>{formatMessage({ id: Number(value) === 1 ? 'SMS' : 'Email' })}</Tag>;
+    return <Tag color={MESSAGE_TYPE_COLORS[value] || 'default'}>{formatMessage({ id: Number(value) === 1 ? 'SMS' : 'EmailChannel' })}</Tag>;
   }
   if (moduleName === 'messageTemplateLevel') {
     return <Tag color={Number(value) === 1 ? 'purple' : 'blue'}>{formatMessage({ id: Number(value) === 1 ? 'Business' : 'System' })}</Tag>;
@@ -16,7 +16,7 @@ const renderEnumTag = ({ formatMessage, value, moduleName }) => {
 
 const getTemplateColumns = ({ formatMessage, onSuccess }) => [
   { name: 'name', title: formatMessage({ id: 'Name' }), renderType: 'main' },
-  { name: 'code', title: formatMessage({ id: 'Code' }) },
+  { name: 'code', title: formatMessage({ id: 'TemplateCode' }) },
   {
     name: 'type',
     title: formatMessage({ id: 'Type' }),
@@ -45,8 +45,8 @@ const getTemplateColumns = ({ formatMessage, onSuccess }) => [
 ];
 
 const getRecordColumns = ({ formatMessage, onSuccess }) => [
-  { name: 'name', title: formatMessage({ id: 'Target' }), renderType: 'main' },
-  { name: 'code', title: formatMessage({ id: 'Code' }) },
+  { name: 'name', title: formatMessage({ id: 'Recipient' }), renderType: 'main' },
+  { name: 'code', title: formatMessage({ id: 'TemplateCode' }) },
   {
     name: 'type',
     title: formatMessage({ id: 'Type' }),

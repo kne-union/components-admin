@@ -43,7 +43,7 @@ const SendMessage = createWithRemoteLoader({
           if (resData.code !== 0) {
             return false;
           }
-          message.success(formatMessage({ id: 'SendMessageSuccess' }, { count: externalUsers.length }));
+          message.success(formatMessage({ id: 'MessageSentToCount' }, { count: externalUsers.length }));
           onSuccess?.();
         }
       },

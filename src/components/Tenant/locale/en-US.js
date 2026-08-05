@@ -42,7 +42,7 @@ const locale = {
   Position: 'Position',
   Phone: 'Phone',
   Email: 'Email',
-  UserDescription: 'Description',
+  UserRemark: 'Remark',
   PhoneTitle: 'Phone',
   DefaultRole: 'Default Role',
 
@@ -178,7 +178,7 @@ const locale = {
   ImportColPhone: 'Phone',
   ImportTenantIdMissing: 'Tenant information is missing, import aborted',
   ImportDragText: 'Click or drag .xlsx / .xls file here',
-  ImportSuccess: 'Import finished: {createdOrgs} org(s) created, {createdUsers} user(s) created, {reusedUsers} user(s) reused, {rowCount} row(s)',
+  ImportOrgUsersSuccess: 'Import finished: {createdOrgs} org(s) created, {createdUsers} user(s) created, {reusedUsers} user(s) reused, {rowCount} row(s)',
   DownloadImportTemplate: 'Download sample Excel template',
   RoleName: 'Role Name',
   RoleCode: 'Role Code',
@@ -213,7 +213,7 @@ const locale = {
   SendSuccess: 'Sent successfully',
   Open: 'Open',
   Close: 'Close',
-  CloseUserConfirm: 'Are you sure you want to close this user? He will not be able to use the current tenant after closing',
+  CloseTenantUserConfirm: 'Are you sure you want to close this user? He will not be able to use the current tenant after closing',
   DeleteUserConfirm: 'Are you sure you want to delete this user? He will not be able to use the current tenant after deletion',
 
   // TenantUserSelect
@@ -289,6 +289,8 @@ const locale = {
   ThirdLoginBound: 'Bound',
   ThirdLoginUnbound: 'Not bound',
   ThirdLoginNoChannel: 'Configure a third-party login channel first',
+  MessageSentToCount: 'Successfully sent to {count} people',
+  SelectedCount: '{count} selected',
 };
 
 export default locale;

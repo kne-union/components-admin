@@ -18,10 +18,10 @@ const DetailContent = withLocale(({ data, type }) => {
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
       <Descriptions bordered column={2} size="small">
         <Descriptions.Item label={formatMessage({ id: 'ID' })}>{data?.id}</Descriptions.Item>
-        <Descriptions.Item label={formatMessage({ id: 'Code' })}>{data?.code || '-'}</Descriptions.Item>
-        <Descriptions.Item label={formatMessage({ id: isRecord ? 'Target' : 'Name' })}>{data?.name || '-'}</Descriptions.Item>
+        <Descriptions.Item label={formatMessage({ id: 'TemplateCode' })}>{data?.code || '-'}</Descriptions.Item>
+        <Descriptions.Item label={formatMessage({ id: isRecord ? 'Recipient' : 'Name' })}>{data?.name || '-'}</Descriptions.Item>
         <Descriptions.Item label={formatMessage({ id: 'Type' })}>
-          <Tag color={MESSAGE_TYPE_COLORS[data?.type] || 'default'}>{formatMessage({ id: Number(data?.type) === 1 ? 'SMS' : 'Email' })}</Tag>
+          <Tag color={MESSAGE_TYPE_COLORS[data?.type] || 'default'}>{formatMessage({ id: Number(data?.type) === 1 ? 'SMS' : 'EmailChannel' })}</Tag>
         </Descriptions.Item>
         {isRecord ? <Descriptions.Item label={formatMessage({ id: 'TemplateId' })} span={2}>{data?.templateId || '-'}</Descriptions.Item> : null}
         {!isRecord ? <Descriptions.Item label={formatMessage({ id: 'Level' })}>{formatMessage({ id: Number(data?.level) === 1 ? 'Business' : 'System' })}</Descriptions.Item> : null}

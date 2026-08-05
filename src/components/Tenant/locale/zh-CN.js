@@ -42,7 +42,7 @@ const locale = {
   Position: '岗位',
   Phone: '手机',
   Email: '邮箱',
-  UserDescription: '描述',
+  UserRemark: '描述',
   PhoneTitle: '电话',
   DefaultRole: '默认角色',
 
@@ -177,7 +177,7 @@ const locale = {
   ImportColPhone: '手机',
   ImportTenantIdMissing: '缺少租户信息，无法导入',
   ImportDragText: '点击或拖拽 .xlsx / .xls 文件到此',
-  ImportSuccess: '导入完成：新建组织 {createdOrgs} 个，新建用户 {createdUsers} 人，复用用户 {reusedUsers} 人，共 {rowCount} 行',
+  ImportOrgUsersSuccess: '导入完成：新建组织 {createdOrgs} 个，新建用户 {createdUsers} 人，复用用户 {reusedUsers} 人，共 {rowCount} 行',
   DownloadImportTemplate: '下载示例 Excel 模板',
   RoleName: '角色名称',
   RoleCode: '角色编码',
@@ -209,7 +209,7 @@ const locale = {
   SendSuccess: '发送成功',
   Open: '开启',
   Close: '关闭',
-  CloseUserConfirm: '确定要关闭用户吗？关闭后他将不能使用当前租户',
+  CloseTenantUserConfirm: '确定要关闭用户吗？关闭后他将不能使用当前租户',
   DeleteUserConfirm: '确定要删除用户吗？删除后他将不能使用当前租户',
 
   // TenantUserSelect
@@ -296,10 +296,10 @@ const locale = {
   SendMessageTypeMarkdown: 'Markdown',
   SendMessagePlaceholder: '请输入消息内容',
   SendMessageContentRequired: '请输入消息内容',
-  SendMessageSuccess: '已成功发送给 {count} 人',
+  MessageSentToCount: '已成功发送给 {count} 人',
   SendMessageFailed: '发送失败',
   Send: '发送',
-  SelectedCount: '已选: {count} 项',
+  SelectedCount: '已选 {count} 项',
   DeselectAll: '取消',
 };
 

@@ -3,10 +3,10 @@ const locale = {
   Avatar: 'Avatar',
   Email: 'Email',
   Nickname: 'Nickname',
-  Description: 'Description',
+  Bio: 'Bio',
 
   // SaveUserInfo
-  EditUserInfo: 'Edit Personal Info',
+  EditPersonalInfo: 'Edit Personal Info',
   SaveSuccess: 'Saved successfully'
 };
 

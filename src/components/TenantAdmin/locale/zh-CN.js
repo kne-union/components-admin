@@ -4,7 +4,7 @@ const locale = {
   Name: '名称',
   Status: '状态',
   Description: '描述',
-  CreatedAt: '添加时间',
+  CreatedAt: '创建时间',
   Open: '开启',
   Close: '关闭',
   All: '全部',

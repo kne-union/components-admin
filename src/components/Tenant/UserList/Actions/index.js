@@ -52,7 +52,7 @@ const Actions = createWithRemoteLoader({
         children: formatMessage({ id: 'Close' }),
         buttonComponent: SetStatus,
         hidden: props.data?.status === 'closed' || !props.apis.save,
-        message: formatMessage({ id: 'CloseUserConfirm' }),
+        message: formatMessage({ id: 'CloseTenantUserConfirm' }),
         isDelete: false
       },
       {

@@ -6,7 +6,7 @@ const locale = {
   Phone: 'Phone',
   IsSuperAdmin: 'Is Super Admin',
   Status: 'Status',
-  Description: 'Description',
+  Bio: 'Bio',
 
   // Status values
   Yes: 'Yes',
@@ -32,7 +32,6 @@ const locale = {
   UserNickname: 'Nickname',
   UserEmail: 'Email',
   UserPhone: 'Phone',
-  UserDescription: 'Description',
 
   // Reset Password
   Password: 'Password',
@@ -50,7 +49,7 @@ const locale = {
   SetNormalConfirm: 'Are you sure to set this account as normal?',
   SetNormalSuccess: 'Account has been opened',
   CloseUser: 'Close',
-  CloseUserConfirm: 'Are you sure to close this account?',
+  CloseAccountConfirm: 'Are you sure to close this account?',
   CloseUserSuccess: 'Account has been closed',
   SetStatusSuccess: 'Set status successfully',
 

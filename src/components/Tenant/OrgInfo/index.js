@@ -826,7 +826,7 @@ const OrgInfo = createWithRemoteLoader({
       const { createdOrgs, createdUsers, reusedUsers, rowCount } = resData.data;
       message.success(
         formatMessage(
-          { id: 'ImportSuccess' },
+          { id: 'ImportOrgUsersSuccess' },
           {
             createdOrgs,
             createdUsers,

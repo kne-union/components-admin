@@ -83,7 +83,7 @@ const buildTodayHourlySlots = raw => {
 
 /** 消息实时统计：type 0 邮件、1 短信（与 enums messageManagerType 一致） */
 const messageTypeLabel = (typeKey, formatMessage) => {
-  if (typeKey === '0') return formatMessage({ id: 'Email' });
+  if (typeKey === '0') return formatMessage({ id: 'EmailChannel' });
   if (typeKey === '1') return formatMessage({ id: 'SMS' });
   return `${formatMessage({ id: 'Type' })} ${typeKey}`;
 };
@@ -224,7 +224,7 @@ const RealtimeSection = createWithRemoteLoader({
 
       const slots = buildTodayHourlySlots(realtimeData);
       const totalLabel = formatMessage({ id: 'TotalCount' });
-      const emailLabel = formatMessage({ id: 'Email' });
+      const emailLabel = formatMessage({ id: 'EmailChannel' });
       const smsLabel = formatMessage({ id: 'SMS' });
       const lineFor = (data, color) => ({
         type: 'line',
@@ -309,7 +309,7 @@ const RealtimeSection = createWithRemoteLoader({
       }
 
       if (!realtimeData) {
-        const emailLabel = formatMessage({ id: 'Email' });
+        const emailLabel = formatMessage({ id: 'EmailChannel' });
         const smsLabel = formatMessage({ id: 'SMS' });
         return {
           color: [PALETTE.email, PALETTE.sms],
@@ -365,7 +365,7 @@ const RealtimeSection = createWithRemoteLoader({
         return sum;
       });
 
-      const emailLabel = formatMessage({ id: 'Email' });
+      const emailLabel = formatMessage({ id: 'EmailChannel' });
       const smsLabel = formatMessage({ id: 'SMS' });
 
       return {
@@ -421,7 +421,7 @@ const RealtimeSection = createWithRemoteLoader({
                 {' · '}
                 {formatMessage({ id: 'TotalCount' })} <strong style={{ color: PALETTE.total }}>{displayStats.totalRecords}</strong>
                 {' · '}
-                <span style={{ color: PALETTE.email }}>{formatMessage({ id: 'Email' })}</span>{' '}
+                <span style={{ color: PALETTE.email }}>{formatMessage({ id: 'EmailChannel' })}</span>{' '}
                 <strong style={{ color: PALETTE.email }}>{displayStats.email}</strong>
                 {emailPct != null ? <span> ({emailPct}%)</span> : null}
                 {' · '}
@@ -460,7 +460,7 @@ const RealtimeSection = createWithRemoteLoader({
                     displayStats.email + displayStats.sms !== displayStats.totalRecords ? (
                       <>
                         {' · '}
-                        {formatMessage({ id: 'Email' })}+{formatMessage({ id: 'SMS' })}={displayStats.email + displayStats.sms}
+                        {formatMessage({ id: 'EmailChannel' })}+{formatMessage({ id: 'SMS' })}={displayStats.email + displayStats.sms}
                       </>
                     ) : null}
                   </span>
@@ -532,7 +532,7 @@ const RealtimeSection = createWithRemoteLoader({
                           borderColor: `${PALETTE.email}50`
                         }}
                       >
-                        {formatMessage({ id: 'Email' })}{' '}
+                        {formatMessage({ id: 'EmailChannel' })}{' '}
                         <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{period.email}</span>
                       </Tag>
                       <Tag

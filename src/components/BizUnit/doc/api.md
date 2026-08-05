@@ -35,7 +35,7 @@
 | children           | 自定义渲染函数，接管布局                            | Function        | -     |
 | onMount            | 组件挂载回调                                  | Function        | -     |
 | onFilterChange     | 筛选变更回调                                  | Function        | -     |
-| urlFilterValue     | URL 筛选参数映射，见 `Filter.useUrlFilterValue` | Array \| Object | -     |
+| searchParamsValue  | 与 Filter `useSearchParamsValue` / TablePage `filter.searchParamsValue` 同参。可传 `{ fields, searchParams?, setSearchParams? }`，或简写为 fields 数组（`string` / `{ name, label, labelKey? }`）。`labelKey` 为选中值展示文案的 URL key。未传 searchParams 时用路由 `useSearchParams`。**isNext 下无论筛选项写在顶层 `filter`/`filterList` 还是 `options.tableProps.filter`，都会把本配置合并进 TablePage** | Object \| Array | -     |
 
 #### apis
 

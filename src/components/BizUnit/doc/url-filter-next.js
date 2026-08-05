@@ -91,7 +91,7 @@ const UrlFilterNextExample = createWithRemoteLoader({
           page={{ title: '销售订单' }}
           apis={apis}
           getColumns={getColumns}
-          urlFilterValue={['status', 'customerName']}
+          searchParamsValue={['status', 'customerName']}
           onFilterChange={value => message.info(`筛选条件已变更：${JSON.stringify(value)}`)}
           options={{
             keywordFilterName: 'customerName',

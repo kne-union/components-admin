@@ -1,7 +1,8 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import merge from 'lodash/merge';
-import { useRef, useEffect, useMemo, useCallback } from 'react';
+import { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import { Flex, Button } from 'antd';
+import { useSearchParams } from 'react-router-dom';
 import Actions from './Actions';
 import Create from './Actions/Create';
 import SendMessage from './Actions/SendMessage';
@@ -13,6 +14,21 @@ import useRefCallback from '@kne/use-ref-callback';
 import useFilterList from './useFilterList';
 import useColumns from './useColumns';
 import get from 'lodash/get';
+
+/**
+ * 将 URL 中的 userId 别名（filterUserId / id）归一到 userId，供 searchParamsValue 直接对齐筛选项 name。
+ * TenantAdmin 详情页 URL 的 id 是租户 id，仅当 allowQueryIdForUserFilter 时才把 id 当作用户 id。
+ */
+const normalizeUserSearchParams = (searchParams, { allowQueryIdForUserFilter } = {}) => {
+  const next = new URLSearchParams(searchParams);
+  if (!next.get('userId')) {
+    const alias = next.get('filterUserId') || (allowQueryIdForUserFilter ? next.get('id') : null);
+    if (alias) {
+      next.set('userId', alias);
+    }
+  }
+  return next;
+};
 
 const UserList = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Table', 'components-core:Filter', 'components-core:Global@usePreset']
@@ -38,14 +54,14 @@ const UserList = createWithRemoteLoader({
       const {
         getFilterValue,
         createFilterValueMapper,
-        useUrlFilter,
-        createUrlFilterReader,
+        useSearchParamsValue,
         multiSelectInterceptor,
         singleSelectInterceptor,
         fields: filterFields
       } = Filter;
       const { InputFilterItem, SuperSelectFilterItem, SelectTreeFilterItem } = filterFields;
       const { plugins } = usePreset();
+      const [searchParams, setSearchParams] = useSearchParams();
 
       const selectedRow = useSelectedRow();
       const { selectedRowKeys, selectedRows, setSelectedRows, setSelectedRowKeys, type } = selectedRow;
@@ -65,69 +81,109 @@ const UserList = createWithRemoteLoader({
         [type, selectedRowKeys, setSelectedRowKeys]
       );
 
-      const mapFilterValue = useMemo(
-        () =>
-          createFilterValueMapper({
-            id: 'string',
-            roles: 'multi',
-            tenantOrgId: 'single',
-            synced: 'single'
-          }),
-        [createFilterValueMapper]
+      const mapFilterValue = useMemo(() => {
+        const mapper = createFilterValueMapper({
+          userId: 'string',
+          roles: 'multi',
+          tenantOrgId: 'single',
+          synced: 'single'
+        });
+        // 接口仍使用 filter.id；返回 { filter } 由 TablePage reload 合并进 params，勿在外层再抬升 params.filter
+        return (filterValue, getFv) => {
+          const value = mapper(filterValue, getFv || getFilterValue);
+          if (value.userId != null && value.userId !== '') {
+            value.id = value.userId;
+            delete value.userId;
+          }
+          return { filter: value };
+        };
+      }, [createFilterValueMapper, getFilterValue]);
+
+      const searchParamsFields = useMemo(
+        () => [
+          { name: 'tenantOrgId', label: formatMessage({ id: 'Department' }), labelKey: 'tenantOrgName' },
+          { name: 'userId', label: formatMessage({ id: 'FilterUserId' }), labelKey: 'userName' }
+        ],
+        [formatMessage]
       );
 
-      const [filter, setFilter] = useUrlFilter({
-        readUrlParams: searchParams => {
-          const reader = createUrlFilterReader(searchParams);
-          const tenantOrgEntry = reader.takeFilterEntry('tenantOrgId');
-          let userEntry = reader.takeFilterEntry('userId');
-          const filterUserEntry = reader.takeFilterEntry('filterUserId');
-          if (!userEntry && filterUserEntry) {
-            userEntry = filterUserEntry;
-          }
-          let idEntry = null;
+      const [seedSearchParams] = useState(() =>
+        normalizeUserSearchParams(searchParams, { allowQueryIdForUserFilter })
+      );
+
+      const stripUserListUrlParams = useCallback(
+        (_next, opts) => {
+          // 基于当前 window search 清理，避免闭包绑死旧 searchParams 导致回调引用抖动
+          const real = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+          ['userId', 'filterUserId', 'userName', 'tenantOrgId', 'tenantOrgName'].forEach(key => {
+            real.delete(key);
+          });
           if (allowQueryIdForUserFilter) {
-            idEntry = reader.takeFilterEntry('id');
+            real.delete('id');
           }
-          const tenantOrgId = tenantOrgEntry?.value || initialTenantOrgId || null;
-          const orgName = tenantOrgEntry?.label || initialOrgName || '';
-          const userId = userEntry?.value || idEntry?.value || initialUserId || null;
-          return {
-            consumedKeys: reader.getConsumedKeys(),
-            tenantOrgId,
-            orgName,
-            userId,
-            tenantOrgEntry,
-            userEntry: userId ? userEntry || { label: String(userId), value: String(userId) } : null
-          };
+          setSearchParams(real, opts);
         },
-        buildFilter: ({ tenantOrgId, orgName, tenantOrgEntry, userEntry }) => {
-          const items = [
-            { name: 'status', label: formatMessage({ id: 'FilterStatus' }), value: { label: formatMessage({ id: 'Open' }), value: 'open' } }
-          ];
-          if (userEntry) {
-            items.push({ name: 'id', label: formatMessage({ id: 'FilterUserId' }), value: userEntry });
-          }
-          if (tenantOrgEntry) {
-            items.push({
-              name: 'tenantOrgId',
-              label: formatMessage({ id: 'Department' }),
-              value: { ...tenantOrgEntry, id: tenantOrgEntry.value, name: tenantOrgEntry.label }
-            });
-          } else if (tenantOrgId) {
-            const orgId = String(tenantOrgId).trim();
-            const name = orgName != null ? String(orgName) : orgId;
-            items.push({
-              name: 'tenantOrgId',
-              label: formatMessage({ id: 'Department' }),
-              value: { label: name, value: orgId, id: orgId, name }
-            });
-          }
-          return items;
-        }
+        [setSearchParams, allowQueryIdForUserFilter]
+      );
+
+      const searchParamsValue = useMemo(
+        () => ({
+          searchParams: seedSearchParams,
+          setSearchParams: stripUserListUrlParams,
+          fields: searchParamsFields
+        }),
+        [seedSearchParams, stripUserListUrlParams, searchParamsFields]
+      );
+
+      // 仅解析首屏展示用；URL 清理交给 TablePage filter.searchParamsValue
+      const fromUrl = useSearchParamsValue({
+        searchParams: seedSearchParams,
+        fields: searchParamsFields
       });
 
-      const filterValue = useMemo(() => mapFilterValue(filter, getFilterValue), [filter, getFilterValue, mapFilterValue]);
+      const [filter, setFilter] = useState(() => {
+        const byName = Object.fromEntries((fromUrl || []).map(item => [item.name, item]));
+        const items = [
+          { name: 'status', label: formatMessage({ id: 'FilterStatus' }), value: { label: formatMessage({ id: 'Open' }), value: 'open' } }
+        ];
+        const userRaw = byName.userId;
+        const userId = userRaw?.value?.value || initialUserId || null;
+        if (userId) {
+          items.push({
+            name: 'userId',
+            label: formatMessage({ id: 'FilterUserId' }),
+            value: userRaw?.value || { label: String(userId), value: String(userId) }
+          });
+        }
+        const orgEntry = byName.tenantOrgId;
+        if (orgEntry) {
+          const orgId = String(orgEntry.value.value).trim();
+          const orgLabel = orgEntry.value.label != null ? String(orgEntry.value.label) : orgId;
+          items.push({
+            name: 'tenantOrgId',
+            label: formatMessage({ id: 'Department' }),
+            value: { label: orgLabel, value: orgId, id: orgId, name: orgLabel }
+          });
+        } else if (initialTenantOrgId) {
+          const orgId = String(initialTenantOrgId).trim();
+          const name = initialOrgName != null ? String(initialOrgName) : orgId;
+          items.push({
+            name: 'tenantOrgId',
+            label: formatMessage({ id: 'Department' }),
+            value: { label: name, value: orgId, id: orgId, name }
+          });
+        }
+        return items;
+      });
+
+      const handleFilterChange = useCallback(
+        next => {
+          setFilter(next);
+          clearSelection();
+        },
+        [clearSelection]
+      );
+
       const filterList = useFilterList({
         formatMessage,
         apis,
@@ -192,13 +248,10 @@ const UserList = createWithRemoteLoader({
         [apis, getActions, reloadTable, rowSelection]
       );
 
+      // 对齐 BizUnit 演示：筛选走 TablePage 内部 reload + mapFilterValue，不要把 filter 抬升进 list.params
       const tableOptions = {
         isNext: true,
-        ...merge({}, apis.list, {
-          params: {
-            filter: filterValue
-          }
-        }),
+        ...merge({}, apis.list),
         dataFormat: data => {
           const format = typeof apis.list?.dataFormat === 'function' ? apis.list.dataFormat : null;
           const formatted = format
@@ -218,8 +271,11 @@ const UserList = createWithRemoteLoader({
         },
         filter: {
           value: filter,
-          onChange: setFilter,
-          list: filterList
+          onChange: handleFilterChange,
+          list: filterList,
+          mapFilterValue,
+          // TablePage 新 API：首包 merge + 清理 URL；字段名与筛选项对齐（userId / tenantOrgId）
+          searchParamsValue
         },
         columns: [
           ...columns,
@@ -247,15 +303,16 @@ const UserList = createWithRemoteLoader({
       };
 
       const handlerMount = useRefCallback(() => {
-        onMount?.({ filter: { value: filter, onChange: setFilter }, filterList, tableOptions });
+        onMount?.({ filter: { value: filter, onChange: handleFilterChange }, filterList, tableOptions });
       });
 
+      // 仅挂载与勾选变化时通知；不要在每次筛选 onChange 时回调，避免外层连带重渲
       useEffect(() => {
         handlerMount();
-      }, [handlerMount, filter, selectedRowKeys]);
+      }, [handlerMount, selectedRowKeys]);
 
       if (typeof children === 'function') {
-        return children({ filter: { value: filter, onChange: setFilter }, filterList, tableOptions });
+        return children({ filter: { value: filter, onChange: handleFilterChange }, filterList, tableOptions });
       }
 
       return <TablePage {...tableOptions} />;

@@ -166,7 +166,7 @@ const HistorySection = createWithRemoteLoader({
             return {
               color: [PALETTE.total, PALETTE.email, PALETTE.sms],
               tooltip: tooltipStyle,
-              legend: { ...legendCenterStyle, data: [formatMessage({ id: 'TotalCount' }), formatMessage({ id: 'Email' }), formatMessage({ id: 'SMS' })] },
+              legend: { ...legendCenterStyle, data: [formatMessage({ id: 'TotalCount' }), formatMessage({ id: 'EmailChannel' }), formatMessage({ id: 'SMS' })] },
               grid: manyPoints ? lineChartGridWithRotatedLabels : lineChartGrid,
               xAxis: {
                 type: 'category',
@@ -196,7 +196,7 @@ const HistorySection = createWithRemoteLoader({
                   areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(59,130,246,0.18)' }, { offset: 1, color: 'rgba(59,130,246,0.02)' }] } }
                 },
                 {
-                  name: formatMessage({ id: 'Email' }),
+                  name: formatMessage({ id: 'EmailChannel' }),
                   type: 'line',
                   smooth: lineSmooth,
                   symbol: 'circle',
@@ -275,7 +275,7 @@ const HistorySection = createWithRemoteLoader({
               {
                 ...pieSeries(['50%', '44%'], ['46%', '66%']),
                 data: [
-                  { name: formatMessage({ id: 'Email' }), value: Number(byType['0']) || 0 },
+                  { name: formatMessage({ id: 'EmailChannel' }), value: Number(byType['0']) || 0 },
                   { name: formatMessage({ id: 'SMS' }), value: Number(byType['1']) || 0 }
                 ]
               }
@@ -289,7 +289,7 @@ const HistorySection = createWithRemoteLoader({
               color: PALETTE.total
             },
             {
-              label: `${formatMessage({ id: 'Email' })}${formatMessage({ id: 'TotalRecords' })}`,
+              label: `${formatMessage({ id: 'EmailChannel' })}${formatMessage({ id: 'TotalRecords' })}`,
               value: Number(byType['0']) || 0,
               color: PALETTE.email
             },

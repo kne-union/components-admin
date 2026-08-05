@@ -26,7 +26,7 @@ const TemplateList = createWithRemoteLoader({
         isNext
         search={{
           name: 'code',
-          label: formatMessage({ id: 'Code' })
+          label: formatMessage({ id: 'TemplateCode' })
         }}
         filter={{
           value: filter,
@@ -34,7 +34,7 @@ const TemplateList = createWithRemoteLoader({
           list: [
             {
               type: InputFilterItem,
-              props: { label: formatMessage({ id: 'Code' }), name: 'code' }
+              props: { label: formatMessage({ id: 'TemplateCode' }), name: 'code' }
             },
             {
               type: SuperSelectFilterItem,
@@ -111,7 +111,7 @@ const RecordList = createWithRemoteLoader({
         isNext
         search={{
           name: 'name',
-          label: formatMessage({ id: 'Target' })
+          label: formatMessage({ id: 'Recipient' })
         }}
         filter={{
           value: filter,
@@ -119,11 +119,11 @@ const RecordList = createWithRemoteLoader({
           list: [
             {
               type: InputFilterItem,
-              props: { label: formatMessage({ id: 'Code' }), name: 'code' }
+              props: { label: formatMessage({ id: 'TemplateCode' }), name: 'code' }
             },
             {
               type: InputFilterItem,
-              props: { label: formatMessage({ id: 'Target' }), name: 'name' }
+              props: { label: formatMessage({ id: 'Recipient' }), name: 'name' }
             },
             {
               type: SuperSelectFilterItem,

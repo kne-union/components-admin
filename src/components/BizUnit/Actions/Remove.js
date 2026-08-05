@@ -29,7 +29,7 @@ const Remove = createWithRemoteLoader({
           if (resData.code !== 0) {
             return;
           }
-          message.success(formatMessage({ id: 'DeleteSuccess' }, { bizName: options.bizName }));
+          message.success(formatMessage({ id: 'DeleteNamedSuccess' }, { bizName: options.bizName }));
           onSuccess && onSuccess();
         }}
       />

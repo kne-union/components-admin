@@ -12,7 +12,8 @@ const locale = {
 
   // Status values
   Enabled: '启用',
-  Disabled: '禁用',
+  Disable: '禁用',
+  Disabled: '已禁用',
 
   // Actions
   AddSecretKey: '添加密钥',

@@ -28,7 +28,7 @@ const Create = createWithRemoteLoader({
             if (resData.code !== 0) {
               return false;
             }
-            message.success(formatMessage({ id: 'AddSuccess' }, { bizName: options.bizName }));
+            message.success(formatMessage({ id: 'AddNamedSuccess' }, { bizName: options.bizName }));
             onSuccess && onSuccess();
           };
           formModal(

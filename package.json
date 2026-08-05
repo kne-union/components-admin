@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.1.75",
+  "version": "1.1.76",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@kne/modules-dev": "^2.4.3",
-    "@kne/react-fetch": "^1.4.3",
+    "@kne/react-fetch": "^1.5.7",
     "@kne/react-scripts": "^5.1.5",
     "@kne/remote-loader": "^1.2.3",
     "@testing-library/jest-dom": "^6.4.2",
@@ -96,7 +96,7 @@
     "@kne/react-intl": "^0.1.15",
     "@kne/react-org-chart": "^0.1.6",
     "@kne/responsive-utils": "^0.1.5",
-    "@kne/super-select": "^0.1.43",
+    "@kne/super-select": "^0.1.45",
     "@kne/system-layout": "^0.2.0-alpha.22",
     "@kne/timeline": "^1.0.2",
     "@kne/token-storage": "^1.0.0",

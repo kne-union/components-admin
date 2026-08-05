@@ -15,14 +15,16 @@ const getBoundBinding = data => {
   return null;
 };
 
+const channelKey = item => `${item.source}::${item.targetId || ''}`;
+
 /**
  * 交互对齐「邀请用户」：
  * 1. 列表点「绑定第三方登录」打开弹窗
- * 2. 选平台后自动生成链接（单渠道直接生成）
+ * 2. 选配置项后自动生成链接（单配置直接生成）
  * 3. 展示链接 + 复制；需要时可「重新生成」
  */
 const BindModalContent = ({ channels, data, apis, ajax, formatMessage, message }) => {
-  const [platform, setPlatform] = useState(channels.length === 1 ? channels[0].source : undefined);
+  const [selectedKey, setSelectedKey] = useState(channels.length === 1 ? channelKey(channels[0]) : undefined);
   const [bindUrl, setBindUrl] = useState('');
   const [generating, setGenerating] = useState(false);
   const requestSeq = useRef(0);
@@ -32,8 +34,9 @@ const BindModalContent = ({ channels, data, apis, ajax, formatMessage, message }
     message.success(formatMessage({ id: 'CopySuccess' }));
   };
 
-  const generate = async selectedPlatform => {
-    if (!selectedPlatform) {
+  const generate = async key => {
+    const channel = channels.find(item => channelKey(item) === key);
+    if (!channel) {
       return;
     }
     const seq = ++requestSeq.current;
@@ -41,7 +44,10 @@ const BindModalContent = ({ channels, data, apis, ajax, formatMessage, message }
     try {
       const { data: resData } = await ajax(
         merge({}, apis.thirdLoginBindToken, {
-          data: { id: data.id, platform: selectedPlatform }
+          data: Object.assign(
+            { id: data.id, platform: channel.source },
+            channel.targetId ? { targetId: channel.targetId } : {}
+          )
         })
       );
       if (seq !== requestSeq.current) {
@@ -60,11 +66,13 @@ const BindModalContent = ({ channels, data, apis, ajax, formatMessage, message }
   };
 
   useEffect(() => {
-    if (platform) {
-      generate(platform);
+    if (selectedKey) {
+      generate(selectedKey);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [platform]);
+  }, [selectedKey]);
+
+  const selectedChannel = channels.find(item => channelKey(item) === selectedKey);
 
   return (
     <Flex vertical gap={16}>
@@ -76,26 +84,30 @@ const BindModalContent = ({ channels, data, apis, ajax, formatMessage, message }
         <div>
           <div style={{ marginBottom: 8 }}>{formatMessage({ id: 'ThirdLoginBindPlatform' })}</div>
           <Radio.Group
-            value={platform}
-            onChange={e => setPlatform(e.target.value)}
+            value={selectedKey}
+            onChange={e => setSelectedKey(e.target.value)}
             options={channels.map(item => ({
-              value: item.source,
+              value: channelKey(item),
               label: (
                 <Space align="center">
                   {getSourceIcon(item.source)}
                   <span>{SOURCE_LABEL_MAP[item.source] || item.source}</span>
+                  {item.targetId ? <Tag>{item.targetId}</Tag> : null}
                 </Space>
               )
             }))}
           />
         </div>
       ) : (
-        <Tag icon={getSourceIcon(channels[0].source)} color="processing">
-          {SOURCE_LABEL_MAP[channels[0].source] || channels[0].source}
-        </Tag>
+        <Space>
+          <Tag icon={getSourceIcon(channels[0].source)} color="processing">
+            {SOURCE_LABEL_MAP[channels[0].source] || channels[0].source}
+          </Tag>
+          {channels[0].targetId ? <Tag>{channels[0].targetId}</Tag> : null}
+        </Space>
       )}
 
-      {!platform ? (
+      {!selectedChannel ? (
         <Typography.Text type="secondary">{formatMessage({ id: 'ThirdLoginBindPlatform' })}</Typography.Text>
       ) : generating && !bindUrl ? (
         <Flex align="center" gap={8}>

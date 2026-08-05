@@ -54,7 +54,7 @@ const locale = {
   LanguageSetting: 'Language Settings',
   SystemLanguage: 'System Language',
   DefaultTag: 'Default',
-  SetDefault: 'Set Default',
+  SetDefault: 'Set as Default',
   MoveUp: 'Move Up',
   MoveDown: 'Move Down',
   NoLanguageOptions: 'No available languages',

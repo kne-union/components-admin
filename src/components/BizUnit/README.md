@@ -8,7 +8,7 @@
 
 - **配置驱动**：仅凭 `apis`、`getColumns`、`getFormInner` 三项核心配置即可生成完整 CRUD 列表页，操作列由组件自动追加
 - **isNext 新版表格**：基于 `@kne/table-page`，支持 `renderType`、`getValueOf`、`format` 等现代化列配置，内置关键字搜索与分页
-- **灵活筛选**：`filter` 配置筛选项，isNext 为一维数组，支持输入框、下拉、日期区间等，可配合 `urlFilterValue` 实现 URL 参数同步
+- **灵活筛选**：`filter` 配置筛选项，isNext 为一维数组，支持输入框、下拉、日期区间等，可配合 `searchParamsValue` 从 URL 平铺参数种子化初始筛选
 - **自定义布局**：通过 `children` 回调接管渲染，配合 `TablePageRender` 适配 `SystemLayout`、`StateBarPage` 等多种容器
 - **可扩展操作**：`getActionList` 支持重置内置按钮、追加自定义按钮，行内操作灵活可控
 
@@ -514,7 +514,7 @@ render(<FormOptionsNextExample />);
 ```
 
 - 销售订单（URL 筛选同步）
-- 场景：订单中心。覆盖 urlFilterValue、onFilterChange、filter 与关键字搜索联动、renderType:status。示例环境已有外层 Router，通过 useSearchParams 初始化 URL 参数，勿嵌套 MemoryRouter。
+- 场景：订单中心。覆盖 searchParamsValue、onFilterChange、filter 与关键字搜索联动、renderType:status。示例环境已有外层 Router，通过 useSearchParams 初始化 URL 参数，勿嵌套 MemoryRouter。
 - _BizUnit(@components/BizUnit),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom),antd(antd)
 
 ```jsx
@@ -611,7 +611,7 @@ const UrlFilterNextExample = createWithRemoteLoader({
           page={{ title: '销售订单' }}
           apis={apis}
           getColumns={getColumns}
-          urlFilterValue={['status', 'customerName']}
+          searchParamsValue={['status', 'customerName']}
           onFilterChange={value => message.info(&#96;筛选条件已变更：${JSON.stringify(value)}&#96;)}
           options={{
             keywordFilterName: 'customerName',
@@ -2429,7 +2429,7 @@ render(<LegacyExamples />);
 | children           | 自定义渲染函数，接管布局                            | Function        | -     |
 | onMount            | 组件挂载回调                                  | Function        | -     |
 | onFilterChange     | 筛选变更回调                                  | Function        | -     |
-| urlFilterValue     | URL 筛选参数映射，见 `Filter.useUrlFilterValue` | Array \| Object | -     |
+| searchParamsValue  | 与 Filter `useSearchParamsValue` / TablePage `filter.searchParamsValue` 同参。可传 `{ fields, searchParams?, setSearchParams? }`，或简写为 fields 数组（`string` / `{ name, label, labelKey? }`）。`labelKey` 为选中值展示文案的 URL key。未传 searchParams 时用路由 `useSearchParams`。**isNext 下无论筛选项写在顶层 `filter`/`filterList` 还是 `options.tableProps.filter`，都会把本配置合并进 TablePage** | Object \| Array | -     |
 
 #### apis
 

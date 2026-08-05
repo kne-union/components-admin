@@ -164,7 +164,7 @@ const FormInner = createWithRemoteLoader({
         ];
       }
       if (isEdit) {
-        return [<TextArea name="target" label={formatMessage({ id: 'Target' })} rule="REQ LEN-1-2000" />];
+        return [<TextArea name="target" label={formatMessage({ id: 'TargetValue' })} rule="REQ LEN-1-2000" />];
       }
       return locales
         .filter(({ value }) => !disabledLocaleSet.has(value))

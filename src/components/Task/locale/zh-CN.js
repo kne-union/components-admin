@@ -29,7 +29,7 @@ const locale = {
   ViewInputParams: '查看参数',
   BatchRetry: '批量重试',
   // Status Enums
-  Pending: '等待执行',
+  PendingExecution: '等待执行',
   Running: '执行中',
   Waiting: '等待',
   Success: '成功',

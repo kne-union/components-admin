@@ -12,14 +12,16 @@ const getSourceLabel = (value, sourceOptions) => {
   return item ? item.label : value;
 };
 
+const getLinkedEnvArgs = envArgs => (envArgs || []).filter(item => item.key && item.key.startsWith('TARGET_LINKED_'));
+
 const LinkFormInner = withLocale(
   createWithRemoteLoader({
     modules: ['components-core:FormInfo']
-  })(({ remoteModules, envArgs, sourceOptions, usedSources = [] }) => {
+  })(({ remoteModules, envArgs, sourceOptions, usedTargetIds = [] }) => {
     const [FormInfo] = remoteModules;
     const { formatMessage } = useIntl();
     const { RadioGroup, Select } = FormInfo.fields;
-    const availableSources = (sourceOptions || []).filter(item => !usedSources.includes(item.value));
+    const availableTargets = getLinkedEnvArgs(envArgs).filter(item => !usedTargetIds.includes(item.key));
 
     return (
       <FormInfo
@@ -30,8 +32,8 @@ const LinkFormInner = withLocale(
             name="source"
             label={formatMessage({ id: 'ThirdLoginConfigSource' })}
             rule="REQ"
-            defaultValue={availableSources[0]?.value || 'wecom'}
-            options={availableSources.map(item => ({
+            defaultValue={sourceOptions?.[0]?.value || 'wecom'}
+            options={(sourceOptions || []).map(item => ({
               value: item.value,
               label: item.label
             }))}
@@ -41,12 +43,10 @@ const LinkFormInner = withLocale(
             name="targetId"
             label={formatMessage({ id: 'ThirdLoginConfigTargetId' })}
             rule="REQ"
-            options={(envArgs || [])
-              .filter(item => item.key && item.key.startsWith('TARGET_LINKED_'))
-              .map(item => ({
-                value: item.key,
-                label: item.name || item.key
-              }))}
+            options={availableTargets.map(item => ({
+              value: item.key,
+              label: item.name || item.key
+            }))}
             placeholder={formatMessage({ id: 'OrgLinkTargetIdPlaceholder' })}
             description={formatMessage({ id: 'OrgLinkTargetIdDesc' })}
           />
@@ -65,10 +65,10 @@ const ThirdLoginSetting = createWithRemoteLoader({
   const { message } = App.useApp();
   const formModal = useFormModal();
 
-  const handleCancel = async (source, reload) => {
+  const handleCancel = async ({ source, targetId }, reload) => {
     const { data: resData } = await ajax(
       merge({}, apis.thirdLoginConfigCancel, {
-        data: { source }
+        data: { source, targetId }
       })
     );
     if (resData.code !== 0) {
@@ -86,7 +86,8 @@ const ThirdLoginSetting = createWithRemoteLoader({
         const configData = data || {};
         const sourceOptions = configData.sourceOptions || [];
         const list = configData.list || [];
-        const usedSources = list.map(item => item.source);
+        const usedTargetIds = list.map(item => item.targetId).filter(Boolean);
+        const availableTargets = getLinkedEnvArgs(envArgs).filter(item => !usedTargetIds.includes(item.key));
 
         return (
           <Flex vertical gap={16}>
@@ -98,11 +99,12 @@ const ThirdLoginSetting = createWithRemoteLoader({
                 dataSource={list}
                 renderItem={item => (
                   <List.Item
+                    key={`${item.source}-${item.targetId}`}
                     actions={[
                       <Popconfirm
                         key="cancel"
                         title={formatMessage({ id: 'ThirdLoginConfigCancelConfirm' })}
-                        onConfirm={() => handleCancel(item.source, reload)}>
+                        onConfirm={() => handleCancel({ source: item.source, targetId: item.targetId }, reload)}>
                         <Button danger size="small" type="link" icon={<DisconnectOutlined />}>
                           {formatMessage({ id: 'ThirdLoginConfigCancel' })}
                         </Button>
@@ -123,7 +125,7 @@ const ThirdLoginSetting = createWithRemoteLoader({
             ) : (
               <Typography.Text type="secondary">{formatMessage({ id: 'ThirdLoginConfigEmpty' })}</Typography.Text>
             )}
-            {usedSources.length < sourceOptions.length ? (
+            {availableTargets.length && sourceOptions.length ? (
               <Button
                 type="primary"
                 size="small"
@@ -147,7 +149,7 @@ const ThirdLoginSetting = createWithRemoteLoader({
                         onSuccess && onSuccess();
                       }
                     },
-                    children: <LinkFormInner envArgs={envArgs} sourceOptions={sourceOptions} usedSources={usedSources} />
+                    children: <LinkFormInner envArgs={envArgs} sourceOptions={sourceOptions} usedTargetIds={usedTargetIds} />
                   });
                 }}>
                 {formatMessage({ id: 'ThirdLoginConfigAdd' })}
