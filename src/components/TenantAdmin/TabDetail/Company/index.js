@@ -21,6 +21,7 @@ const Company = createWithRemoteLoader({
         return (
           <CompanyInfo
             data={data}
+            tenantId={tenant.id}
             onSubmit={async formData => {
               const { data: resData } = await ajax(
                 Object.assign({}, apis.tenantAdmin.companySave, {

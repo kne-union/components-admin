@@ -40,7 +40,7 @@ const CompanyDetail = createWithRemoteLoader({
 const CompanyInfo = createWithRemoteLoader({
   modules: ['components-core:InfoPage', 'components-core:FormInfo', 'components-core:ButtonGroup@ButtonFooter']
 })(
-  withLocale(({ remoteModules, data, onSubmit, hasEdit = true, apis }) => {
+  withLocale(({ remoteModules, data, onSubmit, hasEdit = true, apis, tenantId }) => {
     const [InfoPage, FormInfo, ButtonFooter] = remoteModules;
     const [isEdit, setIsEdit] = useState(false);
     const { formatMessage } = useIntl();
@@ -67,9 +67,9 @@ const CompanyInfo = createWithRemoteLoader({
             setIsEdit(false);
           }}>
           <Flex vertical gap={24} className={style.detailStack}>
-            <BasicFormInner />
+            <BasicFormInner tenantId={tenantId} />
             <DevelopmentHistoryFormInner />
-            <TeamDescriptionFormInner />
+            <TeamDescriptionFormInner tenantId={tenantId} />
             <ButtonFooter className={style.formActions} innerClassName={style.formActionsInner}>
               <Flex justify="center" gap={12} className={style.formActionsRow}>
                 <CancelButton

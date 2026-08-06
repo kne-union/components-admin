@@ -6,11 +6,12 @@ import style from '../style.module.scss';
 
 const FormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
-})(withLocale(({ remoteModules }) => {
+})(withLocale(({ remoteModules, tenantId }) => {
   const [FormInfo] = remoteModules;
   const { formatMessage } = useIntl();
   const { Input, TextArea, Upload, Avatar, DatePicker } = FormInfo.fields;
   const { TableList } = FormInfo;
+  const directory = tenantId ? `Tenant/${tenantId}/Company` : undefined;
 
   return (
     <Flex vertical gap={24} className={style['form-section']}>
@@ -22,11 +23,12 @@ const FormInner = createWithRemoteLoader({
             label={formatMessage({ id: 'BannerBackground' })}
             interceptor="photo-string-list"
             block
+            directory={directory}
             getPermission={type => {
               return ['preview', 'delete'].indexOf(type) > -1;
             }}
           />,
-          <Avatar name="logo" label={formatMessage({ id: 'CompanyLogo' })} interceptor="photo-string" block />,
+          <Avatar name="logo" label={formatMessage({ id: 'CompanyLogo' })} interceptor="photo-string" block directory={directory} />,
           <Input name="name" label={formatMessage({ id: 'CompanyName' })} rule="REQ LEN-0-100" />,
           <Input name="fullName" label={formatMessage({ id: 'CompanyFullName' })} rule="LEN-0-100" />,
           <Input name="industry" label={formatMessage({ id: 'CompanyIndustry' })} rule="LEN-0-100" />,

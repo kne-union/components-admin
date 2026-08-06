@@ -45,7 +45,7 @@ const SaveInner = createWithRemoteLoader({
               onSuccess && onSuccess();
             }
           },
-          children: <FormInner />
+          children: <FormInner tenantId={data.id} />
         });
       }}
     />

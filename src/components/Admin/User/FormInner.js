@@ -12,7 +12,7 @@ const FormInner = createWithRemoteLoader({
     <FormInfo
       column={1}
       list={[
-        <Avatar name="avatar" label={formatMessage({ id: 'UserAvatar' })} labelHidden interceptor="photo-string" />,
+        <Avatar name="avatar" label={formatMessage({ id: 'UserAvatar' })} labelHidden interceptor="photo-string" directory="Avatar" />,
         <Input name="nickname" label={formatMessage({ id: 'UserNickname' })} rule="LEN-0-100" />,
         <Input name="email" label={formatMessage({ id: 'UserEmail' })} rule="EMAIL ACCOUNT_IS_EXISTS" realtime />,
         <PhoneNumber name="phone" label={formatMessage({ id: 'UserPhone' })} rule="ACCOUNT_IS_EXISTS" format="string" />,
