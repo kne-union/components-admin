@@ -49,7 +49,7 @@ const FormInnerInner = createWithRemoteLoader({
   const getFormInner = useRefCallback(() => {
     const formInner = [
       <Flex justify="center">
-        <Avatar name="avatar" label={formatMessage({ id: 'Avatar' })} labelHidden interceptor="photo-string" />
+        <Avatar name="avatar" label={formatMessage({ id: 'Avatar' })} labelHidden interceptor="photo-string" directory="Avatar" />
       </Flex>,
       <Input name="name" label={formatMessage({ id: 'UserName' })} rule="REQ LEN-0-100" disabled={isSynced} />,
       <SuperSelectTree

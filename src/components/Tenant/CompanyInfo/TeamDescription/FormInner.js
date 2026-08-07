@@ -6,12 +6,13 @@ import style from '../style.module.scss';
 const FormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
 })(
-  withLocale(({ remoteModules }) => {
+  withLocale(({ remoteModules, tenantId }) => {
     const [FormInfo] = remoteModules;
     const { formatMessage } = useIntl();
 
     const { List } = FormInfo;
     const { Avatar, Input, TextArea } = FormInfo.fields;
+    const directory = tenantId ? `Tenant/${tenantId}/Company` : undefined;
 
     return (
       <List
@@ -20,7 +21,7 @@ const FormInner = createWithRemoteLoader({
         title={formatMessage({ id: 'TeamDescription' })}
         name="teamDescription"
         list={[
-          <Avatar name="avatar" label={formatMessage({ id: 'TeamAvatar' })} interceptor="photo-string" block />,
+          <Avatar name="avatar" label={formatMessage({ id: 'TeamAvatar' })} interceptor="photo-string" block directory={directory} />,
           <Input name="name" label={formatMessage({ id: 'TeamName' })} rule="REQ LEN-0-100" />,
           <Input name="role" label={formatMessage({ id: 'TeamRole' })} rule="REQ LEN-0-100" />,
           <TextArea name="description" label={formatMessage({ id: 'TeamIntroduction' })} rule="LEN-0-500" block />

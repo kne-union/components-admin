@@ -6,12 +6,14 @@ import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 
 const CompanyInner = createWithRemoteLoader({
-  modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:Permissions']
+  modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:Permissions', 'components-core:Global@useGlobalContext']
 })(({ remoteModules, menu, pageProps: originPageProps, children }) => {
-  const [Page, usePreset, Permissions] = remoteModules;
+  const [Page, usePreset, Permissions, useGlobalContext] = remoteModules;
   const { formatMessage } = useIntl();
   const { ajax, apis } = usePreset();
   const { message } = App.useApp();
+  const { global } = useGlobalContext('userInfo');
+  const tenantId = global?.tenant?.id;
 
   const pageProps = Object.assign({}, originPageProps, {
     menu,
@@ -27,6 +29,7 @@ const CompanyInner = createWithRemoteLoader({
                   return (
                     <CompanyInfo
                       data={data}
+                      tenantId={tenantId}
                       hasEdit={isPass}
                       onSubmit={async formData => {
                         const { data: resData } = await ajax(

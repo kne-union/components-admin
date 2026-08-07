@@ -14,7 +14,7 @@ const UserInfoFormInner = createWithRemoteLoader({
       {...props}
       list={[
         <Flex justify="center">
-          <Avatar name="avatar" label={formatMessage({ id: 'Avatar' })} labelHidden interceptor="photo-string" />
+          <Avatar name="avatar" label={formatMessage({ id: 'Avatar' })} labelHidden interceptor="photo-string" directory="Avatar" />
         </Flex>,
         <Input name="email" label={formatMessage({ id: 'Email' })} rule="REQ" />,
         <Input name="nickname" label={formatMessage({ id: 'Nickname' })} />,
