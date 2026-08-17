@@ -24,6 +24,17 @@
       ]
     },
     {
+      "title": "客户模型分配（无筛选项 mapFilterValue）",
+      "description": "验收：无 filter list、allowKeywordSearch=false 时 options.mapFilterValue 仍注入 filter.type；切换 Tab / 分配模型触发 reload 后，顶部 Alert 仍显示 filter.type（缺则为失败）。",
+      "code": "./map-filter-no-list-next.js",
+      "scope": [
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
       "title": "产品目录（表单弹窗配置）",
       "description": "场景：商品管理。覆盖 options.formSize、formProps、formModalProps、createFormModalProps、editFormModalProps、saveData。",
       "code": "./form-options-next.js",

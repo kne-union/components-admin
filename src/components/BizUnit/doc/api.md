@@ -81,7 +81,7 @@ TablePage 所需的 `{ list, total }`。
 | closeMessage         | 关闭确认提示                                                       | String            | -                                          |
 | saveData             | 编辑时数据处理                                                      | Function          | -                                          |
 | getFilterValue       | Legacy 筛选值转换                                                 | Function          | -                                          |
-| mapFilterValue       | 筛选值映射（isNext `filter` 可用）                               | Function          | -                                          |
+| mapFilterValue       | 筛选值映射（isNext：即使无筛选项也会挂到 TablePage，保证 create/reload 仍带固定 filter） | Function          | -                                          |
 
 #### filter（isNext）
 
