@@ -260,7 +260,9 @@ const BizUnit = createWithRemoteLoader({
 
       const resolveNextFilter = () => {
         const baseFilter = resolveNextFilterBase();
-        if (!baseFilter && !searchParamsValueConfig) {
+        // 仅有 options.mapFilterValue（无筛选项 / URL 种子）时也要挂到 TablePage：
+        // 否则 reload 会走默认 getFilterValue([])，把 apis.list.params.filter 里的固定字段清掉
+        if (!baseFilter && !searchParamsValueConfig && !options.mapFilterValue) {
           return null;
         }
         return merge(
