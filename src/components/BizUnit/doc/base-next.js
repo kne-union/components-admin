@@ -4,7 +4,7 @@ const { createWithRemoteLoader } = remoteLoader;
 
 const getItemExtra = (columns, item) => {
   const column = (columns || []).find(col => col.name === 'options' || col.renderType === 'options');
-  const value = typeof column?.getValueOf === 'function' ? column.getValueOf(item) : null;
+  const value = typeof column?.getValueOf === 'function' ? column.getValueOf(item, { place: 'end' }) : null;
   return value?.children || null;
 };
 
