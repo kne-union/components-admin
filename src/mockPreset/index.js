@@ -103,6 +103,62 @@ const loadFilteredTenantUserList = ({ params } = {}) =>
     return { pageData, totalCount };
   });
 
+const parseMockDateTime = value => {
+  if (!value) {
+    return NaN;
+  }
+  return new Date(String(value).replace(' ', 'T')).getTime();
+};
+
+const isWithinRange = (value, { startTime, endTime } = {}) => {
+  const time = parseMockDateTime(value);
+  if (Number.isNaN(time)) {
+    return false;
+  }
+  if (startTime && time < new Date(startTime).getTime()) {
+    return false;
+  }
+  if (endTime && time > new Date(endTime).getTime()) {
+    return false;
+  }
+  return true;
+};
+
+export const loadFilteredTaskList = ({ params } = {}) =>
+  import('./task-list.json').then(({ default: data }) => {
+    const filter = params?.filter || {};
+    let pageData = data.data?.pageData || [];
+
+    ['id', 'targetId', 'type', 'status', 'runnerType'].forEach(key => {
+      if (filter[key] != null && filter[key] !== '') {
+        pageData = pageData.filter(item => String(item[key]) === String(filter[key]));
+      }
+    });
+
+    if (filter.targetName) {
+      const keyword = String(filter.targetName).toLowerCase();
+      pageData = pageData.filter(item => String(item.input?.name || '').toLowerCase().includes(keyword));
+    }
+
+    if (filter.createdAt) {
+      pageData = pageData.filter(item => isWithinRange(item.createdAt, filter.createdAt));
+    }
+
+    if (filter.completedAt) {
+      pageData = pageData.filter(item => isWithinRange(item.completedAt, filter.completedAt));
+    }
+
+    const totalCount = pageData.length;
+    const perPage = Number(params?.perPage) || 20;
+    const currentPage = Number(params?.currentPage) || 1;
+    const start = (currentPage - 1) * perPage;
+
+    return {
+      pageData: pageData.slice(start, start + perPage),
+      totalCount
+    };
+  });
+
 const loadFilteredRoleList = ({ params } = {}) =>
   import('./tenant-data.json').then(({ default: data }) => {
     const filter = params?.filter || {};
@@ -123,9 +179,7 @@ const loadFilteredRoleList = ({ params } = {}) =>
 const apis = merge({}, getApis(), {
   task: {
     list: {
-      loader: () => {
-        return import('./task-list.json').then(({ default: data }) => data.data);
-      }
+      loader: loadFilteredTaskList
     },
     cancel: {
       loader: () => {

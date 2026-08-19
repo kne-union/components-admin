@@ -1,13 +1,13 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { App } from 'antd';
-import { transform } from 'lodash';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 
 import getColumns from '../getColumns';
 import Menu from '../Menu';
 import Actions from '../Actions';
+import { createTaskMapFilterValue } from '../filterUtils';
 
 const AllTask = createWithRemoteLoader({
   modules: [
@@ -33,7 +33,8 @@ const AllTask = createWithRemoteLoader({
       rowKey: 'id'
     });
 
-    const filterValue = getFilterValue(filter);
+    const mapFilterValue = useMemo(() => createTaskMapFilterValue({ sort }), [sort]);
+    const listParams = useMemo(() => mapFilterValue(filter, getFilterValue), [mapFilterValue, filter, getFilterValue]);
 
     const rowSelection = useMemo(
       () => ({
@@ -82,6 +83,7 @@ const AllTask = createWithRemoteLoader({
         filter={{
           value: filter,
           onChange: setFilter,
+          mapFilterValue: (value, getFv) => mapFilterValue(value, getFv || getFilterValue),
           list: [
             {
               type: InputFilterItem,
@@ -150,29 +152,7 @@ const AllTask = createWithRemoteLoader({
           ]
         }}
         {...Object.assign({}, apis.task.list, {
-          params: {
-            filter: Object.assign({}, filterValue, {
-              createdAt: filterValue.createdAt
-                ? {
-                    startTime: filterValue.createdAt.value[0],
-                    endTime: filterValue.createdAt.value[1]
-                  }
-                : null,
-              completedAt: filterValue.completedAt
-                ? {
-                    startTime: filterValue.completedAt.value[0],
-                    endTime: filterValue.completedAt.value[1]
-                  }
-                : null
-            }),
-            sort: transform(
-              sort,
-              (result, value) => {
-                result[value.name] = value.sort;
-              },
-              {}
-            )
-          },
+          params: listParams,
           dataFormat: data => {
             const list = (data.pageData || []).map(item =>
               Object.assign({}, item, {
@@ -206,7 +186,7 @@ const AllTask = createWithRemoteLoader({
                     data={item}
                     type="link"
                     onSuccess={() => {
-                      ref.current && ref.current.reload();
+                      ref.current?.reload?.({}, true);
                     }}
                   />
                 )
