@@ -1,12 +1,12 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useRef, useState } from 'react';
-import { transform } from 'lodash';
+import { useMemo, useRef, useState } from 'react';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 
 import getColumns from '../getColumns';
 import Menu from '../Menu';
 import Actions from '../Actions';
+import { createTaskMapFilterValue } from '../filterUtils';
 
 const MyTask = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Enum']
@@ -14,7 +14,7 @@ const MyTask = createWithRemoteLoader({
   withLocale(({ remoteModules, baseUrl, getManualTaskAction, pageProps = {} }) => {
     const [TablePage, usePreset, Filter, Enum] = remoteModules;
     const { formatMessage } = useIntl();
-    const { apis, enums } = usePreset();
+    const { apis } = usePreset();
     const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
     const ref = useRef(null);
@@ -34,7 +34,11 @@ const MyTask = createWithRemoteLoader({
       selectedRows: []
     });
 
-    const filterValue = getFilterValue(filter);
+    const mapFilterValue = useMemo(
+      () => createTaskMapFilterValue({ sort, fixedFilter: { runnerType: 'manual' } }),
+      [sort]
+    );
+    const listParams = useMemo(() => mapFilterValue(filter, getFilterValue), [mapFilterValue, filter, getFilterValue]);
 
     const onSelectChange = (selectedRowKeys, selectedRows) => {
       setSelected({ selectedRowKeys, selectedRows });
@@ -50,6 +54,7 @@ const MyTask = createWithRemoteLoader({
         filter={{
           value: filter,
           onChange: setFilter,
+          mapFilterValue: (value, getFv) => mapFilterValue(value, getFv || getFilterValue),
           list: [
             {
               type: InputFilterItem,
@@ -100,30 +105,7 @@ const MyTask = createWithRemoteLoader({
           ]
         }}
         {...Object.assign({}, apis.task.list, {
-          params: {
-            filter: Object.assign({}, filterValue, {
-              createdAt: filterValue.createdAt
-                ? {
-                    startTime: filterValue.createdAt.value[0],
-                    endTime: filterValue.createdAt.value[1]
-                  }
-                : null,
-              completedAt: filterValue.completedAt
-                ? {
-                    startTime: filterValue.completedAt.value[0],
-                    endTime: filterValue.completedAt.value[1]
-                  }
-                : null,
-              runnerType: 'manual'
-            }),
-            sort: transform(
-              sort,
-              (result, value) => {
-                result[value.name] = value.sort;
-              },
-              {}
-            )
-          }
+          params: listParams
         })}
         ref={ref}
         pagination={{ paramsType: 'params' }}
@@ -145,7 +127,7 @@ const MyTask = createWithRemoteLoader({
                     data={item}
                     type="link"
                     onSuccess={() => {
-                      ref.current.reload();
+                      ref.current?.reload?.({}, true);
                     }}
                   />
                 )
@@ -166,7 +148,7 @@ const MyTask = createWithRemoteLoader({
         }}
         page={{
           menu: <Menu baseUrl={baseUrl} />,
-          ...pageProps,
+          ...pageProps
         }}
       />
     );

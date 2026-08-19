@@ -56,6 +56,29 @@
       ]
     },
     {
+      "title": "筛选验收（isNext）",
+      "description": "全部任务 / 我的任务筛选验收：展示最近一次请求的 params.filter 与返回条数，可按预设用例验证状态、类型、执行方式、目标名称、日期范围筛选是否生效",
+      "code": "./filter-next.js",
+      "scope": [
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
       "title": "全部任务",
       "description": "展示全部任务列表，包含手动执行和自动执行的任务，支持批量重试失败的任务",
       "code": "./all-task.js",
