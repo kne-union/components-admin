@@ -20,9 +20,20 @@ const buildOptionsColumn = ({ isNext, formatMessage, apis, options, getActionLis
       width: 180,
       min: 120,
       max: 240,
-      getValueOf: (item, ctx) => ({
-        children: <Actions {...actionsProps} data={item} fetchOptions={ctx?.context} />
-      })
+      getValueOf: (item, ctx) => {
+        const { context, place, className } = ctx || {};
+        return {
+          children: (
+            <Actions
+              {...actionsProps}
+              {...(place ? { place } : {})}
+              {...(className ? { className } : {})}
+              data={item}
+              fetchOptions={context}
+            />
+          )
+        };
+      }
     };
   }
 

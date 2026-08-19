@@ -15,7 +15,7 @@ const Actions = createWithRemoteLoader({
       children,
       itemClassName,
       className,
-      place = 'end',
+      place,
       getActionList,
       getFormInner,
       data,
