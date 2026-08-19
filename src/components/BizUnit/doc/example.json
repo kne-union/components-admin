@@ -35,6 +35,17 @@
       ]
     },
     {
+      "title": "题目管理（卡片下拉加载后操作刷新）",
+      "description": "验收：卡片 forceCard 下拉到 currentPage=2 后点「添加数字人任务」，操作后第一次 list 须为 currentPage=1；之后继续下拉加载第 2 页是正常行为。顶部 Alert 区分「操作后刷新」与「下拉加载」。",
+      "code": "./card-reload-after-load-more-next.js",
+      "scope": [
+        { "name": "_BizUnit", "packageName": "@components/BizUnit" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
       "title": "产品目录（表单弹窗配置）",
       "description": "场景：商品管理。覆盖 options.formSize、formProps、formModalProps、createFormModalProps、editFormModalProps、saveData。",
       "code": "./form-options-next.js",

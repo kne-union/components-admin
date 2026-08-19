@@ -178,7 +178,15 @@ const BizUnit = createWithRemoteLoader({
         : getFilterValue(filterValue);
 
       const reloadTable = () => {
-        ref.current?.reload();
+        const pagination = options.tableProps?.pagination || {};
+        const paramsType = pagination.paramsType || 'params';
+        const currentName = pagination.currentName || 'currentPage';
+        // reload 会保留 ScrollLoader，触底计数用尽后无法再下拉；refresh 卸掉子树以重置分页与加载器
+        ref.current?.refresh({
+          [paramsType]: {
+            [currentName]: 1
+          }
+        });
       };
 
       const toolbarExtra = (
