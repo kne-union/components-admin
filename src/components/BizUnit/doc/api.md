@@ -189,6 +189,8 @@ filter = {
 |---------------|---------------|----------|--------|
 | moreType      | 更多按钮类型        | String   | 'link' |
 | itemClassName | 按钮项 className | String   | -      |
+| className     | 传给 ButtonGroup 根节点 | String   | -      |
+| place         | 传给 ButtonGroup，行内/卡片操作靠右 | String   | 'end'  |
 | getActionList | 操作列表函数        | Function | -      |
 | getFormInner  | 表单内容函数        | Function | -      |
 | data          | 当前行数据         | Object   | -      |

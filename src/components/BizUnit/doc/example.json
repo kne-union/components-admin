@@ -3,7 +3,7 @@
   "list": [
     {
       "title": "角色管理（基础 CRUD）",
-      "description": "场景：角色权限管理。覆盖 isNext、apis（含函数形式）、getColumns（renderType/tag/datetime/description）、getFormInner（create/edit）、page、onMount、options 按钮文案与 removeMessage、关键字搜索。",
+      "description": "场景：角色权限管理。覆盖 isNext、apis（含函数形式）、getColumns（renderType/tag/datetime/description）、getFormInner（create/edit）、page、onMount、options 按钮文案与 removeMessage、关键字搜索、tableProps.renderMobile/renderCard。",
       "code": "./base-next.js",
       "scope": [
         { "name": "_BizUnit", "packageName": "@components/BizUnit" },
@@ -90,7 +90,7 @@
     {
       "title": "组织架构（Layout@TablePage 多页面）",
       "isFull": true,
-      "description": "场景：部门与分类管理。AppChildrenRouter + components-core:Layout 多子路由；BizUnit isNext 默认渲染 Layout@TablePage（page.menu 侧栏导航）；覆盖 filter、tableProps.batchActions/rowSelection。",
+      "description": "场景：部门与分类管理。AppChildrenRouter + components-core:Layout 多子路由；BizUnit isNext 默认渲染 Layout@TablePage（page.menu 侧栏导航）；覆盖 filter、tableProps.batchActions/rowSelection、renderMobile/renderCard。",
       "code": "./layout-next.js",
       "scope": [
         { "name": "_BizUnit", "packageName": "@components/BizUnit" },
