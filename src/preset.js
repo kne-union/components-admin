@@ -57,7 +57,7 @@ export const globalInit = async () => {
     //url: 'http://localhost:3001',
     //tpl: '{{url}}',
     remote: 'components-core',
-    defaultVersion: '0.5.33'
+    defaultVersion: '0.5.38'
   };
   remoteLoaderPreset({
     remotes: {

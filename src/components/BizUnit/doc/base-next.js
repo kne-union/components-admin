@@ -2,6 +2,37 @@ const { default: BizUnit } = _BizUnit;
 const { default: preset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
 
+const getItemExtra = (columns, item) => {
+  const column = (columns || []).find(col => col.name === 'options' || col.renderType === 'options');
+  const value = typeof column?.getValueOf === 'function' ? column.getValueOf(item) : null;
+  return value?.children || null;
+};
+
+const renderRoleCard = ({ dataSource = [], columns, renderToolbar }) => (
+  <div>
+    {typeof renderToolbar === 'function' ? renderToolbar() : null}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {dataSource.map(item => (
+        <div
+          key={item.id}
+          style={{
+            border: '1px solid #eef0f3',
+            borderRadius: 12,
+            padding: 16,
+            background: '#fff'
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>{item.name}</div>
+          <div style={{ color: '#888', fontSize: 12, marginTop: 4 }}>
+            {item.code} · {item.description}
+          </div>
+          <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px dashed #f0f0f0' }}>{getItemExtra(columns, item)}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const roleList = [
   {
     id: 1,
@@ -109,7 +140,11 @@ const BaseNextExample = createWithRemoteLoader({
             createButtonProps: { children: '新建角色', type: 'primary' },
             editButtonProps: { children: '编辑' },
             removeButtonProps: { children: '删除' },
-            removeMessage: '删除后该角色下的用户将失去对应权限，确定继续？'
+            removeMessage: '删除后该角色下的用户将失去对应权限，确定继续？',
+            tableProps: {
+              renderMobile: renderRoleCard,
+              renderCard: renderRoleCard
+            }
           }}
         />
       </Layout>

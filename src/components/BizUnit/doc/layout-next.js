@@ -68,6 +68,37 @@ const statusMap = {
   closed: { type: 'default', text: '停用' }
 };
 
+const getItemExtra = (columns, item) => {
+  const column = (columns || []).find(col => col.name === 'options' || col.renderType === 'options');
+  const value = typeof column?.getValueOf === 'function' ? column.getValueOf(item) : null;
+  return value?.children || null;
+};
+
+const renderOrgCard = ({ dataSource = [], columns, renderToolbar }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    {typeof renderToolbar === 'function' ? renderToolbar() : null}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {dataSource.map(item => (
+        <div
+          key={item.id}
+          style={{
+            border: '1px solid #eef0f3',
+            borderRadius: 12,
+            padding: 16,
+            background: '#fff'
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>{item.name}</div>
+          <div style={{ color: '#888', fontSize: 12, marginTop: 4 }}>
+            {[item.code, item.parent, item.leader, item.description].filter(Boolean).join(' · ')}
+          </div>
+          <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px dashed #f0f0f0' }}>{getItemExtra(columns, item)}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const departmentApis = {
   list: { loader: () => Promise.resolve({ pageData: departmentList, totalCount: departmentList.length }) },
   create: { loader: () => Promise.resolve({ code: 0 }) },
@@ -193,6 +224,8 @@ const LayoutNextExample = createWithRemoteLoader({
     keywordFilterLabel: '部门关键字',
     tableProps: {
       rowKey: 'id',
+      renderMobile: renderOrgCard,
+      renderCard: renderOrgCard,
       rowSelection: getDepartmentRowSelection(departmentList),
       selectedRows: departmentSelectedRows,
       pagination: { pageSize: 10, showSizeChanger: true, showQuickJumper: true },
@@ -241,6 +274,8 @@ const LayoutNextExample = createWithRemoteLoader({
     keywordFilterLabel: '分类关键字',
     tableProps: {
       rowKey: 'id',
+      renderMobile: renderOrgCard,
+      renderCard: renderOrgCard,
       rowSelection: getCategoryRowSelection(categoryList),
       selectedRows: categorySelectedRows,
       pagination: { pageSize: 10, showSizeChanger: true, showQuickJumper: true },

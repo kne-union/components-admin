@@ -34,13 +34,44 @@
 #### 示例代码
 
 - 角色管理（基础 CRUD）
-- 场景：角色权限管理。覆盖 isNext、apis（含函数形式）、getColumns（renderType/tag/datetime/description）、getFormInner（create/edit）、page、onMount、options 按钮文案与 removeMessage、关键字搜索。
+- 场景：角色权限管理。覆盖 isNext、apis（含函数形式）、getColumns（renderType/tag/datetime/description）、getFormInner（create/edit）、page、onMount、options 按钮文案与 removeMessage、关键字搜索、tableProps.renderMobile/renderCard。
 - _BizUnit(@components/BizUnit),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
 
 ```jsx
 const { default: BizUnit } = _BizUnit;
 const { default: preset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
+
+const getItemExtra = (columns, item) => {
+  const column = (columns || []).find(col => col.name === 'options' || col.renderType === 'options');
+  const value = typeof column?.getValueOf === 'function' ? column.getValueOf(item) : null;
+  return value?.children || null;
+};
+
+const renderRoleCard = ({ dataSource = [], columns, renderToolbar }) => (
+  <div>
+    {typeof renderToolbar === 'function' ? renderToolbar() : null}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {dataSource.map(item => (
+        <div
+          key={item.id}
+          style={{
+            border: '1px solid #eef0f3',
+            borderRadius: 12,
+            padding: 16,
+            background: '#fff'
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>{item.name}</div>
+          <div style={{ color: '#888', fontSize: 12, marginTop: 4 }}>
+            {item.code} · {item.description}
+          </div>
+          <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px dashed #f0f0f0' }}>{getItemExtra(columns, item)}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const roleList = [
   {
@@ -149,7 +180,11 @@ const BaseNextExample = createWithRemoteLoader({
             createButtonProps: { children: '新建角色', type: 'primary' },
             editButtonProps: { children: '编辑' },
             removeButtonProps: { children: '删除' },
-            removeMessage: '删除后该角色下的用户将失去对应权限，确定继续？'
+            removeMessage: '删除后该角色下的用户将失去对应权限，确定继续？',
+            tableProps: {
+              renderMobile: renderRoleCard,
+              renderCard: renderRoleCard
+            }
           }}
         />
       </Layout>
@@ -1310,7 +1345,7 @@ render(<CustomActionsNextExample />);
 ```
 
 - 组织架构（Layout@TablePage 多页面）(全屏)
-- 场景：部门与分类管理。AppChildrenRouter + components-core:Layout 多子路由；BizUnit isNext 默认渲染 Layout@TablePage（page.menu 侧栏导航）；覆盖 filter、tableProps.batchActions/rowSelection。
+- 场景：部门与分类管理。AppChildrenRouter + components-core:Layout 多子路由；BizUnit isNext 默认渲染 Layout@TablePage（page.menu 侧栏导航）；覆盖 filter、tableProps.batchActions/rowSelection、renderMobile/renderCard。
 - _BizUnit(@components/BizUnit),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),appChildrenRouter(@kne/app-children-router),reactRouterDom(react-router-dom),antd(antd)
 
 ```jsx
@@ -1383,6 +1418,37 @@ const statusMap = {
   open: { type: 'success', text: '启用' },
   closed: { type: 'default', text: '停用' }
 };
+
+const getItemExtra = (columns, item) => {
+  const column = (columns || []).find(col => col.name === 'options' || col.renderType === 'options');
+  const value = typeof column?.getValueOf === 'function' ? column.getValueOf(item) : null;
+  return value?.children || null;
+};
+
+const renderOrgCard = ({ dataSource = [], columns, renderToolbar }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    {typeof renderToolbar === 'function' ? renderToolbar() : null}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {dataSource.map(item => (
+        <div
+          key={item.id}
+          style={{
+            border: '1px solid #eef0f3',
+            borderRadius: 12,
+            padding: 16,
+            background: '#fff'
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>{item.name}</div>
+          <div style={{ color: '#888', fontSize: 12, marginTop: 4 }}>
+            {[item.code, item.parent, item.leader, item.description].filter(Boolean).join(' · ')}
+          </div>
+          <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px dashed #f0f0f0' }}>{getItemExtra(columns, item)}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const departmentApis = {
   list: { loader: () => Promise.resolve({ pageData: departmentList, totalCount: departmentList.length }) },
@@ -1509,6 +1575,8 @@ const LayoutNextExample = createWithRemoteLoader({
     keywordFilterLabel: '部门关键字',
     tableProps: {
       rowKey: 'id',
+      renderMobile: renderOrgCard,
+      renderCard: renderOrgCard,
       rowSelection: getDepartmentRowSelection(departmentList),
       selectedRows: departmentSelectedRows,
       pagination: { pageSize: 10, showSizeChanger: true, showQuickJumper: true },
@@ -1557,6 +1625,8 @@ const LayoutNextExample = createWithRemoteLoader({
     keywordFilterLabel: '分类关键字',
     tableProps: {
       rowKey: 'id',
+      renderMobile: renderOrgCard,
+      renderCard: renderOrgCard,
       rowSelection: getCategoryRowSelection(categoryList),
       selectedRows: categorySelectedRows,
       pagination: { pageSize: 10, showSizeChanger: true, showQuickJumper: true },
@@ -2995,6 +3065,8 @@ filter = {
 |---------------|---------------|----------|--------|
 | moreType      | 更多按钮类型        | String   | 'link' |
 | itemClassName | 按钮项 className | String   | -      |
+| className     | 传给 ButtonGroup 根节点 | String   | -      |
+| place         | 传给 ButtonGroup，行内/卡片操作靠右 | String   | 'end'  |
 | getActionList | 操作列表函数        | Function | -      |
 | getFormInner  | 表单内容函数        | Function | -      |
 | data          | 当前行数据         | Object   | -      |
