@@ -9,7 +9,7 @@ import CustomComponents from './CustomComponents';
 import Language from './Language';
 import style from './style.module.scss';
 
-const contentMap = {
+const builtinContentMap = {
   args: Args,
   customComponents: CustomComponents,
   language: Language
@@ -25,7 +25,8 @@ const Setting = createWithRemoteLoader({
       reload,
       showLanguageSetting: showLanguageSettingProp,
       languageOptionsApi: languageOptionsApiProp,
-      showBuiltinLanguageOptions: showBuiltinLanguageOptionsProp
+      showBuiltinLanguageOptions: showBuiltinLanguageOptionsProp,
+      appendSettingMenus: appendSettingMenusProp
     }) => {
       const [Menu, usePreset] = remoteModules;
       const { plugins } = usePreset();
@@ -43,8 +44,12 @@ const Setting = createWithRemoteLoader({
         showBuiltinLanguageOptionsProp !== void 0
           ? showBuiltinLanguageOptionsProp
           : !!get(plugins, 'admin.tenant.showBuiltinLanguageOptions', false);
+      const appendSettingMenus =
+        appendSettingMenusProp !== void 0
+          ? appendSettingMenusProp
+          : get(plugins, 'admin.tenant.appendSettingMenus', []) || [];
 
-      const menuItems = useMemo(() => {
+      const { menuItems, contentMap } = useMemo(() => {
         const items = [
           {
             key: 'args',
@@ -61,8 +66,24 @@ const Setting = createWithRemoteLoader({
             label: formatMessage({ id: 'LanguageSetting' })
           });
         }
-        return items;
-      }, [formatMessage, showLanguageSetting]);
+        const map = Object.assign({}, builtinContentMap);
+        (Array.isArray(appendSettingMenus) ? appendSettingMenus : []).forEach(item => {
+          if (!item || !item.key || !item.component) {
+            return;
+          }
+          const menuItem = {
+            key: item.key,
+            label: item.label || item.tab || item.key
+          };
+          if (Number.isInteger(item.index) && item.index >= 0) {
+            items.splice(item.index, 0, menuItem);
+          } else {
+            items.push(menuItem);
+          }
+          map[item.key] = item.component;
+        });
+        return { menuItems: items, contentMap: map };
+      }, [formatMessage, showLanguageSetting, appendSettingMenus]);
 
       const [activeKey, setActiveKey] = useState('args');
       const resolvedActiveKey = menuItems.some(item => item.key === activeKey) ? activeKey : 'args';
