@@ -48,8 +48,12 @@ const Actions = createWithRemoteLoader({
         options
       );
 
+      // className 须同时落到每个按钮上：isNext options 会 cloneElement 传入 options-btn，
+      // 样式选择器是 .options-column .options-btn.ant-btn；只挂 ButtonGroup 容器无效。
+      // ButtonGroup 仍保留 className（卡片 place/布局用）。对齐 UserList/Actions。
       const props = {
         ...otherProps,
+        ...(className ? { className } : {}),
         fetchOptions,
         data,
         apis,
