@@ -16,6 +16,7 @@ const Actions = createWithRemoteLoader({
       itemClassName,
       className,
       place,
+      showLength,
       getActionList,
       getFormInner,
       data,
@@ -130,11 +131,12 @@ const Actions = createWithRemoteLoader({
           itemClassName,
           moreType,
           place,
+          showLength,
           list: actionList
         });
       }
 
-      return <ButtonGroup className={className} place={place} itemClassName={itemClassName} list={actionList} moreType={moreType} />;
+      return <ButtonGroup className={className} place={place} itemClassName={itemClassName} list={actionList} moreType={moreType} showLength={showLength} />;
     }
   )
 );

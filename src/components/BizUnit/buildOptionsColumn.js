@@ -4,6 +4,7 @@ const buildOptionsColumn = ({ isNext, formatMessage, apis, options, getActionLis
   const actionsProps = {
     moreType: 'link',
     itemClassName: 'btn-no-padding',
+    showLength: 0,
     apis,
     options,
     getActionList,
@@ -17,9 +18,6 @@ const buildOptionsColumn = ({ isNext, formatMessage, apis, options, getActionLis
       title: formatMessage({ id: 'Operation' }),
       renderType: 'options',
       fixed: 'right',
-      width: 180,
-      min: 120,
-      max: 240,
       getValueOf: (item, ctx) => {
         const { context, place, className } = ctx || {};
         return {
