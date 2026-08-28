@@ -3,7 +3,8 @@ import classnames from 'classnames';
 import style from './style.module.scss';
 
 const resource = {
-  hello: () => import('./Hello').then(module => module.default)
+  hello: () => import('./Hello').then(module => module.default),
+  workforce: () => import('./Workforce').then(module => module.default)
 };
 
 const LoginIllustration = ({ type, className, ...props }) => {

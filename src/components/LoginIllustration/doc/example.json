@@ -2,9 +2,20 @@
   "isFull": false,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "默认插图",
+      "description": "Lottie 动画插图",
       "code": "./base.js",
+      "scope": [
+        {
+          "name": "_LoginIllustration",
+          "packageName": "@components/LoginIllustration"
+        }
+      ]
+    },
+    {
+      "title": "人才能力插图",
+      "description": "随 locale 自动切换中英文的 workforce 插图",
+      "code": "./workforce.js",
       "scope": [
         {
           "name": "_LoginIllustration",

@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="291.667" height="216.667" viewBox="0 0 291.667 216.667" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Cluster cyan halo" filter="url(#filter0_f_0_8)">
+<ellipse cx="145.833" cy="108.333" rx="120.833" ry="83.3333" fill="#54E6FF" fill-opacity="0.22"/>
+</g>
+<defs>
+<filter id="filter0_f_0_8" x="0" y="0" width="291.667" height="216.667" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="12.5" result="effect1_foregroundBlur_0_8"/>
+</filter>
+</defs>
+</svg>
