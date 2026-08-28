@@ -18,6 +18,9 @@ const buildOptionsColumn = ({ isNext, formatMessage, apis, options, getActionLis
       title: formatMessage({ id: 'Operation' }),
       renderType: 'options',
       fixed: 'right',
+      width: 48,
+      min: 40,
+      max: 160,
       getValueOf: (item, ctx) => {
         const { context, place, className } = ctx || {};
         return {
