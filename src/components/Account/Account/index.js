@@ -12,7 +12,7 @@ import style from './style.module.scss';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 
-const defaultLeftInner = <LoginIllustration />;
+const defaultLeftInner = <LoginIllustration type="workforce" />;
 
 export const Layout = ({ children }) => {
   return (

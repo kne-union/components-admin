@@ -1,0 +1,254 @@
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(144deg, #fbe5cf 24.82%, #e7d5e6 50.81%, #afc9ff 76.8%);
+}
+
+.title-layer {
+  position: absolute;
+  top: 169px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  max-width: calc(100% - 32px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #111827;
+}
+
+.subtitle {
+  p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: #393b48;
+  }
+}
+
+.visual {
+  position: absolute;
+  top: 349px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 522px;
+  max-width: calc(100% - 16px);
+  height: 300px;
+}
+
+.halo-blurred {
+  position: absolute;
+  left: 9.2%;
+  top: 22.3%;
+  width: 83%;
+  height: 59.7%;
+  pointer-events: none;
+}
+
+.halo-cyan {
+  position: absolute;
+  left: 55.4%;
+  top: 13.7%;
+  width: 46.3%;
+  height: 55.6%;
+  pointer-events: none;
+}
+
+.signal-beam {
+  position: absolute;
+  left: 37.5%;
+  top: 30.7%;
+  width: 47.9%;
+  height: 4.2%;
+  background: linear-gradient(
+    90deg,
+    rgba(217, 255, 53, 0) 0%,
+    rgba(217, 255, 53, 0.43) 56.25%,
+    rgba(217, 255, 53, 0) 100%
+  );
+  box-shadow: 0 0 20px rgba(217, 255, 53, 0.5);
+  pointer-events: none;
+}
+
+.card {
+  position: absolute;
+  width: 34.16%;
+  height: 28.89%;
+  border: 0.833px solid rgba(255, 255, 255, 0.72);
+  border-radius: 15px;
+  box-sizing: border-box;
+  padding: 20px 18px 16px;
+}
+
+.card-top-left {
+  left: 10.85%;
+  top: 0;
+}
+
+.card-top-right {
+  left: 49.17%;
+  top: 0;
+}
+
+.card-mid-left {
+  left: 0;
+  top: 35.56%;
+}
+
+.card-mid-center {
+  left: 38.95%;
+  top: 35.56%;
+}
+
+.card-bottom-left {
+  left: 10.85%;
+  top: 71.11%;
+}
+
+.card-bottom-right {
+  left: 49.17%;
+  top: 71.11%;
+}
+
+.card-peach-gradient {
+  background: linear-gradient(123deg, rgba(255, 182, 163, 0.72) 1.24%, rgba(255, 182, 163, 0) 98.9%);
+}
+
+.card-glass {
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.card-purple {
+  background: rgba(237, 204, 255, 0.76);
+}
+
+.card-glass-mid {
+  background: rgba(255, 255, 255, 0.44);
+}
+
+.card-cyan {
+  background: rgba(159, 224, 255, 0.76);
+}
+
+.card-lime {
+  background: rgba(217, 255, 53, 0.72);
+}
+
+.card-title {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #252733;
+}
+
+.card-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-line {
+  display: block;
+  height: 8.333px;
+  border-radius: 82.5px;
+  background: rgba(255, 255, 255, 0.54);
+  width: 62.6%;
+}
+
+.skeleton-line-short {
+  width: 34.5%;
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.card-top-right .skeleton-line,
+.card-mid-center .skeleton-line,
+.card-bottom-left .skeleton-line,
+.card-bottom-right .skeleton-line {
+  width: 68.3%;
+}
+
+.card-top-right .skeleton-line-short,
+.card-mid-center .skeleton-line-short,
+.card-bottom-left .skeleton-line-short,
+.card-bottom-right .skeleton-line-short {
+  width: 43%;
+}
+
+.quote-card {
+  position: absolute;
+  left: 58.6%;
+  top: 54%;
+  width: 41.4%;
+  min-height: 64px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 15px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: inset 0 -4px 8px rgba(255, 255, 255, 0.5);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    pointer-events: none;
+  }
+}
+
+.quote-icon {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: #0a47c2;
+  overflow: hidden;
+}
+
+.quote-mark {
+  position: absolute;
+  left: 10px;
+  top: 7px;
+  font-size: 21.667px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+}
+
+.quote-text {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #252733;
+}
+
+.sparkles {
+  position: absolute;
+  left: 84.7%;
+  top: 12.3%;
+  width: 15.3%;
+  height: 27.7%;
+  pointer-events: none;
+}
