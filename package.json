@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.1.91",
+  "version": "1.1.92",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
@@ -65,6 +65,7 @@
     }
   },
   "devDependencies": {
+    "@kne/craco": "^7.1.4",
     "@kne/modules-dev": "^2.4.10",
     "@kne/react-fetch": "^1.5.7",
     "@kne/react-scripts": "^5.1.5",
@@ -99,7 +100,7 @@
     "@kne/responsive-utils": "^0.1.5",
     "@kne/super-select": "^0.1.46",
     "@kne/system-layout": "^0.2.0-alpha.22",
-    "@kne/timeline": "^1.0.2",
+    "@kne/timeline": "^1.0.4",
     "@kne/token-storage": "^1.0.0",
     "@kne/use-control-value": "^0.1.9",
     "@kne/use-ref-callback": "^0.1.2",
