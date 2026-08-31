@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.1.93",
+  "version": "1.1.94",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
@@ -100,7 +100,7 @@
     "@kne/responsive-utils": "^0.1.5",
     "@kne/super-select": "^0.1.46",
     "@kne/system-layout": "^0.2.0-alpha.22",
-    "@kne/timeline": "^1.0.4",
+    "@kne/timeline": "^1.0.5",
     "@kne/token-storage": "^1.0.0",
     "@kne/use-control-value": "^0.1.9",
     "@kne/use-ref-callback": "^0.1.2",
@@ -109,11 +109,5 @@
     "dingtalk-jsapi": "^3.2.9",
     "md5": "^2.3.0",
     "xlsx": "^0.18.5"
-  },
-  "overrides": {
-    "webpack": "5.106.2",
-    "framer-motion": "12.40.0",
-    "motion-dom": "12.40.0",
-    "motion-utils": "12.39.0"
   }
 }
