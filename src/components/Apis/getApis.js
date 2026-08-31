@@ -33,7 +33,8 @@ const getApis = options => {
       },
       login: {
         url: `${prefix}/account/login`,
-        method: 'POST'
+        method: 'POST',
+        ignoreState: true
       },
       modifyPassword: {
         url: `${prefix}/account/modifyPassword`,
