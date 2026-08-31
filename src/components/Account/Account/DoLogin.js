@@ -24,6 +24,7 @@ const DoLoginInner = createWithRemoteLoader({
     login: async ({ isTenant, ...formData }) => {
       const { data: resData } = await ajax(
         merge({}, account.login, {
+          ignoreState: true,
           data: {
             ...formData,
             password: md5(formData.password)
@@ -59,6 +60,9 @@ const DoLoginInner = createWithRemoteLoader({
         obj.searchParams.delete('referer');
         Object.values(resData.data).forEach(key => key && obj.searchParams.delete(key.toUpperCase()));
         refererHref = obj.pathname + obj.search;
+        if (/\/account\/login\/?$/.test(obj.pathname)) {
+          refererHref = targetUrl || '/';
+        }
       }
 
       Object.keys(storeKeys).forEach(key => {

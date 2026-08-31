@@ -13,7 +13,9 @@ const Login = () => {
     Object.values(storeKeys || { token: 'X-User-Token' }).forEach(tokenKey => {
       removeToken(tokenKey, domain);
     });
-  }, [storeKeys, domain]);
+    // 只在进入登录页时清一次。storeKeys 由 Account merge 每次 render 新建，列入依赖会在登录成功写入 token 后被再次清掉。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <LoginOuterContainer title={systemName} logo={systemLogo} leftInner={loginLeftInner}>
       <DoLogin>
