@@ -1,0 +1,863 @@
+# Task
+
+### 概述
+
+任务管理组件，用于展示和管理系统中的异步任务。支持查看我的任务和全部任务，提供任务筛选、排序、批量操作等功能。包含任务取消、重试、查看错误详情和结果详情等操作。
+
+
+### 示例(全屏)
+
+#### 示例代码
+
+- 基础用法
+- Task 组件的基础使用方式，展示我的任务列表，包含任务筛选、排序和操作功能
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom),antd(antd)
+
+```jsx
+const { default: Task } = _Task;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { useNavigate, Navigate } = reactRouterDom;
+const { Button, Flex } = antd;
+const { Route, Routes } = reactRouterDom;
+
+const BaseExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
+})(({ remoteModules }) => {
+  const [PureGlobal, Layout] = remoteModules;
+  const navigate = useNavigate();
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Layout navigation={{ isFixed: false }}>
+        <Routes>
+          <Route
+            path="/Task/task/*"
+            element={
+              <Task
+                baseUrl="/Task"
+                pageProps={{
+                  menuFixed: false
+                }}>
+                <Flex gap={8}>
+                  <Button
+                    onClick={() => {
+                      navigate('/Task/task');
+                    }}>
+                    我的任务
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      navigate('/Task/task/all');
+                    }}>
+                    全部任务
+                  </Button>
+                </Flex>
+              </Task>
+            }
+          />
+          <Route path="*" element={<Navigate to="/Task/task" replace />} />
+        </Routes>
+      </Layout>
+    </PureGlobal>
+  );
+});
+
+render(<BaseExample />);
+
+```
+
+- 我的任务
+- 展示我的任务列表，支持自定义手动任务的操作按钮，只显示手动执行的任务
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom),antd(antd)
+
+```jsx
+const { MyTask } = _Task;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { BrowserRouter } = reactRouterDom;
+const { Button } = antd;
+
+const MyTaskExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
+})(({ remoteModules }) => {
+  const [PureGlobal, Layout] = remoteModules;
+
+  // 自定义手动任务的操作按钮
+  const getManualTaskAction = data => {
+    return props => (
+      <Button
+        {...props}
+        onClick={() => {
+          console.log('完成任务:', data);
+          props.onSuccess?.();
+        }}>
+        完成任务
+      </Button>
+    );
+  };
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Layout navigation={{ isFixed: false }}>
+        <MyTask
+          baseUrl="/Task"
+          getManualTaskAction={getManualTaskAction}
+          pageProps={{
+            menuOpen: false,
+            menuFixed: false,
+            menu: null
+          }}
+        />
+      </Layout>
+    </PureGlobal>
+  );
+});
+
+render(<MyTaskExample />);
+
+```
+
+- 筛选验收（isNext）
+- 全部任务 / 我的任务筛选验收：展示最近一次请求的 params.filter 与返回条数，可按预设用例验证状态、类型、执行方式、目标名称、日期范围筛选是否生效
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
+
+```jsx
+const { AllTask, MyTask } = _Task;
+const { default: mockPreset, loadFilteredTaskList } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { useMemo, useState } = React;
+const { Alert, App, Button, Card, Flex, Segmented, Typography } = antd;
+
+const { Text, Paragraph } = Typography;
+
+const CompleteTaskAction = ({ data, onSuccess, ...props }) => {
+  const { message } = App.useApp();
+  return (
+    <Button
+      {...props}
+      onClick={() => {
+        message.success(&#96;已完成任务 ${data?.id}，正在按当前筛选刷新列表&#96;);
+        onSuccess && onSuccess();
+      }}
+    />
+  );
+};
+
+const acceptanceCases = [
+  { label: '状态 = 失败', expect: '仅任务 1003（批量邮件通知）' },
+  { label: '类型 = 数据导出', expect: '仅任务 1002（用户数据导出）' },
+  { label: '执行方式 = 手动', expect: '任务 1001、1004' },
+  { label: '目标名称包含「报告」', expect: '任务 1001、1006' },
+  { label: '创建日期 2024-03-08', expect: '任务 1001–1004' },
+  { label: '我的任务 → 完成 pending 任务', expect: '有成功提示，请求次数 +1，params.filter 仍含 runnerType: "manual"' }
+];
+
+const FilterNextExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
+})(({ remoteModules }) => {
+  const [PureGlobal, Layout] = remoteModules;
+  const [view, setView] = useState('all');
+  const [debug, setDebug] = useState({ params: null, result: null, requestSeq: 0 });
+
+  const preset = useMemo(() => {
+    return Object.assign({}, mockPreset, {
+      apis: Object.assign({}, mockPreset.apis, {
+        task: Object.assign({}, mockPreset.apis.task, {
+          list: {
+            loader: props => {
+              const params = props?.params || {};
+              setDebug(prev =>
+                Object.assign({}, prev, {
+                  params,
+                  requestedAt: new Date().toLocaleTimeString(),
+                  requestSeq: (prev.requestSeq || 0) + 1
+                })
+              );
+              return loadFilteredTaskList(props).then(result => {
+                setDebug(prev =>
+                  Object.assign({}, prev, {
+                    result: {
+                      totalCount: result.totalCount,
+                      ids: (result.pageData || []).map(item => item.id)
+                    }
+                  })
+                );
+                return result;
+              });
+            }
+          }
+        })
+      })
+    });
+  }, []);
+
+  return (
+    <PureGlobal preset={preset}>
+      <Layout navigation={{ isFixed: false }}>
+        <Flex vertical gap={16}>
+          <Alert
+            type="info"
+            showIcon
+            message="任务筛选验收（isNext + mapFilterValue）"
+            description={
+              <Flex vertical gap={8}>
+                <Paragraph style={{ marginBottom: 0 }}>
+                  下方表格切换筛选项后，列表条数与「最近一次请求」中的 <Text code>params.filter</Text> 应同步变化。
+                  「我的任务」默认筛 pending，pending 手动任务会显示完成；点击后会强制刷新列表（mock 数据不会改状态），请看成功提示和请求次数。
+                </Paragraph>
+                <ul style={{ margin: 0, paddingLeft: 20 }}>
+                  {acceptanceCases.map(item => (
+                    <li key={item.label}>
+                      <Text strong>{item.label}</Text> → {item.expect}
+                    </li>
+                  ))}
+                </ul>
+              </Flex>
+            }
+          />
+
+          <Card size="small" title="最近一次请求（验收用）">
+            <Flex vertical gap={12}>
+              <Text type="secondary">
+                请求时间：{debug.requestedAt || '-'}　次数：{debug.requestSeq || 0}
+              </Text>
+              <div>
+                <Text strong>params.filter</Text>
+                <pre style={{ margin: '8px 0 0', padding: 12, background: '#f5f5f5', borderRadius: 6, fontSize: 12 }}>
+                  {JSON.stringify(debug.params?.filter || {}, null, 2)}
+                </pre>
+              </div>
+              <div>
+                <Text strong>返回结果</Text>
+                <pre style={{ margin: '8px 0 0', padding: 12, background: '#f5f5f5', borderRadius: 6, fontSize: 12 }}>
+                  {JSON.stringify(debug.result || {}, null, 2)}
+                </pre>
+              </div>
+            </Flex>
+          </Card>
+
+          <Segmented
+            value={view}
+            onChange={setView}
+            options={[
+              { label: '全部任务', value: 'all' },
+              { label: '我的任务（固定 manual）', value: 'my' }
+            ]}
+          />
+
+          {view === 'all' ? (
+            <AllTask
+              baseUrl="/Task"
+              pageProps={{
+                title: '全部任务 · 筛选验收',
+                menu: null,
+                menuOpen: false,
+                menuFixed: false
+              }}
+            />
+          ) : (
+            <MyTask
+              baseUrl="/Task"
+              getManualTaskAction={() => CompleteTaskAction}
+              pageProps={{
+                title: '我的任务 · 筛选验收',
+                menu: null,
+                menuOpen: false,
+                menuFixed: false
+              }}
+            />
+          )}
+        </Flex>
+      </Layout>
+    </PureGlobal>
+  );
+});
+
+render(<FilterNextExample />);
+
+```
+
+- 全部任务
+- 展示全部任务列表，包含手动执行和自动执行的任务，支持批量重试失败的任务
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom)
+
+```jsx
+const { AllTask } = _Task;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { BrowserRouter, Routes, Route } = reactRouterDom;
+
+const AllTaskExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
+})(({ remoteModules }) => {
+  const [PureGlobal, Layout] = remoteModules;
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Layout navigation={{ isFixed: false }}>
+        <AllTask
+          baseUrl="/Task"
+          pageProps={{
+            menu: null,
+            menuOpen: false,
+            menuFixed: false
+          }}
+        />
+      </Layout>
+    </PureGlobal>
+  );
+});
+
+render(<AllTaskExample />);
+
+```
+
+- 任务操作按钮
+- Actions 组件根据任务状态自动显示相应的操作按钮，如取消、重试、查看错误详情、查看结果等
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
+
+```jsx
+const { Actions } = _Task;
+const { default: mockPreset, taskList } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { Space, Button } = antd;
+
+const ActionsExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [PureGlobal] = remoteModules;
+  const { useState } = React;
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // 获取不同状态的任务数据
+  const pendingTask = taskList.data.pageData.find(task => task.status === 'pending');
+  const runningTask = taskList.data.pageData.find(task => task.status === 'running');
+  const failedTask = taskList.data.pageData.find(task => task.status === 'failed');
+  const successTask = taskList.data.pageData.find(task => task.status === 'success');
+  const canceledTask = taskList.data.pageData.find(task => task.status === 'canceled');
+
+  const handleSuccess = () => {
+    console.log('操作成功');
+    setRefreshKey(prev => prev + 1);
+  };
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <div>
+          <div style={{ marginBottom: 8, fontWeight: 'bold' }}>等待执行的手动任务（显示完成和取消按钮）：</div>
+          <Actions
+            data={pendingTask}
+            type="primary"
+            onSuccess={handleSuccess}
+            getManualTaskAction={data => {
+              return props => (
+                <Button
+                  {...props}
+                  onClick={() => {
+                    console.log('完成任务:', data);
+                    props.onSuccess?.();
+                  }}>
+                  完成
+                </Button>
+              );
+            }}
+          />
+        </div>
+
+        <div>
+          <div style={{ marginBottom: 8, fontWeight: 'bold' }}>执行中的任务（显示取消按钮）：</div>
+          <Actions data={runningTask} type="default" onSuccess={handleSuccess} />
+        </div>
+
+        <div>
+          <div style={{ marginBottom: 8, fontWeight: 'bold' }}>失败的任务（显示重试和错误详情按钮）：</div>
+          <Actions data={failedTask} type="link" onSuccess={handleSuccess} />
+        </div>
+
+        <div>
+          <div style={{ marginBottom: 8, fontWeight: 'bold' }}>成功的任务（显示查看结果按钮）：</div>
+          <Actions data={successTask} type="link" onSuccess={handleSuccess} />
+        </div>
+
+        <div>
+          <div style={{ marginBottom: 8, fontWeight: 'bold' }}>已取消的任务（显示重试按钮）：</div>
+          <Actions data={canceledTask} type="default" onSuccess={handleSuccess} />
+        </div>
+      </Space>
+    </PureGlobal>
+  );
+});
+
+render(<ActionsExample />);
+
+```
+
+- 取消任务
+- 展示取消任务功能，支持取消等待执行和执行中的任务
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
+
+```jsx
+const { Actions } = _Task;
+const { default: mockPreset, taskList } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { Space, Card } = antd;
+
+const CancelTaskExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [PureGlobal] = remoteModules;
+  const { useState } = React;
+
+  // 获取可以取消的任务
+  const pendingTask = taskList.data.pageData.find(task => task.status === 'pending');
+  const runningTask = taskList.data.pageData.find(task => task.status === 'running');
+
+  const handleSuccess = () => {
+    console.log('任务已取消');
+  };
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Card title="等待执行的任务" size="small">
+          <div style={{ marginBottom: 8 }}>
+            任务名称：{pendingTask.input.name}
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            任务状态：{pendingTask.status}
+          </div>
+          <Actions data={pendingTask} type="primary" onSuccess={handleSuccess} />
+        </Card>
+
+        <Card title="执行中的任务" size="small">
+          <div style={{ marginBottom: 8 }}>
+            任务名称：{runningTask.input.name}
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            任务状态：{runningTask.status}
+          </div>
+          <Actions data={runningTask} type="primary" onSuccess={handleSuccess} />
+        </Card>
+      </Space>
+    </PureGlobal>
+  );
+});
+
+render(<CancelTaskExample />);
+
+```
+
+- 重试任务
+- 展示重试任务功能，支持重试失败和已取消的任务
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
+
+```jsx
+const { Actions } = _Task;
+const { default: mockPreset, taskList } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { Space, Card } = antd;
+
+const RetryTaskExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [PureGlobal] = remoteModules;
+
+  // 获取可以重试的任务
+  const failedTask = taskList.data.pageData.find(task => task.status === 'failed');
+  const canceledTask = taskList.data.pageData.find(task => task.status === 'canceled');
+
+  const handleSuccess = () => {
+    console.log('任务已重新提交执行');
+  };
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Card title="失败的任务" size="small">
+          <div style={{ marginBottom: 8 }}>
+            任务名称：{failedTask.input.name}
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            任务状态：{failedTask.status}
+          </div>
+          <div style={{ marginBottom: 8, color: '#ff4d4f' }}>
+            错误信息：{failedTask.error.message}
+          </div>
+          <Actions data={failedTask} type="primary" onSuccess={handleSuccess} />
+        </Card>
+
+        <Card title="已取消的任务" size="small">
+          <div style={{ marginBottom: 8 }}>
+            任务名称：{canceledTask.input.name}
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            任务状态：{canceledTask.status}
+          </div>
+          <Actions data={canceledTask} type="primary" onSuccess={handleSuccess} />
+        </Card>
+      </Space>
+    </PureGlobal>
+  );
+});
+
+render(<RetryTaskExample />);
+
+```
+
+- 错误详情
+- 展示失败任务的错误详情，包括输入参数和错误信息
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
+
+```jsx
+const { Actions } = _Task;
+const { default: mockPreset, taskList } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { Card } = antd;
+
+const ErrorDetailExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [PureGlobal] = remoteModules;
+
+  // 获取失败的任务
+  const failedTask = taskList.data.pageData.find(task => task.status === 'failed');
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Card title="失败任务详情" size="small">
+        <div style={{ marginBottom: 8 }}>
+          <strong>任务ID：</strong>{failedTask.id}
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <strong>任务名称：</strong>{failedTask.input.name}
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <strong>任务类型：</strong>{failedTask.type}
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <strong>任务状态：</strong>
+          <span style={{ color: '#ff4d4f' }}>{failedTask.status}</span>
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <strong>错误代码：</strong>{failedTask.error.code}
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <strong>错误信息：</strong>{failedTask.error.message}
+        </div>
+        <Actions data={failedTask} type="primary" />
+      </Card>
+    </PureGlobal>
+  );
+});
+
+render(<ErrorDetailExample />);
+
+```
+
+- 结果详情
+- 展示成功任务的结果详情，包括输入参数和输出结果
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
+
+```jsx
+const { Actions } = _Task;
+const { default: mockPreset, taskList } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { Card } = antd;
+
+const ResultDetailExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal']
+})(({ remoteModules }) => {
+  const [PureGlobal] = remoteModules;
+
+  // 获取成功的任务
+  const successTask = taskList.data.pageData.find(task => task.status === 'success');
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Card title="成功任务详情" size="small">
+        <div style={{ marginBottom: 8 }}>
+          <strong>任务ID：</strong>{successTask.id}
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <strong>任务名称：</strong>{successTask.input.name}
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <strong>任务类型：</strong>{successTask.type}
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <strong>任务状态：</strong>
+          <span style={{ color: '#52c41a' }}>{successTask.status}</span>
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <strong>创建时间：</strong>{successTask.createdAt}
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <strong>完成时间：</strong>{successTask.completedAt}
+        </div>
+        <Actions data={successTask} type="primary" />
+      </Card>
+    </PureGlobal>
+  );
+});
+
+render(<ResultDetailExample />);
+
+```
+
+- 表格列配置
+- 使用 getColumns 函数获取任务列表的表格列配置，支持自定义国际化
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader)
+
+```jsx
+const { getColumns } = _Task;
+const { default: mockPreset, taskList } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+
+const GetColumnsExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal', 'components-core:Layout@TablePage', 'components-core:Layout']
+})(({ remoteModules }) => {
+  const [PureGlobal, TablePage, Layout] = remoteModules;
+
+  // 模拟国际化函数
+  const formatMessage = ({ id }) => {
+    const messages = {
+      ID: 'ID',
+      Type: '类型',
+      Status: '状态',
+      TargetName: '目标名称',
+      ExecutionMode: '执行方式',
+      CreatedAt: '创建时间',
+      CompletedAt: '完成时间',
+      UpdatedAt: '更新时间',
+      ManualExecution: '手动执行',
+      AutomaticExecution: '自动执行'
+    };
+    return messages[id] || id;
+  };
+
+  const columns = getColumns({ formatMessage });
+
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Layout navigation={{ isFixed: false }}>
+        <TablePage
+          loader={() => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                resolve(taskList.data);
+              }, 500);
+            });
+          }}
+          columns={columns}
+          pagination={{ paramsType: 'params' }}
+        />
+      </Layout>
+    </PureGlobal>
+  );
+});
+
+render(<GetColumnsExample />);
+
+```
+
+- 枚举值
+- 展示 Task 组件提供的枚举值，包括任务状态枚举
+- _Task(@components/Task),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
+
+```jsx
+const { enums } = _Task;
+const { Space, Tag } = antd;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+
+const EnumsExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal', 'components-core:Enum']
+})(({ remoteModules }) => {
+  const [PureGlobal, Enum] = remoteModules;
+  return (
+    <PureGlobal preset={mockPreset}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <div>
+          <h4>任务状态枚举（taskStatus）</h4>
+          <Space wrap>
+            <Enum moduleName="taskStatus">
+              {taskStatusList => {
+                return taskStatusList.map(status => (
+                  <Tag
+                    key={status.value}
+                    color={
+                      status.type === 'success'
+                        ? 'green'
+                        : status.type === 'danger'
+                          ? 'red'
+                          : status.type === 'progress'
+                            ? 'blue'
+                            : status.type === 'info'
+                              ? 'default'
+                              : 'default'
+                    }>
+                    {status.value}: {status.description}
+                  </Tag>
+                ));
+              }}
+            </Enum>
+          </Space>
+        </div>
+      </Space>
+    </PureGlobal>
+  );
+});
+
+render(<EnumsExample />);
+
+```
+
+### API
+
+## Task 组件
+
+|属性名|说明|类型|默认值|
+|  ---  | ---  | --- | --- |
+|baseUrl|基础路由路径，用于菜单导航|string|-|
+|getManualTaskAction|手动任务的自定义操作按钮渲染函数，接收任务数据返回按钮组件|(data) => ReactNode|-|
+
+## MyTask 子组件
+
+|属性名|说明|类型|默认值|
+|  ---  | ---  | --- | --- |
+|baseUrl|基础路由路径，用于菜单导航|string|-|
+|getManualTaskAction|手动任务的自定义操作按钮渲染函数|(data) => ReactNode|-|
+
+## AllTask 子组件
+
+|属性名|说明|类型|默认值|
+|  ---  | ---  | --- | --- |
+|baseUrl|基础路由路径，用于菜单导航|string|-|
+|getManualTaskAction|手动任务的自定义操作按钮渲染函数|(data) => ReactNode|-|
+
+## Actions 组件
+
+|属性名|说明|类型|默认值|
+|  ---  | ---  | --- | --- |
+|data|任务数据对象|object|-|
+|getManualTaskAction|手动任务的自定义操作按钮渲染函数|(data) => ReactNode|-|
+|onSuccess|操作成功后的回调函数|() => void|-|
+|type|按钮类型|'default' \| 'primary' \| 'link'|'default'|
+|moreType|更多按钮的类型|'default' \| 'primary' \| 'link'|'link'|
+|itemClassName|按钮项的自定义类名|string|-|
+|children|自定义渲染函数，接收操作列表|({ list }) => ReactNode|-|
+
+## CancelTask 组件
+
+|属性名|说明|类型|默认值|
+|  ---  | ---  | --- | --- |
+|data|任务数据对象|object|-|
+|onSuccess|取消成功后的回调函数|() => void|-|
+
+## RetryTask 组件
+
+|属性名|说明|类型|默认值|
+|  ---  | ---  | --- | --- |
+|data|单个任务数据对象（单个重试时使用）|object|-|
+|taskIds|任务ID数组（批量重试时使用）|number[]|-|
+|onSuccess|重试成功后的回调函数|() => void|-|
+
+## ErrorDetail 组件
+
+|属性名|说明|类型|默认值|
+|  ---  | ---  | --- | --- |
+|data|任务数据对象，包含input和error字段|object|-|
+
+## ResultDetail 组件
+
+|属性名|说明|类型|默认值|
+|  ---  | ---  | --- | --- |
+|data|任务数据对象，包含input和output字段|object|-|
+
+## getColumns 函数
+
+|参数名|说明|类型|默认值|
+|  ---  | ---  | --- | --- |
+|formatMessage|国际化格式化函数|(descriptor) => string|-|
+
+返回值：TablePage 的 columns 配置数组
+
+## enums 枚举
+
+### taskStatus
+
+任务状态枚举，包含以下值：
+- pending: 等待执行
+- running: 执行中
+- waiting: 等待操作
+- success: 成功
+- failed: 失败
+- canceled: 取消
+
+---
+
+## 任务统计 HTTP
+
+**路径**：`GET /api/v1/task/statistics`（与 `apis.task.statistics.getOverview` 对应）
+
+**Query**
+
+| 参数 | 说明 |
+| --- | --- |
+| `range` | 历史区间：`7d` \| `1m` \| `3m` \| `1y` |
+| `timezone` | 浏览器 IANA 时区（如 `Asia/Shanghai`），与后端按日历日聚合的划界一致 |
+
+**响应**（节选，以实际后端为准）
+
+| 字段 | 说明 |
+| --- | --- |
+| `recentTrend` / `recentTrendByType` / `recentTrendByStatus` | 历史趋势 |
+| `durationTrend` | 耗时趋势 |
+| `hourlyCompletionTrend` | 历史「每小时趋势」：`date`、`hour`、`type`、`totalCompleted` 及按状态拆分字段等 |
+| `byStatus` / `byType` / `byRunnerType` | 聚合计数 |
+
+---
+
+## 任务实时统计 SSE
+
+**路径**：`GET /api/v1/task/statistics/sse`（与 `apis.task.statistics.sse` 对应）
+
+**客户端**：使用 `EventSource` 拉流；前端会在 URL 上追加 query（见 `useRealtimeStatisticsSSE`）：
+
+| 参数 | 说明 |
+| --- | --- |
+| `interval` | 推送间隔（秒），如 `5` |
+| `token` | 鉴权，如 `X-User-Token` |
+| `timezone` | IANA 时区，与「今日」、当日完成数划界一致 |
+
+**每条事件的 `data`**
+
+为 JSON 字符串，解析后为对象（或 `{ "data": { ... } }`，前端会解包）。对象内为**增量或全量**字段均可；前端对 SSE 负载做浅合并。
+
+### 看板「手动执行任务」指标（须与实现对齐）
+
+前端见 `Dashboard/RealtimeSection.js`：「等待操作」用 `pickNonNegativeInt` 读取 `waiting` 相关字段；「当日完成」**仅**读取 **`completedToday.manual`**。未下发时显示 `0`。
+
+| 指标 | 含义 | 字段 |
+| --- | --- | --- |
+| 手动 · 当前为 **waiting**（等待操作）的任务数 | 快照：当前处于 `waiting` 状态且 `runnerType === manual` 的任务数量 | **`waitingByRunnerType.manual`**，或 **`runnerTypeStats.manual.waiting`** |
+| 系统 · 同上 | `runnerType === system` | **`waitingByRunnerType.system`**，或 **`runnerTypeStats.system.waiting`** |
+| 手动 · **当日完成**任务数 | 完成时间落在「当日」（由后端按 `timezone` 划界）的手动任务数 | **`completedToday.manual`**（顶层字段，与 `waitingByRunnerType` 并列） |
+| 系统 · 当日完成 | 同上 | **`completedToday.system`** |
+
+（不再使用 `todayCompletedByRunnerType`、`runnerTypeStats.*.completedToday`、`todayCompleted`、`executedToday` 等别名。）
+
+### 其它常用 SSE 字段（节选）
+
+| 字段 | 说明 |
+| --- | --- |
+| `date` | 服务端「今日」日期（YYYY-MM-DD，可与 timezone 对齐校验） |
+| `totalTasks` | 今日任务量等总览 |
+| `byStatus` | 各状态计数（含 `waiting`，与 `pending` 不同） |
+| `byType` / `byRunnerType` | 按类型 / 按执行方式聚合 |
+| `hourlyTrend` / `hourlyTrendByStatus` / `hourlyTrendByType` | 今日按小时序列 |
+| `completedToday` | **当日完成**按 `manual` / `system` 分组（顶层对象，与 `waitingByRunnerType` 并列） |
+| `pendingByRunnerType` | **pending（等待执行）** 按 `manual` / `system` 分组；与看板「手动等待操作数」（`waiting`）无关 |
+| `runnerTypeStats` | 可按 runner 扩展；看板「手动等待操作数」仅读 **`waiting` / `waitingCount`**；**`executed`** 勿用作「当日完成」（当日完成仅 **`completedToday`**） |
+| `todayDuration` | 今日耗时统计（均值等） |
