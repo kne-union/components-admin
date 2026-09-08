@@ -39,7 +39,7 @@ const getOrgListApi = (apis, { disableSynced } = {}) => {
 
 const EMAIL_REG = /^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
-const normalizeContactPhone = phone => {
+export const normalizeContactPhone = phone => {
   if (phone == null || phone === '') {
     return '';
   }
@@ -49,15 +49,19 @@ const normalizeContactPhone = phone => {
   return String(phone).trim();
 };
 
-/** 非同步用户须至少填写邮箱或手机（与后端 USER_CONTACT_REQUIRED 一致） */
+/** 是否已填写邮箱或手机（与后端 USER_CONTACT_REQUIRED 一致） */
+export const hasTenantUserContact = (data = {}) => {
+  const email = String(data.email ?? '').trim();
+  const phone = normalizeContactPhone(data.phone);
+  return !!(email || phone);
+};
+
+/** 非同步用户须至少填写邮箱或手机 */
 export const createEmailOrPhoneRule = (formatMessage, { isSynced = false } = {}) => (value, context = {}) => {
   if (isSynced) {
     return { result: true, errMsg: '' };
   }
-  const data = context.data || {};
-  const email = String(data.email ?? '').trim();
-  const phone = normalizeContactPhone(data.phone);
-  if (email || phone) {
+  if (hasTenantUserContact(context.data || {})) {
     return { result: true, errMsg: '' };
   }
   return {
@@ -153,9 +157,8 @@ const FormInnerInner = createWithRemoteLoader({
     return <FormInfo column={1} list={formInner} />;
   });
 
-  return useMemo(() => {
-    return getFormInner();
-  }, [getFormInner]);
+  // 勿对 getFormInner 做空依赖 useMemo：useRefCallback 引用稳定会导致字段 rule 首次渲染后不再更新
+  return getFormInner();
 });
 
 export default withLocale(FormInnerInner);

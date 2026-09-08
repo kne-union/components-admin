@@ -1,6 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Button, App } from 'antd';
-import FormInner from '../FormInner';
+import FormInner, { hasTenantUserContact } from '../FormInner';
 import merge from 'lodash/merge';
 import get from 'lodash/get';
 import withLocale from '../../withLocale';
@@ -38,6 +38,10 @@ const Edit = createWithRemoteLoader({
               tenantOrgIds: mapUserOrgIdsToFormValue(enhancedData)
             }),
             onSubmit: async formData => {
+              if (!enhancedData?.synced && !hasTenantUserContact(formData)) {
+                message.error(formatMessage({ id: 'EmailOrPhoneRequired' }));
+                return false;
+              }
               const { data: resData } = await ajax(
                 merge({}, apis.save, {
                   data: transformUserFormData(formData, enhancedData)
