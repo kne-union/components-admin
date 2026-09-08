@@ -101,7 +101,6 @@ const FormInnerInner = createWithRemoteLoader({
   const { Avatar, Input, PhoneNumber, TextArea, SuperSelectTree, SuperSelect } = FormInfo.fields;
   const isSynced = !!data?.synced;
   const orgListApi = useMemo(() => getOrgListApi(apis, { disableSynced: !isSynced }), [apis, isSynced]);
-  const emailOrPhoneRule = useMemo(() => createEmailOrPhoneRule(formatMessage, { isSynced }), [formatMessage, isSynced]);
   const emailFieldRule = useMemo(() => createEmailFieldRule(formatMessage, { isSynced }), [formatMessage, isSynced]);
   const getFormInner = useRefCallback(() => {
     const formInner = [
@@ -126,17 +125,8 @@ const FormInnerInner = createWithRemoteLoader({
         labelKey="name"
         interceptor="array-output-value"
       />,
-      <PhoneNumber
-        name="phone"
-        label={formatMessage({ id: 'Phone' })}
-        format="string"
-        disabled={isSynced}
-        rule={emailOrPhoneRule}
-        associations={{
-          fields: [{ name: 'email' }],
-          callback: revalidateAssociatedField
-        }}
-      />,
+      // PhoneNumber 内部会对 rule 做 string.split，不能传函数规则；联系方式校验放在 email + Create/Edit onSubmit
+      <PhoneNumber name="phone" label={formatMessage({ id: 'Phone' })} format="string" disabled={isSynced} />,
       <Input
         name="email"
         label={formatMessage({ id: 'Email' })}
