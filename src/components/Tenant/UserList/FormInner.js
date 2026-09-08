@@ -37,6 +37,57 @@ const getOrgListApi = (apis, { disableSynced } = {}) => {
   });
 };
 
+const EMAIL_REG = /^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+const normalizeContactPhone = phone => {
+  if (phone == null || phone === '') {
+    return '';
+  }
+  if (typeof phone === 'object') {
+    return String(phone.phone ?? phone.value ?? phone.number ?? '').trim();
+  }
+  return String(phone).trim();
+};
+
+/** 非同步用户须至少填写邮箱或手机（与后端 USER_CONTACT_REQUIRED 一致） */
+export const createEmailOrPhoneRule = (formatMessage, { isSynced = false } = {}) => (value, context = {}) => {
+  if (isSynced) {
+    return { result: true, errMsg: '' };
+  }
+  const data = context.data || {};
+  const email = String(data.email ?? '').trim();
+  const phone = normalizeContactPhone(data.phone);
+  if (email || phone) {
+    return { result: true, errMsg: '' };
+  }
+  return {
+    result: false,
+    errMsg: formatMessage({ id: 'EmailOrPhoneRequired' })
+  };
+};
+
+const createEmailFieldRule = (formatMessage, { isSynced = false } = {}) => {
+  const contactRule = createEmailOrPhoneRule(formatMessage, { isSynced });
+  return (value, context = {}) => {
+    const contactResult = contactRule(value, context);
+    if (!contactResult.result) {
+      return contactResult;
+    }
+    const email = String(value ?? '').trim();
+    if (!email) {
+      return { result: true, errMsg: '' };
+    }
+    if (email.length > 100 || !EMAIL_REG.test(email)) {
+      return { result: false, errMsg: formatMessage({ id: 'EmailInvalid' }) };
+    }
+    return { result: true, errMsg: '' };
+  };
+};
+
+const revalidateAssociatedField = ({ target, openApi }) => {
+  openApi.validateField({ name: target.name });
+};
+
 const FormInnerInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo', 'components-core:Global@usePreset']
 })(({ remoteModules, apis, data }) => {
@@ -46,6 +97,8 @@ const FormInnerInner = createWithRemoteLoader({
   const { Avatar, Input, PhoneNumber, TextArea, SuperSelectTree, SuperSelect } = FormInfo.fields;
   const isSynced = !!data?.synced;
   const orgListApi = useMemo(() => getOrgListApi(apis, { disableSynced: !isSynced }), [apis, isSynced]);
+  const emailOrPhoneRule = useMemo(() => createEmailOrPhoneRule(formatMessage, { isSynced }), [formatMessage, isSynced]);
+  const emailFieldRule = useMemo(() => createEmailFieldRule(formatMessage, { isSynced }), [formatMessage, isSynced]);
   const getFormInner = useRefCallback(() => {
     const formInner = [
       <Flex justify="center">
@@ -69,13 +122,32 @@ const FormInnerInner = createWithRemoteLoader({
         labelKey="name"
         interceptor="array-output-value"
       />,
-      <PhoneNumber name="phone" label={formatMessage({ id: 'Phone' })} format="string" disabled={isSynced} />,
-      <Input name="email" label={formatMessage({ id: 'Email' })} rule="EMAIL LEN-0-100" disabled={isSynced} />,
+      <PhoneNumber
+        name="phone"
+        label={formatMessage({ id: 'Phone' })}
+        format="string"
+        disabled={isSynced}
+        rule={emailOrPhoneRule}
+        associations={{
+          fields: [{ name: 'email' }],
+          callback: revalidateAssociatedField
+        }}
+      />,
+      <Input
+        name="email"
+        label={formatMessage({ id: 'Email' })}
+        rule={emailFieldRule}
+        disabled={isSynced}
+        associations={{
+          fields: [{ name: 'phone' }],
+          callback: revalidateAssociatedField
+        }}
+      />,
       <TextArea name="description" label={formatMessage({ id: 'UserRemark' })} block disabled={isSynced} />
     ];
     const UserFormInner = get(plugins, 'tenantAdmin.UserFormInner');
     if (UserFormInner && (UserFormInner.$$typeof || typeof UserFormInner.type === 'function')) {
-      return <UserFormInner column={1} list={formInner} apis={apis}/>;
+      return <UserFormInner column={1} list={formInner} apis={apis} />;
     }
 
     return <FormInfo column={1} list={formInner} />;

@@ -42,6 +42,8 @@ const locale = {
   Position: '岗位',
   Phone: '手机',
   Email: '邮箱',
+  EmailOrPhoneRequired: '请填写邮箱或手机号',
+  EmailInvalid: '请输入有效的邮箱',
   UserRemark: '描述',
   PhoneTitle: '电话',
   DefaultRole: '默认角色',
