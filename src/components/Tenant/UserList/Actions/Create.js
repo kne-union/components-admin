@@ -1,7 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Button, App } from 'antd';
 import merge from 'lodash/merge';
-import FormInner from '../FormInner';
+import FormInner, { hasTenantUserContact } from '../FormInner';
 import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
 import transformUserFormData from '../transformUserFormData';
@@ -23,6 +23,10 @@ const Create = createWithRemoteLoader({
           size: 'small',
           formProps: {
             onSubmit: async formData => {
+              if (!hasTenantUserContact(formData)) {
+                message.error(formatMessage({ id: 'EmailOrPhoneRequired' }));
+                return false;
+              }
               const { data: resData } = await ajax(
                 merge({}, apis.create, {
                   data: transformUserFormData(formData)

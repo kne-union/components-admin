@@ -807,10 +807,27 @@ const apis = merge({}, getApis(), {
       loader: loadFilteredTenantUserList
     },
     userCreate: {
-      loader: () => ({ id: `user-${Date.now()}` })
+      loader: ({ data } = {}) => {
+        const email = String(data?.email ?? '').trim();
+        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        if (!email && !phone) {
+          return { code: 400, msg: '手机号或邮箱不能同时为空' };
+        }
+        return { id: `user-${Date.now()}` };
+      }
     },
     userSave: {
-      loader: () => ({ code: 0 })
+      loader: ({ data } = {}) => {
+        if (data?.synced) {
+          return { code: 0 };
+        }
+        const email = String(data?.email ?? '').trim();
+        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        if (!email && !phone) {
+          return { code: 400, msg: '手机号或邮箱不能同时为空' };
+        }
+        return { code: 0 };
+      }
     },
     userRemove: {
       loader: () => ({ code: 0 })
@@ -880,10 +897,27 @@ const apis = merge({}, getApis(), {
       loader: loadFilteredTenantUserList
     },
     createUser: {
-      loader: () => ({ id: `user-${Date.now()}` })
+      loader: ({ data } = {}) => {
+        const email = String(data?.email ?? '').trim();
+        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        if (!email && !phone) {
+          return { code: 400, msg: '手机号或邮箱不能同时为空' };
+        }
+        return { id: `user-${Date.now()}` };
+      }
     },
     saveUser: {
-      loader: () => ({ code: 0 })
+      loader: ({ data } = {}) => {
+        if (data?.synced) {
+          return { code: 0 };
+        }
+        const email = String(data?.email ?? '').trim();
+        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        if (!email && !phone) {
+          return { code: 400, msg: '手机号或邮箱不能同时为空' };
+        }
+        return { code: 0 };
+      }
     },
     removeUser: {
       loader: () => ({ code: 0 })
@@ -1038,10 +1072,27 @@ const apis = merge({}, getApis(), {
       loader: loadFilteredTenantUserList
     },
     userCreate: {
-      loader: () => ({ id: `user-${Date.now()}` })
+      loader: ({ data } = {}) => {
+        const email = String(data?.email ?? '').trim();
+        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        if (!email && !phone) {
+          return { code: 400, msg: '手机号或邮箱不能同时为空' };
+        }
+        return { id: `user-${Date.now()}` };
+      }
     },
     userSave: {
-      loader: () => ({ code: 0 })
+      loader: ({ data } = {}) => {
+        if (data?.synced) {
+          return { code: 0 };
+        }
+        const email = String(data?.email ?? '').trim();
+        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        if (!email && !phone) {
+          return { code: 400, msg: '手机号或邮箱不能同时为空' };
+        }
+        return { code: 0 };
+      }
     },
     userSetStatus: {
       loader: () => ({ code: 0 })

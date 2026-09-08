@@ -334,8 +334,14 @@ const createComponent = (callback = item => item) => {
                   })}
                   footer={
                     showAdd
-                      ? () => (
-                          <Button type="link" onClick={() => openGroupForm({ treeData, reload })}>
+                      ? ({ close }) => (
+                          <Button
+                            type="link"
+                            onClick={() => {
+                              close?.();
+                              openGroupForm({ treeData, reload });
+                            }}
+                          >
                             {formatMessage({ id: 'GroupSelectAdd' }, { name: groupName })}
                           </Button>
                         )

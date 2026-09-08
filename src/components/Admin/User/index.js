@@ -8,6 +8,7 @@ import getColumns from './getColumns';
 import FormInner from './FormInner';
 import ResetPasswordFormInner from './ResetPasswordFormInner';
 import UserMobileList from './UserMobileList';
+import useTablePaginationSearchParams from '../../../utils/useTablePaginationSearchParams';
 import md5 from 'md5';
 import get from 'lodash/get';
 
@@ -26,6 +27,7 @@ const UserInner = createWithRemoteLoader({
   const { message } = App.useApp();
   const ref = useRef(null);
   const mobileListRef = useRef([]);
+  const paginationSearchParams = useTablePaginationSearchParams();
 
   const reloadTable = useCallback(() => {
     ref.current?.reload();
@@ -259,7 +261,11 @@ const UserInner = createWithRemoteLoader({
         mobileListRef.current = formatted?.list || [];
         return formatted;
       }}
-      pagination={{ paramsType: 'params' }}
+      pagination={{
+        paramsType: 'params',
+        searchParams: paginationSearchParams.searchParams,
+        setSearchParams: paginationSearchParams.setSearchParams
+      }}
       name="user-list"
       ref={ref}
       menuFixed={pageProps?.menuFixed}
