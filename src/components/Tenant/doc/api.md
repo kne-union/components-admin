@@ -97,6 +97,7 @@
 | placeholder | 成员选择占位文本 | string | - |
 | single | 是否单选 | boolean | true |
 | disabled | 是否禁用 | boolean | false |
+| disabledIds | 不可选中的成员 id 列表（仍展示，置灰不可点选） | array | - |
 | showSelectedFooter | 是否在底部展示已选成员，支持点击标签移除 | boolean | true |
 | allowSelectAll | 多选时是否展示全选 | boolean | true |
 | userStatus | 成员状态筛选：`open` / `closed`（兼容 `active` → `open`、`inactive` → `closed`） | string | - |

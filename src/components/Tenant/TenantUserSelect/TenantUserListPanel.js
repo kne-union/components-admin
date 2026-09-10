@@ -1,7 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
 import { CheckOutlined } from '@ant-design/icons';
-import { Avatar, Checkbox, Empty, Flex } from 'antd';
+import { Avatar, Checkbox, Empty, Flex, Tag } from 'antd';
 import classnames from 'classnames';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
@@ -51,6 +51,7 @@ const TenantUserListPanel = createWithRemoteLoader({
     onChange,
     single,
     disabled,
+    disabledIds,
     formatMessage,
     activeOrgId,
     onTotalCountChange,
@@ -61,12 +62,19 @@ const TenantUserListPanel = createWithRemoteLoader({
   }) => {
     const [ScrollLoader] = remoteModules;
     const selectedIds = useMemo(() => getSelectedIds(value, single), [value, single]);
+    const disabledIdSet = useMemo(
+      () => new Set((Array.isArray(disabledIds) ? disabledIds : []).map(id => String(id))),
+      [disabledIds]
+    );
 
     const handleSelect = item => {
       if (disabled) {
         return;
       }
       const itemId = String(item?.[valueKey] ?? item?.id);
+      if (disabledIdSet.has(itemId)) {
+        return;
+      }
       const itemValue = mapUserToSelectedValue(item, activeOrgId, { valueKey, labelKey });
       if (single) {
         onChange(itemValue);
@@ -118,6 +126,7 @@ const TenantUserListPanel = createWithRemoteLoader({
                   value={value}
                   onChange={onChange}
                   disabled={disabled}
+                  disabledIds={disabledIds}
                   formatMessage={formatMessage}
                   selectedCountInActiveOrg={selectedCountInActiveOrg}
                   valueKey={valueKey}
@@ -150,18 +159,19 @@ const TenantUserListPanel = createWithRemoteLoader({
                     const itemId = String(item?.[valueKey] ?? item?.id);
                     const itemLabel = item?.[labelKey] ?? item?.name;
                     const selected = selectedIds.includes(String(itemId));
+                    const itemDisabled = disabled || disabledIdSet.has(itemId);
                     const description = getUserDescription(item);
                     return (
                       <div
                         key={itemId}
                         className={classnames(style['user-list-item'], {
                           [style['user-list-item-selected']]: selected,
-                          [style['user-list-item-disabled']]: disabled
+                          [style['user-list-item-disabled']]: itemDisabled
                         })}
                         onClick={() => handleSelect(item)}
                       >
                         {!single ? (
-                          <Checkbox className={style['user-list-checkbox']} checked={selected} disabled={disabled} />
+                          <Checkbox className={style['user-list-checkbox']} checked={selected} disabled={itemDisabled} />
                         ) : null}
                         <Avatar className={style['user-list-avatar']} src={item.avatar} size={36}>
                           {itemLabel?.[0]}
@@ -170,7 +180,12 @@ const TenantUserListPanel = createWithRemoteLoader({
                           <div className={style['user-list-name']}>{itemLabel}</div>
                           {description ? <div className={style['user-list-desc']}>{description}</div> : null}
                         </Flex>
-                        {single && selected ? <CheckOutlined className={style['user-list-check']} /> : null}
+                        {itemDisabled ? (
+                          <Tag className={style['user-list-disabled-tag']}>
+                            {formatMessage({ id: 'TenantUserSelectItemDisabled' })}
+                          </Tag>
+                        ) : null}
+                        {single && selected && !itemDisabled ? <CheckOutlined className={style['user-list-check']} /> : null}
                       </div>
                     );
                     })}
