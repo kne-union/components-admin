@@ -226,6 +226,7 @@ const locale = {
   TenantUserSelectSelectedEmpty: '暂未选择成员',
   TenantUserSelectOrgMemberTotal: '共 {count} 人',
   TenantUserSelectSelectAll: '全选',
+  TenantUserSelectItemDisabled: '不可选',
 
   // Role
   SystemType: '系统',

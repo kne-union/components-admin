@@ -389,8 +389,8 @@
       ]
     },
     {
-      "title": "按组织选择成员（SelectInput.Field）",
-      "description": "TenantUserSelect.Input.Field 纯控件，不依赖 Form，value/onChange 受控",
+      "title": "按组织选择成员（SelectInput.Field + disabledIds）",
+      "description": "TenantUserSelect.Input.Field 纯控件示例；演示 disabledIds 禁用指定成员（张伟 user-1 置灰不可选）",
       "code": "./tenant-user-select-input-field.js",
       "scope": [
         {

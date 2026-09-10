@@ -426,7 +426,31 @@
 
 .user-list-item-disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  background: rgba(0, 0, 0, 0.04);
+  opacity: 1;
+
+  .user-list-avatar {
+    filter: grayscale(1);
+    opacity: 0.55;
+  }
+
+  .user-list-name {
+    color: rgba(0, 0, 0, 0.35);
+  }
+
+  .user-list-desc {
+    color: rgba(0, 0, 0, 0.25);
+  }
+}
+
+.user-list-disabled-tag {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
 }
 
 .user-list-checkbox {

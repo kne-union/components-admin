@@ -230,6 +230,7 @@ const locale = {
   TenantUserSelectSelectedEmpty: 'No members selected',
   TenantUserSelectOrgMemberTotal: '{count} members',
   TenantUserSelectSelectAll: 'Select all',
+  TenantUserSelectItemDisabled: 'Unavailable',
 
   // Role
   SystemType: 'System',

@@ -23,7 +23,7 @@ const PanelControl = ({ value, onChange, disabled }) => {
 const OrgTenantUserField = createWithRemoteLoader({
   modules: ['components-core:FormInfo@hooks']
 })(
-  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', ...props }) => {
+  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', disabledIds, ...props }) => {
     const [hooks] = remoteModules;
     const { useDecorator } = hooks;
     const { formatMessage } = useIntl();
@@ -40,7 +40,8 @@ const OrgTenantUserField = createWithRemoteLoader({
       'initialSelectedMeta',
       'height',
       'valueKey',
-      'labelKey'
+      'labelKey',
+      'disabledIds'
     ]);
     const render = useDecorator(
       merge(
@@ -65,9 +66,10 @@ const OrgTenantUserField = createWithRemoteLoader({
         initialSelectedMeta,
         height,
         valueKey,
-        labelKey
+        labelKey,
+        disabledIds
       }),
-      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey, labelKey]
+      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey, labelKey, disabledIds]
     );
 
     return (
@@ -83,6 +85,7 @@ OrgTenantUserField.Field = withLocale(
     value,
     onChange,
     disabled,
+    disabledIds,
     orgApi,
     userApi,
     userStatus,
@@ -102,6 +105,7 @@ OrgTenantUserField.Field = withLocale(
         value={value}
         onChange={onChange}
         disabled={disabled}
+        disabledIds={disabledIds}
         formatMessage={formatMessage}
         orgApi={orgApi}
         userApi={userApi}

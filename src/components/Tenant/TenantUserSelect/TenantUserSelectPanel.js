@@ -32,6 +32,7 @@ const TenantUserSelectPanel = ({
   onChange,
   onSelectComplete,
   disabled,
+  disabledIds,
   formatMessage,
   orgApi,
   userApi,
@@ -362,6 +363,7 @@ const TenantUserSelectPanel = ({
                 activeOrgId={orgId}
                 single={single}
                 disabled={disabled}
+                disabledIds={disabledIds}
                 value={effectiveValue}
                 onChange={next => handleChange(next, { source: 'user' })}
                 formatMessage={formatMessage}

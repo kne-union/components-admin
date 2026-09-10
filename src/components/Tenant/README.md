@@ -1007,8 +1007,8 @@ render(<TenantUserSelectInputModalExample />);
 
 ```
 
-- 按组织选择成员（SelectInput.Field）
-- TenantUserSelect.Input.Field 纯控件，不依赖 Form，value/onChange 受控
+- 按组织选择成员（SelectInput.Field + disabledIds）
+- TenantUserSelect.Input.Field 纯控件示例；演示 disabledIds 禁用指定成员（张伟 user-1 置灰不可选）
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
 
 ```jsx
@@ -1023,20 +1023,26 @@ const TenantUserSelectInputFieldExample = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [PureGlobal] = remoteModules;
   const [value, setValue] = useState(null);
+  // 三个一级组织各禁用一人，点任意一级组织都能看到置灰项：
+  // 技术研发中心→张伟；产品设计中心→刘芳；运营中心→周洋
+  const disabledIds = ['user-1', 'user-4', 'user-7'];
 
   return (
     <PureGlobal preset={mockPreset}>
-      <Flex vertical gap={12} style={{ maxWidth: 480 }}>
+      <Flex vertical gap={12} style={{ maxWidth: 520 }}>
         <Typography.Text type="secondary">
-          TenantUserSelect.Input.Field 为纯控件，不依赖 Form，通过 value / onChange 受控
+          请先在左侧组织树点击「技术研发中心」（不要点灰色的公司根节点）。成员列表中「张伟」应置灰不可选；也可点「产品设计中心」看「刘芳」、「运营中心」看「周洋」。
         </Typography.Text>
         <TenantUserSelect.Input.Field
           value={value}
           onChange={setValue}
-          isPopup
+          isPopup={false}
           single
           companyName="科技创新有限公司"
           placeholder="请选择成员"
+          disabledIds={disabledIds}
+          height={420}
+          overlayWidth={760}
         />
         <Typography.Paragraph>
           <Typography.Text strong>当前值：</Typography.Text>
@@ -1213,6 +1219,7 @@ render(<SettingExample />);
 | placeholder | 成员选择占位文本 | string | - |
 | single | 是否单选 | boolean | true |
 | disabled | 是否禁用 | boolean | false |
+| disabledIds | 不可选中的成员 id 列表（仍展示，置灰不可点选） | array | - |
 | showSelectedFooter | 是否在底部展示已选成员，支持点击标签移除 | boolean | true |
 | allowSelectAll | 多选时是否展示全选 | boolean | true |
 | userStatus | 成员状态筛选：`open` / `closed`（兼容 `active` → `open`、`inactive` → `closed`） | string | - |

@@ -32,12 +32,17 @@ const TenantUserListSelectAllContainer = ({
   value,
   onChange,
   disabled,
+  disabledIds,
   formatMessage,
   selectedCountInActiveOrg,
   valueKey = 'id',
   labelKey = 'name'
 }) => {
   const [loading, setLoading] = useState(false);
+  const disabledIdSet = useMemo(
+    () => new Set((Array.isArray(disabledIds) ? disabledIds : []).map(id => String(id))),
+    [disabledIds]
+  );
 
   const selectAllState = useMemo(() => {
     if (!total) {
@@ -60,13 +65,14 @@ const TenantUserListSelectAllContainer = ({
     setLoading(true);
     try {
       const allUsers = await fetchAllOrgUsers(api, total);
-      const currentOrgIds = new Set(allUsers.map(item => String(item?.[valueKey] ?? item?.id)));
+      const selectableUsers = allUsers.filter(item => !disabledIdSet.has(String(item?.[valueKey] ?? item?.id)));
+      const currentOrgIds = new Set(selectableUsers.map(item => String(item?.[valueKey] ?? item?.id)));
       if (!checked) {
         onChange(current.filter(item => !currentOrgIds.has(String(item.id))));
         return;
       }
       const merged = [...current];
-      allUsers.forEach(item => {
+      selectableUsers.forEach(item => {
         const nextValue = mapUserToSelectedValue(item, activeOrgId, { valueKey, labelKey });
         if (!merged.some(existing => String(existing.id) === String(nextValue.id))) {
           merged.push(nextValue);
