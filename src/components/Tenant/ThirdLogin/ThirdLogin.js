@@ -67,7 +67,16 @@ const ThirdLogin = createWithRemoteLoader({
   const redirect = searchParams.get('redirect');
   const bindToken = searchParams.get('bindToken');
   const targetId = searchParams.get('targetId');
+  const queryString = searchParams.toString();
   const { formatMessage, title, logo } = usePlatformShell(platform);
+
+  // 北森免登：入口 URL 已带 userId/timestamp/sign，直接跳结果页换票，不请求 auth_url
+  useEffect(() => {
+    if (platform !== 'beisen' || !tenantId) {
+      return;
+    }
+    window.location.href = `/third-login-result${queryString ? `?${queryString}` : ''}`;
+  }, [platform, tenantId, queryString]);
 
   if (!platform || !tenantId) {
     return (
@@ -78,6 +87,10 @@ const ThirdLogin = createWithRemoteLoader({
         tip={formatMessage({ id: 'ContactAdmin' })}
       />
     );
+  }
+
+  if (platform === 'beisen') {
+    return <ThirdLoginLoading title={title} logo={logo} tip={formatMessage({ id: 'ThirdLoginAuthenticating' })} />;
   }
 
   return (
