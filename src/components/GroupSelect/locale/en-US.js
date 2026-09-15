@@ -5,7 +5,7 @@ export default {
   GroupSelectParent: 'Parent',
   GroupSelectColor: 'Color',
   GroupSelectDescription: 'Description',
-  GroupSelectOperation: 'Action',
+  GroupSelectAction: 'Action',
   GroupSelectDelete: 'Delete',
   GroupSelectEditAction: 'Edit',
   GroupSelectConfirm: 'Confirm',

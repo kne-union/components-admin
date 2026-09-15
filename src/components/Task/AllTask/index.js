@@ -175,7 +175,7 @@ const AllTask = createWithRemoteLoader({
           ...getColumns({ formatMessage }),
           {
             name: 'options',
-            title: formatMessage({ id: 'Operation' }),
+            title: formatMessage({ id: 'Action' }),
             renderType: 'options',
             fixed: 'right',
             getValueOf: item => {

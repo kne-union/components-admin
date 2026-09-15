@@ -4,7 +4,7 @@ const locale = {
   Delete: '删除',
   Open: '开启',
   Close: '关闭',
-  Operation: '操作',
+  Action: '操作',
   Keyword: '关键字',
   AddBiz: '添加{bizName}',
   EditBiz: '编辑{bizName}',

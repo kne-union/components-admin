@@ -32,7 +32,7 @@ const locale = {
   IsSynced: 'Source',
   Keyword: 'Keyword',
   Add: 'Add',
-  Operation: 'Action',
+  Action: 'Action',
   Avatar: 'Avatar',
   UserName: 'Name',
   Department: 'Department',

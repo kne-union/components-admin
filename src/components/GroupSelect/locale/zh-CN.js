@@ -5,7 +5,7 @@ export default {
   GroupSelectParent: '父级',
   GroupSelectColor: '颜色',
   GroupSelectDescription: '描述',
-  GroupSelectOperation: '操作',
+  GroupSelectAction: '操作',
   GroupSelectDelete: '删除',
   GroupSelectEditAction: '编辑',
   GroupSelectConfirm: '确定',

@@ -18,7 +18,7 @@ const getBoundBinding = data => {
 const Actions = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
 })(
-  withLocale(({ remoteModules, moreType, children, itemClassName, ...props }) => {
+  withLocale(({ remoteModules, moreType, children, itemClassName, showLength, ...props }) => {
     const [ButtonGroup] = remoteModules;
     const { formatMessage } = useIntl();
     const bound = getBoundBinding(props.data);
@@ -69,11 +69,12 @@ const Actions = createWithRemoteLoader({
         ...props,
         itemClassName,
         moreType,
+        showLength,
         list: actionList
       });
     }
 
-    return <ButtonGroup itemClassName={itemClassName} list={actionList} moreType={moreType} />;
+    return <ButtonGroup itemClassName={itemClassName} list={actionList} moreType={moreType} showLength={showLength} />;
   })
 );
 

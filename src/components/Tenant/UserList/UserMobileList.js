@@ -10,7 +10,7 @@ const resolveRowId = (item, rowKey = 'id') => get(item, typeof rowKey === 'funct
 /**
  * 租户用户列表移动端渲染：人物卡片内含 Checkbox + 操作入口
  */
-const UserMobileList = ({ dataSource = [], rowKey = 'id', rowSelection, apis, getActions, onSuccess }) => {
+const UserMobileList = ({ dataSource = [], rowKey = 'id', rowSelection, apis, getActions, onSuccess, showLength }) => {
   if (!dataSource.length) {
     return (
       <div className={style.empty}>
@@ -72,7 +72,15 @@ const UserMobileList = ({ dataSource = [], rowKey = 'id', rowSelection, apis, ge
                 }
                 footer={
                   <div className={style.actions}>
-                    <Actions type="link" itemClassName="btn-no-padding" moreType="link" data={item} apis={apis} onSuccess={onSuccess}>
+                    <Actions
+                      type="link"
+                      itemClassName="btn-no-padding"
+                      moreType="link"
+                      showLength={showLength}
+                      data={item}
+                      apis={apis}
+                      onSuccess={onSuccess}
+                    >
                       {getActions}
                     </Actions>
                   </div>

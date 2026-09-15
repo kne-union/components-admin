@@ -84,7 +84,7 @@ const Args = createWithRemoteLoader({
             {
               name: 'options',
               renderType: 'options',
-              title: formatMessage({ id: 'Operation' }),
+              title: formatMessage({ id: 'Action' }),
               fixed: 'right',
               getValueOf: item => {
                 return [

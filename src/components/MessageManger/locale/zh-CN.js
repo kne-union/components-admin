@@ -7,7 +7,7 @@ const messages = {
   TemplateDetail: '模板详情',
   RecordDetail: '发送详情',
   Detail: '详情',
-  Operation: '操作',
+  Action: '操作',
   Name: '名称',
   Recipient: '发送对象',
   Type: '类型',

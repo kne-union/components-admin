@@ -32,7 +32,7 @@ const locale = {
   IsSynced: '来源',
   Keyword: '关键字',
   Add: '添加',
-  Operation: '操作',
+  Action: '操作',
   Avatar: '头像',
   UserName: '姓名',
   Department: '部门',

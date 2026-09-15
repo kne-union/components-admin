@@ -4,7 +4,7 @@ const locale = {
   Delete: 'Delete',
   Open: 'Open',
   Close: 'Close',
-  Operation: 'Action',
+  Action: 'Action',
   Keyword: 'Keyword',
   AddBiz: 'Add {bizName}',
   EditBiz: 'Edit {bizName}',

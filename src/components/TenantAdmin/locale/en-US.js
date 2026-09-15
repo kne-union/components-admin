@@ -19,7 +19,7 @@ const locale = {
   Delete: 'Delete',
   Save: 'Save',
   SaveSuccess: 'Saved successfully',
-  Operation: 'Action',
+  Action: 'Action',
   Keyword: 'Keyword',
   OpenTenantConfirm: 'Are you sure you want to open the current tenant?',
   CloseTenantConfirm: 'Are you sure you want to close the current tenant?',

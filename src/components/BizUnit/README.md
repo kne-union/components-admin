@@ -2944,6 +2944,8 @@ TablePage 所需的 `{ list, total }`。
 | openButtonProps      | 开启按钮                                                         | Object            | `{ children: '开启' }`                       |
 | closeButtonProps     | 关闭按钮                                                         | Object            | `{ children: '关闭' }`                       |
 | tableProps           | 表格属性；isNext 下可传 `rowSelection`、`batchActions`、`pagination`、`buttonGroup`（`list` 追加在创建按钮之后）等 | Object            | `{ pagination: { paramsType: 'params' } }` |
+| showLength           | 操作列外显按钮数，其余收入三点菜单；不传时默认 `0`（全部收入三点）                         | Number            | `0`                                        |
+| optionsColumn        | 合并进自动追加的操作列（如 `width` / `min` / `max`）；isNext 默认列宽为 48/40/160 | Object            | -                                          |
 | keywordFilterName    | 关键字搜索字段名                                                     | String            | 'keyword'                                  |
 | keywordFilterLabel   | 关键字搜索标签                                                      | String            | '关键字'                                      |
 | formSize             | 表单弹窗尺寸                                                       | String            | 'small'                                    |

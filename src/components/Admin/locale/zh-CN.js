@@ -24,7 +24,7 @@ const locale = {
   EditUserInfo: '编辑用户信息',
   DeleteSuccess: '删除成功',
   SaveSuccess: '保存成功',
-  Operation: '操作',
+  Action: '操作',
   Keyword: '关键字',
 
   // FormInner labels

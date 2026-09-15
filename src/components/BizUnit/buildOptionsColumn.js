@@ -4,7 +4,7 @@ const buildOptionsColumn = ({ isNext, formatMessage, apis, options, getActionLis
   const actionsProps = {
     moreType: 'link',
     itemClassName: 'btn-no-padding',
-    showLength: 0,
+    showLength: options.showLength ?? 0,
     apis,
     options,
     getActionList,
@@ -13,40 +13,46 @@ const buildOptionsColumn = ({ isNext, formatMessage, apis, options, getActionLis
   };
 
   if (isNext) {
-    return {
-      name: 'options',
-      title: formatMessage({ id: 'Operation' }),
-      renderType: 'options',
-      fixed: 'right',
-      width: 48,
-      min: 40,
-      max: 160,
-      getValueOf: (item, ctx) => {
-        const { context, place, className } = ctx || {};
-        return {
-          children: (
-            <Actions
-              {...actionsProps}
-              {...(place ? { place } : {})}
-              {...(className ? { className } : {})}
-              data={item}
-              fetchOptions={context}
-            />
-          )
-        };
-      }
-    };
+    return Object.assign(
+      {
+        name: 'options',
+        title: formatMessage({ id: 'Action' }),
+        renderType: 'options',
+        fixed: 'right',
+        width: 48,
+        min: 40,
+        max: 160,
+        getValueOf: (item, ctx) => {
+          const { context, place, className } = ctx || {};
+          return {
+            children: (
+              <Actions
+                {...actionsProps}
+                {...(place ? { place } : {})}
+                {...(className ? { className } : {})}
+                data={item}
+                fetchOptions={context}
+              />
+            )
+          };
+        }
+      },
+      options.optionsColumn
+    );
   }
 
-  return {
-    name: 'options',
-    type: 'options',
-    title: formatMessage({ id: 'Operation' }),
-    fixed: 'right',
-    valueOf: (item, fetchOptions) => ({
-      children: <Actions {...actionsProps} data={item} fetchOptions={fetchOptions} />
-    })
-  };
+  return Object.assign(
+    {
+      name: 'options',
+      type: 'options',
+      title: formatMessage({ id: 'Action' }),
+      fixed: 'right',
+      valueOf: (item, fetchOptions) => ({
+        children: <Actions {...actionsProps} data={item} fetchOptions={fetchOptions} />
+      })
+    },
+    options.optionsColumn
+  );
 };
 
 export default buildOptionsColumn;

@@ -44,7 +44,9 @@ const UserList = createWithRemoteLoader({
       initialTenantOrgId,
       initialOrgName,
       initialUserId,
-      allowQueryIdForUserFilter
+      allowQueryIdForUserFilter,
+      showLength,
+      optionsColumn
     }) => {
       const [TablePage, Table, Filter, usePreset] = remoteModules;
       const { useSelectedRow } = Table;
@@ -243,9 +245,10 @@ const UserList = createWithRemoteLoader({
             apis={apis}
             getActions={getActions}
             onSuccess={reloadTable}
+            showLength={showLength}
           />
         ),
-        [apis, getActions, reloadTable, rowSelection]
+        [apis, getActions, reloadTable, rowSelection, showLength]
       );
 
       // 对齐 BizUnit 演示：筛选走 TablePage 内部 reload + mapFilterValue，不要把 filter 抬升进 list.params
@@ -279,21 +282,31 @@ const UserList = createWithRemoteLoader({
         },
         columns: [
           ...columns,
-          {
-            name: 'options',
-            title: formatMessage({ id: 'Operation' }),
-            renderType: 'options',
-            fixed: 'right',
-            getValueOf: item => {
-              return {
-                children: (
-                  <Actions itemClassName="btn-no-padding" moreType="link" data={item} apis={apis} onSuccess={reloadTable}>
-                    {getActions}
-                  </Actions>
-                )
-              };
-            }
-          }
+          Object.assign(
+            {
+              name: 'options',
+              title: formatMessage({ id: 'Action' }),
+              renderType: 'options',
+              fixed: 'right',
+              getValueOf: item => {
+                return {
+                  children: (
+                    <Actions
+                      itemClassName="btn-no-padding"
+                      moreType="link"
+                      showLength={showLength}
+                      data={item}
+                      apis={apis}
+                      onSuccess={reloadTable}
+                    >
+                      {getActions}
+                    </Actions>
+                  )
+                };
+              }
+            },
+            optionsColumn
+          )
         ],
         name: 'tenant-user-list',
         pagination: { paramsType: 'params' },

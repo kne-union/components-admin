@@ -16,7 +16,7 @@ const messages = {
   CreatedAt: '创建时间',
   UpdatedAt: '更新时间',
   CompletedAt: '完成时间',
-  Operation: '操作',
+  Action: '操作',
   ViewDetail: '查看详情',
   ViewTrace: '查看轨迹',
   MessageDetail: '消息详情',

@@ -9,7 +9,7 @@ import Actions from '../Actions';
 
 const ListInner = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Filter', 'components-core:Global@usePreset']
-})(({ remoteModules, baseUrl }) => {
+})(({ remoteModules, baseUrl, showLength, optionsColumn }) => {
   const [TablePage, Filter, usePreset] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
@@ -53,17 +53,20 @@ const ListInner = createWithRemoteLoader({
       }}
       columns={[
         ...getColumns({ navigate, formatMessage }),
-        {
-          name: 'options',
-          title: formatMessage({ id: 'Operation' }),
-          renderType: 'options',
-          fixed: 'right',
-          getValueOf: item => {
-            return {
-              children: <Actions data={item} onSuccess={() => ref.current?.reload()} />
-            };
-          }
-        }
+        Object.assign(
+          {
+            name: 'options',
+            title: formatMessage({ id: 'Action' }),
+            renderType: 'options',
+            fixed: 'right',
+            getValueOf: item => {
+              return {
+                children: <Actions data={item} showLength={showLength} onSuccess={() => ref.current?.reload()} />
+              };
+            }
+          },
+          optionsColumn
+        )
       ]}
     />
   );

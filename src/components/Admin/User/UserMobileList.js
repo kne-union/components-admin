@@ -9,7 +9,7 @@ const resolveRowId = (item, rowKey = 'id') => get(item, typeof rowKey === 'funct
 
 const UserMobileList = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
-})(({ remoteModules, dataSource = [], rowKey = 'id', getActions }) => {
+})(({ remoteModules, dataSource = [], rowKey = 'id', getActions, showLength }) => {
   const [ButtonGroup] = remoteModules;
 
   if (!dataSource.length) {
@@ -36,7 +36,7 @@ const UserMobileList = createWithRemoteLoader({
                 footer={
                   actions?.length ? (
                     <div className={style.actions}>
-                      <ButtonGroup itemClassName="btn-no-padding" moreType="link" list={actions} />
+                      <ButtonGroup itemClassName="btn-no-padding" moreType="link" showLength={showLength} list={actions} />
                     </div>
                   ) : null
                 }

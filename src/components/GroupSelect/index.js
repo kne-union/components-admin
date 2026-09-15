@@ -251,7 +251,7 @@ const createComponent = (callback = item => item) => {
 
         if (showEdit || showDelete) {
           columns.push({
-            title: formatMessage({ id: 'GroupSelectOperation' }),
+            title: formatMessage({ id: 'GroupSelectAction' }),
             name: 'options',
             type: 'options',
             renderType: 'options',
