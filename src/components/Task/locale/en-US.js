@@ -12,7 +12,7 @@ const locale = {
   CreatedAt: 'Created At',
   CompletedAt: 'Completed At',
   UpdatedAt: 'Updated At',
-  Operation: 'Operation',
+  Action: 'Action',
   // Execution Mode
   ManualExecution: 'Manual Execution',
   AutomaticExecution: 'Automatic Execution',

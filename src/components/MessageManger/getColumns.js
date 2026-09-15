@@ -35,7 +35,7 @@ const getTemplateColumns = ({ formatMessage, onSuccess }) => [
   { name: 'createdAt', title: formatMessage({ id: 'CreatedAt' }), format: 'datetime' },
   {
     name: 'options',
-    title: formatMessage({ id: 'Operation' }),
+    title: formatMessage({ id: 'Action' }),
     renderType: 'options',
     fixed: 'right',
     getValueOf: item => ({
@@ -56,7 +56,7 @@ const getRecordColumns = ({ formatMessage, onSuccess }) => [
   { name: 'createdAt', title: formatMessage({ id: 'CreatedAt' }), format: 'datetime' },
   {
     name: 'options',
-    title: formatMessage({ id: 'Operation' }),
+    title: formatMessage({ id: 'Action' }),
     renderType: 'options',
     fixed: 'right',
     getValueOf: item => ({

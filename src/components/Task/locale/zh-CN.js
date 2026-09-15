@@ -12,7 +12,7 @@ const locale = {
   CreatedAt: '创建时间',
   CompletedAt: '完成时间',
   UpdatedAt: '更新时间',
-  Operation: '操作',
+  Action: '操作',
   // Execution Mode
   ManualExecution: '手动执行',
   AutomaticExecution: '自动执行',

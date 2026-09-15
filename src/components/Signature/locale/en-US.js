@@ -18,7 +18,7 @@ const locale = {
   // Actions
   AddSecretKey: 'Add Secret Key',
   Verify: 'Verify',
-  Operation: 'Operation',
+  Action: 'Action',
 
   // Form labels
   VerifySecretKey: 'Verify Secret Key',

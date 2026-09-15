@@ -7,7 +7,7 @@ import Remove from './Remove';
 
 const ActionsInner = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
-})(({ remoteModules, moreType, children, itemClassName, ...props }) => {
+})(({ remoteModules, moreType, children, itemClassName, showLength, ...props }) => {
   const [ButtonGroup] = remoteModules;
   const { formatMessage } = useIntl();
 
@@ -48,11 +48,12 @@ const ActionsInner = createWithRemoteLoader({
     return children({
       itemClassName,
       moreType,
+      showLength,
       list: actionList
     });
   }
 
-  return <ButtonGroup itemClassName={itemClassName} list={actionList} moreType={moreType} />;
+  return <ButtonGroup itemClassName={itemClassName} list={actionList} moreType={moreType} showLength={showLength} />;
 });
 
 export default withLocale(ActionsInner);

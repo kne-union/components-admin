@@ -13,9 +13,15 @@ import md5 from 'md5';
 import get from 'lodash/get';
 
 const UserInner = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Filter', 'components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
-})(({ remoteModules, pageProps: propsPageProps }) => {
-  const [TablePage, Filter, useFormModal, usePreset] = remoteModules;
+  modules: [
+    'components-core:Layout@TablePage',
+    'components-core:Filter',
+    'components-core:FormInfo@useFormModal',
+    'components-core:Global@usePreset',
+    'components-core:ButtonGroup'
+  ]
+})(({ remoteModules, pageProps: propsPageProps, showLength, optionsColumn }) => {
+  const [TablePage, Filter, useFormModal, usePreset, ButtonGroup] = remoteModules;
   const { formatMessage } = useIntl();
   const contextProps = useProps();
   const pageProps = Object.assign({}, contextProps?.pageProps, propsPageProps);
@@ -179,8 +185,10 @@ const UserInner = createWithRemoteLoader({
   );
 
   const renderMobile = useCallback(
-    ({ dataSource } = {}) => <UserMobileList dataSource={dataSource ?? mobileListRef.current} getActions={getActions} />,
-    [getActions]
+    ({ dataSource } = {}) => (
+      <UserMobileList dataSource={dataSource ?? mobileListRef.current} getActions={getActions} showLength={showLength} />
+    ),
+    [getActions, showLength]
   );
 
   return (
@@ -272,13 +280,25 @@ const UserInner = createWithRemoteLoader({
       renderMobile={renderMobile}
       columns={[
         ...getColumns({ formatMessage }),
-        {
-          name: 'options',
-          title: formatMessage({ id: 'Operation' }),
-          renderType: 'options',
-          fixed: 'right',
-          getValueOf: item => getActions(item)
-        }
+        Object.assign(
+          {
+            name: 'options',
+            title: formatMessage({ id: 'Action' }),
+            renderType: 'options',
+            fixed: 'right',
+            getValueOf: item => ({
+              children: (
+                <ButtonGroup
+                  itemClassName="btn-no-padding"
+                  moreType="link"
+                  showLength={showLength}
+                  list={getActions(item)}
+                />
+              )
+            })
+          },
+          optionsColumn
+        )
       ]}
       buttonGroup={{
         list: [

@@ -18,7 +18,7 @@ const locale = {
   // Actions
   AddSecretKey: '添加密钥',
   Verify: '验证',
-  Operation: '操作',
+  Action: '操作',
 
   // Form labels
   VerifySecretKey: '验证密钥',

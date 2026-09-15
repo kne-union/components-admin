@@ -19,7 +19,7 @@ const locale = {
   Delete: '删除',
   Save: '保存',
   SaveSuccess: '保存成功',
-  Operation: '操作',
+  Action: '操作',
   Keyword: '关键字',
   OpenTenantConfirm: '确定要开启当前租户吗？',
   CloseTenantConfirm: '确定要关闭当前租户吗？',
