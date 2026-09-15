@@ -24,7 +24,7 @@ const locale = {
   EditUserInfo: 'Edit User Info',
   DeleteSuccess: 'Deleted successfully',
   SaveSuccess: 'Saved successfully',
-  Operation: 'Operation',
+  Operation: 'Action',
   Keyword: 'Keyword',
 
   // FormInner labels

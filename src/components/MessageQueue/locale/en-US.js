@@ -16,7 +16,7 @@ const messages = {
   CreatedAt: 'Created At',
   UpdatedAt: 'Updated At',
   CompletedAt: 'Completed At',
-  Operation: 'Operation',
+  Operation: 'Action',
   ViewDetail: 'View Detail',
   ViewTrace: 'View Trace',
   MessageDetail: 'Message Detail',

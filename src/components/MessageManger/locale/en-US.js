@@ -7,7 +7,7 @@ const messages = {
   TemplateDetail: 'Template Detail',
   RecordDetail: 'Record Detail',
   Detail: 'Detail',
-  Operation: 'Operation',
+  Operation: 'Action',
   Name: 'Name',
   Recipient: 'Recipient',
   Type: 'Type',
