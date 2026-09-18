@@ -36,9 +36,9 @@ const locale = {
   Avatar: 'Avatar',
   UserName: 'Name',
   Department: 'Department',
-  Departments: 'Departments',
+  Departments: 'Department',
   OrgTooltipListTitle: 'Departments ({count})',
-  UserRole: 'Role',
+  UserRole: 'Roles',
   Position: 'Position',
   Phone: 'Phone',
   Email: 'Email',
@@ -116,12 +116,12 @@ const locale = {
 
   // Permission
   TenantPermission: 'Tenant Permission',
-  Role: 'Role',
+  Role: 'Roles',
   SharedGroup: 'Shared Group',
 
   // Role
-  SetPermission: 'Set Permission',
-  SetRolePermission: 'Set Role Permissions',
+  SetPermission: 'Manage Permission',
+  SetRolePermission: 'Manage Role Permissions',
   Description: 'Description',
 
   // FormInner labels
@@ -241,7 +241,7 @@ const locale = {
   CompanyInfoPage: 'Company Information',
   CompanyInfoSaveSuccess: 'Company information saved successfully',
   OrgStructure: 'Organization',
-  PermissionManagement: 'Permission Management',
+  PermissionManagement: 'Roles & Permissions',
 
   // TenantPermission
   SelectAll: 'Select All',
@@ -286,7 +286,7 @@ const locale = {
   ThirdLoginConfigCancelConfirm: 'Remove this SSO channel?',
   ThirdLoginConfigSaveSuccess: 'SSO configuration saved',
   ThirdLoginConfigCancelSuccess: 'SSO configuration removed',
-  ThirdLoginBind: 'Bind SSO',
+  ThirdLoginBind: 'Link Third-party Account',
   ThirdLoginUnbind: 'Unbind SSO',
   ThirdLoginBindHint: 'Copy or open the link and complete authorization in WeCom/DingTalk/Beisen to bind.',
   ThirdLoginBindLink: 'Bind link',

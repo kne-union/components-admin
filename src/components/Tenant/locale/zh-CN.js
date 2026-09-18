@@ -119,7 +119,7 @@ const locale = {
   SharedGroup: '共享组',
 
   // Role
-  SetPermission: '设置权限',
+  SetPermission: '管理权限',
   SetRolePermission: '设置角色权限',
   Description: '描述',
 
