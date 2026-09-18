@@ -153,7 +153,7 @@ const locale = {
   OrgLeader: 'Department head',
   OrgLeaderMustBeMember: 'Only members of this department can be selected as head',
   OrgLeaderCreateHint: 'When creating a department, the selected head will be added to this department automatically',
-  OrgExcelImport: 'Import orgs from Excel',
+  OrgExcelImport: 'Import Orgs from Excel',
   ImportUploadLabel: 'Upload file',
   ImportPreviewLabel: 'Parsed preview',
   ImportAnchorLabel: 'Anchor organization (imported orgs will be direct children of this node)',
@@ -248,8 +248,8 @@ const locale = {
 
   // OrgLink
   OrgLinkTitle: 'Organization Sync',
-  OrgLinkHint: 'After enabling, you can sync organization data from WeCom or DingTalk. Synced organizations cannot be edited or deleted, only the department leader can be modified.',
-  OrgLinkEnable: 'Enable Link',
+  OrgLinkHint: 'Sync organization data from WeCom or DingTalk. Synced organizations cannot be edited or deleted; only department managers can be updated.',
+  OrgLinkEnable: 'Enable Sync',
   OrgLinkSource: 'Source',
   OrgLinkSyncInterval: 'Auto Sync Interval',
   OrgLinkTargetId: 'Target ID',
