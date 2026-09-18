@@ -9,7 +9,7 @@ const locale = {
   Edit: '编辑',
 
   // OrgInfo
-  ViewUsers: '查看用户',
+  ViewUsers: '查看成员',
   OrgUserCount: '{count} 人',
   AddSubOrg: '新增子级组织',
   Delete: '删除',
@@ -44,7 +44,7 @@ const locale = {
   Email: '邮箱',
   EmailOrPhoneRequired: '请填写邮箱或手机号',
   EmailInvalid: '请输入有效的邮箱',
-  UserRemark: '描述',
+  UserRemark: '备注',
   PhoneTitle: '电话',
   DefaultRole: '默认角色',
 

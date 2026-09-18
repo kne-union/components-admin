@@ -44,7 +44,7 @@ const locale = {
   Email: 'Email',
   EmailOrPhoneRequired: 'Please enter an email or phone number',
   EmailInvalid: 'Please enter a valid email',
-  UserRemark: 'Remark',
+  UserRemark: 'Notes',
   PhoneTitle: 'Phone',
   DefaultRole: 'Default Role',
 
