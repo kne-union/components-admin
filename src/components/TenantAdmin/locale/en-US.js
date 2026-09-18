@@ -63,7 +63,7 @@ const locale = {
   TenantDetail: 'Tenant Detail',
   BasicInfo: 'Basic Information',
   CompanyInfo: 'Company Information',
-  OrgStructure: 'Organization Structure',
+  OrgStructure: 'Organization',
   UserList: 'User List',
   Permission: 'Permission',
   Setting: 'Settings',
@@ -77,7 +77,7 @@ const locale = {
   Department: 'Department',
 
   // OrgLink
-  OrgLinkTitle: 'Linked Organization',
+  OrgLinkTitle: 'Organization Sync',
   OrgLinkHint:
     'After enabling, you can sync organization data from WeCom or DingTalk. Synced organizations cannot be edited or deleted, only the department leader can be modified.',
   OrgLinkEnable: 'Enable Link',
