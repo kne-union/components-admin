@@ -79,7 +79,7 @@ const locale = {
   // OrgLink
   OrgLinkTitle: 'Organization Sync',
   OrgLinkHint: 'Sync organization data from WeCom or DingTalk. Synced organizations cannot be edited or deleted; only department managers can be updated.',
-  OrgLinkEnable: 'Enable Link',
+  OrgLinkEnable: 'Enable Sync',
   OrgLinkSource: 'Sync Source',
   OrgLinkSyncInterval: 'Sync Frequency',
   OrgLinkTargetId: 'Sync Target ID',
