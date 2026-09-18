@@ -3,6 +3,7 @@ import { getApis } from '@components/Apis';
 import { enums as taskEnums } from '@components/Task';
 import { enums as intlAdminEnums } from '@components/IntlAdmin';
 import merge from 'lodash/merge';
+import localStorage from '@kne/local-storage';
 import { filterPageData } from '@components/MessageQueue/utils';
 import { filterMessagePageData } from '@components/MessageManger/utils';
 
@@ -1505,6 +1506,7 @@ const preset = {
     }
     return Promise.resolve({ data: loader ? { code: 0, data: loader(props) } : { code: 0, data: {} } });
   },
+  locale: localStorage.getItem('X-User-Locale') || 'zh-CN',
   apis,
   enums,
   global: tenantData.global

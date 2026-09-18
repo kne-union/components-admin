@@ -61,8 +61,8 @@ const locale = {
 
   // Detail
   TenantDetail: 'Tenant Detail',
-  BasicInfo: 'Basic Info',
-  CompanyInfo: 'Company Info',
+  BasicInfo: 'Basic Information',
+  CompanyInfo: 'Company Information',
   OrgStructure: 'Organization Structure',
   UserList: 'User List',
   Permission: 'Permission',
@@ -73,7 +73,7 @@ const locale = {
   AccountCountTag: 'Account Count',
 
   // TabDetail
-  CompanyInfoSaveSuccess: 'Company info saved successfully',
+  CompanyInfoSaveSuccess: 'Company information saved successfully',
   Department: 'Department',
 
   // OrgLink

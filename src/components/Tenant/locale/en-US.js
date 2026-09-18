@@ -1,7 +1,7 @@
 const locale = {
   // CompanyInfo
-  CompanyInfo: 'Company Info',
-  CompanyBasicSection: 'Basic information',
+  CompanyInfo: 'Company Infomation',
+  CompanyBasicSection: 'Basic Information',
   DevelopmentHistory: 'Development History',
   TeamDescription: 'Team Description',
   Save: 'Save',
@@ -72,8 +72,8 @@ const locale = {
   InviteYouJoin: 'You are invited to join 【{name}】',
   InviteJoinSubtitle: 'Complete the steps below to join this organization',
   StepBack: 'Back',
-  ConfirmCompanyInfo: 'Confirm Company Info',
-  ConfirmEmployeeInfo: 'Confirm Employee Info',
+  ConfirmCompanyInfo: 'Confirm Company Information',
+  ConfirmEmployeeInfo: 'Confirm Employee Information',
   ConfirmEmployeeInfoHint: 'Please review your profile in this tenant. Confirm to complete joining.',
   Complete: 'Complete',
   WelcomeJoin: 'Welcome to join 【{name}】！',
@@ -237,8 +237,8 @@ const locale = {
   CustomType: 'Custom',
 
   // Setting
-  CompanyInfoPage: 'Company Info',
-  CompanyInfoSaveSuccess: 'Company info saved successfully',
+  CompanyInfoPage: 'Company Information',
+  CompanyInfoSaveSuccess: 'Company information saved successfully',
   OrgStructure: 'Organization Structure',
   PermissionManagement: 'Permission Management',
 
