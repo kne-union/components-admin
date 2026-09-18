@@ -120,8 +120,8 @@
       ]
     },
     {
-      "title": "第三方登录",
-      "description": "ThirdLogin 组件用于第三方登录页，路由 path 为 third-login；根据 platform（wecom / dingtalk）展示对应平台 logo 与标题",
+      "title": "单点登录（SSO）",
+      "description": "ThirdLogin 组件用于单点登录（SSO）页，路由 path 为 third-login；根据 platform（wecom / dingtalk）展示对应平台 logo 与标题",
       "code": "./third-login.js",
       "scope": [
         {
@@ -147,8 +147,8 @@
       ]
     },
     {
-      "title": "第三方登录结果",
-      "description": "ThirdLoginResult 组件用于第三方登录结果页，路由 path 为 third-login-result；企业微信需 platform/tenantId/code，钉钉另需 corpId/clientId",
+      "title": "单点登录（SSO）结果",
+      "description": "ThirdLoginResult 组件用于单点登录（SSO）结果页，路由 path 为 third-login-result；企业微信需 platform/tenantId/code，钉钉另需 corpId/clientId",
       "code": "./third-login-result.js",
       "scope": [
         {
