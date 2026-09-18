@@ -8,22 +8,24 @@ import Fetch from '@kne/react-fetch';
 import merge from 'lodash/merge';
 import dayjs from 'dayjs';
 
-const SYNC_INTERVAL_OPTIONS = [
-  { value: 'daily', label: '每天' },
-  { value: 'weekly', label: '每7天' },
-  { value: 'monthly', label: '每个月' },
-  { value: 'yearly', label: '每年' },
-  { value: 'off', label: '关闭' }
-];
-
-const getSourceLabel = (value, sourceOptions) => {
-  const item = (sourceOptions || []).find(o => o.value === value);
-  return item ? item.label : value;
+const SOURCE_LOCALE_IDS = {
+  wecom: 'SourceWecom',
+  dingtalk: 'SourceDingtalk'
 };
 
-const getSyncIntervalLabel = value => {
+const SYNC_INTERVAL_OPTIONS = [
+  { value: 'daily', labelId: 'OrgLinkIntervalDaily' },
+  { value: 'weekly', labelId: 'OrgLinkIntervalWeekly' },
+  { value: 'monthly', labelId: 'OrgLinkIntervalMonthly' },
+  { value: 'yearly', labelId: 'OrgLinkIntervalYearly' },
+  { value: 'off', labelId: 'OrgLinkIntervalOff' }
+];
+
+const getSourceLabel = (value, formatMessage) => formatMessage({ id: SOURCE_LOCALE_IDS[value] });
+
+const getSyncIntervalLabel = (value, formatMessage) => {
   const item = SYNC_INTERVAL_OPTIONS.find(o => o.value === value);
-  return item ? item.label : value;
+  return formatMessage({ id: item.labelId });
 };
 
 const STATUS_MAP = {
@@ -54,7 +56,7 @@ const LinkFormInner = withLocale(
             defaultValue="wecom"
             options={(sourceOptions || []).map(item => ({
               value: item.value,
-              label: item.label
+              label: formatMessage({ id: SOURCE_LOCALE_IDS[item.value] })
             }))}
           />,
           <RadioGroup
@@ -64,7 +66,7 @@ const LinkFormInner = withLocale(
             defaultValue="off"
             options={SYNC_INTERVAL_OPTIONS.map(item => ({
               value: item.value,
-              label: item.label
+              label: formatMessage({ id: item.labelId })
             }))}
           />,
           <Select
@@ -141,6 +143,7 @@ const OrgLinkSetting = createWithRemoteLoader({
                   formModal({
                     title: formatMessage({ id: 'OrgLinkEnable' }),
                     size: 'small',
+                    saveText: formatMessage({ id: 'OrgLinkEnable' }),
                     formProps: {
                       onSubmit: async formData => {
                         const { data: resData } = await ajax(
@@ -175,12 +178,12 @@ const OrgLinkSetting = createWithRemoteLoader({
                 {
                   key: 'source',
                   label: formatMessage({ id: 'OrgLinkSource' }),
-                  children: <Tag color="blue">{getSourceLabel(config.source, sourceOptions)}</Tag>
+                  children: <Tag color="blue">{getSourceLabel(config.source, formatMessage)}</Tag>
                 },
                 {
                   key: 'syncInterval',
                   label: formatMessage({ id: 'OrgLinkSyncInterval' }),
-                  children: getSyncIntervalLabel(config.syncInterval)
+                  children: getSyncIntervalLabel(config.syncInterval, formatMessage)
                 },
                 {
                   key: 'targetId',

@@ -27,7 +27,9 @@ const FormInner = createWithRemoteLoader({
             getPermission={type => {
               return ['preview', 'delete'].indexOf(type) > -1;
             }}
-          />,
+          >
+            {formatMessage({ id: 'UploadImages' })}
+          </Upload>,
           <Avatar name="logo" label={formatMessage({ id: 'CompanyLogo' })} interceptor="photo-string" block directory={directory} />,
           <Input name="name" label={formatMessage({ id: 'CompanyName' })} rule="REQ LEN-0-100" />,
           <Input name="fullName" label={formatMessage({ id: 'CompanyFullName' })} rule="LEN-0-100" />,

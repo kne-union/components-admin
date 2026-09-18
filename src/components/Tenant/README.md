@@ -276,8 +276,8 @@ render(<LoginTenantExample />);
 
 ```
 
-- 第三方登录
-- ThirdLogin 组件用于第三方登录页，路由 path 为 third-login；根据 platform（wecom / dingtalk）展示对应平台 logo 与标题
+- 单点登录（SSO）
+- ThirdLogin 组件用于单点登录（SSO）页，路由 path 为 third-login；根据 platform（wecom / dingtalk）展示对应平台 logo 与标题
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom),antd(antd)
 
 ```jsx
@@ -354,8 +354,8 @@ render(<ThirdLoginExample />);
 
 ```
 
-- 第三方登录结果
-- ThirdLoginResult 组件用于第三方登录结果页，路由 path 为 third-login-result；企业微信需 platform/tenantId/code，钉钉另需 corpId/clientId
+- 单点登录（SSO）结果
+- ThirdLoginResult 组件用于单点登录（SSO）结果页，路由 path 为 third-login-result；企业微信需 platform/tenantId/code，钉钉另需 corpId/clientId
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom),antd(antd),icons(@ant-design/icons)
 
 ```jsx

@@ -3,6 +3,7 @@ import { preset as fetchPreset } from '@kne/react-fetch';
 import { Spin, Empty, message } from 'antd';
 import createAjax from '@kne/axios-fetch';
 import { preset as remoteLoaderPreset } from '@kne/remote-loader';
+import localStorage from '@kne/local-storage';
 
 window.PUBLIC_URL = window.runtimePublicUrl || process.env.PUBLIC_URL;
 
@@ -92,6 +93,7 @@ export const globalInit = async () => {
 
   return {
     ajax,
+    locale: localStorage.getItem('X-User-Locale') || 'zh-CN',
     themeToken: {
       colorPrimary: '#4183F0'
     }

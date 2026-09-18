@@ -3,6 +3,7 @@ import { getApis } from '@components/Apis';
 import { enums as taskEnums } from '@components/Task';
 import { enums as intlAdminEnums } from '@components/IntlAdmin';
 import merge from 'lodash/merge';
+import localStorage from '@kne/local-storage';
 import { filterPageData } from '@components/MessageQueue/utils';
 import { filterMessagePageData } from '@components/MessageManger/utils';
 
@@ -60,6 +61,15 @@ const orgLinkConfigMock = () => ({
     { value: 'wecom', label: '企业微信' },
     { value: 'dingtalk', label: '钉钉' }
   ]
+});
+
+const thirdLoginConfigMock = () => ({
+  sourceOptions: [
+    { value: 'wecom', label: '企业微信' },
+    { value: 'dingtalk', label: '钉钉' },
+    { value: 'beisen', label: '北森' }
+  ],
+  list: []
 });
 
 const normalizeTenantUserStatusFilter = status => {
@@ -803,6 +813,21 @@ const apis = merge({}, getApis(), {
     orgLinkSync: {
       loader: () => ({ code: 0 })
     },
+    thirdLoginConfig: {
+      loader: thirdLoginConfigMock
+    },
+    thirdLoginConfigSave: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginConfigCancel: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginBindToken: {
+      loader: () => ({ url: 'https://example.com/third-login-bind?token=mock' })
+    },
+    thirdLoginUnbind: {
+      loader: () => ({ code: 0 })
+    },
     userList: {
       loader: loadFilteredTenantUserList
     },
@@ -1066,6 +1091,21 @@ const apis = merge({}, getApis(), {
       loader: () => ({ code: 0 })
     },
     orgLinkSync: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginConfig: {
+      loader: thirdLoginConfigMock
+    },
+    thirdLoginConfigSave: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginConfigCancel: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginBindToken: {
+      loader: () => ({ url: 'https://example.com/third-login-bind?token=mock' })
+    },
+    thirdLoginUnbind: {
       loader: () => ({ code: 0 })
     },
     userList: {
@@ -1505,6 +1545,7 @@ const preset = {
     }
     return Promise.resolve({ data: loader ? { code: 0, data: loader(props) } : { code: 0, data: {} } });
   },
+  locale: localStorage.getItem('X-User-Locale') || 'zh-CN',
   apis,
   enums,
   global: tenantData.global

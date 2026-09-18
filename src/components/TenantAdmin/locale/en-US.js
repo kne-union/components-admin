@@ -61,9 +61,9 @@ const locale = {
 
   // Detail
   TenantDetail: 'Tenant Detail',
-  BasicInfo: 'Basic Info',
-  CompanyInfo: 'Company Info',
-  OrgStructure: 'Organization Structure',
+  BasicInfo: 'Basic Information',
+  CompanyInfo: 'Company Information',
+  OrgStructure: 'Organization',
   UserList: 'User List',
   Permission: 'Permission',
   Setting: 'Settings',
@@ -73,19 +73,18 @@ const locale = {
   AccountCountTag: 'Account Count',
 
   // TabDetail
-  CompanyInfoSaveSuccess: 'Company info saved successfully',
+  CompanyInfoSaveSuccess: 'Company information saved successfully',
   Department: 'Department',
 
   // OrgLink
-  OrgLinkTitle: 'Linked Organization',
-  OrgLinkHint:
-    'After enabling, you can sync organization data from WeCom or DingTalk. Synced organizations cannot be edited or deleted, only the department leader can be modified.',
-  OrgLinkEnable: 'Enable Link',
-  OrgLinkSource: 'Source',
-  OrgLinkSyncInterval: 'Auto Sync Interval',
-  OrgLinkTargetId: 'Target ID',
-  OrgLinkTargetIdPlaceholder: 'Select a TARGET_LINKED_ environment variable',
-  OrgLinkTargetIdDesc: 'Please add environment variables in "Settings" with a KEY starting with TARGET_LINKED_ to make them available here.',
+  OrgLinkTitle: 'Organization Sync',
+  OrgLinkHint: 'Sync organization data from WeCom or DingTalk. Synced organizations cannot be edited or deleted; only department managers can be updated.',
+  OrgLinkEnable: 'Enable Sync',
+  OrgLinkSource: 'Sync Source',
+  OrgLinkSyncInterval: 'Sync Frequency',
+  OrgLinkTargetId: 'Sync Target ID',
+  OrgLinkTargetIdPlaceholder: 'Select a sync target ID',
+  OrgLinkTargetIdDesc: 'Select the organization account you want to sync.',
   OrgLinkManualSync: 'Manual Sync',
   OrgLinkCancel: 'Cancel Link',
   OrgLinkCancelConfirm: 'Are you sure you want to cancel the link? Synced organizations will be kept but will no longer be auto-updated.',
