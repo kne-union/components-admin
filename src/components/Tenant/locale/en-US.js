@@ -161,7 +161,7 @@ const locale = {
   ImportExcelHint:
     'Download the template with two sheets: "组织" (org name, parent, description) and "用户" (org name, user name, email/phone, optional leader=yes). The file is parsed locally and previewed; the raw Excel is not uploaded. Orgs are imported before users from the workbook.',
   ImportFileRequired: 'Please select an Excel file and wait for parsing to finish',
-  ImportConfirmSubmit: 'Confirm batch import',
+  ImportConfirmSubmit: 'Import',
   ImportPreviewCount: 'Parsed {count} row(s) (including blanks; all-blank rows are ignored on submit)',
   ImportSelectedCount: '{selected} of {total} row(s) selected; only selected rows will be imported',
   ImportNoRowsSelected: 'Select at least one row before submitting',
@@ -277,7 +277,7 @@ const locale = {
 
   // ThirdLoginConfig
   ThirdLoginConfigTitle: 'Single Sign-On (SSO)',
-  ThirdLoginConfigHint: 'Used only for login verification; organization and users are not synced. Credentials are read from TARGET_LINKED_ environment variables.',
+  ThirdLoginConfigHint: 'Used only for login verification; organization and users are not synced.',
   ThirdLoginConfigAdd: 'Add channel',
   ThirdLoginConfigEmpty: 'No SSO channel configured',
   ThirdLoginConfigSource: 'Login channel',

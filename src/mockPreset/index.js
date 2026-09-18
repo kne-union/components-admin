@@ -63,6 +63,15 @@ const orgLinkConfigMock = () => ({
   ]
 });
 
+const thirdLoginConfigMock = () => ({
+  sourceOptions: [
+    { value: 'wecom', label: '企业微信' },
+    { value: 'dingtalk', label: '钉钉' },
+    { value: 'beisen', label: '北森' }
+  ],
+  list: []
+});
+
 const normalizeTenantUserStatusFilter = status => {
   const s = status != null ? String(status).trim() : '';
   if (s === 'active') return 'open';
@@ -804,6 +813,21 @@ const apis = merge({}, getApis(), {
     orgLinkSync: {
       loader: () => ({ code: 0 })
     },
+    thirdLoginConfig: {
+      loader: thirdLoginConfigMock
+    },
+    thirdLoginConfigSave: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginConfigCancel: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginBindToken: {
+      loader: () => ({ url: 'https://example.com/third-login-bind?token=mock' })
+    },
+    thirdLoginUnbind: {
+      loader: () => ({ code: 0 })
+    },
     userList: {
       loader: loadFilteredTenantUserList
     },
@@ -1067,6 +1091,21 @@ const apis = merge({}, getApis(), {
       loader: () => ({ code: 0 })
     },
     orgLinkSync: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginConfig: {
+      loader: thirdLoginConfigMock
+    },
+    thirdLoginConfigSave: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginConfigCancel: {
+      loader: () => ({ code: 0 })
+    },
+    thirdLoginBindToken: {
+      loader: () => ({ url: 'https://example.com/third-login-bind?token=mock' })
+    },
+    thirdLoginUnbind: {
       loader: () => ({ code: 0 })
     },
     userList: {

@@ -160,7 +160,7 @@ const locale = {
   ImportExcelHint:
     '请下载模板填写。模板含「组织」「用户」两个工作表：组织表填组织名称、上级组织名称、描述；用户表填所属组织名称、用户姓名、邮箱/手机，可选「是否负责人」填「是」。选择文件后本地解析预览，确认后提交（不上传原始 Excel）。解析顺序为先组织表、后用户表。',
   ImportFileRequired: '请先选择 Excel 文件并完成解析',
-  ImportConfirmSubmit: '确认批量导入',
+  ImportConfirmSubmit: '导入',
   ImportPreviewCount: '已解析 {count} 行（含空行；完全空行提交时会被忽略）',
   ImportSelectedCount: '已勾选 {selected} / {total} 行，仅勾选行会提交导入',
   ImportNoRowsSelected: '请至少勾选一行后再提交',
@@ -273,9 +273,9 @@ const locale = {
 
   // ThirdLoginConfig
   ThirdLoginConfigTitle: '单点登录（SSO）',
-  ThirdLoginConfigHint: '配置后仅用于登录验证，不会同步组织或用户。凭证从 TARGET_LINKED_ 环境变量读取。',
+  ThirdLoginConfigHint: '配置后仅用于登录验证，不会同步组织或用户。',
   ThirdLoginConfigAdd: '添加渠道',
-  ThirdLoginConfigEmpty: '暂未配置单点登录（SSO）渠道',
+  ThirdLoginConfigEmpty: '暂未配置身份提供方，请联系系统管理员。',
   ThirdLoginConfigSource: '登录渠道',
   ThirdLoginConfigTargetId: '同步目标ID',
   ThirdLoginConfigCancel: '取消',
