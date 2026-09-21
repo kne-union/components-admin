@@ -10,7 +10,8 @@ import dayjs from 'dayjs';
 
 const SOURCE_LOCALE_IDS = {
   wecom: 'SourceWecom',
-  dingtalk: 'SourceDingtalk'
+  dingtalk: 'SourceDingtalk',
+  beisen: 'SourceBeisen'
 };
 
 const SYNC_INTERVAL_OPTIONS = [

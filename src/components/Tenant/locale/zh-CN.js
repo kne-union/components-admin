@@ -249,6 +249,7 @@ const locale = {
   OrgLinkSource: '同步来源',
   SourceWecom: '企业微信',
   SourceDingtalk: '钉钉',
+  SourceBeisen: '北森',
   OrgLinkSyncInterval: '同步频率',
   OrgLinkIntervalDaily: '每天',
   OrgLinkIntervalWeekly: '每7天',

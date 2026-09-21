@@ -253,6 +253,7 @@ const locale = {
   OrgLinkSource: 'Source',
   SourceWecom: 'WeCom',
   SourceDingtalk: 'DingTalk',
+  SourceBeisen: 'Beisen',
   OrgLinkSyncInterval: 'Auto Sync Interval',
   OrgLinkIntervalDaily: 'Daily',
   OrgLinkIntervalWeekly: 'Every 7 days',
