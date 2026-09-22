@@ -6,49 +6,56 @@ import Remove from './Remove';
 import BindThirdLogin from './BindThirdLogin';
 import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
-
-const getBoundBinding = data => {
-  const binding = data?.options?.thirdLogin;
-  if (binding?.platform && binding?.sourceId) {
-    return binding;
-  }
-  return null;
-};
+import { listRemovableThirdLoginBindings } from '../listThirdLoginBindings';
 
 const Actions = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
 })(
-  withLocale(({ remoteModules, moreType, children, itemClassName, showLength, ...props }) => {
+  withLocale(({ remoteModules, moreType, children, itemClassName, showLength, place, className, ...props }) => {
     const [ButtonGroup] = remoteModules;
     const { formatMessage } = useIntl();
-    const bound = getBoundBinding(props.data);
+    const removableBindings = listRemovableThirdLoginBindings(props.data?.options, props.data?.syncSource);
+    const canThirdLogin = props.apis.thirdLoginBindToken && props.apis.thirdLoginConfig;
+    // className 须落到每个按钮：isNext options / 卡片 clone 会传入 options-btn
+    const itemProps = {
+      ...props,
+      ...(className ? { className } : {})
+    };
     const actionList = [
       {
-        ...props,
+        ...itemProps,
         children: formatMessage({ id: 'EditUser' }),
         hidden: !props.apis.save,
         buttonComponent: Edit
       },
       {
-        ...props,
+        ...itemProps,
         children: formatMessage({ id: 'InviteUser' }),
         buttonComponent: Invite,
         hidden: props.data?.userId
       },
       {
-        ...props,
-        children: bound ? formatMessage({ id: 'ThirdLoginUnbind' }) : formatMessage({ id: 'ThirdLoginBind' }),
+        ...itemProps,
+        children: formatMessage({ id: 'ThirdLoginBind' }),
         buttonComponent: BindThirdLogin,
-        hidden: !props.apis.thirdLoginBindToken || !props.apis.thirdLoginConfig
+        mode: 'bind',
+        hidden: !canThirdLogin
       },
       {
-        ...props,
+        ...itemProps,
+        children: formatMessage({ id: 'ThirdLoginUnbind' }),
+        buttonComponent: BindThirdLogin,
+        mode: 'unbind',
+        hidden: !canThirdLogin || !props.apis.thirdLoginUnbind || removableBindings.length === 0
+      },
+      {
+        ...itemProps,
         children: formatMessage({ id: 'Open' }),
         buttonComponent: SetStatus,
         hidden: props.data?.status === 'open' || !props.apis.save
       },
       {
-        ...props,
+        ...itemProps,
         children: formatMessage({ id: 'Close' }),
         buttonComponent: SetStatus,
         hidden: props.data?.status === 'closed' || !props.apis.save,
@@ -56,7 +63,7 @@ const Actions = createWithRemoteLoader({
         isDelete: false
       },
       {
-        ...props,
+        ...itemProps,
         children: formatMessage({ id: 'Delete' }),
         buttonComponent: Remove,
         hidden: !props.apis.delete,
@@ -67,6 +74,8 @@ const Actions = createWithRemoteLoader({
     if (typeof children === 'function') {
       return children({
         ...props,
+        className,
+        place,
         itemClassName,
         moreType,
         showLength,
@@ -74,7 +83,16 @@ const Actions = createWithRemoteLoader({
       });
     }
 
-    return <ButtonGroup itemClassName={itemClassName} list={actionList} moreType={moreType} showLength={showLength} />;
+    return (
+      <ButtonGroup
+        className={className}
+        place={place}
+        itemClassName={itemClassName}
+        list={actionList}
+        moreType={moreType}
+        showLength={showLength}
+      />
+    );
   })
 );
 

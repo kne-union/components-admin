@@ -75,14 +75,14 @@ const Actions = createWithRemoteLoader({
           name: 'setStatusOpen',
           type: 'link',
           buttonComponent: SetStatus,
-          hidden: props.data?.status === props.options?.openStatus || 'open'
+          hidden: props.data?.status === (props.options?.openStatus ?? 'open')
         },
         setStatusClose: {
           ...props,
           name: 'setStatusClose',
           type: 'link',
           buttonComponent: SetStatus,
-          hidden: props.data?.status === props.options?.closedStatus || 'closed',
+          hidden: props.data?.status === (props.options?.closedStatus ?? 'closed'),
           confirmMessage: props.options?.closeMessage || formatMessage({ id: 'ConfirmClose' }, { bizName: props.options?.bizName }),
           isDelete: false
         },

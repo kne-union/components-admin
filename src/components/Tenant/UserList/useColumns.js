@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import get from 'lodash/get';
-import { Tag } from 'antd';
+import { Space, Tag } from 'antd';
 import UserOrgTags from './UserOrgTags';
 import buildRolesTitle from '../Role/buildRolesTitle';
 import { getSourceIcon, SOURCE_LABEL_MAP, SOURCE_TAG_CLASS } from '../constants';
+import listThirdLoginBindings from './listThirdLoginBindings';
 
 const getColumns = ({ formatMessage }) => {
   return [
@@ -56,6 +57,27 @@ const getColumns = ({ formatMessage }) => {
           <Tag className={SOURCE_TAG_CLASS} icon={getSourceIcon(item.syncSource)} color="processing">
             {label}
           </Tag>
+        );
+      }
+    },
+    {
+      name: 'thirdLoginChannels',
+      title: formatMessage({ id: 'ThirdLoginChannels' }),
+      width: 220,
+      disableColItem: true,
+      getValueOf: item => {
+        const bindings = listThirdLoginBindings(item.options);
+        if (!bindings.length) {
+          return formatMessage({ id: 'ThirdLoginChannelsEmpty' });
+        }
+        return (
+          <Space size={[4, 4]} wrap>
+            {bindings.map(binding => (
+              <Tag key={binding.platform} className={SOURCE_TAG_CLASS} icon={getSourceIcon(binding.platform)} color="processing">
+                {SOURCE_LABEL_MAP[binding.platform] || binding.platform}
+              </Tag>
+            ))}
+          </Space>
         );
       }
     },

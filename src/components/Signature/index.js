@@ -10,7 +10,7 @@ import TablePageRender from '../BizUnit/TablePageRender';
 
 const VerifyAction = createWithRemoteLoader({
   modules: ['components-core:FormInfo', 'components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
-})(({ remoteModules, data }) => {
+})(({ remoteModules, data, children, apis: _apis, onSuccess, options, getFormInner, fetchOptions, ...props }) => {
   const [FormInfo, useFormModal, usePreset] = remoteModules;
   const { formatMessage } = useIntl();
   const { ajax, apis } = usePreset();
@@ -19,7 +19,8 @@ const VerifyAction = createWithRemoteLoader({
   const { message } = App.useApp();
 
   return (
-    <a
+    <Button
+      {...props}
       onClick={() => {
         formModal({
           title: formatMessage({ id: 'VerifySecretKey' }),
@@ -69,9 +70,10 @@ const VerifyAction = createWithRemoteLoader({
             />
           )
         });
-      }}>
-      {formatMessage({ id: 'Verify' })}
-    </a>
+      }}
+    >
+      {children ?? formatMessage({ id: 'Verify' })}
+    </Button>
   );
 });
 
@@ -156,18 +158,32 @@ const CreateButton = createWithRemoteLoader({
 );
 
 const Signature = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset']
+  modules: ['components-core:Global@usePreset', 'components-core:Filter']
 })(
   withLocale(({ remoteModules, pageProps = {} }) => {
-    const [usePreset] = remoteModules;
+    const [usePreset, Filter] = remoteModules;
+    const { InputFilterItem, SuperSelectFilterItem } = Filter.fields;
     const { apis: presetApis } = usePreset();
     const { formatMessage } = useIntl();
     const tableRef = useRef(null);
 
     const apis = {
       list: presetApis.signature.list,
-      remove: presetApis.signature.remove,
-      setStatus: presetApis.signature.update
+      remove: ({ data }) =>
+        Object.assign({}, presetApis.signature.remove, {
+          data: { appId: data.appId || data.id }
+        }),
+      setStatus: ({ data, options }) => {
+        const openStatus = options?.openStatus ?? 0;
+        const closedStatus = options?.closedStatus ?? 1;
+        const nextStatus = data.status === openStatus ? closedStatus : openStatus;
+        return Object.assign({}, presetApis.signature.update, {
+          data: {
+            appId: data.appId || data.id,
+            status: nextStatus
+          }
+        });
+      }
     };
 
     const columnsGetColumns = () => getColumns({ formatMessage });
@@ -192,8 +208,10 @@ const Signature = createWithRemoteLoader({
       return [
         {
           ...props,
+          type: 'link',
           buttonComponent: VerifyAction,
-          data
+          data,
+          children: formatMessage({ id: 'Verify' })
         },
         ...baseActions
       ];
@@ -211,6 +229,8 @@ const Signature = createWithRemoteLoader({
       },
       closeMessage: formatMessage({ id: 'DisableSecretKeyMessage' }),
       removeMessage: formatMessage({ id: 'ConfirmDelete' }, { bizName: '密钥' }),
+      keywordFilterName: 'keyword',
+      keywordFilterLabel: formatMessage({ id: 'Keyword' }),
       tableProps: {
         buttonGroup: {
           list: [
@@ -235,7 +255,34 @@ const Signature = createWithRemoteLoader({
         getColumns={columnsGetColumns}
         getActionList={getActionList}
         options={options}
-        allowKeywordSearch={false}>
+        allowKeywordSearch
+        filter={{
+          list: [
+            {
+              type: InputFilterItem,
+              props: {
+                name: 'appId',
+                label: formatMessage({ id: 'FilterAppId' })
+              }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                name: 'status',
+                label: formatMessage({ id: 'FilterStatus' }),
+                single: true,
+                api: {
+                  loader: () => ({
+                    pageData: [
+                      { label: formatMessage({ id: 'Enabled' }), value: 0 },
+                      { label: formatMessage({ id: 'Disabled' }), value: 1 }
+                    ]
+                  })
+                }
+              }
+            }
+          ]
+        }}>
         {props => {
           tableRef.current = props.tableOptions?.ref;
           return <TablePageRender {...props} />;

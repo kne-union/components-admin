@@ -22,6 +22,22 @@ const useFilterList = ({
         }
       },
       {
+        type: InputFilterItem,
+        props: {
+          key: 'email',
+          label: formatMessage({ id: 'FilterEmail' }),
+          name: 'email'
+        }
+      },
+      {
+        type: InputFilterItem,
+        props: {
+          key: 'phone',
+          label: formatMessage({ id: 'FilterPhone' }),
+          name: 'phone'
+        }
+      },
+      {
         type: SuperSelectFilterItem,
         props: {
           key: 'roles',

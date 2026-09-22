@@ -13,6 +13,12 @@ const createComponent = (callback = item => item) => {
       <Component
         {...props}
         pagination={{ paramsType: 'params' }}
+        getSearchProps={
+          props.getSearchProps ||
+          (({ searchText }) => ({
+            filter: { keyword: searchText }
+          }))
+        }
         api={merge(
           {},
           apis.admin.getUserList,
