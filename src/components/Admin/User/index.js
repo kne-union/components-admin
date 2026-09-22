@@ -35,7 +35,12 @@ const UserInner = createWithRemoteLoader({
   const paginationSearchParams = useTablePaginationSearchParams();
 
   const reloadTable = useCallback(() => {
-    ref.current?.reload();
+    // isNext 卡片下拉后 currentPage 可能 >1；裸 reload 会带着当前页刷新，易出现第一页空白/无法再下拉
+    ref.current?.refresh({
+      params: {
+        currentPage: 1
+      }
+    });
   }, []);
 
   const getActions = useCallback(

@@ -1,4 +1,4 @@
-import '@kne/react-box/dist/index.css';
+import '@kne/react-box/dist/index.css'; // personal-card layout
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { PersonalCard } from '@kne/react-box';
 import { Tag } from 'antd';
@@ -77,10 +77,9 @@ const buildPersonalCardProps = (data, { Image, formatMessage }) => {
     phone: data?.phone,
     description: typeof data?.description === 'string' && data.description.trim() ? data.description.trim() : undefined,
     moreInfo,
-    // 始终走 Image.Avatar：有 id 加载真图，无 id 用 gender 默认头像
-    // width/height 100% 填满蓝环内圈（容器有 padding，勿写死外圈像素）
-    avatar: ({ className }) => (
-      <Image.Avatar className={className} id={avatarId || undefined} width="100%" height="100%" shape="circle" gender={data?.gender || 'M'} />
+    // 用 PersonalCard 传入的像素 size 做宽高占位；100% 在图片未加载时 ant-avatar 会塌成默认尺寸
+    avatar: ({ className, size }) => (
+      <Image.Avatar className={className} id={avatarId || undefined} size={size || 80} shape="circle" gender={data?.gender || 'M'} />
     )
   };
 };
