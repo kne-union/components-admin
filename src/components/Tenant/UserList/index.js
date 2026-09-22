@@ -201,6 +201,15 @@ const UserList = createWithRemoteLoader({
 
       const hasExternalSelected = selectedRows.some(row => row.syncSource);
 
+      const reloadTable = useCallback(() => {
+        // 与 BizUnit / Admin User 一致：isNext 卡片操作后用 refresh 回第一页，避免页码滞留导致列表空白
+        tableRef.current?.refresh({
+          params: {
+            currentPage: 1
+          }
+        });
+      }, []);
+
       const buttonGroupList = [];
       if (apis.create) {
         buttonGroupList.push({
@@ -208,7 +217,7 @@ const UserList = createWithRemoteLoader({
           type: 'primary',
           size: topOptionsSize,
           apis,
-          onSuccess: () => tableRef.current.reload(),
+          onSuccess: () => reloadTable(),
           children: formatMessage({ id: 'Add' })
         });
       }
@@ -220,7 +229,7 @@ const UserList = createWithRemoteLoader({
           selectedRows,
           onSuccess: () => {
             clearSelection();
-            tableRef.current.reload();
+            reloadTable();
           }
         });
       }
@@ -234,10 +243,6 @@ const UserList = createWithRemoteLoader({
           </Flex>
         ));
       }
-
-      const reloadTable = useCallback(() => {
-        tableRef.current?.reload();
-      }, []);
 
       const renderMobile = useCallback(
         ({ dataSource } = {}) => (
