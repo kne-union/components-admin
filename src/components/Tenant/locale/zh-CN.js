@@ -24,6 +24,8 @@ const locale = {
 
   // UserList
   FilterUserId: 'ID',
+  FilterEmail: '邮箱',
+  FilterPhone: '手机号',
   FilterStatus: '状态',
   FilterSynced: '外部来源',
   SyncedExternal: '外部同步',
@@ -297,6 +299,10 @@ const locale = {
   ThirdLoginBound: '已绑定',
   ThirdLoginUnbound: '未绑定',
   ThirdLoginNoChannel: '请先配置单点登录（SSO）渠道',
+  ThirdLoginChannels: '登录渠道',
+  ThirdLoginChannelsEmpty: '-',
+  ThirdLoginAllBound: '已绑定全部可用登录渠道',
+  ThirdLoginUnbindSelectHint: '请选择要解绑的登录渠道（来源渠道不可解绑）',
 
   // SendMessage
   SendOrgMessage: '发送{type}消息',

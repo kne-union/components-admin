@@ -17,11 +17,10 @@ const UserInner = createWithRemoteLoader({
     'components-core:Layout@TablePage',
     'components-core:Filter',
     'components-core:FormInfo@useFormModal',
-    'components-core:Global@usePreset',
-    'components-core:ButtonGroup'
+    'components-core:Global@usePreset'
   ]
 })(({ remoteModules, pageProps: propsPageProps, showLength, optionsColumn }) => {
-  const [TablePage, Filter, useFormModal, usePreset, ButtonGroup] = remoteModules;
+  const [TablePage, Filter, useFormModal, usePreset] = remoteModules;
   const { formatMessage } = useIntl();
   const contextProps = useProps();
   const pageProps = Object.assign({}, contextProps?.pageProps, propsPageProps);
@@ -195,8 +194,8 @@ const UserInner = createWithRemoteLoader({
     <TablePage
       isNext
       search={{
-        name: 'nickname',
-        label: formatMessage({ id: 'Nickname' })
+        name: 'keyword',
+        label: formatMessage({ id: 'Keyword' })
       }}
       filter={{
         value: filter,
@@ -278,6 +277,7 @@ const UserInner = createWithRemoteLoader({
       ref={ref}
       menuFixed={pageProps?.menuFixed}
       renderMobile={renderMobile}
+      renderCard={renderMobile}
       columns={[
         ...getColumns({ formatMessage }),
         Object.assign(
@@ -286,15 +286,11 @@ const UserInner = createWithRemoteLoader({
             title: formatMessage({ id: 'Action' }),
             renderType: 'options',
             fixed: 'right',
+            // isNext options 须返回按钮数组（或 { list }），由 renderType 统一加 options-btn；
+            // 勿包 ButtonGroup / { children }，否则样式与其它列表不一致且可能空白。
             getValueOf: item => ({
-              children: (
-                <ButtonGroup
-                  itemClassName="btn-no-padding"
-                  moreType="link"
-                  showLength={showLength}
-                  list={getActions(item)}
-                />
-              )
+              list: getActions(item),
+              showLength
             })
           },
           optionsColumn

@@ -24,6 +24,8 @@ const locale = {
 
   // UserList
   FilterUserId: 'ID',
+  FilterEmail: 'Email',
+  FilterPhone: 'Phone',
   FilterStatus: 'Status',
   FilterSynced: 'External Source',
   SyncedExternal: 'Synced',
@@ -301,6 +303,10 @@ const locale = {
   ThirdLoginBound: 'Bound',
   ThirdLoginUnbound: 'Not bound',
   ThirdLoginNoChannel: 'Configure an SSO channel first',
+  ThirdLoginChannels: 'Login channels',
+  ThirdLoginChannelsEmpty: '-',
+  ThirdLoginAllBound: 'All available login channels are already bound',
+  ThirdLoginUnbindSelectHint: 'Select a channel to unbind (source channel cannot be unbound)',
   MessageSentToCount: 'Successfully sent to {count} people',
   SelectedCount: '{count} selected',
 };

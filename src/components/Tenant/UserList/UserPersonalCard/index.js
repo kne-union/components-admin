@@ -69,6 +69,28 @@ const applyPlugins = (moreInfo, data, context) => {
   return moreInfo;
 };
 
+/** 头像字段可能是文件 id 字符串，也可能是 { id }；对象本身不能当 id（会变成 [object Object]） */
+const resolveAvatarId = avatar => {
+  const asId = value => {
+    if (typeof value === 'string' || typeof value === 'number') {
+      const text = String(value).trim();
+      return text && text !== '[object Object]' ? text : '';
+    }
+    return '';
+  };
+  if (avatar == null || avatar === false) {
+    return '';
+  }
+  const direct = asId(avatar);
+  if (direct) {
+    return direct;
+  }
+  if (typeof avatar === 'object' && !Array.isArray(avatar)) {
+    return asId(avatar.id) || asId(avatar.fileId) || asId(avatar.file_id);
+  }
+  return '';
+};
+
 /** 将用户数据映射为 PersonalCard 属性 */
 const buildPersonalCardProps = (data, context = {}) => {
   const { Image, formatMessage, plugins } = context;
@@ -82,6 +104,8 @@ const buildPersonalCardProps = (data, context = {}) => {
     </Tag>
   ) : null;
 
+  const avatarId = resolveAvatarId(data?.avatar);
+
   return {
     mode: context.mode || 'horizontal',
     name: data?.name ? (
@@ -94,9 +118,13 @@ const buildPersonalCardProps = (data, context = {}) => {
     ),
     email: data?.email,
     phone: data?.phone,
-    description: data?.description,
+    description: typeof data?.description === 'string' && data.description.trim() ? data.description.trim() : undefined,
     moreInfo,
-    avatar: ({ className }) => <Image.Avatar className={className} id={data?.avatar} size={56} gender="M" />
+    // 始终走 Image.Avatar：有 id 加载真图，无 id 用 gender 默认头像
+    // width/height 100% 填满蓝环内圈（容器有 padding，勿写死外圈像素）
+    avatar: ({ className }) => (
+      <Image.Avatar className={className} id={avatarId || undefined} width="100%" height="100%" shape="circle" gender={data?.gender || 'M'} />
+    )
   };
 };
 

@@ -6,14 +6,7 @@ import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
 import { getSourceIcon, SOURCE_LABEL_MAP } from '../../constants';
 import { useEffect, useRef, useState } from 'react';
-
-const getBoundBinding = data => {
-  const binding = data?.options?.thirdLogin;
-  if (binding?.platform && binding?.sourceId) {
-    return binding;
-  }
-  return null;
-};
+import { listThirdLoginBindings, listRemovableThirdLoginBindings } from '../listThirdLoginBindings';
 
 const channelKey = item => `${item.source}::${item.targetId || ''}`;
 
@@ -129,32 +122,112 @@ const BindModalContent = ({ channels, data, apis, ajax, formatMessage, message }
   );
 };
 
+const UnbindModalContent = ({ bindings, data, apis, ajax, formatMessage, message, onSuccess }) => {
+  const [selectedPlatform, setSelectedPlatform] = useState(bindings.length === 1 ? bindings[0].platform : undefined);
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async () => {
+    if (!selectedPlatform) {
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { data: resData } = await ajax(
+        merge({}, apis.thirdLoginUnbind, {
+          data: { id: data.id, platform: selectedPlatform }
+        })
+      );
+      if (resData.code !== 0) {
+        return;
+      }
+      message.success(formatMessage({ id: 'ThirdLoginUnbindSuccess' }));
+      onSuccess && onSuccess();
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Flex vertical gap={16}>
+      <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+        {formatMessage({ id: 'ThirdLoginUnbindSelectHint' })}
+      </Typography.Paragraph>
+      <Radio.Group
+        value={selectedPlatform}
+        onChange={e => setSelectedPlatform(e.target.value)}
+        options={bindings.map(item => ({
+          value: item.platform,
+          label: (
+            <Space align="center">
+              {getSourceIcon(item.platform)}
+              <span>{SOURCE_LABEL_MAP[item.platform] || item.platform}</span>
+            </Space>
+          )
+        }))}
+      />
+      <Flex justify="flex-end">
+        <Button type="primary" loading={submitting} disabled={!selectedPlatform} onClick={submit}>
+          {formatMessage({ id: 'ThirdLoginUnbind' })}
+        </Button>
+      </Flex>
+    </Flex>
+  );
+};
+
 const BindThirdLoginInner = createWithRemoteLoader({
   modules: ['components-core:LoadingButton', 'components-core:ConfirmButton', 'components-core:Modal@useModal', 'components-core:Global@usePreset']
-})(({ remoteModules, data, apis, onSuccess, ...props }) => {
+})(({ remoteModules, data, apis, onSuccess, mode = 'bind', ...props }) => {
   const [LoadingButton, ConfirmButton, useModal, usePreset] = remoteModules;
   const { ajax } = usePreset();
   const modal = useModal();
   const { formatMessage } = useIntl();
   const { message } = App.useApp();
-  const bound = getBoundBinding(data);
+  const removableBindings = listRemovableThirdLoginBindings(data?.options, data?.syncSource);
 
-  if (bound) {
+  if (mode === 'unbind') {
+    if (removableBindings.length === 1) {
+      const platform = removableBindings[0].platform;
+      return (
+        <ConfirmButton
+          {...props}
+          message={formatMessage({ id: 'ThirdLoginUnbindConfirm' })}
+          onClick={async () => {
+            const { data: resData } = await ajax(
+              merge({}, apis.thirdLoginUnbind, {
+                data: { id: data.id, platform }
+              })
+            );
+            if (resData.code !== 0) {
+              return;
+            }
+            message.success(formatMessage({ id: 'ThirdLoginUnbindSuccess' }));
+            onSuccess && onSuccess();
+          }}
+        />
+      );
+    }
+
     return (
-      <ConfirmButton
+      <LoadingButton
         {...props}
-        message={formatMessage({ id: 'ThirdLoginUnbindConfirm' })}
-        onClick={async () => {
-          const { data: resData } = await ajax(
-            merge({}, apis.thirdLoginUnbind, {
-              data: { id: data.id }
-            })
-          );
-          if (resData.code !== 0) {
-            return;
-          }
-          message.success(formatMessage({ id: 'ThirdLoginUnbindSuccess' }));
-          onSuccess && onSuccess();
+        onClick={() => {
+        modal({
+          title: formatMessage({ id: 'ThirdLoginUnbind' }),
+          size: 'small',
+          width: 480,
+          footer: null,
+          children: (
+            <UnbindModalContent
+              bindings={removableBindings}
+              data={data}
+              apis={apis}
+              ajax={ajax}
+              formatMessage={formatMessage}
+              message={message}
+              onSuccess={onSuccess}
+            />
+          )
+        });
         }}
       />
     );
@@ -168,9 +241,14 @@ const BindThirdLoginInner = createWithRemoteLoader({
         if (configRes.code !== 0) {
           return;
         }
-        const channels = configRes.data?.list || [];
-        if (!channels.length) {
+        const boundPlatforms = new Set(listThirdLoginBindings(data?.options).map(item => item.platform));
+        const channels = (configRes.data?.list || []).filter(item => !boundPlatforms.has(String(item.source)));
+        if (!(configRes.data?.list || []).length) {
           message.warning(formatMessage({ id: 'ThirdLoginNoChannel' }));
+          return;
+        }
+        if (!channels.length) {
+          message.warning(formatMessage({ id: 'ThirdLoginAllBound' }));
           return;
         }
 
@@ -179,9 +257,7 @@ const BindThirdLoginInner = createWithRemoteLoader({
           size: 'small',
           width: 560,
           footer: null,
-          children: (
-            <BindModalContent channels={channels} data={data} apis={apis} ajax={ajax} formatMessage={formatMessage} message={message} />
-          )
+          children: <BindModalContent channels={channels} data={data} apis={apis} ajax={ajax} formatMessage={formatMessage} message={message} />
         });
       }}
     />

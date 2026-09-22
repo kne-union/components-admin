@@ -14,7 +14,7 @@ const SetStatus = createWithRemoteLoader({
     const { formatMessage } = useIntl();
     const confirmText = confirmMessage || confirm;
     const CurrentButton = confirmText ? ConfirmButton : LoadingButton;
-    const isOpenAction = data.status !== (options?.openStatus || 'open');
+    const isOpenAction = data.status !== (options?.openStatus ?? 'open');
     return (
       <CurrentButton
         {...merge({}, props, isOpenAction ? options.openButtonProps : options.closeButtonProps)}
@@ -27,7 +27,7 @@ const SetStatus = createWithRemoteLoader({
               : merge({}, apis.setStatus, {
                   data: {
                     id: data.id,
-                    status: isOpenAction ? options?.openStatus || 'open' : options?.closedStatus || 'closed'
+                    status: isOpenAction ? options?.openStatus ?? 'open' : options?.closedStatus ?? 'closed'
                   }
                 })
           );

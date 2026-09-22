@@ -86,6 +86,8 @@ const UserList = createWithRemoteLoader({
       const mapFilterValue = useMemo(() => {
         const mapper = createFilterValueMapper({
           userId: 'string',
+          email: 'string',
+          phone: 'string',
           roles: 'multi',
           tenantOrgId: 'single',
           synced: 'single'
@@ -312,6 +314,7 @@ const UserList = createWithRemoteLoader({
         pagination: { paramsType: 'params' },
         rowSelection,
         renderMobile,
+        renderCard: renderMobile,
         ...(buttonGroupList.length > 0 ? { buttonGroup: { list: buttonGroupList } } : {})
       };
 

@@ -10,6 +10,11 @@ const locale = {
   Status: '状态',
   CreatedAt: '创建时间',
 
+  // Filters
+  Keyword: '关键字',
+  FilterAppId: 'AppId',
+  FilterStatus: '状态',
+
   // Status values
   Enabled: '启用',
   Disable: '禁用',

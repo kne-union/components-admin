@@ -10,6 +10,11 @@ const locale = {
   Status: 'Status',
   CreatedAt: 'Created At',
 
+  // Filters
+  Keyword: 'Keyword',
+  FilterAppId: 'AppId',
+  FilterStatus: 'Status',
+
   // Status values
   Enabled: 'Enabled',
   Disable: 'Disable',
