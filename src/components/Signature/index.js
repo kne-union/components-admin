@@ -171,7 +171,7 @@ const Signature = createWithRemoteLoader({
       list: presetApis.signature.list,
       remove: ({ data }) =>
         Object.assign({}, presetApis.signature.remove, {
-          data: { appId: data.appId || data.id }
+          data: { appId: String(data.appId || data.id) }
         }),
       setStatus: ({ data, options }) => {
         const openStatus = options?.openStatus ?? 0;
@@ -179,7 +179,7 @@ const Signature = createWithRemoteLoader({
         const nextStatus = data.status === openStatus ? closedStatus : openStatus;
         return Object.assign({}, presetApis.signature.update, {
           data: {
-            appId: data.appId || data.id,
+            appId: String(data.appId || data.id),
             status: nextStatus
           }
         });
