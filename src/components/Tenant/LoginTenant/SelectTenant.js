@@ -5,6 +5,7 @@ import Fetch from '@kne/react-fetch';
 import { useState } from 'react';
 import classnames from 'classnames';
 import withLocale from '../withLocale';
+import { withPublicUrl } from '../../../utils/publicUrl';
 import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 
@@ -165,7 +166,7 @@ const SelectTenant = createWithRemoteLoader({
                       icon={<RightOutlined />}
                       iconPosition="end"
                       onClick={() => {
-                        window.location.href = tenantPath;
+                        window.location.href = withPublicUrl(tenantPath);
                       }}>
                       {formatMessage({ id: 'EnterTenant' })}
                     </Button>

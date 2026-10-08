@@ -5,6 +5,7 @@ import Fetch from '@kne/react-fetch';
 import { setToken } from '@kne/token-storage';
 import { Spin, Typography } from 'antd';
 import withLocale from '../withLocale';
+import { withPublicUrl } from '../../../utils/publicUrl';
 import { usePlatformShell, ThirdLoginLoading, ThirdLoginError, ThirdLoginPanel } from './shared';
 import style from './style.module.scss';
 
@@ -28,7 +29,7 @@ const ThirdLoginResultContent = createWithRemoteLoader({
     }
     setToken('X-Third-Login-Token', token);
     if (redirectUrl) {
-      window.location.href = decodeURIComponent(redirectUrl);
+      window.location.href = withPublicUrl(decodeURIComponent(redirectUrl));
     }
   }, [token, redirectUrl]);
 
