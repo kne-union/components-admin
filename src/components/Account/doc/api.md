@@ -90,3 +90,5 @@ const logout = useLogout({ storeKeys, domain, loginUrl });
 | loginUrl  | 登出后跳转的登录页面地址 | string            | '/account/login'          |
 
 返回值：`() => void` - 执行登出操作的函数
+
+子应用挂载在路径前缀下时（App Manager 注入 `window.runtimePublicUrl`，如 `/app/talent-saas`），以 `/` 开头的 `loginUrl` 会自动补上该前缀；登录成功按 `referer` 跳回时也会去掉该前缀，避免路由 basename 重复。

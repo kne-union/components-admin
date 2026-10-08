@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Spin, Typography } from 'antd';
 import withLocale from '../withLocale';
+import { withPublicUrl } from '../../../utils/publicUrl';
 import { usePlatformShell, ThirdLoginLoading, ThirdLoginError, ThirdLoginPanel } from './shared';
 import style from './style.module.scss';
 
@@ -75,7 +76,7 @@ const ThirdLogin = createWithRemoteLoader({
     if (platform !== 'beisen' || !tenantId) {
       return;
     }
-    window.location.href = `/third-login-result${queryString ? `?${queryString}` : ''}`;
+    window.location.href = `${withPublicUrl('/third-login-result')}${queryString ? `?${queryString}` : ''}`;
   }, [platform, tenantId, queryString]);
 
   if (!platform || !tenantId) {

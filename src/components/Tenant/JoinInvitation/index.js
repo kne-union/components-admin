@@ -12,6 +12,7 @@ import CompanyInfo from '../CompanyInfo';
 import TenantUserPersonalCard from '../UserList/UserPersonalCard';
 
 import withLocale from '../withLocale';
+import { withPublicUrl } from '../../../utils/publicUrl';
 import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 
@@ -133,7 +134,7 @@ const JoinInvitation = createWithRemoteLoader({
                 size="large"
                 className={style.footerBtn}
                 onClick={() => {
-                  window.location.href = `${baseUrl}/tenant`;
+                  window.location.href = withPublicUrl(`${baseUrl}/tenant`);
                 }}>
                 {formatMessage({ id: 'EnterDirectly' })}
               </Button>
@@ -172,7 +173,7 @@ const JoinInvitation = createWithRemoteLoader({
                               duration={5}
                               format="s"
                               onComplete={() => {
-                                window.location.href = `${baseUrl}/tenant`;
+                                window.location.href = withPublicUrl(`${baseUrl}/tenant`);
                               }}
                             />
                           </span>

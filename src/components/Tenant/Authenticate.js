@@ -3,6 +3,7 @@ import Fetch from '@kne/react-fetch';
 import { App, Result, Button, Flex } from 'antd';
 import dayjs from 'dayjs';
 import withLocale from './withLocale';
+import { withPublicUrl } from '../../utils/publicUrl';
 import { useIntl } from '@kne/react-intl';
 
 const TenantUserInfo = createWithRemoteLoader({
@@ -24,13 +25,13 @@ const TenantUserInfo = createWithRemoteLoader({
               <Button
                 type="primary"
                 onClick={() => {
-                  window.location.href = `/account/login?referer=${referer}`;
+                  window.location.href = `${withPublicUrl('/account/login')}?referer=${referer}`;
                 }}>
                 {formatMessage({ id: 'LoginOtherAccount' })}
               </Button>
               <Button
                 onClick={() => {
-                  window.location.href = `/login-tenant?referer=${referer}`;
+                  window.location.href = `${withPublicUrl('/login-tenant')}?referer=${referer}`;
                 }}>
                 {formatMessage({ id: 'SwitchOtherTenant' })}
               </Button>

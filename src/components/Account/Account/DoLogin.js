@@ -7,6 +7,7 @@ import { useProps } from './context';
 import { setToken } from '@kne/token-storage';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
+import { stripPublicUrl } from '../../../utils/publicUrl';
 
 const DoLoginInner = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
@@ -59,7 +60,7 @@ const DoLoginInner = createWithRemoteLoader({
         let obj = new URL(/http(s)?:/.test(_referer) ? _referer : window.location.origin + _referer);
         obj.searchParams.delete('referer');
         Object.values(resData.data).forEach(key => key && obj.searchParams.delete(key.toUpperCase()));
-        refererHref = obj.pathname + obj.search;
+        refererHref = stripPublicUrl(obj.pathname) + obj.search;
         if (/\/account\/login\/?$/.test(obj.pathname)) {
           refererHref = targetUrl || '/';
         }

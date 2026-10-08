@@ -1,6 +1,7 @@
 import { removeToken } from '@kne/token-storage';
 import merge from 'lodash/merge';
 import { Button } from 'antd';
+import { withPublicUrl } from '../../utils/publicUrl';
 
 export const useLogout = props => {
   const { storeKeys, domain, loginUrl } = merge({}, { storeKeys: { token: 'X-User-Token' }, loginUrl: '/account/login' }, props);
@@ -8,7 +9,7 @@ export const useLogout = props => {
     Object.values(storeKeys).forEach(tokenKey => {
       removeToken(tokenKey, domain);
     });
-    window.location.href = `${loginUrl}?referer=${encodeURIComponent(window.location.href)}`;
+    window.location.href = `${withPublicUrl(loginUrl)}?referer=${encodeURIComponent(window.location.href)}`;
   };
 };
 
