@@ -68,8 +68,12 @@ const locale = {
   KeyRotated: 'Signing key rotated',
 
   // Session
-  SelectUser: 'Select User',
-  SelectUserFirst: 'Select a user to view sessions',
+  User: 'User',
+  Session: 'Session',
+  SelectUserFirst: 'Select a user in the "User" filter to view sessions',
+  RevokeSelectedSessions: 'End Selected Sessions',
+  RevokeSelectedSessionsConfirm: 'End the {count} selected sessions? All applications in them will need to sign in again',
+  SessionsRevoked: 'Ended {count} sessions',
   SessionUid: 'Session ID',
   LoginAt: 'Login At',
   ExpiresAt: 'Expires At',

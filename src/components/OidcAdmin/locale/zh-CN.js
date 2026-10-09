@@ -68,8 +68,12 @@ const locale = {
   KeyRotated: '签名密钥已轮换',
 
   // Session
-  SelectUser: '选择用户',
-  SelectUserFirst: '请先选择要查看的用户',
+  User: '用户',
+  Session: '会话',
+  SelectUserFirst: '请先在「用户」筛选中选择要查看的用户',
+  RevokeSelectedSessions: '结束所选会话',
+  RevokeSelectedSessionsConfirm: '确定结束选中的 {count} 个会话吗？会话下所有应用需要重新登录',
+  SessionsRevoked: '已结束 {count} 个会话',
   SessionUid: '会话 ID',
   LoginAt: '登录时间',
   ExpiresAt: '过期时间',

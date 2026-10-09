@@ -1,15 +1,10 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { useState } from 'react';
-import { App, Empty, Flex, Table, Tag } from 'antd';
-import dayjs from 'dayjs';
-import Fetch from '@kne/react-fetch';
+import { useMemo, useRef, useState } from 'react';
+import { Alert, App } from 'antd';
 import { useIntl } from '@kne/react-intl';
-import UserSelect from '@components/UserSelect';
+import BizUnit from '@components/BizUnit';
 import withLocale from '../withLocale';
 import Menu from '../Menu';
-import style from '../style.module.scss';
-
-const formatTime = value => (value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '-');
 
 const getUserId = value => {
   const item = Array.isArray(value) ? value[0] : value;
@@ -18,6 +13,8 @@ const getUserId = value => {
   }
   return item;
 };
+
+const getFilterUserId = filter => getUserId((filter || []).find(item => item.name === 'userId')?.value);
 
 const RevokeUserButton = createWithRemoteLoader({
   modules: ['components-core:ConfirmButton', 'components-core:Global@usePreset']
@@ -43,109 +40,224 @@ const RevokeUserButton = createWithRemoteLoader({
 
 const RevokeSessionButton = createWithRemoteLoader({
   modules: ['components-core:ConfirmButton', 'components-core:Global@usePreset']
-})(({ remoteModules, uid, onSuccess, formatMessage, ...props }) => {
-  const [ConfirmButton, usePreset] = remoteModules;
-  const { ajax, apis } = usePreset();
-  const { message } = App.useApp();
-  return (
-    <ConfirmButton
-      {...props}
-      message={formatMessage({ id: 'RevokeSessionConfirm' })}
-      onClick={async () => {
-        const { data: resData } = await ajax(Object.assign({}, apis.oidc.session.revoke, { data: { uid } }));
-        if (resData.code !== 0) {
-          return;
-        }
-        message.success(formatMessage({ id: 'SessionRevoked' }));
-        onSuccess && onSuccess();
-      }}>
-      {formatMessage({ id: 'RevokeSession' })}
-    </ConfirmButton>
-  );
-});
+})(
+  withLocale(({ remoteModules, data, onSuccess, apis: _apis, options, getFormInner, fetchOptions, ...props }) => {
+    const [ConfirmButton, usePreset] = remoteModules;
+    const { ajax, apis } = usePreset();
+    const { message } = App.useApp();
+    const { formatMessage } = useIntl();
+    return (
+      <ConfirmButton
+        {...props}
+        danger
+        message={formatMessage({ id: 'RevokeSessionConfirm' })}
+        onClick={async () => {
+          const { data: resData } = await ajax(Object.assign({}, apis.oidc.session.revoke, { data: { uid: data.uid } }));
+          if (resData.code !== 0) {
+            return;
+          }
+          message.success(formatMessage({ id: 'SessionRevoked' }));
+          onSuccess && onSuccess();
+        }}>
+        {formatMessage({ id: 'RevokeSession' })}
+      </ConfirmButton>
+    );
+  })
+);
 
 const SessionManager = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Layout@Page']
+  modules: ['components-core:Global@usePreset', 'components-core:Filter', 'components-core:TablePage@Table']
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {}, defaultUserId }) => {
-    const [usePreset, Page] = remoteModules;
-    const { apis } = usePreset();
+    const [usePreset, Filter, Table] = remoteModules;
+    const { SuperSelectFilterItem } = Filter.fields;
+    const { ajax, apis: presetApis } = usePreset();
+    const { message, modal } = App.useApp();
     const { formatMessage } = useIntl();
-    const [user, setUser] = useState(defaultUserId ? { value: defaultUserId } : null);
-    const userId = getUserId(user);
+    const apis = presetApis.oidc.session;
+    const [filter, setFilter] = useState(() =>
+      defaultUserId ? [{ name: 'userId', label: formatMessage({ id: 'User' }), value: { value: defaultUserId, label: String(defaultUserId) } }] : []
+    );
+    // 强制下线后会话列表整体变化，BizUnit 不暴露 reload，重新挂载列表刷新（筛选值受控，不会丢失）
+    const [reloadKey, setReloadKey] = useState(0);
+    const userId = getFilterUserId(filter);
+    const dataRef = useRef([]);
+    const { selectedRowKeys, selectedRows, setSelectedRowKeys, clearSelectedRows } = Table.useSelectedRow({ rowKey: 'uid' });
+
+    const userApi = useMemo(
+      () =>
+        Object.assign({}, presetApis.admin.getUserList, {
+          transformData: data =>
+            Object.assign({}, data, {
+              pageData: (data.pageData || []).map(item =>
+                Object.assign({}, item, {
+                  value: item.id,
+                  label: item.nickname || item.name || item.email || item.phone
+                })
+              )
+            })
+        }),
+      [presetApis.admin.getUserList]
+    );
 
     return (
-      <Page
-        {...pageProps}
-        title={formatMessage({ id: 'SessionManager' })}
-        menu={<Menu baseUrl={baseUrl} />}
-        children={
-          <Flex vertical gap={16}>
-            <div className={style['session-user-select']}>
-              <UserSelect.Field single value={user} onChange={setUser} placeholder={formatMessage({ id: 'SelectUser' })} />
-            </div>
-            {userId ? (
-              <Fetch
-                {...Object.assign({}, apis.oidc.session.list, { params: { userId: String(userId) } })}
-                render={({ data, reload }) => (
-                  <Flex vertical gap={12}>
-                    <Flex gap={8} wrap>
-                      <RevokeUserButton
-                        userId={userId}
-                        logout={false}
-                        formatMessage={formatMessage}
-                        confirmMessage={formatMessage({ id: 'RevokeTokensConfirm' })}
-                        onSuccess={reload}>
-                        {formatMessage({ id: 'RevokeTokens' })}
-                      </RevokeUserButton>
-                      <RevokeUserButton
-                        danger
-                        userId={userId}
-                        logout
-                        formatMessage={formatMessage}
-                        confirmMessage={formatMessage({ id: 'ForceLogoutConfirm' })}
-                        onSuccess={reload}>
-                        {formatMessage({ id: 'ForceLogout' })}
-                      </RevokeUserButton>
-                    </Flex>
-                    <Table
-                      rowKey="uid"
-                      size="middle"
-                      pagination={false}
-                      scroll={{ x: 'max-content' }}
-                      dataSource={data || []}
-                      columns={[
-                        { dataIndex: 'uid', title: formatMessage({ id: 'SessionUid' }) },
-                        { dataIndex: 'loginAt', title: formatMessage({ id: 'LoginAt' }), render: formatTime },
-                        { dataIndex: 'expiresAt', title: formatMessage({ id: 'ExpiresAt' }), render: formatTime },
-                        {
-                          dataIndex: 'clients',
-                          title: formatMessage({ id: 'SessionClients' }),
-                          render: clients => (
-                            <Flex gap={4} wrap>
-                              {(clients || []).map(item => (
-                                <Tag key={item.clientId}>{item.clientId}</Tag>
-                              ))}
-                            </Flex>
-                          )
-                        },
-                        {
-                          key: 'options',
-                          fixed: 'right',
-                          render: (_, item) => (
-                            <RevokeSessionButton type="link" danger uid={item.uid} formatMessage={formatMessage} onSuccess={reload} />
-                          )
+      <BizUnit
+        isNext
+        key={reloadKey}
+        name="oidc-session-list"
+        allowKeywordSearch={false}
+        page={{
+          title: formatMessage({ id: 'SessionManager' }),
+          menu: <Menu baseUrl={baseUrl} />,
+          ...pageProps
+        }}
+        apis={{
+          list: {
+            loader: async ({ params, data }) => {
+              const { userId: currentUserId } = Object.assign({}, data, params);
+              if (!currentUserId) {
+                return { pageData: [], totalCount: 0 };
+              }
+              const { data: resData } = await ajax(Object.assign({}, apis.list, { params: { userId: String(currentUserId) } }));
+              if (resData.code !== 0) {
+                throw new Error(resData.msg);
+              }
+              const list = resData.data || [];
+              return { pageData: list, totalCount: list.length };
+            }
+          }
+        }}
+        getColumns={() => [
+          {
+            name: 'uid',
+            title: formatMessage({ id: 'SessionUid' }),
+            renderType: 'small',
+            width: 240
+          },
+          {
+            name: 'clients',
+            title: formatMessage({ id: 'SessionClients' }),
+            renderType: 'description',
+            width: 240,
+            getValueOf: item => (item.clients || []).map(client => client.clientId).join(', ')
+          },
+          {
+            name: 'loginAt',
+            title: formatMessage({ id: 'LoginAt' }),
+            format: 'datetime',
+            width: 180
+          },
+          {
+            name: 'expiresAt',
+            title: formatMessage({ id: 'ExpiresAt' }),
+            format: 'datetime',
+            width: 180
+          }
+        ]}
+        getActionList={({ data, ...props }) => [
+          {
+            ...props,
+            data,
+            buttonComponent: RevokeSessionButton
+          }
+        ]}
+        filter={{
+          value: filter,
+          onChange: value => {
+            clearSelectedRows();
+            setFilter(value);
+          },
+          list: [
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                name: 'userId',
+                label: formatMessage({ id: 'User' }),
+                single: true,
+                api: userApi,
+                pagination: { paramsType: 'params' },
+                getSearchProps: ({ searchText }) => ({ filter: { keyword: searchText } })
+              }
+            }
+          ]
+        }}
+        options={{
+          bizName: formatMessage({ id: 'Session' }),
+          mapFilterValue: value => ({ userId: getFilterUserId(value) }),
+          tableProps: {
+            rowKey: 'uid',
+            pagination: { open: false },
+            dataFormat: data => {
+              dataRef.current = data.pageData || [];
+              return { list: dataRef.current, total: data.totalCount, data };
+            },
+            topArea: () => (userId ? null : <Alert type="info" showIcon message={formatMessage({ id: 'SelectUserFirst' })} style={{ marginBottom: 12 }} />),
+            rowSelection: {
+              type: 'checkbox',
+              selectedRowKeys,
+              allowSelectedAll: false,
+              onChange: keys => {
+                setSelectedRowKeys(keys, dataRef.current || []);
+              }
+            },
+            selectedRows,
+            batchActions: [
+              {
+                key: 'batch-revoke',
+                label: formatMessage({ id: 'RevokeSelectedSessions' }),
+                danger: true,
+                onClick: ({ selectedRowKeys: uids, reload }) => {
+                  if (!uids?.length) {
+                    return;
+                  }
+                  modal.confirm({
+                    title: formatMessage({ id: 'RevokeSelectedSessionsConfirm' }, { count: uids.length }),
+                    okButtonProps: { danger: true },
+                    onOk: async () => {
+                      let count = 0;
+                      for (const uid of uids) {
+                        const { data: resData } = await ajax(Object.assign({}, apis.revoke, { data: { uid } }));
+                        if (resData.code === 0) {
+                          count++;
                         }
-                      ]}
-                    />
-                  </Flex>
-                )}
-              />
-            ) : (
-              <Empty description={formatMessage({ id: 'SelectUserFirst' })} />
-            )}
-          </Flex>
-        }
+                      }
+                      message.success(formatMessage({ id: 'SessionsRevoked' }, { count }));
+                      clearSelectedRows();
+                      reload?.();
+                    }
+                  });
+                }
+              }
+            ],
+            buttonGroup: {
+              list: [
+                {
+                  buttonComponent: RevokeUserButton,
+                  disabled: !userId,
+                  userId,
+                  logout: false,
+                  formatMessage,
+                  confirmMessage: formatMessage({ id: 'RevokeTokensConfirm' }),
+                  children: formatMessage({ id: 'RevokeTokens' })
+                },
+                {
+                  buttonComponent: RevokeUserButton,
+                  danger: true,
+                  disabled: !userId,
+                  userId,
+                  logout: true,
+                  formatMessage,
+                  confirmMessage: formatMessage({ id: 'ForceLogoutConfirm' }),
+                  onSuccess: () => {
+                    clearSelectedRows();
+                    setReloadKey(key => key + 1);
+                  },
+                  children: formatMessage({ id: 'ForceLogout' })
+                }
+              ]
+            }
+          }
+        }}
       />
     );
   })
