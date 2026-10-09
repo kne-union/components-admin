@@ -20,6 +20,13 @@ const locale = {
   RememberAccount: '记住账号',
   RegisterBtn: '注册',
   ForgetPassword: '忘记密码',
+
+  // Account/SsoLogin.js
+  Or: '或',
+  SsoLogin: '单点登录（SSO）',
+  SsoRedirecting: '正在跳转到统一登录…',
+  SsoRedirectFailed: '跳转统一登录失败',
+  Retry: '重试',
   
   // Account/Register.js
   VerificationCode: '验证码',

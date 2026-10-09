@@ -113,10 +113,11 @@ IdP 登录交互页，路由路径需与 fastify-oidc 的 `interactionPage`（�
 
 ### 依赖接口
 
-`getApis` 新增 `oidcPrefix`（默认 `/api/oidc`），对应 `apis.oidc.interaction`：
+`getApis` 新增 `oidcPrefix`（默认 `/api/oidc`），对应 `apis.oidc.config` 与 `apis.oidc.interaction`：
 
 | 接口 | 方法 | 地址 |
 |--------|------|------|
+| config | GET | `{oidcPrefix}/config`（免登录，Account 登录页据此判断是否展示 SSO） |
 | details | GET | `{oidcPrefix}/interaction/{uid}/details` |
 | login | POST | `{oidcPrefix}/interaction/{uid}/login` |
 | tenant | POST | `{oidcPrefix}/interaction/{uid}/tenant` |

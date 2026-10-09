@@ -1,3 +1,20 @@
+### Account SSO 登录
+
+`Account`（含登录 / 注册等路由的整体组件）在登录页根据 fastify-oidc 的 `GET {oidcPrefix}/config`（`apis.oidc.config`，免登录）自动判断是否展示 SSO：
+
+| 场景 | 登录页表现 |
+|----|----|
+| 没有 OIDC client，或配置接口请求失败 | 只有账号密码登录（与原来一致） |
+| `mode` 为 `standalone` | 账号密码表单下方增加「单点登录（SSO）」按钮 |
+| `mode` 为其它值（`central` 子项目） | 不显示密码表单，进入登录页直接跳转到主项目 IdP；注册、忘记密码、重置密码、修改密码路由重定向到登录页 |
+
+OIDC client 默认取 preset 的 `oidc`（`components-admin:Oidc` 的 `createOidcClient`），业务项目需已挂载 `Oidc@Callback` 回调路由。SSO 跳转的 `returnTo` 取登录页 URL 的 `referer`，没有时为 `targetUrl`（默认 `/`）。
+
+| 属性名 | 说明 | 类型 | 默认值 |
+|----|----|----|----|
+| sso | SSO 配置；传 `false` 关闭自动探测 | `false` \| `{ client? }` | - |
+| sso.client | 显式指定 OIDC client | object | preset.oidc |
+
 ### Login 登录组件
 
 | 属性名         | 说明            | 类型                 | 默认值     |

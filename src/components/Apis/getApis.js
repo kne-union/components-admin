@@ -776,6 +776,10 @@ const getApis = options => {
       }
     },
     oidc: {
+      config: {
+        url: `${oidcPrefix}/config`,
+        method: 'GET'
+      },
       interaction: {
         details: {
           url: `${oidcPrefix}/interaction/{uid}/details`,

@@ -1491,6 +1491,9 @@ const apis = merge({}, getApis(), {
     }
   },
   oidc: {
+    config: {
+      loader: () => ({ mode: 'standalone', issuer: 'https://hr.example.com/oidc', clientId: 'hr-portal', audience: 'https://hr.example.com/api' })
+    },
     interaction: {
       details: {
         loader: ({ urlParams }) => oidcData.interactions[urlParams?.uid] || oidcData.interactions['demo-login']
