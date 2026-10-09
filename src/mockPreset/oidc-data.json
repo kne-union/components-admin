@@ -1,0 +1,196 @@
+{
+  "interactions": {
+    "demo-login": {
+      "uid": "demo-login",
+      "prompt": { "name": "login", "reasons": ["no_session"], "details": {} },
+      "params": { "clientId": "hr-portal", "scope": "openid profile offline_access api", "resource": "https://hr.example.com/api" },
+      "client": { "clientId": "hr-portal", "clientName": "人力资源门户" },
+      "user": null,
+      "tenants": null
+    },
+    "demo-tenant": {
+      "uid": "demo-tenant",
+      "prompt": { "name": "tenant", "reasons": ["tenant_required"], "details": {} },
+      "params": { "clientId": "hr-portal", "scope": "openid profile offline_access api", "resource": "https://hr.example.com/api" },
+      "client": { "clientId": "hr-portal", "clientName": "人力资源门户" },
+      "user": { "id": "1001", "nickname": "张三", "email": "zhangsan@example.com" },
+      "tenants": {
+        "defaultTenantId": "tenant-1",
+        "list": [
+          { "tenantId": "tenant-1", "tenantUserId": "tu-1", "name": "科技创新", "companyName": "科技创新有限公司" },
+          { "tenantId": "tenant-2", "tenantUserId": "tu-2", "name": "智慧教育", "companyName": "智慧教育集团" },
+          { "tenantId": "tenant-3", "tenantUserId": "tu-3", "name": "云端零售", "companyName": "云端零售股份有限公司" }
+        ]
+      }
+    },
+    "demo-consent": {
+      "uid": "demo-consent",
+      "prompt": { "name": "consent", "reasons": ["op_scopes_missing"], "details": { "missingOIDCScope": ["openid", "profile"] } },
+      "params": { "clientId": "partner-crm", "scope": "openid profile email offline_access api", "resource": "https://crm.partner.com/api" },
+      "client": { "clientId": "partner-crm", "clientName": "合作方 CRM" },
+      "user": { "id": "1001", "nickname": "张三", "email": "zhangsan@example.com" },
+      "tenants": null
+    }
+  },
+  "clientList": {
+    "totalCount": 4,
+    "pageData": [
+      {
+        "id": "c-1",
+        "clientId": "hr-portal",
+        "clientName": "人力资源门户",
+        "hasSecret": false,
+        "metadata": {
+          "application_type": "web",
+          "token_endpoint_auth_method": "none",
+          "grant_types": ["authorization_code", "refresh_token"],
+          "response_types": ["code"],
+          "redirect_uris": ["https://hr.example.com/oidc-callback"],
+          "post_logout_redirect_uris": ["https://hr.example.com/"]
+        },
+        "allowedResources": ["https://hr.example.com/api"],
+        "description": "HR 系统前端，SPA + PKCE",
+        "status": "open",
+        "createdAt": "2026-08-01T09:12:00.000Z"
+      },
+      {
+        "id": "c-2",
+        "clientId": "recruit-web",
+        "clientName": "招聘系统",
+        "hasSecret": false,
+        "metadata": {
+          "application_type": "web",
+          "token_endpoint_auth_method": "none",
+          "grant_types": ["authorization_code", "refresh_token"],
+          "response_types": ["code"],
+          "redirect_uris": ["https://recruit.example.com/oidc-callback"],
+          "post_logout_redirect_uris": ["https://recruit.example.com/"],
+          "backchannel_logout_uri": "https://recruit.example.com/api/oidc/backchannel-logout",
+          "backchannel_logout_session_required": true
+        },
+        "allowedResources": ["https://recruit.example.com/api", "https://hr.example.com/api"],
+        "description": "接入统一登录的招聘业务系统",
+        "status": "open",
+        "createdAt": "2026-08-12T03:40:00.000Z"
+      },
+      {
+        "id": "c-3",
+        "clientId": "report-service",
+        "clientName": "报表服务",
+        "hasSecret": true,
+        "metadata": {
+          "application_type": "web",
+          "token_endpoint_auth_method": "client_secret_basic",
+          "grant_types": ["client_credentials", "urn:ietf:params:oauth:grant-type:token-exchange"],
+          "response_types": [],
+          "redirect_uris": []
+        },
+        "allowedResources": ["https://hr.example.com/service"],
+        "description": "后端服务间调用，读取用户与租户信息",
+        "status": "open",
+        "createdAt": "2026-08-20T07:05:00.000Z"
+      },
+      {
+        "id": "c-4",
+        "clientId": "legacy-admin",
+        "clientName": "旧版管理后台",
+        "hasSecret": false,
+        "metadata": {
+          "application_type": "web",
+          "token_endpoint_auth_method": "none",
+          "grant_types": ["authorization_code", "refresh_token"],
+          "response_types": ["code"],
+          "redirect_uris": ["https://old-admin.example.com/oidc-callback"]
+        },
+        "allowedResources": ["https://hr.example.com/api"],
+        "description": "迁移完成后下线",
+        "status": "closed",
+        "createdAt": "2026-07-02T10:00:00.000Z"
+      }
+    ]
+  },
+  "resourceServerList": {
+    "totalCount": 3,
+    "pageData": [
+      {
+        "id": "rs-1",
+        "identifier": "https://hr.example.com/api",
+        "name": "HR API",
+        "scope": "api",
+        "accessTokenTTL": null,
+        "includePermissions": false,
+        "description": "HR 系统业务接口",
+        "status": "open",
+        "createdAt": "2026-08-01T09:10:00.000Z"
+      },
+      {
+        "id": "rs-2",
+        "identifier": "https://hr.example.com/service",
+        "name": "HR 服务接口",
+        "scope": "user:read tenant:read",
+        "accessTokenTTL": 300,
+        "includePermissions": false,
+        "description": "供其它项目后端读取用户 / 租户信息",
+        "status": "open",
+        "createdAt": "2026-08-01T09:10:00.000Z"
+      },
+      {
+        "id": "rs-3",
+        "identifier": "https://recruit.example.com/api",
+        "name": "招聘 API",
+        "scope": "api",
+        "accessTokenTTL": 900,
+        "includePermissions": true,
+        "description": "招聘系统接口，令牌携带权限列表",
+        "status": "open",
+        "createdAt": "2026-08-12T03:38:00.000Z"
+      }
+    ]
+  },
+  "keyList": [
+    {
+      "id": "k-3",
+      "kid": "9b2f4c1e-7d3a-4b8e-a1f2-5c6d7e8f9a0b",
+      "alg": "RS256",
+      "status": "active",
+      "activatedAt": "2026-09-15T00:00:00.000Z",
+      "retiredAt": null,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "k-4",
+      "kid": "3e8a1d2c-5f6b-4c7d-9e0f-1a2b3c4d5e6f",
+      "alg": "RS256",
+      "status": "next",
+      "activatedAt": null,
+      "retiredAt": null,
+      "createdAt": "2026-09-15T00:00:00.000Z"
+    },
+    {
+      "id": "k-2",
+      "kid": "7c6d5e4f-3a2b-4c1d-8e9f-0a1b2c3d4e5f",
+      "alg": "RS256",
+      "status": "retired",
+      "activatedAt": "2026-08-01T00:00:00.000Z",
+      "retiredAt": "2026-09-15T00:00:00.000Z",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    }
+  ],
+  "sessionList": [
+    {
+      "uid": "kJ8sQ2mN4pR6tV1xZ3bC5",
+      "loginAt": "2026-10-08T01:20:00.000Z",
+      "expiresAt": "2026-10-22T01:20:00.000Z",
+      "clients": [
+        { "clientId": "hr-portal", "sid": "a1b2c3" },
+        { "clientId": "recruit-web", "sid": "d4e5f6" }
+      ]
+    },
+    {
+      "uid": "pL9wE3rT7yU2iO5aS8dF1",
+      "loginAt": "2026-10-09T06:45:00.000Z",
+      "expiresAt": "2026-10-23T06:45:00.000Z",
+      "clients": [{ "clientId": "hr-portal", "sid": "g7h8i9" }]
+    }
+  ]
+}

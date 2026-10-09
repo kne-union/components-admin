@@ -1,0 +1,87 @@
+const locale = {
+  // Menu
+  ClientManager: 'Applications',
+  ResourceServerManager: 'Resource Servers',
+  KeyManager: 'Signing Keys',
+  SessionManager: 'Sessions',
+
+  // Common
+  Status: 'Status',
+  StatusOpen: 'Enabled',
+  StatusClosed: 'Disabled',
+  Description: 'Description',
+  CreatedAt: 'Created At',
+  Keyword: 'Keyword',
+  Copy: 'Copy',
+  SecretOnceWarning: 'The secret is only shown once, copy and store it safely now',
+
+  // Client
+  Client: 'Application',
+  ClientId: 'Client ID',
+  ClientIdPlaceholder: 'Generated automatically when empty',
+  ClientName: 'Application Name',
+  ClientType: 'Application Type',
+  ClientTypePublic: 'Public (SPA / mobile, PKCE)',
+  ClientTypeConfidential: 'Confidential (backend service with secret)',
+  ClientTypePublicShort: 'Public',
+  ClientTypeConfidentialShort: 'Confidential',
+  GrantTypes: 'Grant Types',
+  GrantAuthorizationCode: 'Authorization Code',
+  GrantRefreshToken: 'Refresh Token',
+  GrantClientCredentials: 'Client Credentials',
+  GrantTokenExchange: 'Token Exchange',
+  RedirectUris: 'Redirect URIs',
+  PostLogoutRedirectUris: 'Post Logout Redirect URIs',
+  UrisPlaceholder: 'One URI per line',
+  BackchannelLogoutUri: 'Back-Channel Logout URI',
+  AllowedResources: 'Allowed Resource Servers',
+  ClientCreated: 'Application created',
+  RotateSecret: 'Rotate Secret',
+  RotateSecretConfirm: 'The old secret stops working immediately. Rotate the secret?',
+  SecretRotated: 'Secret rotated',
+  ClientSecret: 'Client Secret',
+
+  // Resource server
+  ResourceServer: 'Resource Server',
+  Identifier: 'Identifier (audience)',
+  IdentifierPlaceholder: 'Absolute URI, e.g. https://app.example.com/api',
+  ResourceServerName: 'Name',
+  Scope: 'Grantable Scopes',
+  ScopePlaceholder: 'Space separated, e.g. api user:read',
+  AccessTokenTTL: 'Access Token TTL (seconds)',
+  AccessTokenTTLPlaceholder: 'Use default when empty',
+  IncludePermissions: 'Include Permissions in Token',
+  Yes: 'Yes',
+  No: 'No',
+
+  // Key
+  Kid: 'Key ID',
+  Alg: 'Algorithm',
+  KeyStatus: 'Status',
+  KeyActive: 'Active',
+  KeyNext: 'Next',
+  KeyRetired: 'Retired',
+  ActivatedAt: 'Activated At',
+  RetiredAt: 'Retired At',
+  RotateKey: 'Rotate Signing Key',
+  RotateKeyConfirm: 'New tokens will be signed with the new key; the old key can still verify tokens during the retention period. Rotate now?',
+  KeyRotated: 'Signing key rotated',
+
+  // Session
+  SelectUser: 'Select User',
+  SelectUserFirst: 'Select a user to view sessions',
+  SessionUid: 'Session ID',
+  LoginAt: 'Login At',
+  ExpiresAt: 'Expires At',
+  SessionClients: 'Signed-in Applications',
+  RevokeSession: 'End Session',
+  RevokeSessionConfirm: 'All applications in this session will need to sign in again. End the session?',
+  SessionRevoked: 'Session ended',
+  RevokeTokens: 'Revoke All Tokens',
+  RevokeTokensConfirm: 'The user will need to refresh tokens (sessions are kept for silent sign-in). Revoke now?',
+  ForceLogout: 'Force Logout',
+  ForceLogoutConfirm: 'This ends all sessions of the user and revokes all tokens. Continue?',
+  RevokeUserSuccess: 'Revoked {grants} grants and ended {sessions} sessions'
+};
+
+export default locale;

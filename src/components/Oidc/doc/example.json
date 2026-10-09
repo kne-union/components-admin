@@ -1,0 +1,60 @@
+{
+  "isFull": false,
+  "list": [
+    {
+      "title": "登录交互页：账号登录",
+      "description": "IdP 将未登录用户重定向到交互页，Interaction 根据 uid 拉取交互详情，prompt 为 login 时展示账号密码登录，提交后跳转回授权流程。",
+      "code": "./interaction-login.js",
+      "isFull": true,
+      "scope": [
+        { "name": "_Oidc", "packageName": "@components/Oidc" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
+      ]
+    },
+    {
+      "title": "登录交互页：选择租户",
+      "description": "账号属于多个租户时，prompt 为 tenant，展示可进入的租户列表，选择后签发带租户信息的令牌。",
+      "code": "./interaction-tenant.js",
+      "isFull": true,
+      "scope": [
+        { "name": "_Oidc", "packageName": "@components/Oidc" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
+      ]
+    },
+    {
+      "title": "登录交互页：授权确认",
+      "description": "第三方应用首次请求授权时，prompt 为 consent，展示应用名称与申请的 scope，用户可同意或拒绝。",
+      "code": "./interaction-consent.js",
+      "isFull": true,
+      "scope": [
+        { "name": "_Oidc", "packageName": "@components/Oidc" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
+      ]
+    },
+    {
+      "title": "登录态守卫、租户切换与退出",
+      "description": "OidcAuthenticate 保证已登录才渲染内容；TenantSwitch 通过 prompt=none 静默切换租户；OidcLogout 走 end_session 退出。示例使用 preset 中的模拟 client。",
+      "code": "./tenant-switch.js",
+      "scope": [
+        { "name": "_Oidc", "packageName": "@components/Oidc" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
+      "title": "登录回调页",
+      "description": "Callback 用授权码兑换令牌并回到登录前页面；传入 onSuccess 可自定义跳转。",
+      "code": "./callback.js",
+      "scope": [
+        { "name": "_Oidc", "packageName": "@components/Oidc" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    }
+  ]
+}

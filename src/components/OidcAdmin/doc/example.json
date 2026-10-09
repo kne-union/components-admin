@@ -1,0 +1,26 @@
+{
+  "isFull": true,
+  "list": [
+    {
+      "title": "基础用法",
+      "description": "OIDC 管理后台：左侧菜单切换应用管理、资源服务、签名密钥、登录会话四个页面。",
+      "code": "./base.js",
+      "scope": [
+        { "name": "_OidcAdmin", "packageName": "@components/OidcAdmin" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "reactRouterDom", "packageName": "react-router-dom" }
+      ]
+    },
+    {
+      "title": "登录会话管理",
+      "description": "单独使用 SessionManager：选择用户查看其登录会话，可结束单个会话、撤销全部令牌或强制下线。",
+      "code": "./session.js",
+      "scope": [
+        { "name": "_OidcAdmin", "packageName": "@components/OidcAdmin" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
+      ]
+    }
+  ]
+}

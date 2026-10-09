@@ -1,0 +1,87 @@
+const locale = {
+  // Menu
+  ClientManager: '应用管理',
+  ResourceServerManager: '资源服务',
+  KeyManager: '签名密钥',
+  SessionManager: '登录会话',
+
+  // Common
+  Status: '状态',
+  StatusOpen: '启用',
+  StatusClosed: '停用',
+  Description: '描述',
+  CreatedAt: '创建时间',
+  Keyword: '关键字',
+  Copy: '复制',
+  SecretOnceWarning: '密钥只展示这一次，请立即复制并妥善保存',
+
+  // Client
+  Client: '应用',
+  ClientId: 'Client ID',
+  ClientIdPlaceholder: '留空自动生成',
+  ClientName: '应用名称',
+  ClientType: '应用类型',
+  ClientTypePublic: '公开应用（SPA / 移动端，PKCE）',
+  ClientTypeConfidential: '机密应用（后端服务，持有密钥）',
+  ClientTypePublicShort: '公开',
+  ClientTypeConfidentialShort: '机密',
+  GrantTypes: '授权方式',
+  GrantAuthorizationCode: '授权码',
+  GrantRefreshToken: '刷新令牌',
+  GrantClientCredentials: '客户端凭证',
+  GrantTokenExchange: '令牌交换',
+  RedirectUris: '登录回调地址',
+  PostLogoutRedirectUris: '退出回调地址',
+  UrisPlaceholder: '每行一个地址',
+  BackchannelLogoutUri: 'Back-Channel 退出通知地址',
+  AllowedResources: '可访问的资源服务',
+  ClientCreated: '应用已创建',
+  RotateSecret: '重置密钥',
+  RotateSecretConfirm: '重置后旧密钥立即失效，确定重置吗？',
+  SecretRotated: '密钥已重置',
+  ClientSecret: 'Client Secret',
+
+  // Resource server
+  ResourceServer: '资源服务',
+  Identifier: '资源标识（audience）',
+  IdentifierPlaceholder: '绝对 URI，如 https://app.example.com/api',
+  ResourceServerName: '名称',
+  Scope: '可授予的 scope',
+  ScopePlaceholder: '空格分隔，如 api user:read',
+  AccessTokenTTL: 'Access Token 有效期（秒）',
+  AccessTokenTTLPlaceholder: '留空使用默认值',
+  IncludePermissions: '令牌携带权限列表',
+  Yes: '是',
+  No: '否',
+
+  // Key
+  Kid: 'Key ID',
+  Alg: '算法',
+  KeyStatus: '状态',
+  KeyActive: '使用中',
+  KeyNext: '待启用',
+  KeyRetired: '已退役',
+  ActivatedAt: '启用时间',
+  RetiredAt: '退役时间',
+  RotateKey: '轮换签名密钥',
+  RotateKeyConfirm: '轮换后新签发的令牌使用新密钥，旧密钥在保留期内仍可验签。确定轮换吗？',
+  KeyRotated: '签名密钥已轮换',
+
+  // Session
+  SelectUser: '选择用户',
+  SelectUserFirst: '请先选择要查看的用户',
+  SessionUid: '会话 ID',
+  LoginAt: '登录时间',
+  ExpiresAt: '过期时间',
+  SessionClients: '已登录应用',
+  RevokeSession: '结束会话',
+  RevokeSessionConfirm: '结束后该会话下所有应用需要重新登录，确定结束吗？',
+  SessionRevoked: '会话已结束',
+  RevokeTokens: '撤销全部令牌',
+  RevokeTokensConfirm: '撤销后用户需刷新令牌（会话保留，可静默重新登录），确定撤销吗？',
+  ForceLogout: '强制下线',
+  ForceLogoutConfirm: '强制下线会结束该用户全部会话并撤销令牌，确定执行吗？',
+  RevokeUserSuccess: '已撤销 {grants} 个授权，结束 {sessions} 个会话'
+};
+
+export default locale;

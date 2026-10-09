@@ -1,8 +1,9 @@
 const getApis = options => {
-  const { prefix } = Object.assign(
+  const { prefix, oidcPrefix } = Object.assign(
     {},
     {
-      prefix: `/api/v1`
+      prefix: `/api/v1`,
+      oidcPrefix: `/api/oidc`
     },
     options
   );
@@ -770,6 +771,110 @@ const getApis = options => {
         },
         cleanup: {
           url: `${prefix}/mq/queue/cleanup`,
+          method: 'POST'
+        }
+      }
+    },
+    oidc: {
+      interaction: {
+        details: {
+          url: `${oidcPrefix}/interaction/{uid}/details`,
+          method: 'GET'
+        },
+        login: {
+          url: `${oidcPrefix}/interaction/{uid}/login`,
+          method: 'POST'
+        },
+        tenant: {
+          url: `${oidcPrefix}/interaction/{uid}/tenant`,
+          method: 'POST'
+        },
+        confirm: {
+          url: `${oidcPrefix}/interaction/{uid}/confirm`,
+          method: 'POST'
+        },
+        abort: {
+          url: `${oidcPrefix}/interaction/{uid}/abort`,
+          method: 'POST'
+        }
+      },
+      client: {
+        list: {
+          url: `${oidcPrefix}/admin/client/list`,
+          method: 'GET'
+        },
+        detail: {
+          url: `${oidcPrefix}/admin/client/detail`,
+          method: 'GET'
+        },
+        create: {
+          url: `${oidcPrefix}/admin/client/create`,
+          method: 'POST'
+        },
+        save: {
+          url: `${oidcPrefix}/admin/client/save`,
+          method: 'POST'
+        },
+        setStatus: {
+          url: `${oidcPrefix}/admin/client/set-status`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${oidcPrefix}/admin/client/remove`,
+          method: 'POST'
+        },
+        rotateSecret: {
+          url: `${oidcPrefix}/admin/client/rotate-secret`,
+          method: 'POST'
+        }
+      },
+      resourceServer: {
+        list: {
+          url: `${oidcPrefix}/admin/resource-server/list`,
+          method: 'GET'
+        },
+        detail: {
+          url: `${oidcPrefix}/admin/resource-server/detail`,
+          method: 'GET'
+        },
+        create: {
+          url: `${oidcPrefix}/admin/resource-server/create`,
+          method: 'POST'
+        },
+        save: {
+          url: `${oidcPrefix}/admin/resource-server/save`,
+          method: 'POST'
+        },
+        setStatus: {
+          url: `${oidcPrefix}/admin/resource-server/set-status`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${oidcPrefix}/admin/resource-server/remove`,
+          method: 'POST'
+        }
+      },
+      key: {
+        list: {
+          url: `${oidcPrefix}/admin/key/list`,
+          method: 'GET'
+        },
+        rotate: {
+          url: `${oidcPrefix}/admin/key/rotate`,
+          method: 'POST'
+        }
+      },
+      session: {
+        list: {
+          url: `${oidcPrefix}/admin/session/list`,
+          method: 'GET'
+        },
+        revoke: {
+          url: `${oidcPrefix}/admin/session/revoke`,
+          method: 'POST'
+        },
+        revokeUser: {
+          url: `${oidcPrefix}/admin/session/revoke-user`,
           method: 'POST'
         }
       }
