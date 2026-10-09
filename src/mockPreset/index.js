@@ -20,6 +20,7 @@ import messageQueueList from './message-queue-list.json';
 import deadLetterList from './dead-letter-list.json';
 import traceList from './trace-list.json';
 import messageMangerData from './message-manger-data.json';
+import oidcData from './oidc-data.json';
 
 export {
   taskList,
@@ -1488,8 +1489,114 @@ const apis = merge({}, getApis(), {
         loader: () => ({ deleted: 3 })
       }
     }
+  },
+  oidc: {
+    config: {
+      loader: () => ({ mode: 'standalone', issuer: 'https://hr.example.com/oidc', clientId: 'hr-portal', audience: 'https://hr.example.com/api' })
+    },
+    interaction: {
+      details: {
+        loader: ({ urlParams }) => oidcData.interactions[urlParams?.uid] || oidcData.interactions['demo-login']
+      },
+      login: {
+        loader: () => ({})
+      },
+      tenant: {
+        loader: () => ({})
+      },
+      confirm: {
+        loader: () => ({})
+      },
+      abort: {
+        loader: () => ({})
+      }
+    },
+    client: {
+      list: {
+        loader: () => oidcData.clientList
+      },
+      create: {
+        loader: ({ data }) => ({
+          id: `c-${Date.now()}`,
+          clientId: data?.clientId || `client_${Math.random().toString(36).slice(2, 14)}`,
+          clientSecret: data?.metadata?.token_endpoint_auth_method === 'none' ? undefined : `cs_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`
+        })
+      },
+      save: {
+        loader: () => ({})
+      },
+      setStatus: {
+        loader: () => ({})
+      },
+      remove: {
+        loader: () => ({})
+      },
+      rotateSecret: {
+        loader: () => ({
+          clientId: 'report-service',
+          clientSecret: `cs_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`
+        })
+      }
+    },
+    resourceServer: {
+      list: {
+        loader: () => oidcData.resourceServerList
+      },
+      create: {
+        loader: () => ({ id: `rs-${Date.now()}` })
+      },
+      save: {
+        loader: () => ({})
+      },
+      setStatus: {
+        loader: () => ({})
+      },
+      remove: {
+        loader: () => ({})
+      }
+    },
+    key: {
+      list: {
+        loader: () => oidcData.keyList
+      },
+      rotate: {
+        loader: () => oidcData.keyList
+      }
+    },
+    session: {
+      list: {
+        loader: () => oidcData.sessionList
+      },
+      revoke: {
+        loader: () => ({})
+      },
+      revokeUser: {
+        loader: ({ data }) => ({ grants: 3, sessions: data?.logout ? oidcData.sessionList.length : 0 })
+      }
+    }
   }
 });
+
+const mockOidcState = { tenantId: 'tenant-1' };
+
+const mockOidcClient = {
+  config: { clientId: 'hr-portal', issuer: 'https://hr.example.com/oidc' },
+  isAuthenticated: () => true,
+  subscribe: () => () => {},
+  login: async () => {},
+  logout: async () => {},
+  handleCallback: async () => ({ returnTo: '/' }),
+  switchTenant: async tenantId => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+    mockOidcState.tenantId = tenantId;
+  },
+  getTenantId: () => mockOidcState.tenantId,
+  getAccessToken: async () => 'mock-access-token',
+  getAuthHeaders: async () => ({ Authorization: 'Bearer mock-access-token' }),
+  getTokenSet: () => null,
+  getClaims: () => null,
+  getIdTokenClaims: () => null
+};
 
 const enums = Object.assign({}, taskEnums, intlAdminEnums, {
   taskType: [
@@ -1548,6 +1655,7 @@ const preset = {
   locale: localStorage.getItem('X-User-Locale') || 'zh-CN',
   apis,
   enums,
+  oidc: mockOidcClient,
   global: tenantData.global
 };
 

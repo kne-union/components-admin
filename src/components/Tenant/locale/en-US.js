@@ -85,6 +85,7 @@ const locale = {
   // SelectTenant
   SelectLoginTenant: 'Select Login Tenant',
   SelectLoginTenantSubtitle: 'Choose a tenant to enter. Click a card to set it as your default.',
+  SelectLoginTenantEmbeddedSubtitle: 'Click a tenant to enter',
   NoAvailableTenant: 'No tenants available',
   TenantUserCannotUse: 'Tenant user cannot be used',
   CurrentTenant: 'Current Tenant',

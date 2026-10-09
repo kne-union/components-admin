@@ -17,6 +17,33 @@
       ]
     },
     {
+      "title": "SSO 登录",
+      "description": "Account 根据 fastify-oidc 的 /config 判断：主系统（isMain）只有密码登录，其它 standalone 在密码表单下显示 SSO 按钮，central 直接跳转主项目登录",
+      "code": "./sso.js",
+      "scope": [
+        {
+          "name": "_Account",
+          "packageName": "@components/Account"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
       "title": "Register",
       "description": "注册",
       "code": "./register.js",

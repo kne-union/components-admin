@@ -20,6 +20,13 @@ const locale = {
   RememberAccount: 'Remember Account',
   RegisterBtn: 'Register',
   ForgetPassword: 'Forgot Password',
+
+  // Account/SsoLogin.js
+  Or: 'or',
+  SsoLogin: 'Single Sign-On (SSO)',
+  SsoRedirecting: 'Redirecting to single sign-on…',
+  SsoRedirectFailed: 'Failed to redirect to single sign-on',
+  Retry: 'Retry',
   
   // Account/Register.js
   VerificationCode: 'Verification Code',
