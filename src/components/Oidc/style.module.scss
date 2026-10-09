@@ -74,6 +74,48 @@
   min-height: 60vh;
 }
 
+.callback-result {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.callback-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font-size: 26px;
+  color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
+.callback-icon-error {
+  color: var(--color-error, #ff4d4f);
+  background: color-mix(in srgb, var(--color-error, #ff4d4f) 10%, transparent);
+}
+
+.callback-title {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.callback-desc {
+  text-align: center;
+}
+
+.callback-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+}
+
 .full-loading-placeholder {
   width: 200px;
   height: 80px;

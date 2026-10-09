@@ -7,10 +7,17 @@ import { useIntl } from '@kne/react-intl';
 import { useState } from 'react';
 import classnames from 'classnames';
 import md5 from 'md5';
+import LoginIllustration from '@components/LoginIllustration';
 import LoginOuterContainer from '../Account/LoginOuterContainer';
 import LoginComponent from '../Account/Login';
+import { Layout } from '../Account/Account';
+import { ExpiredIcon } from './CallbackIcons';
+import ResultPanel from './ResultPanel';
 import withLocale from './withLocale';
+import { withPublicUrl } from '../../utils/publicUrl';
 import style from './style.module.scss';
+
+const defaultLeftInner = <LoginIllustration type="workforce" />;
 
 const ACCOUNT_STATUS_MESSAGES = {
   10: 'OidcAccountNotInitialized',
@@ -52,10 +59,10 @@ const CurrentUser = ({ user }) => {
   );
 };
 
-const LoginStep = ({ data, apis, submit, accountType, registerUrl, forgetUrl, title }) => {
+const LoginStep = ({ data, apis, submit, accountType, registerUrl, forgetUrl, title, isSelfClient }) => {
   const { formatMessage } = useIntl();
   const { message } = App.useApp();
-  const clientName = data.client?.clientName;
+  const clientName = isSelfClient ? null : data.client?.clientName;
   return (
     <LoginComponent
       title={title || (clientName ? formatMessage({ id: 'OidcLoginTo' }, { clientName }) : formatMessage({ id: 'OidcLoginTitle' }))}
@@ -176,16 +183,27 @@ const InteractionInner = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
 })(({ remoteModules, uid, data, accountType, registerUrl, forgetUrl, loginTitle }) => {
   const [usePreset] = remoteModules;
-  const { ajax, apis: presetApis } = usePreset();
+  const { ajax, apis: presetApis, oidc } = usePreset();
   const { formatMessage } = useIntl();
   const apis = presetApis.oidc.interaction;
   const { loading, submit } = useInteractionSubmit({ ajax, uid });
   const stepProps = { data, apis, submit, loading };
   const promptName = data.prompt?.name;
+  // 本系统自己登录：不提示「登录到 xx」，也不提供取消（取消只对其它 client / 子项目跳转过来有意义）
+  const isSelfClient = !!data.client?.clientId && data.client.clientId === oidc?.config?.clientId;
 
   const content = (() => {
     if (promptName === 'login') {
-      return <LoginStep {...stepProps} accountType={accountType} registerUrl={registerUrl} forgetUrl={forgetUrl} title={loginTitle} />;
+      return (
+        <LoginStep
+          {...stepProps}
+          accountType={accountType}
+          registerUrl={registerUrl}
+          forgetUrl={forgetUrl}
+          title={loginTitle}
+          isSelfClient={isSelfClient}
+        />
+      );
     }
     if (promptName === 'tenant') {
       return <TenantStep {...stepProps} />;
@@ -199,7 +217,7 @@ const InteractionInner = createWithRemoteLoader({
   return (
     <Flex vertical gap={16} className={style['interaction']}>
       {content}
-      {promptName !== 'consent' && (
+      {promptName !== 'consent' && !isSelfClient && (
         <Button type="link" className={style['abort-button']} disabled={loading} onClick={() => submit(apis.abort)}>
           {formatMessage({ id: 'OidcCancelLogin' })}
         </Button>
@@ -211,28 +229,40 @@ const InteractionInner = createWithRemoteLoader({
 const Interaction = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
 })(
-  withLocale(({ remoteModules, uid: uidProp, systemName, systemLogo, loginLeftInner, accountType = 'email', registerUrl, forgetUrl, loginTitle }) => {
+  withLocale(({ remoteModules, uid: uidProp, systemName, systemLogo, loginLeftInner = defaultLeftInner, accountType = 'email', registerUrl, forgetUrl, loginTitle }) => {
     const [usePreset] = remoteModules;
-    const { apis } = usePreset();
+    const { apis, oidc } = usePreset();
     const { formatMessage } = useIntl();
     const [searchParams] = useSearchParams();
     const uid = uidProp || searchParams.get('uid');
+    // 会话已失效时无法得知发起登录的 client：有本系统 oidc 客户端就重新发起登录，否则回首页由应用自行拉起登录
+    const renderExpired = title => (
+      <ResultPanel
+        icon={<ExpiredIcon />}
+        title={title}
+        description={formatMessage({ id: 'OidcInvalidInteractionDesc' })}
+        actionText={formatMessage({ id: 'OidcBackToLogin' })}
+        onAction={() => (oidc?.login ? oidc.login({ returnTo: '/' }) : window.location.assign(withPublicUrl('/')))}
+      />
+    );
 
     return (
-      <LoginOuterContainer title={systemName} logo={systemLogo} leftInner={loginLeftInner}>
-        {uid ? (
-          <Fetch
-            {...Object.assign({}, apis.oidc.interaction.details)}
-            urlParams={{ uid }}
-            error={msg => <Result status="warning" title={formatMessage({ id: 'OidcInvalidInteraction' })} subTitle={msg || formatMessage({ id: 'OidcInvalidInteractionDesc' })} />}
-            render={({ data }) => (
-              <InteractionInner uid={uid} data={data} accountType={accountType} registerUrl={registerUrl} forgetUrl={forgetUrl} loginTitle={loginTitle} />
-            )}
-          />
-        ) : (
-          <Result status="warning" title={formatMessage({ id: 'OidcMissingUid' })} subTitle={formatMessage({ id: 'OidcInvalidInteractionDesc' })} />
-        )}
-      </LoginOuterContainer>
+      <Layout>
+        <LoginOuterContainer title={systemName} logo={systemLogo} leftInner={loginLeftInner}>
+          {uid ? (
+            <Fetch
+              {...Object.assign({}, apis.oidc.interaction.details)}
+              urlParams={{ uid }}
+              error={() => renderExpired(formatMessage({ id: 'OidcInvalidInteraction' }))}
+              render={({ data }) => (
+                <InteractionInner uid={uid} data={data} accountType={accountType} registerUrl={registerUrl} forgetUrl={forgetUrl} loginTitle={loginTitle} />
+              )}
+            />
+          ) : (
+            renderExpired(formatMessage({ id: 'OidcMissingUid' }))
+          )}
+        </LoginOuterContainer>
+      </Layout>
     );
   })
 );

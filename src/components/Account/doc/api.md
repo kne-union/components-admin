@@ -5,7 +5,8 @@
 | 场景 | 登录页表现 |
 |----|----|
 | 没有 OIDC client，或配置接口请求失败 | 只有账号密码登录（与原来一致） |
-| `mode` 为 `standalone` | 账号密码表单下方增加「单点登录（SSO）」按钮 |
+| `mode` 为 `standalone` 且 `isMain` 为 `true`（主系统） | 只有账号密码登录（主系统本身就是 IdP，不显示 SSO 入口） |
+| `mode` 为 `standalone` 且非主系统 | 账号密码表单下方增加「单点登录（SSO）」按钮 |
 | `mode` 为其它值（`central` 子项目） | 不显示密码表单，进入登录页直接跳转到主项目 IdP；注册、忘记密码、重置密码、修改密码路由重定向到登录页 |
 
 OIDC client 默认取 preset 的 `oidc`（`components-admin:Oidc` 的 `createOidcClient`），业务项目需已挂载 `Oidc@Callback` 回调路由。SSO 跳转的 `returnTo` 取登录页 URL 的 `referer`，没有时为 `targetUrl`（默认 `/`）。

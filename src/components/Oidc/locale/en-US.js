@@ -3,7 +3,8 @@ const locale = {
   OidcLoginTitle: 'Sign in',
   OidcLoginTo: 'Sign in to {clientName}',
   OidcInvalidInteraction: 'Login session expired',
-  OidcInvalidInteractionDesc: 'Please go back to the application and sign in again',
+  OidcInvalidInteractionDesc: 'This sign in page has expired or was already used. Please go back and sign in again.',
+  OidcBackToLogin: 'Back to sign in',
   OidcMissingUid: 'Missing login session parameter',
   OidcCancelLogin: 'Cancel',
   OidcAccountNotInitialized: 'The account has not been initialized yet, please initialize it in the account center first',
@@ -22,6 +23,11 @@ const locale = {
   // Callback
   OidcCallbackLoading: 'Completing sign in…',
   OidcCallbackFailed: 'Sign in failed',
+  OidcLoginCancelled: 'Sign in cancelled',
+  OidcLoginCancelledDesc: 'You cancelled this sign in. Sign in again to continue.',
+  OidcCallbackFailedDesc: 'Something went wrong while signing in. Please try again.',
+  OidcLoginExpired: 'Sign in expired',
+  OidcLoginExpiredDesc: 'This sign in page is no longer valid. Please sign in again.',
   OidcRetryLogin: 'Sign in again',
   // OidcAuthenticate
   OidcRedirecting: 'Redirecting to sign in…',

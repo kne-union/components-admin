@@ -227,4 +227,21 @@ describe('createOidcClient', () => {
     expect(url.searchParams.get('post_logout_redirect_uri')).toBe('https://app.test/');
     expect(window.localStorage.getItem('kne-oidc:token')).toBeNull();
   });
+
+  test('logout is not overridden by login triggered from token cleared', async () => {
+    window.localStorage.setItem(
+      'kne-oidc:token',
+      JSON.stringify({ accessToken: 'at-1', tokenType: 'bearer', idToken: 'id-1', expiresAt: Date.now() + 600000 })
+    );
+    const client = createClient();
+    client.subscribe(() => {
+      if (!client.isAuthenticated()) {
+        client.login();
+      }
+    });
+    await client.logout();
+    await flush();
+    expect(assign).toHaveBeenCalledTimes(1);
+    expect(new URL(assign.mock.calls[0][0]).pathname).toBe('/oidc/session/end');
+  });
 });

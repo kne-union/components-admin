@@ -50,7 +50,8 @@ const Login = () => {
             );
           }}
         </DoLogin>
-        {sso?.enabled && <SsoButton client={sso.client} targetUrl={targetUrl} />}
+        {/* 主系统本身就是 IdP，SSO 入口没有意义 */}
+        {sso?.enabled && !sso.isMain && <SsoButton client={sso.client} targetUrl={targetUrl} />}
       </>
     );
   };

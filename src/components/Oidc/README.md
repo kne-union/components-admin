@@ -217,15 +217,19 @@ IdP 登录交互页，路由路径需与 fastify-oidc 的 `interactionPage`（�
 | uid | string | 否 | URL 参数 `uid` | 交互 ID |
 | systemName | ReactNode | 否 | - | 左侧系统名称 |
 | systemLogo | string \| ReactNode | 否 | - | 左侧系统 logo |
-| loginLeftInner | ReactNode | 否 | 默认插画 | 左侧内容 |
-| loginTitle | string | 否 | `登录到 {clientName}` | 登录步骤标题 |
+| loginLeftInner | ReactNode | 否 | 与 Account 一致的 workforce 插画 | 左侧内容 |
+| loginTitle | string | 否 | 其它 client 跳转来时为 `登录到 {clientName}`，本系统（`preset.oidc` 的 clientId）为 `登录` | 登录步骤标题 |
 | accountType | `'email'` \| `'phone'` | 否 | `'email'` | 登录账号类型 |
 | registerUrl | string | 否 | - | 注册页地址，传入后显示注册入口 |
 | forgetUrl | string | 否 | - | 忘记密码页地址，传入后显示入口 |
 
+交互页外层与 Account 登录页相同（`Account` 的 `Layout`：主题色全屏背景、卡片居中）。本系统自己登录（交互的 client 即 `preset.oidc` 的 clientId）时不显示「取消登录」；其它 client（子项目）跳转来时显示，取消后带 `access_denied` 回到该子项目。
+
+登录会话失效（uid 过期 / 已使用）或缺少 uid 时显示「登录会话已失效」与「返回登录」：有 `preset.oidc` 时调用 `oidc.login({ returnTo: '/' })` 重新发起登录，否则跳回应用首页。
+
 ### Callback
 
-登录回调页，路由路径需与 `redirectUri` 一致（默认 `/oidc-callback`）。
+登录回调页，路由路径需与 `redirectUri` 一致（默认 `/oidc-callback`）。外层与交互页相同；兑换失败时显示「登录失败」，用户在交互页取消登录（`access_denied`）时显示「已取消登录」，均提供「重新登录」按钮。
 
 #### 属性说明
 
@@ -233,6 +237,9 @@ IdP 登录交互页，路由路径需与 fastify-oidc 的 `interactionPage`（�
 |--------|------|------|--------|------|
 | client | object | 否 | preset.oidc | OIDC client 实例 |
 | onSuccess | `({ returnTo }) => void` | 否 | 跳转回 returnTo | 兑换令牌成功后的回调 |
+| systemName | ReactNode | 否 | - | 左侧系统名称 |
+| systemLogo | string \| ReactNode | 否 | - | 左侧系统 logo |
+| loginLeftInner | ReactNode | 否 | 与 Account 一致的 workforce 插画 | 左侧内容 |
 
 ### OidcAuthenticate
 

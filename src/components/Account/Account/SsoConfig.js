@@ -37,6 +37,7 @@ const SsoConfig = createWithRemoteLoader({
     loading: !disabled && state.loading,
     enabled: !!mode,
     mode,
+    isMain: !!(mode && state.config.isMain),
     client
   });
 });

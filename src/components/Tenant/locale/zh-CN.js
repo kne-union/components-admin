@@ -85,6 +85,7 @@ const locale = {
   // SelectTenant
   SelectLoginTenant: '选择登录租户',
   SelectLoginTenantSubtitle: '请选择要进入的租户，点击卡片可切换默认租户',
+  SelectLoginTenantEmbeddedSubtitle: '点击租户即可进入',
   NoAvailableTenant: '暂无可登录的租户',
   TenantUserCannotUse: '租户用户不能使用',
   CurrentTenant: '当前租户',

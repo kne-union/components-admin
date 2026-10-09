@@ -67,7 +67,10 @@
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | tenantPath | 登录成功跳转路径 | string | - |
-| children | 自定义渲染 | function | - |
+| embedded | 嵌入宿主 Page（如 `@kne/system-layout`）的样式：标题、说明与租户列表居中成一块，点击租户直接进入 | boolean | false |
+| children | 自定义渲染，参数为 `{ children, backgroundColor }` | function | - |
+
+preset 中存在 `oidc`（`components-admin:Oidc` 的 `createOidcClient`）时：当前租户取令牌中的租户；点击卡片仅选中，点「进入租户」时若与当前租户不同，调用 `oidc.switchTenant` 重新签发令牌后进入 `tenantPath`（`embedded` 时点击即进入）。没有 `oidc` 时沿用切换默认租户接口。
 
 ### JoinInvitation 邀请加入
 

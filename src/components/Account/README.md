@@ -60,7 +60,7 @@ render(<BaseExample />);
 ```
 
 - SSO 登录
-- Account 根据 fastify-oidc 的 /config 判断：standalone 在密码表单下显示 SSO 按钮，central 直接跳转主项目登录
+- Account 根据 fastify-oidc 的 /config 判断：主系统（isMain）只有密码登录，其它 standalone 在密码表单下显示 SSO 按钮，central 直接跳转主项目登录
 - _Account(@components/Account),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom),antd(antd)
 
 ```jsx
@@ -77,13 +77,20 @@ const SsoExample = createWithRemoteLoader({
   modules: ['components-core:Global@PureGlobal']
 })(({ remoteModules }) => {
   const [PureGlobal] = remoteModules;
-  const [mode, setMode] = useState('standalone');
+  const [scene, setScene] = useState('standalone');
   const preset = useMemo(
     () =>
       Object.assign({}, mockPreset, {
         apis: Object.assign({}, mockPreset.apis, {
           oidc: Object.assign({}, mockPreset.apis.oidc, {
-            config: { loader: () => ({ mode, issuer: 'https://main.example.com/oidc', clientId: 'hr-portal' }) }
+            config: {
+              loader: () => ({
+                mode: scene === 'central' ? 'central' : 'standalone',
+                isMain: scene === 'main',
+                issuer: 'https://main.example.com/oidc',
+                clientId: 'hr-portal'
+              })
+            }
           })
         }),
         oidc: Object.assign({}, mockPreset.oidc, {
@@ -92,7 +99,7 @@ const SsoExample = createWithRemoteLoader({
           }
         })
       }),
-    [mode]
+    [scene]
   );
   return (
     <Flex vertical gap={20}>
@@ -100,18 +107,19 @@ const SsoExample = createWithRemoteLoader({
         <Space>
           <span>认证模式:</span>
           <Radio.Group
-            value={mode}
+            value={scene}
             onChange={e => {
-              setMode(e.target.value);
+              setScene(e.target.value);
             }}
             options={[
+              { label: '主系统（仅密码登录）', value: 'main' },
               { label: 'standalone（显示 SSO 按钮）', value: 'standalone' },
               { label: 'central（直接跳转）', value: 'central' }
             ]}
           />
         </Space>
       </Flex>
-      <PureGlobal key={mode} preset={preset}>
+      <PureGlobal key={scene} preset={preset}>
         <Routes>
           <Route path={&#96;${baseUrl}/*&#96;} element={<Account baseUrl={baseUrl} systemName="企业管理系统" />} />
           <Route path="*" element={<Navigate to={&#96;${baseUrl}/login&#96;} replace />} />
@@ -286,7 +294,8 @@ render(<BaseExample />);
 | 场景 | 登录页表现 |
 |----|----|
 | 没有 OIDC client，或配置接口请求失败 | 只有账号密码登录（与原来一致） |
-| `mode` 为 `standalone` | 账号密码表单下方增加「单点登录（SSO）」按钮 |
+| `mode` 为 `standalone` 且 `isMain` 为 `true`（主系统） | 只有账号密码登录（主系统本身就是 IdP，不显示 SSO 入口） |
+| `mode` 为 `standalone` 且非主系统 | 账号密码表单下方增加「单点登录（SSO）」按钮 |
 | `mode` 为其它值（`central` 子项目） | 不显示密码表单，进入登录页直接跳转到主项目 IdP；注册、忘记密码、重置密码、修改密码路由重定向到登录页 |
 
 OIDC client 默认取 preset 的 `oidc`（`components-admin:Oidc` 的 `createOidcClient`），业务项目需已挂载 `Oidc@Callback` 回调路由。SSO 跳转的 `returnTo` 取登录页 URL 的 `referer`，没有时为 `targetUrl`（默认 `/`）。

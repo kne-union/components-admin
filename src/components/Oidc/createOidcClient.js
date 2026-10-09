@@ -120,7 +120,13 @@ const createOidcClient = options => {
 
   const isExpiring = target => !target?.accessToken || target.expiresAt - config.refreshSkew * 1000 <= Date.now();
 
+  // 退出时清 token 会通知 OidcAuthenticate 发起登录；若登录跳转晚于 end_session 跳转，IdP 会话仍在会直接签发新 token
+  let loggingOut = false;
+
   const login = async ({ returnTo, prompt, tenantId, loginHint, params } = {}) => {
+    if (loggingOut) {
+      return new Promise(() => {});
+    }
     const as = await discover();
     const codeVerifier = oauth.generateRandomCodeVerifier();
     const state = oauth.generateRandomState();
@@ -161,7 +167,7 @@ const createOidcClient = options => {
     const tx = readJson(window.sessionStorage, txKey);
     window.sessionStorage.removeItem(txKey);
     if (!tx) {
-      throw new Error('login state expired');
+      throw Object.assign(new Error('login state expired'), { error: 'login_state_expired' });
     }
     const as = await discover();
     let params;
@@ -291,6 +297,7 @@ const createOidcClient = options => {
 
   const logout = async ({ returnTo } = {}) => {
     const idToken = tokenSet?.idToken;
+    loggingOut = true;
     setTokenSet(null);
     if (config.dpop) {
       dpopHandle = null;

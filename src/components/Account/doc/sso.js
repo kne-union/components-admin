@@ -11,13 +11,20 @@ const SsoExample = createWithRemoteLoader({
   modules: ['components-core:Global@PureGlobal']
 })(({ remoteModules }) => {
   const [PureGlobal] = remoteModules;
-  const [mode, setMode] = useState('standalone');
+  const [scene, setScene] = useState('standalone');
   const preset = useMemo(
     () =>
       Object.assign({}, mockPreset, {
         apis: Object.assign({}, mockPreset.apis, {
           oidc: Object.assign({}, mockPreset.apis.oidc, {
-            config: { loader: () => ({ mode, issuer: 'https://main.example.com/oidc', clientId: 'hr-portal' }) }
+            config: {
+              loader: () => ({
+                mode: scene === 'central' ? 'central' : 'standalone',
+                isMain: scene === 'main',
+                issuer: 'https://main.example.com/oidc',
+                clientId: 'hr-portal'
+              })
+            }
           })
         }),
         oidc: Object.assign({}, mockPreset.oidc, {
@@ -26,7 +33,7 @@ const SsoExample = createWithRemoteLoader({
           }
         })
       }),
-    [mode]
+    [scene]
   );
   return (
     <Flex vertical gap={20}>
@@ -34,18 +41,19 @@ const SsoExample = createWithRemoteLoader({
         <Space>
           <span>认证模式:</span>
           <Radio.Group
-            value={mode}
+            value={scene}
             onChange={e => {
-              setMode(e.target.value);
+              setScene(e.target.value);
             }}
             options={[
+              { label: '主系统（仅密码登录）', value: 'main' },
               { label: 'standalone（显示 SSO 按钮）', value: 'standalone' },
               { label: 'central（直接跳转）', value: 'central' }
             ]}
           />
         </Space>
       </Flex>
-      <PureGlobal key={mode} preset={preset}>
+      <PureGlobal key={scene} preset={preset}>
         <Routes>
           <Route path={`${baseUrl}/*`} element={<Account baseUrl={baseUrl} systemName="企业管理系统" />} />
           <Route path="*" element={<Navigate to={`${baseUrl}/login`} replace />} />
