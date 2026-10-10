@@ -182,7 +182,7 @@ render(<BaseExample />);
 | resource | string | 否 | - | 资源指示（audience），不传时 IdP 使用 client 允许的第一个资源 |
 | scope | string | 否 | `openid profile offline_access api` | 申请的 scope |
 | dpop | boolean | 否 | false | 是否开启 DPoP，开启后令牌绑定浏览器密钥（密钥存于 IndexedDB） |
-| storageKey | string | 否 | `kne-oidc` | 令牌在 localStorage / sessionStorage 中的 key 前缀 |
+| storageKey | string | 否 | `kne-oidc:{clientId}` | 令牌在 localStorage / sessionStorage 中的 key 前缀；默认按 clientId 隔离，同源部署的多个应用互不覆盖 |
 | refreshSkew | number | 否 | 30 | 令牌到期前多少秒开始刷新 |
 | extraParams | object | 否 | {} | 每次授权请求附加的参数（如 `ui_locales`） |
 

@@ -7,8 +7,9 @@ import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
 import TenantUserPersonalCard from '../UserPersonalCard';
 import style from './inviteModal.module.scss';
+import { withPublicUrl } from '../../../../utils/publicUrl';
 
-const buildInviteUrl = token => `${window.location.origin}/join-tenant?token=${token}`;
+const buildInviteUrl = token => `${window.location.origin}${withPublicUrl('/join-tenant')}?token=${token}`;
 
 const InviteInner = createWithRemoteLoader({
   modules: ['components-core:LoadingButton', 'components-core:Modal@useModal', 'components-core:Global@usePreset']

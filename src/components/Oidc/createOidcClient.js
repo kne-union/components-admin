@@ -29,7 +29,7 @@ const createOidcClient = options => {
       resource: null,
       scope: 'openid profile offline_access api',
       dpop: false,
-      storageKey: 'kne-oidc',
+      storageKey: null,
       refreshSkew: 30,
       extraParams: {}
     },
@@ -43,10 +43,12 @@ const createOidcClient = options => {
   const client = { client_id: config.clientId };
   const clientAuth = oauth.None();
   const requestOptions = issuerUrl.protocol === 'http:' ? { [oauth.allowInsecureRequests]: true } : {};
-  const tokenKey = `${config.storageKey}:token`;
-  const txKey = `${config.storageKey}:tx`;
-  const reloginKey = `${config.storageKey}:relogin-at`;
-  const dpopKeyName = `${config.storageKey}:${config.clientId}`;
+  // 主项目与子应用常同源部署（应用中心路径模式），key 必须按 clientId 隔离，否则 token 互相覆盖
+  const storagePrefix = config.storageKey || `kne-oidc:${config.clientId}`;
+  const tokenKey = `${storagePrefix}:token`;
+  const txKey = `${storagePrefix}:tx`;
+  const reloginKey = `${storagePrefix}:relogin-at`;
+  const dpopKeyName = `${config.storageKey || 'kne-oidc'}:${config.clientId}`;
 
   let discovery = null;
   const discover = () => {
