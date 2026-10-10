@@ -105,6 +105,14 @@ describe('createOidcClient', () => {
     expect(() => createOidcClient({})).toThrow('clientId');
   });
 
+  test('isolates token storage per clientId on the same origin', () => {
+    const tokenSet = { accessToken: 'host-token', expiresAt: Math.floor(Date.now() / 1000) + 3600 };
+    window.localStorage.setItem('kne-oidc:hr-portal:token', JSON.stringify(tokenSet));
+    expect(createClient().getTokenSet()).toEqual(tokenSet);
+    expect(createClient({ clientId: 'app-child' }).getTokenSet()).toBeNull();
+    expect(createClient({ storageKey: 'custom' }).getTokenSet()).toBeNull();
+  });
+
   test('login redirects to authorization endpoint with PKCE and tenant parameters', async () => {
     const client = createClient();
     client.login({ tenantId: 'tenant-2', prompt: 'none' });
@@ -124,7 +132,7 @@ describe('createOidcClient', () => {
       prompt: 'none',
       tenant_id: 'tenant-2'
     });
-    expect(JSON.parse(window.sessionStorage.getItem('kne-oidc:tx'))).toMatchObject({
+    expect(JSON.parse(window.sessionStorage.getItem('kne-oidc:hr-portal:tx'))).toMatchObject({
       state: 'state-1',
       codeVerifier: 'verifier-1',
       returnTo: '/dashboard?tab=1'
@@ -145,7 +153,7 @@ describe('createOidcClient', () => {
     expect(client.getTenantId()).toBe('tenant-2');
     const headers = await client.getAuthHeaders({ method: 'get', url: 'https://app.test/api/me' });
     expect(headers.Authorization).toMatch(/^Bearer /);
-    expect(window.sessionStorage.getItem('kne-oidc:tx')).toBeNull();
+    expect(window.sessionStorage.getItem('kne-oidc:hr-portal:tx')).toBeNull();
   });
 
   test('silent login failure falls back to interactive login', async () => {
@@ -163,7 +171,7 @@ describe('createOidcClient', () => {
 
   test('refreshes expired access token once for concurrent callers', async () => {
     window.localStorage.setItem(
-      'kne-oidc:token',
+      'kne-oidc:hr-portal:token',
       JSON.stringify({ accessToken: 'at-1', tokenType: 'bearer', refreshToken: 'rt-1', expiresAt: Date.now() - 1000 })
     );
     const client = createClient();
@@ -180,18 +188,18 @@ describe('createOidcClient', () => {
       throw new oauth.ResponseBodyError('invalid_grant');
     });
     window.localStorage.setItem(
-      'kne-oidc:token',
+      'kne-oidc:hr-portal:token',
       JSON.stringify({ accessToken: 'at-1', tokenType: 'bearer', refreshToken: 'rt-1', expiresAt: Date.now() - 1000 })
     );
     const client = createClient();
     expect(await client.getAccessToken()).toBeNull();
     expect(client.isAuthenticated()).toBe(false);
-    expect(window.localStorage.getItem('kne-oidc:token')).toBeNull();
+    expect(window.localStorage.getItem('kne-oidc:hr-portal:token')).toBeNull();
   });
 
   test('interceptors inject bearer header and re-login once on 401', async () => {
     window.localStorage.setItem(
-      'kne-oidc:token',
+      'kne-oidc:hr-portal:token',
       JSON.stringify({ accessToken: 'at-1', tokenType: 'bearer', refreshToken: 'rt-1', expiresAt: Date.now() + 600000 })
     );
     const client = createClient();
@@ -216,7 +224,7 @@ describe('createOidcClient', () => {
 
   test('logout clears tokens and redirects to end_session', async () => {
     window.localStorage.setItem(
-      'kne-oidc:token',
+      'kne-oidc:hr-portal:token',
       JSON.stringify({ accessToken: 'at-1', tokenType: 'bearer', idToken: 'id-1', expiresAt: Date.now() + 600000 })
     );
     const client = createClient();
@@ -225,12 +233,12 @@ describe('createOidcClient', () => {
     expect(url.origin + url.pathname).toBe('https://idp.test/oidc/session/end');
     expect(url.searchParams.get('id_token_hint')).toBe('id-1');
     expect(url.searchParams.get('post_logout_redirect_uri')).toBe('https://app.test/');
-    expect(window.localStorage.getItem('kne-oidc:token')).toBeNull();
+    expect(window.localStorage.getItem('kne-oidc:hr-portal:token')).toBeNull();
   });
 
   test('logout is not overridden by login triggered from token cleared', async () => {
     window.localStorage.setItem(
-      'kne-oidc:token',
+      'kne-oidc:hr-portal:token',
       JSON.stringify({ accessToken: 'at-1', tokenType: 'bearer', idToken: 'id-1', expiresAt: Date.now() + 600000 })
     );
     const client = createClient();
