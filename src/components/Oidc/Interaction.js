@@ -10,6 +10,7 @@ import md5 from 'md5';
 import LoginIllustration from '@components/LoginIllustration';
 import LoginOuterContainer from '../Account/LoginOuterContainer';
 import LoginComponent from '../Account/Login';
+import Language from '../Account/Language';
 import { Layout } from '../Account/Account';
 import { ExpiredIcon } from './CallbackIcons';
 import ResultPanel from './ResultPanel';
@@ -121,7 +122,8 @@ const TenantStep = createWithRemoteLoader({
                     if (!result) {
                       setSelecting(null);
                     }
-                  }}>
+                  }}
+                >
                   {item.logo ? (
                     <Image.Avatar id={item.logo} size={40} />
                   ) : (
@@ -229,42 +231,63 @@ const InteractionInner = createWithRemoteLoader({
 const Interaction = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
 })(
-  withLocale(({ remoteModules, uid: uidProp, systemName, systemLogo, loginLeftInner = defaultLeftInner, accountType = 'email', registerUrl, forgetUrl, loginTitle }) => {
-    const [usePreset] = remoteModules;
-    const { apis, oidc } = usePreset();
-    const { formatMessage } = useIntl();
-    const [searchParams] = useSearchParams();
-    const uid = uidProp || searchParams.get('uid');
-    // 会话已失效时无法得知发起登录的 client：有本系统 oidc 客户端就重新发起登录，否则回首页由应用自行拉起登录
-    const renderExpired = title => (
-      <ResultPanel
-        icon={<ExpiredIcon />}
-        title={title}
-        description={formatMessage({ id: 'OidcInvalidInteractionDesc' })}
-        actionText={formatMessage({ id: 'OidcBackToLogin' })}
-        onAction={() => (oidc?.login ? oidc.login({ returnTo: '/' }) : window.location.assign(withPublicUrl('/')))}
-      />
-    );
+  withLocale(
+    ({
+      remoteModules,
+      uid: uidProp,
+      systemName,
+      systemLogo,
+      loginLeftInner = defaultLeftInner,
+      accountType = 'email',
+      registerUrl,
+      forgetUrl,
+      loginTitle,
+      allowLanguageSwitch = true
+    }) => {
+      const [usePreset] = remoteModules;
+      const { apis, oidc } = usePreset();
+      const { formatMessage } = useIntl();
+      const [searchParams] = useSearchParams();
+      const uid = uidProp || searchParams.get('uid');
+      // 会话已失效时无法得知发起登录的 client：有本系统 oidc 客户端就重新发起登录，否则回首页由应用自行拉起登录
+      const renderExpired = title => (
+        <ResultPanel
+          icon={<ExpiredIcon />}
+          title={title}
+          description={formatMessage({ id: 'OidcInvalidInteractionDesc' })}
+          actionText={formatMessage({ id: 'OidcBackToLogin' })}
+          onAction={() => (oidc?.login ? oidc.login({ returnTo: '/' }) : window.location.assign(withPublicUrl('/')))}
+        />
+      );
 
-    return (
-      <Layout>
-        <LoginOuterContainer title={systemName} logo={systemLogo} leftInner={loginLeftInner}>
-          {uid ? (
-            <Fetch
-              {...Object.assign({}, apis.oidc.interaction.details)}
-              urlParams={{ uid }}
-              error={() => renderExpired(formatMessage({ id: 'OidcInvalidInteraction' }))}
-              render={({ data }) => (
-                <InteractionInner uid={uid} data={data} accountType={accountType} registerUrl={registerUrl} forgetUrl={forgetUrl} loginTitle={loginTitle} />
-              )}
-            />
-          ) : (
-            renderExpired(formatMessage({ id: 'OidcMissingUid' }))
-          )}
-        </LoginOuterContainer>
-      </Layout>
-    );
-  })
+      return (
+        <Layout>
+          <LoginOuterContainer title={systemName} logo={systemLogo} leftInner={loginLeftInner}>
+            {uid ? (
+              <Fetch
+                {...Object.assign({}, apis.oidc.interaction.details)}
+                urlParams={{ uid }}
+                error={() => renderExpired(formatMessage({ id: 'OidcInvalidInteraction' }))}
+                render={({ data }) => (
+                  <InteractionInner
+                    uid={uid}
+                    data={data}
+                    accountType={accountType}
+                    registerUrl={registerUrl}
+                    forgetUrl={forgetUrl}
+                    loginTitle={loginTitle}
+                  />
+                )}
+              />
+            ) : (
+              renderExpired(formatMessage({ id: 'OidcMissingUid' }))
+            )}
+            {allowLanguageSwitch && <Language colorful={false} className={style['language']} />}
+          </LoginOuterContainer>
+        </Layout>
+      );
+    }
+  )
 );
 
 export default Interaction;

@@ -222,6 +222,7 @@ IdP 登录交互页，路由路径需与 fastify-oidc 的 `interactionPage`（�
 | accountType | `'email'` \| `'phone'` | 否 | `'email'` | 登录账号类型 |
 | registerUrl | string | 否 | - | 注册页地址，传入后显示注册入口 |
 | forgetUrl | string | 否 | - | 忘记密码页地址，传入后显示入口 |
+| allowLanguageSwitch | boolean | 否 | `true` | 右上角显示语言切换，与 Account 登录页一致 |
 
 交互页外层与 Account 登录页相同（`Account` 的 `Layout`：主题色全屏背景、卡片居中）。本系统自己登录（交互的 client 即 `preset.oidc` 的 clientId）时不显示「取消登录」；其它 client（子项目）跳转来时显示，取消后带 `access_denied` 回到该子项目。
 
