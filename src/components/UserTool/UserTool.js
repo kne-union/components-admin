@@ -9,11 +9,12 @@ import { useState } from 'react';
 import { useMobilePopupMount } from '@kne/responsive-utils';
 
 const UserTool = createWithRemoteLoader({
-  modules: ['components-core:Image', 'components-core:Icon']
+  modules: ['components-core:Image', 'components-core:Icon', 'components-core:Global@usePreset']
 })(
   withLocale(({ remoteModules, avatar, name, email, storeKeys = { token: 'X-User-Token' }, domain, list, children = null }) => {
-    const [Image, Icon] = remoteModules;
-    const logout = useLogout({ storeKeys, domain });
+    const [Image, Icon, usePreset] = remoteModules;
+    const { oidc: oidcClient } = usePreset();
+    const logout = useLogout({ storeKeys, domain, oidcClient });
     const { formatMessage } = useIntl();
     const [open, setOpen] = useState(false);
     const { isMobile, getPopupContainer, fixedModeClass, anchorRef } = useMobilePopupMount();

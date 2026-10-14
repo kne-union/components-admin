@@ -4,7 +4,12 @@ export const getPublicBasePath = () => {
   if (!raw || raw === '/') {
     return '';
   }
-  return String(raw).replace(/\/+$/, '');
+  const base = String(raw).replace(/\/+$/, '');
+  // runtimePublicUrl 为 CDN 静态资源根（http(s)）时，不是 SPA 挂载前缀
+  if (/^https?:\/\//i.test(base)) {
+    return '';
+  }
+  return base;
 };
 
 // For full-page redirects: router navigate already applies basename, window.location does not.

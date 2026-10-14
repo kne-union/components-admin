@@ -1,6 +1,7 @@
 import * as oauth from 'oauth4webapi';
 import { loadKeyPair, removeKeyPair, createProof, decodeJwtPayload } from './dpop';
 import { getPublicBasePath } from '../../utils/publicUrl';
+import { registerOidcClient } from '../../utils/accountLogout';
 
 const SILENT_LOGIN_ERRORS = ['login_required', 'interaction_required', 'consent_required', 'account_selection_required'];
 const RELOGIN_GUARD_MS = 10 * 1000;
@@ -340,7 +341,7 @@ const createOidcClient = options => {
     return () => listeners.delete(listener);
   };
 
-  return {
+  const oidcClientApi = {
     config,
     discover,
     login,
@@ -358,6 +359,8 @@ const createOidcClient = options => {
     getTenantId,
     subscribe
   };
+  registerOidcClient(oidcClientApi);
+  return oidcClientApi;
 };
 
 export default createOidcClient;
