@@ -17,6 +17,12 @@ describe('publicUrl', () => {
     expect(stripPublicUrl('/tenant/home')).toBe('/tenant/home');
   });
 
+  it('ignores absolute CDN runtimePublicUrl', () => {
+    window.runtimePublicUrl = 'https://cdn.leapin-ai.com/leapin-ai-interview-flowup/cn-staging/02f0037e';
+    expect(getPublicBasePath()).toBe('');
+    expect(withPublicUrl('/account/login')).toBe('/account/login');
+  });
+
   it('prefixes full-page redirect paths once', () => {
     window.runtimePublicUrl = '/app/talent-saas';
     expect(withPublicUrl('/account/login')).toBe('/app/talent-saas/account/login');
