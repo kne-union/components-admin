@@ -1,0 +1,52 @@
+{
+  "isFull": true,
+  "list": [
+    {
+      "title": "完整模块",
+      "description": "邮件网关管理后台：左侧切换邮箱账号与文件夹（收件箱、已发送、草稿箱、已删除），标签按文件夹展示；菜单进入邮箱账号、标签管理、邮件模版、收发规则、规则日志。",
+      "code": "./base.js",
+      "scope": [
+        { "name": "_MailGateway", "packageName": "@components/MailGateway" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "reactRouterDom", "packageName": "react-router-dom" }
+      ]
+    },
+    {
+      "title": "SystemLayout 布局",
+      "description": "宿主使用 @kne/system-layout 时：getMenuItems 生成 SystemLayout 侧栏菜单（图标由宿主补充），renderPage 交给 Page 承载各子页面标题与内容；模块不再渲染自带的左侧菜单，邮箱页的账号切换、文件夹与标签侧栏放在页面内容区左侧。",
+      "code": "./system-layout.js",
+      "scope": [
+        { "name": "_MailGateway", "packageName": "@components/MailGateway" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "_systemLayout", "packageName": "@kne/system-layout" },
+        { "packageName": "@kne/system-layout/dist/index.css" },
+        { "name": "reactRouterDom", "packageName": "react-router-dom" }
+      ]
+    },
+    {
+      "title": "写信与选择字段",
+      "description": "在业务页面中复用 Compose 按钮发起写信、回复、回复全部、转发和编辑草稿；AccountSelectField / LabelSelectField 可直接放进 FormInfo 表单。",
+      "isFull": false,
+      "code": "./compose.js",
+      "scope": [
+        { "name": "_MailGateway", "packageName": "@components/MailGateway" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
+      "title": "扩展动作与条件",
+      "description": "宿主在服务端注册「创建售后工单」动作和「AI 判断」条件后，规则编辑器自动出现它们；参数子表单由服务端 formSchema（FormCreator Schema）定义，其中的自定义字段类型 TicketQueue 由宿主通过 FormCreator preset 注册。点击「添加」新建规则：条件字段下拉的「扩展条件」分组里选择「AI 判断」并填写判断要求（示例用关键词模拟大模型），动作中选择「创建售后工单」；保存后在卡片菜单里「试运行」可看到每个条件的命中结果与 AI 给出的理由。",
+      "code": "./custom-action.js",
+      "scope": [
+        { "name": "_MailGateway", "packageName": "@components/MailGateway" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    }
+  ]
+}

@@ -882,6 +882,84 @@ const getApis = options => {
           method: 'POST'
         }
       }
+    },
+    mailGateway: {
+      account: {
+        list: { url: `${prefix}/mail-gateway/accounts`, method: 'GET' },
+        detail: { url: `${prefix}/mail-gateway/accounts/{id}`, method: 'GET' },
+        create: { url: `${prefix}/mail-gateway/accounts`, method: 'POST' },
+        save: { url: `${prefix}/mail-gateway/accounts/{id}`, method: 'PUT' },
+        remove: { url: `${prefix}/mail-gateway/accounts/{id}`, method: 'DELETE' },
+        setStatus: { url: `${prefix}/mail-gateway/accounts/{id}/status`, method: 'POST' },
+        testConnection: { url: `${prefix}/mail-gateway/accounts/test-connection`, method: 'POST' },
+        sync: { url: `${prefix}/mail-gateway/accounts/{id}/sync`, method: 'POST' }
+      },
+      mail: {
+        list: { url: `${prefix}/mail-gateway/mails`, method: 'GET' },
+        stats: { url: `${prefix}/mail-gateway/mails/stats`, method: 'GET' },
+        detail: { url: `${prefix}/mail-gateway/mails/{id}`, method: 'GET' },
+        downloadAttachment: { url: `${prefix}/mail-gateway/mails/{id}/attachments/{index}/download`, method: 'POST' },
+        read: { url: `${prefix}/mail-gateway/mails/read`, method: 'POST' },
+        star: { url: `${prefix}/mail-gateway/mails/star`, method: 'POST' },
+        setLabels: { url: `${prefix}/mail-gateway/mails/{id}/labels`, method: 'PUT' },
+        trash: { url: `${prefix}/mail-gateway/mails/trash`, method: 'POST' },
+        restore: { url: `${prefix}/mail-gateway/mails/restore`, method: 'POST' },
+        remove: { url: `${prefix}/mail-gateway/mails/remove`, method: 'POST' },
+        send: { url: `${prefix}/mail-gateway/mails/send`, method: 'POST' }
+      },
+      draft: {
+        create: { url: `${prefix}/mail-gateway/drafts`, method: 'POST' },
+        save: { url: `${prefix}/mail-gateway/drafts/{id}`, method: 'PUT' },
+        remove: { url: `${prefix}/mail-gateway/drafts/{id}`, method: 'DELETE' },
+        send: { url: `${prefix}/mail-gateway/drafts/{id}/send`, method: 'POST' }
+      },
+      label: {
+        list: { url: `${prefix}/mail-gateway/labels`, method: 'GET' },
+        create: { url: `${prefix}/mail-gateway/labels`, method: 'POST' },
+        save: { url: `${prefix}/mail-gateway/labels/{id}`, method: 'PUT' },
+        remove: { url: `${prefix}/mail-gateway/labels/{id}`, method: 'DELETE' },
+        sort: { url: `${prefix}/mail-gateway/labels/sort`, method: 'POST' }
+      },
+      rule: {
+        list: { url: `${prefix}/mail-gateway/rules`, method: 'GET' },
+        options: { url: `${prefix}/mail-gateway/rules/options`, method: 'GET' },
+        detail: { url: `${prefix}/mail-gateway/rules/{id}`, method: 'GET' },
+        create: { url: `${prefix}/mail-gateway/rules`, method: 'POST' },
+        save: { url: `${prefix}/mail-gateway/rules/{id}`, method: 'PUT' },
+        remove: { url: `${prefix}/mail-gateway/rules/{id}`, method: 'DELETE' },
+        setStatus: { url: `${prefix}/mail-gateway/rules/{id}/status`, method: 'POST' },
+        sort: { url: `${prefix}/mail-gateway/rules/sort`, method: 'POST' },
+        test: { url: `${prefix}/mail-gateway/rules/test`, method: 'POST' }
+      },
+      ruleLog: {
+        list: { url: `${prefix}/mail-gateway/rule-logs`, method: 'GET' }
+      },
+      action: {
+        list: { url: `${prefix}/mail-gateway/actions`, method: 'GET' }
+      },
+      templateCategory: {
+        list: { url: `${prefix}/mail-gateway/template-categories`, method: 'GET' },
+        create: { url: `${prefix}/mail-gateway/template-categories`, method: 'POST' },
+        save: { url: `${prefix}/mail-gateway/template-categories/{id}`, method: 'PUT' },
+        remove: { url: `${prefix}/mail-gateway/template-categories/{id}`, method: 'DELETE' },
+        sort: { url: `${prefix}/mail-gateway/template-categories/sort`, method: 'POST' }
+      },
+      template: {
+        list: { url: `${prefix}/mail-gateway/templates`, method: 'GET' },
+        detail: { url: `${prefix}/mail-gateway/templates/{id}`, method: 'GET' },
+        create: { url: `${prefix}/mail-gateway/templates`, method: 'POST' },
+        save: { url: `${prefix}/mail-gateway/templates/{id}`, method: 'PUT' },
+        remove: { url: `${prefix}/mail-gateway/templates/{id}`, method: 'DELETE' },
+        setStatus: { url: `${prefix}/mail-gateway/templates/{id}/status`, method: 'POST' },
+        copy: { url: `${prefix}/mail-gateway/templates/{id}/copy`, method: 'POST' },
+        render: { url: `${prefix}/mail-gateway/templates/render`, method: 'POST' }
+      },
+      contact: {
+        list: { url: `${prefix}/mail-gateway/contacts`, method: 'GET' },
+        create: { url: `${prefix}/mail-gateway/contacts`, method: 'POST' },
+        save: { url: `${prefix}/mail-gateway/contacts/{id}`, method: 'PUT' },
+        remove: { url: `${prefix}/mail-gateway/contacts/{id}`, method: 'DELETE' }
+      }
     }
   };
 };

@@ -21,6 +21,8 @@ import deadLetterList from './dead-letter-list.json';
 import traceList from './trace-list.json';
 import messageMangerData from './message-manger-data.json';
 import oidcData from './oidc-data.json';
+import mailGatewayMock, { mailGatewayData } from './mail-gateway';
+import { enums as mailGatewayEnums } from '@components/MailGateway';
 
 export {
   taskList,
@@ -35,7 +37,8 @@ export {
   messageQueueList,
   deadLetterList,
   traceList,
-  messageMangerData
+  messageMangerData,
+  mailGatewayData
 };
 
 const collectOrgSubtreeIds = (orgs, rootId) => {
@@ -1574,7 +1577,8 @@ const apis = merge({}, getApis(), {
         loader: ({ data }) => ({ grants: 3, sessions: data?.logout ? oidcData.sessionList.length : 0 })
       }
     }
-  }
+  },
+  mailGateway: mailGatewayMock
 });
 
 const mockOidcState = { tenantId: 'tenant-1' };
@@ -1598,7 +1602,7 @@ const mockOidcClient = {
   getIdTokenClaims: () => null
 };
 
-const enums = Object.assign({}, taskEnums, intlAdminEnums, {
+const enums = Object.assign({}, taskEnums, intlAdminEnums, mailGatewayEnums, {
   taskType: [
     { value: 'interview_report', description: '面试报告' },
     { value: 'data_export', description: '数据导出' },

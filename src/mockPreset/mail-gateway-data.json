@@ -1,0 +1,1051 @@
+{
+  "accounts": [
+    {
+      "id": "acc-1",
+      "name": "客服中心",
+      "address": "service@leapin-ai.com",
+      "username": "service@leapin-ai.com",
+      "imap": {
+        "host": "imap.exmail.qq.com",
+        "port": 993,
+        "secure": true
+      },
+      "smtp": {
+        "host": "smtp.exmail.qq.com",
+        "port": 465,
+        "secure": true
+      },
+      "status": "enabled",
+      "syncState": {
+        "uidValidity": "1712034001",
+        "lastUid": 2381
+      },
+      "lastSyncAt": "2026-10-15T09:35:00+08:00",
+      "lastError": null,
+      "createdAt": "2026-09-01T10:00:00+08:00"
+    },
+    {
+      "id": "acc-2",
+      "name": "财务部",
+      "address": "finance@leapin-ai.com",
+      "username": "finance@leapin-ai.com",
+      "imap": {
+        "host": "imap.exmail.qq.com",
+        "port": 993,
+        "secure": true
+      },
+      "smtp": {
+        "host": "smtp.exmail.qq.com",
+        "port": 465,
+        "secure": true
+      },
+      "status": "enabled",
+      "syncState": {
+        "uidValidity": "1712034002",
+        "lastUid": 516
+      },
+      "lastSyncAt": "2026-10-15T09:35:00+08:00",
+      "lastError": null,
+      "createdAt": "2026-09-03T14:20:00+08:00"
+    },
+    {
+      "id": "acc-3",
+      "name": "招聘邮箱",
+      "address": "hr@leapin-ai.com",
+      "username": "hr@leapin-ai.com",
+      "imap": {
+        "host": "imap.exmail.qq.com",
+        "port": 993,
+        "secure": true
+      },
+      "smtp": {
+        "host": "smtp.exmail.qq.com",
+        "port": 465,
+        "secure": true
+      },
+      "status": "disabled",
+      "syncState": {
+        "uidValidity": "1712034003",
+        "lastUid": 88
+      },
+      "lastSyncAt": "2026-10-10T18:00:00+08:00",
+      "lastError": "Invalid login: 535 Error: authentication failed",
+      "createdAt": "2026-09-10T09:00:00+08:00"
+    }
+  ],
+  "labels": [
+    {
+      "id": "lb-1",
+      "accountId": null,
+      "name": "发票",
+      "color": "#fa8c16",
+      "sort": 0
+    },
+    {
+      "id": "lb-2",
+      "accountId": "acc-1",
+      "name": "客户咨询",
+      "color": "#1677ff",
+      "sort": 1
+    },
+    {
+      "id": "lb-3",
+      "accountId": null,
+      "name": "紧急",
+      "color": "#f5222d",
+      "sort": 2
+    },
+    {
+      "id": "lb-4",
+      "accountId": "acc-3",
+      "name": "简历",
+      "color": "#52c41a",
+      "sort": 3
+    }
+  ],
+  "mails": [
+    {
+      "id": "mail-1",
+      "accountId": "acc-1",
+      "folder": "inbox",
+      "messageId": "<20261015091200.1@customer.example.com>",
+      "from": [
+        {
+          "name": "王晓明",
+          "address": "wangxm@customer.example.com"
+        }
+      ],
+      "to": [
+        {
+          "name": "客服中心",
+          "address": "service@leapin-ai.com"
+        }
+      ],
+      "cc": [],
+      "subject": "咨询：企业版账号如何批量导入员工？",
+      "html": "<p>您好，</p><p>我们公司刚开通企业版，想了解如何批量导入 300 名员工账号，是否支持 Excel 模板？</p><p>谢谢！<br/>王晓明 · 采购部</p>",
+      "date": "2026-10-15T09:12:00+08:00",
+      "isRead": false,
+      "isStarred": false,
+      "attachments": [],
+      "labelIds": ["lb-2"]
+    },
+    {
+      "id": "mail-2",
+      "accountId": "acc-1",
+      "folder": "inbox",
+      "messageId": "<20261015083000.2@ops.example.com>",
+      "from": [
+        {
+          "name": "运维值班",
+          "address": "oncall@ops.example.com"
+        }
+      ],
+      "to": [
+        {
+          "name": "客服中心",
+          "address": "service@leapin-ai.com"
+        }
+      ],
+      "cc": [
+        {
+          "name": "技术支持",
+          "address": "support@leapin-ai.com"
+        }
+      ],
+      "subject": "【紧急】客户反馈登录页面无法打开",
+      "html": "<p>多名客户反馈 8:20 起登录页面返回 502，请尽快确认影响范围。</p><ul><li>影响区域：华东</li><li>首次报告：08:21</li></ul>",
+      "date": "2026-10-15T08:30:00+08:00",
+      "isRead": false,
+      "isStarred": true,
+      "attachments": [
+        {
+          "filename": "error-screenshot.png",
+          "contentType": "image/png",
+          "size": 182344
+        }
+      ],
+      "labelIds": ["lb-3"]
+    },
+    {
+      "id": "mail-3",
+      "accountId": "acc-1",
+      "folder": "inbox",
+      "messageId": "<20261014163000.3@invoice.example.com>",
+      "from": [
+        {
+          "name": "云服务账单",
+          "address": "billing@invoice.example.com"
+        }
+      ],
+      "to": [
+        {
+          "name": "客服中心",
+          "address": "service@leapin-ai.com"
+        }
+      ],
+      "cc": [],
+      "subject": "2026 年 9 月电子发票已开具",
+      "html": "<p>尊敬的客户，您 2026 年 9 月的电子发票已开具，金额 ¥12,800.00，请查收附件。</p>",
+      "date": "2026-10-14T16:30:00+08:00",
+      "isRead": true,
+      "isStarred": false,
+      "attachments": [
+        {
+          "filename": "发票-202609.pdf",
+          "contentType": "application/pdf",
+          "size": 98213
+        }
+      ],
+      "labelIds": ["lb-1"]
+    },
+    {
+      "id": "mail-4",
+      "accountId": "acc-1",
+      "folder": "inbox",
+      "messageId": "<20261013102000.4@partner.example.com>",
+      "from": [
+        {
+          "name": "李静",
+          "address": "lijing@partner.example.com"
+        }
+      ],
+      "to": [
+        {
+          "name": "客服中心",
+          "address": "service@leapin-ai.com"
+        }
+      ],
+      "cc": [],
+      "subject": "合作方案的报价确认",
+      "html": "<p>您好，附件是我们讨论的年度合作报价，请确认后回复，我们安排合同流程。</p><p>李静</p>",
+      "date": "2026-10-13T10:20:00+08:00",
+      "isRead": true,
+      "isStarred": true,
+      "attachments": [
+        {
+          "filename": "年度合作报价.xlsx",
+          "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "size": 45120
+        }
+      ],
+      "labelIds": []
+    },
+    {
+      "id": "mail-5",
+      "accountId": "acc-2",
+      "folder": "inbox",
+      "messageId": "<20261015080000.5@invoice.example.com>",
+      "from": [
+        {
+          "name": "差旅平台",
+          "address": "invoice@trip.example.com"
+        }
+      ],
+      "to": [
+        {
+          "name": "财务部",
+          "address": "finance@leapin-ai.com"
+        }
+      ],
+      "cc": [],
+      "subject": "10 月差旅发票汇总（共 18 张）",
+      "html": "<p>本月差旅发票共 18 张，合计 ¥36,420.50，明细见附件。</p>",
+      "date": "2026-10-15T08:00:00+08:00",
+      "isRead": false,
+      "isStarred": false,
+      "attachments": [
+        {
+          "filename": "差旅发票汇总.zip",
+          "contentType": "application/zip",
+          "size": 2048000
+        }
+      ],
+      "labelIds": ["lb-1"]
+    },
+    {
+      "id": "mail-6",
+      "accountId": "acc-1",
+      "folder": "sent",
+      "messageId": "<20261014110000.6@leapin-ai.com>",
+      "inReplyTo": "<20261014100000.0@customer.example.com>",
+      "from": [
+        {
+          "name": "客服中心",
+          "address": "service@leapin-ai.com"
+        }
+      ],
+      "to": [
+        {
+          "name": "赵磊",
+          "address": "zhaolei@customer.example.com"
+        }
+      ],
+      "cc": [],
+      "subject": "Re: 发票抬头修改",
+      "html": "<p>赵先生您好，发票抬头已修改为「上海星河科技有限公司」，新发票会在 3 个工作日内重新开具。</p>",
+      "date": "2026-10-14T11:00:00+08:00",
+      "isRead": true,
+      "isStarred": false,
+      "attachments": [],
+      "labelIds": []
+    },
+    {
+      "id": "mail-7",
+      "accountId": "acc-1",
+      "folder": "sent",
+      "messageId": "<20261013150000.7@leapin-ai.com>",
+      "from": [
+        {
+          "name": "客服中心",
+          "address": "service@leapin-ai.com"
+        }
+      ],
+      "to": [
+        {
+          "name": "全体客户",
+          "address": "customers@leapin-ai.com"
+        }
+      ],
+      "cc": [],
+      "subject": "系统维护通知：10 月 18 日 00:00-02:00",
+      "html": "<p>尊敬的客户，我们将于 10 月 18 日 00:00-02:00 进行系统升级，期间服务可能短暂中断。</p>",
+      "date": "2026-10-13T15:00:00+08:00",
+      "isRead": true,
+      "isStarred": false,
+      "attachments": [],
+      "labelIds": []
+    },
+    {
+      "id": "mail-8",
+      "accountId": "acc-1",
+      "folder": "draft",
+      "from": [
+        {
+          "name": "客服中心",
+          "address": "service@leapin-ai.com"
+        }
+      ],
+      "to": [
+        {
+          "name": "王晓明",
+          "address": "wangxm@customer.example.com"
+        }
+      ],
+      "cc": [],
+      "subject": "Re: 咨询：企业版账号如何批量导入员工？",
+      "html": "<p>王先生您好，企业版支持通过 Excel 模板批量导入，操作路径：</p><p>（待补充）</p>",
+      "date": "2026-10-15T09:30:00+08:00",
+      "isRead": true,
+      "isStarred": false,
+      "attachments": [],
+      "labelIds": []
+    },
+    {
+      "id": "mail-9",
+      "accountId": "acc-1",
+      "folder": "trash",
+      "originFolder": "inbox",
+      "messageId": "<20261012090000.9@promo.example.com>",
+      "from": [
+        {
+          "name": "营销推广",
+          "address": "no-reply@promo.example.com"
+        }
+      ],
+      "to": [
+        {
+          "name": "客服中心",
+          "address": "service@leapin-ai.com"
+        }
+      ],
+      "cc": [],
+      "subject": "限时优惠：企业云盘 5 折",
+      "html": "<p>本周限时优惠，企业云盘年付 5 折。</p>",
+      "date": "2026-10-12T09:00:00+08:00",
+      "isRead": true,
+      "isStarred": false,
+      "attachments": [],
+      "labelIds": []
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule-1",
+      "name": "发票归档并通知财务系统",
+      "description": "主题含“发票”或来自账单域名的邮件打上发票标签，并推送到财务系统",
+      "direction": "receive",
+      "accountIds": [],
+      "conditions": {
+        "match": "any",
+        "items": [
+          {
+            "field": "subject",
+            "operator": "contains",
+            "value": "发票"
+          },
+          {
+            "field": "from",
+            "operator": "endsWith",
+            "value": "@invoice.example.com"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "addLabel",
+          "params": {
+            "labelIds": ["lb-1"]
+          }
+        },
+        {
+          "type": "webhook",
+          "params": {
+            "url": "https://finance.leapin-ai.com/hooks/mail",
+            "secret": "fin-2026",
+            "timeout": 10000
+          }
+        }
+      ],
+      "priority": 0,
+      "stopProcessing": true,
+      "status": "enabled",
+      "createdAt": "2026-09-05T10:00:00+08:00"
+    },
+    {
+      "id": "rule-2",
+      "name": "客服邮箱自动回复",
+      "description": "客户来信自动回复受理通知，并标记为客户咨询",
+      "direction": "receive",
+      "accountIds": ["acc-1"],
+      "conditions": {
+        "match": "all",
+        "items": [
+          {
+            "field": "from",
+            "operator": "notContains",
+            "value": "@leapin-ai.com"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "autoReply",
+          "params": {
+            "templateId": "tpl-1",
+            "subject": "Re: {{mail.subject}}",
+            "intervalHours": 24
+          }
+        },
+        {
+          "type": "addLabel",
+          "params": {
+            "labelIds": ["lb-2"]
+          }
+        }
+      ],
+      "priority": 1,
+      "stopProcessing": false,
+      "status": "enabled",
+      "createdAt": "2026-09-06T10:00:00+08:00"
+    },
+    {
+      "id": "rule-3",
+      "name": "紧急邮件转发值班主管",
+      "description": "主题含“紧急”的邮件加星标并转发给值班主管",
+      "direction": "receive",
+      "accountIds": [],
+      "conditions": {
+        "match": "all",
+        "items": [
+          {
+            "field": "subject",
+            "operator": "regex",
+            "value": "紧急|urgent"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "addLabel",
+          "params": {
+            "labelIds": ["lb-3"]
+          }
+        },
+        {
+          "type": "star",
+          "params": {}
+        },
+        {
+          "type": "forward",
+          "params": {
+            "to": ["duty-manager@leapin-ai.com"],
+            "comment": "请优先处理"
+          }
+        }
+      ],
+      "priority": 2,
+      "stopProcessing": false,
+      "status": "enabled",
+      "createdAt": "2026-09-08T10:00:00+08:00"
+    },
+    {
+      "id": "rule-4",
+      "name": "外发邮件同步 CRM",
+      "description": "客服发出的邮件同步到 CRM 客户跟进记录",
+      "direction": "send",
+      "accountIds": ["acc-1"],
+      "conditions": {
+        "match": "all",
+        "items": []
+      },
+      "actions": [
+        {
+          "type": "webhook",
+          "params": {
+            "url": "https://crm.leapin-ai.com/hooks/mail-sent",
+            "timeout": 5000
+          }
+        }
+      ],
+      "priority": 3,
+      "stopProcessing": false,
+      "status": "disabled",
+      "createdAt": "2026-09-12T10:00:00+08:00"
+    }
+  ],
+  "ruleLogs": [
+    {
+      "id": "log-1",
+      "ruleId": "rule-3",
+      "mailId": "mail-2",
+      "accountId": "acc-1",
+      "direction": "receive",
+      "status": "success",
+      "results": [
+        {
+          "type": "addLabel",
+          "success": true,
+          "output": {
+            "labelIds": ["lb-3"]
+          },
+          "logs": []
+        },
+        {
+          "type": "star",
+          "success": true,
+          "logs": []
+        },
+        {
+          "type": "forward",
+          "success": true,
+          "output": {
+            "messageId": "<20261015083005.f@leapin-ai.com>"
+          },
+          "logs": []
+        }
+      ],
+      "executionTime": 812,
+      "createdAt": "2026-10-15T08:30:05+08:00"
+    },
+    {
+      "id": "log-2",
+      "ruleId": "rule-1",
+      "mailId": "mail-5",
+      "accountId": "acc-2",
+      "direction": "receive",
+      "status": "partial",
+      "results": [
+        {
+          "type": "addLabel",
+          "success": true,
+          "output": {
+            "labelIds": ["lb-1"]
+          },
+          "logs": []
+        },
+        {
+          "type": "webhook",
+          "success": false,
+          "error": "Webhook 响应 503 Service Unavailable",
+          "logs": []
+        }
+      ],
+      "executionTime": 10023,
+      "createdAt": "2026-10-15T08:00:12+08:00"
+    },
+    {
+      "id": "log-3",
+      "ruleId": "rule-2",
+      "mailId": "mail-1",
+      "accountId": "acc-1",
+      "direction": "receive",
+      "status": "success",
+      "results": [
+        {
+          "type": "autoReply",
+          "success": true,
+          "output": {
+            "sent": true
+          },
+          "logs": []
+        },
+        {
+          "type": "addLabel",
+          "success": true,
+          "output": {
+            "labelIds": ["lb-2"]
+          },
+          "logs": []
+        }
+      ],
+      "executionTime": 645,
+      "createdAt": "2026-10-15T09:12:08+08:00"
+    },
+    {
+      "id": "log-4",
+      "ruleId": "rule-2",
+      "mailId": "mail-9",
+      "accountId": "acc-1",
+      "direction": "receive",
+      "status": "success",
+      "results": [
+        {
+          "type": "autoReply",
+          "success": true,
+          "output": {
+            "skipped": true,
+            "reason": "no-reply 发件人"
+          },
+          "logs": ["跳过自动回复：no-reply 发件人"]
+        },
+        {
+          "type": "addLabel",
+          "success": true,
+          "output": {
+            "labelIds": ["lb-2"]
+          },
+          "logs": []
+        }
+      ],
+      "executionTime": 21,
+      "createdAt": "2026-10-12T09:00:06+08:00"
+    }
+  ],
+  "actions": [
+    {
+      "type": "addLabel",
+      "label": "打标签",
+      "description": "给邮件添加标签，收件箱中按标签显示为文件夹",
+      "directions": ["receive", "send"],
+      "builtIn": true,
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "id": "params-labelIds",
+                "type": "MailLabelSelect",
+                "name": "labelIds",
+                "label": "标签",
+                "rule": "REQ"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "markRead",
+      "label": "标为已读",
+      "description": "",
+      "directions": ["receive"],
+      "builtIn": true,
+      "formSchema": null
+    },
+    {
+      "type": "star",
+      "label": "加星标",
+      "description": "",
+      "directions": ["receive", "send"],
+      "builtIn": true,
+      "formSchema": null
+    },
+    {
+      "type": "moveToTrash",
+      "label": "移入回收站",
+      "description": "",
+      "directions": ["receive", "send"],
+      "builtIn": true,
+      "formSchema": null
+    },
+    {
+      "type": "autoReply",
+      "label": "自动回复",
+      "description": "用当前邮箱回复发件人。可选择邮件模版或直接填写回复内容，支持 {{mail.subject}}、{{mail.from[0].name}}、{{account.name}} 等变量；自动跳过自动生成邮件、邮件列表和 no-reply 发件人",
+      "directions": ["receive"],
+      "builtIn": true,
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "id": "params-templateId",
+                "type": "MailTemplateSelect",
+                "name": "templateId",
+                "label": "邮件模版",
+                "description": "选择模版后使用模版的主题与正文，模版主题为空时使用下方回复主题"
+              },
+              {
+                "id": "params-subject",
+                "type": "MailTemplateText",
+                "name": "subject",
+                "label": "回复主题",
+                "props": {
+                  "defaultValue": "Re: {{mail.subject}}"
+                }
+              },
+              {
+                "id": "params-html",
+                "type": "MailEditor",
+                "name": "html",
+                "label": "回复内容",
+                "description": "未选择模版时必填"
+              },
+              {
+                "id": "params-intervalHours",
+                "type": "InputNumber",
+                "name": "intervalHours",
+                "label": "同一发件人最短回复间隔（小时）",
+                "props": {
+                  "defaultValue": 24,
+                  "min": 0
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "forward",
+      "label": "转发",
+      "description": "用当前邮箱把邮件（含附件）转发给指定地址",
+      "directions": ["receive", "send"],
+      "builtIn": true,
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "id": "params-to",
+                "type": "MailContactSelect",
+                "name": "to",
+                "label": "转发给",
+                "rule": "REQ"
+              },
+              {
+                "id": "params-comment",
+                "type": "TextArea",
+                "name": "comment",
+                "label": "附言",
+                "props": {
+                  "rows": 3
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "webhook",
+      "label": "调用 Webhook",
+      "description": "POST JSON 到指定地址，可选用 secret 对请求体做 HMAC-SHA256 签名（请求头 X-Mail-Gateway-Signature）",
+      "directions": ["receive", "send"],
+      "builtIn": true,
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "id": "params-url",
+                "type": "Input",
+                "name": "url",
+                "label": "地址",
+                "rule": "REQ"
+              },
+              {
+                "id": "params-secret",
+                "type": "Password",
+                "name": "secret",
+                "label": "签名密钥"
+              },
+              {
+                "id": "params-headers",
+                "type": "MailJson",
+                "name": "headers",
+                "label": "自定义请求头",
+                "description": "键值对 JSON，如 {\"Authorization\": \"Bearer xxx\"}",
+                "props": {
+                  "defaultValue": {
+                    "Content-Type": "application/json"
+                  }
+                }
+              },
+              {
+                "id": "params-timeout",
+                "type": "InputNumber",
+                "name": "timeout",
+                "label": "超时（毫秒）",
+                "props": {
+                  "defaultValue": 10000,
+                  "min": 0
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "customActions": [
+    {
+      "type": "createTicket",
+      "label": "创建售后工单",
+      "description": "宿主系统注册的动作：收到客户邮件后在工单系统创建售后工单，邮件主题作为工单标题",
+      "directions": ["receive"],
+      "builtIn": false,
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "id": "params-queue",
+                "type": "TicketQueue",
+                "name": "queue",
+                "label": "工单队列",
+                "rule": "REQ",
+                "description": "TicketQueue 是宿主通过 FormCreator preset 扩展的字段类型",
+                "props": {
+                  "defaultValue": "after-sale"
+                }
+              },
+              {
+                "id": "params-level",
+                "type": "Select",
+                "name": "level",
+                "label": "紧急程度",
+                "props": {
+                  "defaultValue": "normal",
+                  "options": [
+                    {
+                      "label": "普通",
+                      "value": "normal"
+                    },
+                    {
+                      "label": "紧急",
+                      "value": "urgent"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "params-notify",
+                "type": "Switch",
+                "name": "notify",
+                "label": "通知负责人",
+                "props": {
+                  "defaultValue": true
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "templateCategories": [
+    {
+      "id": "tc-1",
+      "name": "客服回复",
+      "description": "客户咨询、投诉的标准回复",
+      "sort": 0,
+      "createdAt": "2026-09-01T10:00:00+08:00"
+    },
+    {
+      "id": "tc-2",
+      "name": "财务通知",
+      "description": "发票、对账、付款相关通知",
+      "sort": 1,
+      "createdAt": "2026-09-01T10:05:00+08:00"
+    },
+    {
+      "id": "tc-3",
+      "name": "招聘沟通",
+      "description": "面试邀请、录用通知等候选人沟通",
+      "sort": 2,
+      "createdAt": "2026-09-01T10:10:00+08:00"
+    }
+  ],
+  "templates": [
+    {
+      "id": "tpl-1",
+      "categoryId": "tc-1",
+      "name": "来信受理通知",
+      "subject": "已收到：{{mail.subject}}",
+      "html": "<p>{{mail.from[0].name}} 您好：</p><p>我们已收到您的来信，客服将在 <strong>1 个工作日</strong>内回复您。</p><p>如有紧急问题，请拨打客服热线 400-820-1234。</p><p>{{account.name}}</p>",
+      "description": "自动回复规则「客服邮箱自动回复」在使用",
+      "status": "enabled",
+      "sort": 0,
+      "createdAt": "2026-09-02T09:00:00+08:00"
+    },
+    {
+      "id": "tpl-2",
+      "categoryId": "tc-1",
+      "name": "问题已解决回访",
+      "subject": "Re: {{mail.subject}}",
+      "html": "<p>{{mail.from[0].name}} 您好：</p><p>您反馈的问题已处理完成，请确认是否恢复正常。如仍有疑问，直接回复本邮件即可。</p><p>感谢您对我们的支持！</p><p>{{account.name}}</p>",
+      "description": "工单关闭前发送给客户",
+      "status": "enabled",
+      "sort": 1,
+      "createdAt": "2026-09-03T09:00:00+08:00"
+    },
+    {
+      "id": "tpl-3",
+      "categoryId": "tc-2",
+      "name": "发票已开具",
+      "subject": "【发票】{{mail.subject}} 已开具",
+      "html": "<p>您好：</p><p>贵司申请的发票已开具，电子发票见附件，纸质发票将于 3 个工作日内寄出。</p><table border=\"1\" cellpadding=\"6\"><tr><td>开票主体</td><td>上海领平智能科技有限公司</td></tr><tr><td>寄送方式</td><td>顺丰快递</td></tr></table><p>{{account.name}}</p>",
+      "description": "回复客户开票申请",
+      "status": "enabled",
+      "sort": 0,
+      "createdAt": "2026-09-05T14:00:00+08:00"
+    },
+    {
+      "id": "tpl-4",
+      "categoryId": "tc-3",
+      "name": "面试邀请",
+      "subject": "面试邀请 - 领平智能",
+      "html": "<p>{{mail.from[0].name}} 您好：</p><p>感谢您投递简历，诚邀您参加面试：</p><ul><li>时间：请回复可面试的时间段</li><li>地点：上海市徐汇区漕河泾开发区 A 座 12 层</li></ul><p>期待与您见面！</p><p>{{account.name}}</p>",
+      "description": "",
+      "status": "enabled",
+      "sort": 0,
+      "createdAt": "2026-09-10T11:00:00+08:00"
+    },
+    {
+      "id": "tpl-5",
+      "categoryId": null,
+      "name": "国庆放假通知",
+      "subject": "国庆假期安排通知",
+      "html": "<p>您好：</p><p>10 月 1 日至 10 月 7 日放假，期间邮件将于 10 月 8 日起统一处理。</p><p>{{account.name}}</p>",
+      "description": "节后可停用",
+      "status": "disabled",
+      "sort": 0,
+      "createdAt": "2026-09-25T16:00:00+08:00"
+    }
+  ],
+  "ruleOptions": {
+    "fields": ["from", "to", "cc", "subject", "text", "hasAttachment", "accountId"],
+    "operators": ["contains", "notContains", "equals", "startsWith", "endsWith", "regex"]
+  },
+  "contacts": [
+    {
+      "id": "ct-1",
+      "name": "王晓明",
+      "address": "wangxm@customer.example.com",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=wangxm",
+      "remark": "企业版客户 · 采购部",
+      "createdAt": "2026-10-10T10:00:00.000Z"
+    },
+    {
+      "id": "ct-2",
+      "name": "李静",
+      "address": "lijing@partner.example.com",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=lijing",
+      "remark": "渠道合作伙伴",
+      "createdAt": "2026-10-09T10:00:00.000Z"
+    },
+    {
+      "id": "ct-3",
+      "name": "财务部",
+      "address": "finance@leapin-ai.com",
+      "remark": "",
+      "createdAt": "2026-10-08T10:00:00.000Z"
+    },
+    {
+      "id": "ct-4",
+      "name": "运维值班",
+      "address": "oncall@ops.example.com",
+      "remark": "紧急故障通知",
+      "createdAt": "2026-10-07T10:00:00.000Z"
+    }
+  ],
+  "customConditions": [
+    {
+      "type": "aiJudge",
+      "label": "AI 判断",
+      "description": "宿主系统注册的条件：把邮件主题和正文交给大模型，按判断要求返回是否命中及理由（示例中用关键词模拟）",
+      "directions": ["receive", "send"],
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "id": "params-prompt",
+                "type": "TextArea",
+                "name": "prompt",
+                "label": "判断要求",
+                "rule": "REQ",
+                "props": {
+                  "placeholder": "例如：这封邮件是否是客户投诉或退款申请？",
+                  "autoSize": {
+                    "minRows": 2,
+                    "maxRows": 6
+                  }
+                }
+              },
+              {
+                "id": "params-scope",
+                "type": "Select",
+                "name": "scope",
+                "label": "判断范围",
+                "props": {
+                  "defaultValue": "all",
+                  "options": [
+                    {
+                      "label": "主题 + 正文",
+                      "value": "all"
+                    },
+                    {
+                      "label": "仅主题",
+                      "value": "subject"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
