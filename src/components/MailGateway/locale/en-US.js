@@ -213,6 +213,7 @@ const locale = {
   LogSuccess: 'Success',
   LogPartial: 'Partial',
   LogFailed: 'Failed',
+  Reexecute: 'Run again',
   TemplateManage: 'Templates',
   TemplateCategoryManage: 'Template Categories',
   Template: 'Template',

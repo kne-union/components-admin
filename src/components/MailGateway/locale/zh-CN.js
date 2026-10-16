@@ -213,6 +213,7 @@ const locale = {
   LogSuccess: '成功',
   LogPartial: '部分成功',
   LogFailed: '失败',
+  Reexecute: '重新执行',
   TemplateManage: '邮件模版',
   TemplateCategoryManage: '模版分类',
   Template: '邮件模版',
