@@ -1023,7 +1023,13 @@ const apis = merge({}, getApis(), {
         }
         return 'https://picsum.photos/200/200';
       }
-    }
+    },
+    upload: async ({ file }) => ({
+      data: {
+        code: 0,
+        data: { id: URL.createObjectURL(file), filename: file.name, contentType: file.type, size: file.size }
+      }
+    })
   },
   tenantAdmin: {
     list: {

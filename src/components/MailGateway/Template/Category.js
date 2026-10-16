@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useIntl } from '@kne/react-intl';
 import BizUnit from '@components/BizUnit';
 import withLocale from '../withLocale';
-import Menu from '../Menu';
+import { useBizUnitPage } from '../PageLayout';
 import { getMoveSortActions } from '../MoveSortButton';
 import { createCardRenders, EnumTag } from '../CardList';
 import { getSystemLockedActions } from './ActionButtons';
@@ -46,11 +46,7 @@ const TemplateCategory = createWithRemoteLoader({
         isNext
         name="mail-gateway-template-category"
         allowKeywordSearch={false}
-        page={{
-          title: formatMessage({ id: 'TemplateCategoryManage' }),
-          menu: <Menu baseUrl={baseUrl} />,
-          ...pageProps
-        }}
+        {...useBizUnitPage({ title: formatMessage({ id: 'TemplateCategoryManage' }), baseUrl, pageProps })}
         titleExtra={<Button onClick={() => navigate(`${baseUrl}/templates`)}>{formatMessage({ id: 'BackToTemplates' })}</Button>}
         apis={{
           list: Object.assign({}, categoryApis.list, {

@@ -41,7 +41,7 @@ const Account = createWithRemoteLoader({
             })
         }}
         getColumns={() => getColumns({ formatMessage })}
-        getFormInner={({ action }) => <FormInner action={action} />}
+        getFormInner={({ action, data }) => <FormInner action={action} data={data} />}
         getActionList={props => [
           {
             ...props,

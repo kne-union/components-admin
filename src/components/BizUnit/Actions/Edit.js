@@ -60,7 +60,7 @@ const Edit = createWithRemoteLoader({
                       })
                     : options.formProps
                 ),
-                children: getFormInner({ apis, action: 'edit', options })
+                children: getFormInner({ apis, action: 'edit', options, data })
               },
               options.formModalProps,
               options.editFormModalProps

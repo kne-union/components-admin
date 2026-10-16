@@ -9,11 +9,27 @@ import { ContactsProvider, useGetContacts } from '../fields';
 
 const toAddressValue = list => (list || []).map(formatAddress);
 
+const splitAttachments = list => ({
+  uploaded: (list || []).filter(item => item.id),
+  pending: (list || []).filter(item => !item.id)
+});
+
+const toAttachment = ({ id, url, filename, originalName, contentType, size, mailId, index }) => ({
+  id,
+  url,
+  filename: filename || originalName,
+  contentType,
+  size,
+  mailId,
+  index
+});
+
 const getComposeData = ({ mode, mail, accountId, accountAddress, formatMessage }) => {
   if (!mail) {
     return { form: { accountId }, extra: {} };
   }
   if (mode === 'draft') {
+    const { uploaded, pending } = splitAttachments(mail.attachments);
     return {
       form: {
         accountId: mail.accountId,
@@ -21,17 +37,24 @@ const getComposeData = ({ mode, mail, accountId, accountAddress, formatMessage }
         cc: toAddressValue(mail.cc),
         bcc: toAddressValue(mail.bcc),
         subject: mail.subject,
-        html: mail.html
+        html: mail.html,
+        attachments: uploaded
       },
-      extra: { inReplyTo: mail.inReplyTo, references: mail.references, attachments: mail.attachments }
+      extra: { inReplyTo: mail.inReplyTo, references: mail.references, attachments: pending }
     };
   }
   if (mode === 'forward') {
+    const { uploaded, pending } = splitAttachments(
+      (mail.attachments || []).map((item, index) => (item.id || item.url ? item : Object.assign({}, item, { mailId: mail.id, index })))
+    );
     return {
-      form: { accountId: mail.accountId, subject: prefixSubject('Fwd:', mail.subject), html: quoteMail(mail, { formatMessage }) },
-      extra: {
-        attachments: (mail.attachments || []).map((item, index) => (item.id || item.url ? item : Object.assign({}, item, { mailId: mail.id, index })))
-      }
+      form: {
+        accountId: mail.accountId,
+        subject: prefixSubject('Fwd:', mail.subject),
+        html: quoteMail(mail, { formatMessage }),
+        attachments: uploaded
+      },
+      extra: { attachments: pending }
     };
   }
   const self = String(accountAddress || '').toLowerCase();
@@ -67,7 +90,10 @@ export const useOpenCompose = ({ FormInfo, usePreset, getContacts: getContactsPr
     ({ mode = 'new', mail, accountId, accountAddress, onSuccess } = {}) => {
       const draftId = mode === 'draft' ? mail?.id : null;
       const { form, extra } = getComposeData({ mode, mail, accountId, accountAddress, formatMessage });
-      const buildPayload = formData => Object.assign({}, extra, formData);
+      const buildPayload = formData =>
+        Object.assign({}, extra, formData, {
+          attachments: [...(extra.attachments || []), ...(formData.attachments || [])].map(toAttachment)
+        });
       const isQuote = Boolean(mail) && ['reply', 'replyAll', 'forward'].includes(mode);
       const titleId = { new: 'Compose', reply: 'Reply', replyAll: 'ReplyAll', forward: 'Forward', draft: 'EditDraft' }[mode] || 'Compose';
 
