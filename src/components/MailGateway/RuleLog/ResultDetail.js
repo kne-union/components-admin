@@ -44,9 +44,10 @@ export const ResultItem = ({ item, index, actionMap, formatMessage }) => (
 
 const canReexecute = status => status === 'failed' || status === 'partial';
 
-const LogDetailContent = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset']
-})(({ remoteModules, data, actionMap, ruleName, onSuccess }) => {
+const LogDetailContent = withLocale(
+  createWithRemoteLoader({
+    modules: ['components-core:Global@usePreset']
+  })(({ remoteModules, data, actionMap, ruleName, onSuccess }) => {
   const [usePreset] = remoteModules;
   const { ajax, apis } = usePreset();
   const { message } = App.useApp();
@@ -126,7 +127,8 @@ const LogDetailContent = createWithRemoteLoader({
       ))}
     </Flex>
   );
-});
+})
+);
 
 const ResultDetail = createWithRemoteLoader({
   modules: ['components-core:Modal@useModal']
