@@ -142,6 +142,7 @@ filter = {
 | action  | 操作类型   | `'create'` \| `'edit'` |
 | apis    | API 配置 | Object                 |
 | options | 配置选项   | Object                 |
+| data    | 当前行数据（仅 `edit`） | Object          |
 
 使用 `FormInfo` 及 `FormInfo.fields` 定义字段。
 

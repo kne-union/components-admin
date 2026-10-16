@@ -29,7 +29,7 @@ export const toAccountFormData = data => ({
 const FormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo', 'components-core:Global@usePreset']
 })(
-  withLocale(({ remoteModules, action }) => {
+  withLocale(({ remoteModules, action, data }) => {
     const [FormInfo, usePreset] = remoteModules;
     const { Input, Password, InputNumber, Switch } = FormInfo.fields;
     const { FormApiButton } = FormInfo;
@@ -37,6 +37,7 @@ const FormInner = createWithRemoteLoader({
     const { message, modal } = App.useApp();
     const { formatMessage } = useIntl();
     const isEdit = action === 'edit';
+    const accountId = isEdit ? data?.id : null;
 
     return (
       <>
@@ -81,8 +82,8 @@ const FormInner = createWithRemoteLoader({
           <FormApiButton
             onClick={async ({ openApi }) => {
               const formData = openApi.getFormData();
-              const payload = toAccountPayload(formData);
-              if (!payload.password || !payload.imap.host || !payload.smtp.host || !payload.username) {
+              const payload = Object.assign(toAccountPayload(formData), accountId ? { id: accountId } : null);
+              if ((!payload.password && !accountId) || !payload.imap.host || !payload.smtp.host || !payload.username) {
                 message.warning(formatMessage({ id: 'TestConnectionNeedFields' }));
                 return;
               }
