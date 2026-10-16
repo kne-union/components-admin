@@ -8,7 +8,7 @@ import enums from '../enums';
 import { useBizUnitPage } from '../PageLayout';
 import getColumns from './getColumns';
 import FormInner, { toAccountFormData, toAccountPayload } from './FormInner';
-import { SyncButton, TestConnectionButton } from './Actions';
+import { SyncButton, SyncHistoryButton, TestConnectionButton } from './Actions';
 import { createCardRenders, EnumTag, formatDateTime } from '../CardList';
 import style from '../style.module.scss';
 
@@ -52,6 +52,12 @@ const Account = createWithRemoteLoader({
             ...props,
             buttonComponent: SyncButton,
             children: formatMessage({ id: 'SyncNow' }),
+            hidden: props.data?.status !== 'enabled'
+          },
+          {
+            ...props,
+            buttonComponent: SyncHistoryButton,
+            children: formatMessage({ id: 'SyncHistory' }),
             hidden: props.data?.status !== 'enabled'
           }
         ]}

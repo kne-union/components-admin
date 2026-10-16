@@ -90,10 +90,12 @@ export const useOpenCompose = ({ FormInfo, usePreset, getContacts: getContactsPr
     ({ mode = 'new', mail, accountId, accountAddress, onSuccess } = {}) => {
       const draftId = mode === 'draft' ? mail?.id : null;
       const { form, extra } = getComposeData({ mode, mail, accountId, accountAddress, formatMessage });
-      const buildPayload = formData =>
-        Object.assign({}, extra, formData, {
-          attachments: [...(extra.attachments || []), ...(formData.attachments || [])].map(toAttachment)
+      const buildPayload = formData => {
+        const { __templateId, ...rest } = formData || {};
+        return Object.assign({}, extra, rest, {
+          attachments: [...(extra.attachments || []), ...(rest.attachments || [])].map(toAttachment)
         });
+      };
       const isQuote = Boolean(mail) && ['reply', 'replyAll', 'forward'].includes(mode);
       const titleId = { new: 'Compose', reply: 'Reply', replyAll: 'ReplyAll', forward: 'Forward', draft: 'EditDraft' }[mode] || 'Compose';
 

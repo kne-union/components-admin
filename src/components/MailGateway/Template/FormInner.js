@@ -1,5 +1,4 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { App } from 'antd';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 import { MailEditorField } from '../MailEditor';
@@ -15,13 +14,13 @@ export const toTemplatePayload = formData => ({
 });
 
 const FormInner = createWithRemoteLoader({
-  modules: ['components-core:FormInfo']
+  modules: ['components-core:FormInfo', 'components-core:Modal@useModal']
 })(
   withLocale(({ remoteModules }) => {
-    const [FormInfo] = remoteModules;
+    const [FormInfo, useModal] = remoteModules;
     const { Input, TextArea } = FormInfo.fields;
     const { FormApiButton } = FormInfo;
-    const { modal } = App.useApp();
+    const modal = useModal();
     const { formatMessage } = useIntl();
     return (
       <>
@@ -45,10 +44,10 @@ const FormInner = createWithRemoteLoader({
         <FormApiButton
           onClick={({ openApi }) => {
             const formData = openApi.getFormData();
-            modal.info({
+            modal({
               title: formatMessage({ id: 'TemplatePreview' }),
-              width: 760,
-              content: <TemplatePreview template={formData} />
+              children: <TemplatePreview template={formData} />,
+              footerButtons: [{ type: 'primary', children: formatMessage({ id: 'Close' }) }]
             });
           }}
         >

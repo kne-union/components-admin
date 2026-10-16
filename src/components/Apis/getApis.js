@@ -892,7 +892,8 @@ const getApis = options => {
         remove: { url: `${prefix}/mail-gateway/accounts/{id}`, method: 'DELETE' },
         setStatus: { url: `${prefix}/mail-gateway/accounts/{id}/status`, method: 'POST' },
         testConnection: { url: `${prefix}/mail-gateway/accounts/test-connection`, method: 'POST' },
-        sync: { url: `${prefix}/mail-gateway/accounts/{id}/sync`, method: 'POST' }
+        sync: { url: `${prefix}/mail-gateway/accounts/{id}/sync`, method: 'POST' },
+        syncHistory: { url: `${prefix}/mail-gateway/accounts/{id}/sync-history`, method: 'POST' }
       },
       mail: {
         list: { url: `${prefix}/mail-gateway/mails`, method: 'GET' },
@@ -929,7 +930,8 @@ const getApis = options => {
         remove: { url: `${prefix}/mail-gateway/rules/{id}`, method: 'DELETE' },
         setStatus: { url: `${prefix}/mail-gateway/rules/{id}/status`, method: 'POST' },
         sort: { url: `${prefix}/mail-gateway/rules/sort`, method: 'POST' },
-        test: { url: `${prefix}/mail-gateway/rules/test`, method: 'POST' }
+        test: { url: `${prefix}/mail-gateway/rules/test`, method: 'POST' },
+        execute: { url: `${prefix}/mail-gateway/rules/{id}/execute`, method: 'POST' }
       },
       ruleLog: {
         list: { url: `${prefix}/mail-gateway/rule-logs`, method: 'GET' }

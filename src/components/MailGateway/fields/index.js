@@ -66,29 +66,57 @@ export const useTemplateList = (apis, { categoryId, onlyEnabled = true } = {}) =
 };
 
 export const TemplateSelect = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset']
+  modules: ['components-core:FormInfo', 'components-core:Global@usePreset']
 })(
-  withLocale(({ remoteModules, placeholder, categoryId, onlyEnabled = true, ...props }) => {
-    const [usePreset] = remoteModules;
+  withLocale(({ remoteModules, placeholder, categoryId, onlyEnabled = true, value, onChange, ...props }) => {
+    const [FormInfo, usePreset] = remoteModules;
+    const SuperSelect = FormInfo.fields.SuperSelect.Field || FormInfo.fields.SuperSelect;
     const { apis } = usePreset();
     const { formatMessage } = useIntl();
-    const { list } = useTemplateList(apis, { categoryId, onlyEnabled });
-    const groups = list.reduce((result, item) => {
-      const key = item.category?.id ? String(item.category.id) : '';
-      if (!result.has(key)) {
-        result.set(key, { label: item.category?.name || formatMessage({ id: 'Uncategorized' }), options: [] });
+    const baseFilter = Object.assign({}, onlyEnabled ? { status: 'enabled' } : {}, categoryId ? { categoryId } : {});
+    // 表单层用 interceptor=object-output-value 取 id；此处须保留 {value,label} 才能回显文案
+    const normalizeValue = next => {
+      if (next == null || next === '') {
+        return undefined;
       }
-      result.get(key).options.push({ label: item.name, value: item.id, disabled: item.status !== 'enabled' });
-      return result;
-    }, new Map());
+      if (typeof next === 'object') {
+        const id = next.value ?? next.id;
+        if (id == null || id === '') {
+          return undefined;
+        }
+        return Object.assign({}, next, {
+          value: id,
+          label: next.label ?? next.name ?? String(id)
+        });
+      }
+      return { value: next, label: String(next) };
+    };
     return (
-      <Select
+      <SuperSelect
+        single
         allowClear
-        showSearch
-        optionFilterProp="label"
+        isPopup
         placeholder={placeholder || formatMessage({ id: 'SelectTemplate' })}
+        pagination={{ paramsType: 'params' }}
+        getSearchProps={({ searchText }) => ({
+          filter: Object.assign({}, baseFilter, searchText ? { keyword: searchText } : null)
+        })}
+        api={Object.assign({}, apis.mailGateway.template.list, {
+          params: { filter: baseFilter },
+          transformData: data =>
+            Object.assign({}, data, {
+              pageData: (data.pageData || []).map(item =>
+                Object.assign({}, item, {
+                  value: item.id,
+                  label: item.category?.name ? `${item.category.name} / ${item.name}` : item.name,
+                  disabled: onlyEnabled ? false : item.status !== 'enabled'
+                })
+              )
+            })
+        })}
+        value={normalizeValue(value)}
+        onChange={next => onChange && onChange(next == null || next === '' ? undefined : normalizeValue(next))}
         {...props}
-        options={Array.from(groups.values())}
       />
     );
   })

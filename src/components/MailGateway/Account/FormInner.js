@@ -27,14 +27,15 @@ export const toAccountFormData = data => ({
 });
 
 const FormInner = createWithRemoteLoader({
-  modules: ['components-core:FormInfo', 'components-core:Global@usePreset']
+  modules: ['components-core:FormInfo', 'components-core:Global@usePreset', 'components-core:Modal@useConfirmModal']
 })(
   withLocale(({ remoteModules, action, data }) => {
-    const [FormInfo, usePreset] = remoteModules;
+    const [FormInfo, usePreset, useConfirmModal] = remoteModules;
     const { Input, Password, InputNumber, Switch } = FormInfo.fields;
     const { FormApiButton } = FormInfo;
     const { ajax, apis } = usePreset();
-    const { message, modal } = App.useApp();
+    const { message } = App.useApp();
+    const confirmModal = useConfirmModal();
     const { formatMessage } = useIntl();
     const isEdit = action === 'edit';
     const accountId = isEdit ? data?.id : null;
@@ -91,7 +92,7 @@ const FormInner = createWithRemoteLoader({
               if (resData.code !== 0) {
                 return;
               }
-              showTestResult({ modal, formatMessage, result: resData.data });
+              showTestResult({ confirmModal, formatMessage, result: resData.data });
             }}
           >
             {formatMessage({ id: 'TestConnection' })}

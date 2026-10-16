@@ -70,7 +70,12 @@ const FormInner = createWithRemoteLoader({
               marks={{ 0: '0', 50: '50', 100: '100' }}
               tips={formatMessage({ id: 'PriorityTips' })}
             />,
-            <Switch name="stopProcessing" label={formatMessage({ id: 'StopProcessing' })} tips={formatMessage({ id: 'StopProcessingTips' })} />,
+            <Switch
+              name="stopProcessing"
+              label={formatMessage({ id: 'StopProcessing' })}
+              tips={formatMessage({ id: 'StopProcessingTips' })}
+              defaultValue={true}
+            />,
             <TextArea name="description" label={formatMessage({ id: 'Description' })} block />
           ]}
         />

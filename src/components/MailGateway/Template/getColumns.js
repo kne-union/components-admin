@@ -1,8 +1,24 @@
-const getColumns = ({ formatMessage }) => [
+import { Typography } from 'antd';
+
+const getColumns = ({ formatMessage, onPreview }) => [
   {
     name: 'name',
     title: formatMessage({ id: 'TemplateName' }),
-    renderType: 'main'
+    renderType: 'main',
+    // 点击模版名称打开预览（与操作列「预览」一致）
+    render: (value, { dataSource }) =>
+      typeof onPreview === 'function' ? (
+        <Typography.Link
+          onClick={e => {
+            e.stopPropagation();
+            onPreview(dataSource);
+          }}
+        >
+          {value}
+        </Typography.Link>
+      ) : (
+        value
+      )
   },
   {
     name: 'category',

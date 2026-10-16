@@ -10,22 +10,35 @@ export const isSystemLevel = data => Number(data?.level) === 0;
 export const getSystemLockedActions = data =>
   ['save', 'remove'].map(name => ({ name, reset: ({ hidden }) => ({ name, hidden: hidden || isSystemLevel(data) }) }));
 
-export const PreviewTemplateButton = withLocale(({ data, apis, onSuccess, options, getFormInner, fetchOptions, ...props }) => {
-  const { modal } = App.useApp();
-  const { formatMessage } = useIntl();
-  return (
-    <Button
-      {...props}
-      onClick={() => {
-        modal.info({
-          title: `${formatMessage({ id: 'TemplatePreview' })} - ${data.name}`,
-          width: 760,
-          content: <TemplatePreview template={data} />
-        });
-      }}
-    />
-  );
-});
+/** 打开模版预览弹窗（列表「预览」按钮与点击模版名称共用） */
+export const openTemplatePreview = ({ modal, formatMessage, template }) => {
+  if (!template) {
+    return;
+  }
+  modal({
+    title: `${formatMessage({ id: 'TemplatePreview' })} - ${template.name}`,
+    children: <TemplatePreview template={template} />,
+    footerButtons: [{ type: 'primary', children: formatMessage({ id: 'Close' }) }]
+  });
+};
+
+export const PreviewTemplateButton = createWithRemoteLoader({
+  modules: ['components-core:Modal@useModal']
+})(
+  withLocale(({ remoteModules, data, apis, onSuccess, options, getFormInner, fetchOptions, ...props }) => {
+    const [useModal] = remoteModules;
+    const modal = useModal();
+    const { formatMessage } = useIntl();
+    return (
+      <Button
+        {...props}
+        onClick={() => {
+          openTemplatePreview({ modal, formatMessage, template: data });
+        }}
+      />
+    );
+  })
+);
 
 export const CopyTemplateButton = createWithRemoteLoader({
   modules: ['components-core:LoadingButton', 'components-core:Global@usePreset']
