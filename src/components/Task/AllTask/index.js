@@ -15,14 +15,16 @@ const AllTask = createWithRemoteLoader({
     'components-core:TablePage@Table',
     'components-core:Global@usePreset',
     'components-core:Filter',
-    'components-core:Enum'
+    'components-core:Enum',
+    'components-core:Modal@useConfirmModal'
   ]
 })(
   withLocale(({ remoteModules, baseUrl, getManualTaskAction, pageProps = {} }) => {
-    const [TablePage, Table, usePreset, Filter, Enum] = remoteModules;
+    const [TablePage, Table, usePreset, Filter, Enum, useConfirmModal] = remoteModules;
     const { formatMessage } = useIntl();
     const { apis, ajax } = usePreset();
-    const { message, modal } = App.useApp();
+    const { message } = App.useApp();
+    const confirmModal = useConfirmModal();
     const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
     const ref = useRef(null);
@@ -53,9 +55,9 @@ const AllTask = createWithRemoteLoader({
         if (!taskIds?.length) {
           return;
         }
-        modal.confirm({
+        confirmModal({
           title: formatMessage({ id: 'ConfirmRetryTask' }),
-          onOk: async () => {
+          onConfirm: async () => {
             const { data: resData } = await ajax(
               Object.assign({}, apis.task.retry, {
                 data: { taskIds }
@@ -70,7 +72,7 @@ const AllTask = createWithRemoteLoader({
           }
         });
       },
-      [ajax, apis.task.retry, clearSelectedRows, formatMessage, message, modal]
+      [ajax, apis.task.retry, clearSelectedRows, confirmModal, formatMessage, message]
     );
 
     return (

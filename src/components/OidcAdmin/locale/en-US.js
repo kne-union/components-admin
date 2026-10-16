@@ -85,7 +85,8 @@ const locale = {
   RevokeTokensConfirm: 'The user will need to refresh tokens (sessions are kept for silent sign-in). Revoke now?',
   ForceLogout: 'Force Logout',
   ForceLogoutConfirm: 'This ends all sessions of the user and revokes all tokens. Continue?',
-  RevokeUserSuccess: 'Revoked {grants} grants and ended {sessions} sessions'
+  RevokeUserSuccess: 'Revoked {grants} grants and ended {sessions} sessions',
+  Close: 'Close'
 };
 
 export default locale;

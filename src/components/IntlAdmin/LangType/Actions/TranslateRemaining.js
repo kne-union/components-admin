@@ -9,12 +9,13 @@ const TRANSLATE_BATCH_SIZE = 50;
 const MAX_BATCH_ROUNDS = 500;
 
 const TranslateRemaining = createWithRemoteLoader({
-  modules: ['components-core:ConfirmButton', 'components-core:Global@usePreset']
+  modules: ['components-core:ConfirmButton', 'components-core:Global@usePreset', 'components-core:Modal@useModal']
 })(
   withLocale(({ remoteModules, data, namespace, onSuccess, apis, options, ...props }) => {
-    const [ConfirmButton, usePreset] = remoteModules;
+    const [ConfirmButton, usePreset, useModal] = remoteModules;
     const { ajax } = usePreset();
-    const { message, modal } = App.useApp();
+    const { message } = App.useApp();
+    const modal = useModal();
     const { formatMessage } = useIntl();
     const remainCount = Math.max(0, (data?.defaultEntryCount || 0) - (data?.entryCount || 0));
 

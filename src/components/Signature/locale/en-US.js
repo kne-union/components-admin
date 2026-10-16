@@ -46,7 +46,8 @@ const locale = {
   ConfirmDelete: 'Are you sure you want to delete {bizName}?',
 
   // Form rules
-  InputNumber: 'Please enter a number'
+  InputNumber: 'Please enter a number',
+  Close: 'Close'
 };
 
 export default locale;

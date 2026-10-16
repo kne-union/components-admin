@@ -1,5 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Tree, App, Card, Button, Space, Modal, Upload, Typography, Table, Divider, Checkbox, Tag, Badge, Tooltip } from 'antd';
+import { Flex, Tree, App, Card, Button, Space, Upload, Typography, Table, Divider, Checkbox, Tag, Badge, Tooltip } from 'antd';
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import OrgChart from '@kne/react-org-chart';
 import merge from 'lodash/merge';
@@ -569,7 +569,7 @@ const TreeOrg = ({ data, apis, onSuccess, onViewUsers, linkedSource, isMobile, c
 };
 
 const OrgInfo = createWithRemoteLoader({
-  modules: ['components-core:StateBar', 'components-core:Global@usePreset', 'components-core:Drawer@useDrawer']
+  modules: ['components-core:StateBar', 'components-core:Global@usePreset', 'components-core:Drawer@useDrawer', 'components-core:Modal']
 })(({
   remoteModules,
   data,
@@ -583,12 +583,11 @@ const OrgInfo = createWithRemoteLoader({
   thirdLoginSettingProps,
   collapseThreshold = DEFAULT_COLLAPSE_THRESHOLD
 }) => {
-  const [StateBar, usePreset, useDrawer] = remoteModules;
+  const [StateBar, usePreset, useDrawer, Modal] = remoteModules;
   const { ajax } = usePreset();
   const drawer = useDrawer();
   const [activeKey, setActiveKey] = useState('tree');
   const [importOpen, setImportOpen] = useState(false);
-  const [importLoading, setImportLoading] = useState(false);
   const [anchorOrgId, setAnchorOrgId] = useState(undefined);
   const [importFile, setImportFile] = useState(null);
   const [parsedRows, setParsedRows] = useState(null);
@@ -782,6 +781,15 @@ const OrgInfo = createWithRemoteLoader({
     return merge({}, apis.orgList, tenantId ? { params: Object.assign({ tenantId }, apis.orgList.params || {}) } : {});
   }, [apis?.orgList, tenantId]);
 
+  const closeImport = () => {
+    setImportOpen(false);
+    setImportFile(null);
+    setParsedRows(null);
+    setImportSelectedRowKeys([]);
+    setUploadKey(k => k + 1);
+    setAnchorOrgId(undefined);
+  };
+
   const handleImportSubmit = async () => {
     if (!parsedRows || !parsedRows.length) {
       message.warning(formatMessage({ id: 'ImportFileRequired' }));
@@ -806,45 +814,35 @@ const OrgInfo = createWithRemoteLoader({
       message.error(formatMessage({ id: 'ImportTenantIdMissing' }));
       return;
     }
-    setImportLoading(true);
-    try {
-      const body = { rows: rowsToSubmit };
-      if (anchorOrgId) {
-        body.parentOrgId = anchorOrgId;
-      }
-      if (isAdminBatchImport && tenantId) {
-        body.tenantId = tenantId;
-      }
-      const { data: resData } = await ajax(
-        merge({}, apis.import, {
-          data: body
-        })
-      );
-      if (resData.code !== 0) {
-        return;
-      }
-      const { createdOrgs, createdUsers, reusedUsers, rowCount } = resData.data;
-      message.success(
-        formatMessage(
-          { id: 'ImportOrgUsersSuccess' },
-          {
-            createdOrgs,
-            createdUsers,
-            reusedUsers,
-            rowCount
-          }
-        )
-      );
-      setImportOpen(false);
-      setImportFile(null);
-      setParsedRows(null);
-      setImportSelectedRowKeys([]);
-      setUploadKey(k => k + 1);
-      setAnchorOrgId(undefined);
-      onSuccess && onSuccess();
-    } finally {
-      setImportLoading(false);
+    const body = { rows: rowsToSubmit };
+    if (anchorOrgId) {
+      body.parentOrgId = anchorOrgId;
     }
+    if (isAdminBatchImport && tenantId) {
+      body.tenantId = tenantId;
+    }
+    const { data: resData } = await ajax(
+      merge({}, apis.import, {
+        data: body
+      })
+    );
+    if (resData.code !== 0) {
+      return;
+    }
+    const { createdOrgs, createdUsers, reusedUsers, rowCount } = resData.data;
+    message.success(
+      formatMessage(
+        { id: 'ImportOrgUsersSuccess' },
+        {
+          createdOrgs,
+          createdUsers,
+          reusedUsers,
+          rowCount
+        }
+      )
+    );
+    closeImport();
+    onSuccess && onSuccess();
   };
 
   return (
@@ -927,20 +925,17 @@ const OrgInfo = createWithRemoteLoader({
       <Modal
         title={formatMessage({ id: 'OrgExcelImport' })}
         open={importOpen}
-        onCancel={() => {
-          setImportOpen(false);
-          setImportFile(null);
-          setParsedRows(null);
-          setImportSelectedRowKeys([]);
-          setUploadKey(k => k + 1);
-          setAnchorOrgId(undefined);
-        }}
-        onOk={handleImportSubmit}
-        okText={formatMessage({ id: 'ImportConfirmSubmit' })}
-        okButtonProps={{
-          disabled: !parsedRows || !parsedRows.length || !importSelectedRowKeys.length
-        }}
-        confirmLoading={importLoading}
+        onClose={closeImport}
+        footerButtons={[
+          { children: formatMessage({ id: 'Cancel' }) },
+          {
+            type: 'primary',
+            children: formatMessage({ id: 'ImportConfirmSubmit' }),
+            disabled: !parsedRows || !parsedRows.length || !importSelectedRowKeys.length,
+            autoClose: false,
+            onClick: handleImportSubmit
+          }
+        ]}
         destroyOnClose
         width={importModalWidth}>
         <Flex vertical gap={20} className={style.importModal}>
