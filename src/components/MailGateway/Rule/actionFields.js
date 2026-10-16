@@ -58,6 +58,8 @@ const createMailActionFields = formatMessage => {
       label: formatMessage({ id: 'FieldTypeMailTemplate' }),
       groupName,
       component: TemplateSelectField,
+      // 提交存 id；控件内仍保留 {value,label} 用于回显
+      defaults: { interceptor: 'object-output-value' },
       valueSchema: { type: 'string' }
     },
     MailContactSelect: {

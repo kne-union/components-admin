@@ -66,7 +66,7 @@ const Rule = createWithRemoteLoader({
           </ContactsProvider>
         )}
         getActionList={props => [
-          { ...props, buttonComponent: TestRuleButton, children: formatMessage({ id: 'TestRule' }) },
+          { ...props, actionMap, buttonComponent: TestRuleButton, children: formatMessage({ id: 'TestRule' }) },
           ...getMoveSortActions({ props, listRef, sortApi: ruleApis.sort, formatMessage })
         ]}
         filter={{

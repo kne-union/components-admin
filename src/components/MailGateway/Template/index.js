@@ -1,5 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Button, Tag } from 'antd';
+import { Button, Tag, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from '@kne/react-intl';
 import BizUnit from '@components/BizUnit';
@@ -9,20 +9,22 @@ import Menu from '../Menu';
 import { useTemplateCategoryList } from '../fields';
 import getColumns from './getColumns';
 import FormInner, { toTemplatePayload } from './FormInner';
-import { CopyTemplateButton, getSystemLockedActions, PreviewTemplateButton } from './ActionButtons';
+import { CopyTemplateButton, getSystemLockedActions, openTemplatePreview, PreviewTemplateButton } from './ActionButtons';
 import { createCardRenders, EnumTag, formatDateTime } from '../CardList';
 
 const Template = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Filter']
+  modules: ['components-core:Global@usePreset', 'components-core:Filter', 'components-core:Modal@useModal']
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {} }) => {
-    const [usePreset, Filter] = remoteModules;
+    const [usePreset, Filter, useModal] = remoteModules;
     const { SuperSelectFilterItem } = Filter.fields;
     const { apis } = usePreset();
+    const modal = useModal();
     const { formatMessage, locale } = useIntl();
     const navigate = useNavigate();
     const templateApis = apis.mailGateway.template;
     const { list: categories } = useTemplateCategoryList(apis);
+    const onPreview = template => openTemplatePreview({ modal, formatMessage, template });
 
     return (
       <BizUnit
@@ -45,7 +47,7 @@ const Template = createWithRemoteLoader({
               data: { status: data.status === 'enabled' ? 'disabled' : 'enabled' }
             })
         }}
-        getColumns={() => getColumns({ formatMessage })}
+        getColumns={() => getColumns({ formatMessage, onPreview })}
         getFormInner={() => <FormInner />}
         getActionList={props => [
           ...getSystemLockedActions(props.data),
@@ -103,7 +105,16 @@ const Template = createWithRemoteLoader({
           openButtonProps: { children: formatMessage({ id: 'Enable' }) },
           closeButtonProps: { children: formatMessage({ id: 'Disable' }) },
           tableProps: createCardRenders(item => ({
-            title: item.name,
+            title: (
+              <Typography.Link
+                onClick={e => {
+                  e.stopPropagation();
+                  onPreview(item);
+                }}
+              >
+                {item.name}
+              </Typography.Link>
+            ),
             extra: (
               <>
                 <Tag>{item.category?.name || formatMessage({ id: 'Uncategorized' })}</Tag>

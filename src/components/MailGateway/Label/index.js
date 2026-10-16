@@ -7,8 +7,13 @@ import withLocale from '../withLocale';
 import { useBizUnitPage } from '../PageLayout';
 import { getMoveSortActions } from '../MoveSortButton';
 import { AccountSelectField, useAccountList } from '../fields';
-import { createCardRenders } from '../CardList';
+import { createCardRenders, EnumTag } from '../CardList';
 import style from '../style.module.scss';
+
+const isSystemLabel = data => Number(data?.level) === 0;
+
+const getSystemLockedActions = data =>
+  ['save', 'remove'].map(name => ({ name, reset: ({ hidden }) => ({ name, hidden: hidden || isSystemLabel(data) }) }));
 
 const LabelFormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
@@ -37,7 +42,7 @@ const Label = createWithRemoteLoader({
   withLocale(({ remoteModules, baseUrl, pageProps = {} }) => {
     const [usePreset] = remoteModules;
     const { apis } = usePreset();
-    const { formatMessage } = useIntl();
+    const { formatMessage, locale } = useIntl();
     const labelApis = apis.mailGateway.label;
     const listRef = useRef([]);
     const { list: accounts } = useAccountList(apis);
@@ -71,15 +76,25 @@ const Label = createWithRemoteLoader({
           {
             name: 'accountId',
             title: formatMessage({ id: 'Account' }),
-            width: 260,
+            width: 200,
             getValueOf: item =>
               item.accountId ? accountMap.get(String(item.accountId))?.name || item.accountId : formatMessage({ id: 'GlobalLabel' })
+          },
+          {
+            name: 'level',
+            title: formatMessage({ id: 'TemplateLevel' }),
+            width: 100,
+            renderType: 'enum',
+            moduleName: 'mailTemplateLevel'
           },
           { name: 'color', title: formatMessage({ id: 'Color' }), width: 120 },
           { name: 'sort', title: formatMessage({ id: 'Sort' }), width: 100 }
         ]}
         getFormInner={() => <LabelFormInner />}
-        getActionList={props => getMoveSortActions({ props, listRef, sortApi: labelApis.sort, formatMessage })}
+        getActionList={props => [
+          ...getSystemLockedActions(props.data),
+          ...getMoveSortActions({ props, listRef, sortApi: labelApis.sort, formatMessage })
+        ]}
         options={{
           bizName: formatMessage({ id: 'Label' }),
           removeMessage: formatMessage({ id: 'ConfirmRemoveLabel' }),
@@ -88,10 +103,13 @@ const Label = createWithRemoteLoader({
             createCardRenders(item => ({
               title: <Tag color={item.color}>{item.name}</Tag>,
               extra: (
-                <span className={style['card-label-color']}>
-                  <span className={style['label-dot']} style={{ background: item.color }} />
-                  {item.color}
-                </span>
+                <>
+                  <EnumTag moduleName="mailTemplateLevel" value={Number(item.level ?? 1)} locale={locale} />
+                  <span className={style['card-label-color']}>
+                    <span className={style['label-dot']} style={{ background: item.color }} />
+                    {item.color}
+                  </span>
+                </>
               ),
               subtitle: item.accountId ? accountMap.get(String(item.accountId))?.name || item.accountId : formatMessage({ id: 'GlobalLabel' }),
               footer: `${formatMessage({ id: 'Sort' })} ${item.sort ?? 0}`

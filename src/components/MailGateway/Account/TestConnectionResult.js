@@ -23,10 +23,11 @@ const TestConnectionResult = withLocale(({ result }) => (
   </Flex>
 ));
 
-export const showTestResult = ({ modal, formatMessage, result }) => {
-  modal[result?.success ? 'success' : 'error']({
+export const showTestResult = ({ confirmModal, formatMessage, result }) => {
+  confirmModal({
+    type: result?.success ? 'success' : 'error',
     title: formatMessage({ id: result?.success ? 'ConnectionSuccess' : 'ConnectionFailed' }),
-    content: <TestConnectionResult result={result} />
+    message: <TestConnectionResult result={result} />
   });
 };
 

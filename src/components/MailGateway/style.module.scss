@@ -298,15 +298,210 @@
   padding-left: 0;
 }
 
-.test-result-list {
-  margin: 0;
-  padding-left: 18px;
+.test-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--bg-color-grey-3, #f0f0f0);
+  background: var(--bg-color-grey-1, #fafafa);
+  --test-banner-color: var(--font-color-grey, #8c8c8c);
+
+  &.is-success {
+    border-color: #b7eb8f;
+    background: #f6ffed;
+    --test-banner-color: #52c41a;
+  }
+
+  &.is-warning {
+    border-color: #ffe58f;
+    background: #fffbe6;
+    --test-banner-color: #faad14;
+  }
+
+  &.is-error {
+    border-color: #ffccc7;
+    background: #fff2f0;
+    --test-banner-color: #ff4d4f;
+  }
 }
 
-.test-result-note {
-  display: block;
-  margin-top: 2px;
+.test-banner-icon {
+  flex: 0 0 auto;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--test-banner-color);
+}
+
+.test-banner-text {
+  min-width: 0;
+}
+
+.test-banner-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--font-color, rgba(0, 0, 0, 0.88));
+}
+
+.test-banner-desc {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--font-color-grey, #8c8c8c);
+}
+
+.test-section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.test-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--font-color, rgba(0, 0, 0, 0.88));
+}
+
+.test-condition {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--bg-color-grey-3, #f0f0f0);
+  background: #fff;
+  --test-condition-color: var(--font-color-grey, #bfbfbf);
+
+  &.is-matched {
+    --test-condition-color: #52c41a;
+  }
+
+  &.is-unmatched {
+    --test-condition-color: #ff4d4f;
+  }
+}
+
+.test-condition-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.test-condition-icon {
+  flex: 0 0 auto;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--test-condition-color, var(--font-color-grey, #bfbfbf));
+
+  &.is-matched,
+  &.is-success {
+    color: #52c41a;
+  }
+
+  &.is-unmatched,
+  &.is-error {
+    color: #ff4d4f;
+  }
+
+  &.is-warning {
+    color: #faad14;
+  }
+
+  &.is-skipped {
+    color: var(--font-color-grey, #bfbfbf);
+  }
+}
+
+.test-condition-text {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.test-condition-field {
+  font-weight: 500;
+  color: var(--font-color, rgba(0, 0, 0, 0.88));
+}
+
+.test-condition-operator {
+  color: var(--font-color-grey, #8c8c8c);
+}
+
+.test-condition-value {
+  max-width: 100%;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-family: SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 12px;
+  line-height: 22px;
+  word-break: break-all;
+  background: var(--bg-color-grey-2, #f5f5f5);
+}
+
+.test-condition-state {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--test-condition-color);
+}
+
+.test-condition-note {
+  margin: 6px 0 0 26px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--font-color-grey, #8c8c8c);
+
+  &.is-error {
+    color: #ff4d4f;
+  }
+}
+
+.test-mail-item {
+  padding: 12px;
+  border: 1px solid var(--bg-color-grey-3, #f0f0f0);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.test-mail-item-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.test-mail-item-subject {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+
+.test-mail-item-conditions {
+  margin-top: 10px;
+}
+
+.test-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.test-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 6px;
+  border-radius: 16px;
+  border: 1px solid var(--bg-color-grey-3, #f0f0f0);
+  background: #fff;
+}
+
+.test-actions-arrow {
+  font-size: 12px;
+  color: var(--font-color-grey, #bfbfbf);
 }
 
 .log-result-summary {
@@ -368,8 +563,11 @@
   margin-bottom: 16px;
 }
 
-.compose-template {
-  margin-bottom: 16px;
+.compose-template-select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .card-list-wrap {

@@ -12,7 +12,7 @@ const LOG_STATUS_COLOR = { success: 'success', partial: 'warning', failed: 'erro
 
 const hasOutput = output => output && typeof output === 'object' && Object.keys(output).length > 0;
 
-const ResultItem = ({ item, index, actionMap, formatMessage }) => (
+export const ResultItem = ({ item, index, actionMap, formatMessage }) => (
   <div className={style['log-result-item']}>
     <div className={style['log-result-head']}>
       <span className={style['rule-step']}>{index + 1}</span>
