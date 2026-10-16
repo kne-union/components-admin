@@ -85,7 +85,8 @@ const locale = {
   RevokeTokensConfirm: '撤销后用户需刷新令牌（会话保留，可静默重新登录），确定撤销吗？',
   ForceLogout: '强制下线',
   ForceLogoutConfirm: '强制下线会结束该用户全部会话并撤销令牌，确定执行吗？',
-  RevokeUserSuccess: '已撤销 {grants} 个授权，结束 {sessions} 个会话'
+  RevokeUserSuccess: '已撤销 {grants} 个授权，结束 {sessions} 个会话',
+  Close: '关闭'
 };
 
 export default locale;

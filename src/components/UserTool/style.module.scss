@@ -54,6 +54,9 @@
 }
 
 .mobile-modal {
+  --kne-modal-body-min-height: 0px;
+  --kne-modal-content-min-height: 0px;
+
   :global {
     .ant-modal-content {
       padding: 0;

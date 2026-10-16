@@ -46,7 +46,8 @@ const locale = {
   ConfirmDelete: '确定要删除{bizName}吗？',
 
   // Form rules
-  InputNumber: '请输入数字'
+  InputNumber: '请输入数字',
+  Close: '关闭'
 };
 
 export default locale;

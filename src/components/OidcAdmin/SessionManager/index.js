@@ -66,13 +66,14 @@ const RevokeSessionButton = createWithRemoteLoader({
 );
 
 const SessionManager = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Filter', 'components-core:TablePage@Table']
+  modules: ['components-core:Global@usePreset', 'components-core:Filter', 'components-core:TablePage@Table', 'components-core:Modal@useConfirmModal']
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {}, defaultUserId }) => {
-    const [usePreset, Filter, Table] = remoteModules;
+    const [usePreset, Filter, Table, useConfirmModal] = remoteModules;
     const { SuperSelectFilterItem } = Filter.fields;
     const { ajax, apis: presetApis } = usePreset();
-    const { message, modal } = App.useApp();
+    const { message } = App.useApp();
+    const confirmModal = useConfirmModal();
     const { formatMessage } = useIntl();
     const apis = presetApis.oidc.session;
     const [filter, setFilter] = useState(() =>
@@ -210,10 +211,10 @@ const SessionManager = createWithRemoteLoader({
                   if (!uids?.length) {
                     return;
                   }
-                  modal.confirm({
+                  confirmModal({
+                    danger: true,
                     title: formatMessage({ id: 'RevokeSelectedSessionsConfirm' }, { count: uids.length }),
-                    okButtonProps: { danger: true },
-                    onOk: async () => {
+                    onConfirm: async () => {
                       let count = 0;
                       for (const uid of uids) {
                         const { data: resData } = await ajax(Object.assign({}, apis.revoke, { data: { uid } }));

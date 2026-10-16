@@ -1,5 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Divider, List, Dropdown, Space, Flex, Modal } from 'antd';
+import { Divider, List, Dropdown, Space, Flex } from 'antd';
 import { useLogout } from '@components/Account';
 import style from './style.module.scss';
 import withLocale from './withLocale';
@@ -9,10 +9,10 @@ import { useState } from 'react';
 import { useMobilePopupMount } from '@kne/responsive-utils';
 
 const UserTool = createWithRemoteLoader({
-  modules: ['components-core:Image', 'components-core:Icon', 'components-core:Global@usePreset']
+  modules: ['components-core:Image', 'components-core:Icon', 'components-core:Global@usePreset', 'components-core:Modal']
 })(
   withLocale(({ remoteModules, avatar, name, email, storeKeys = { token: 'X-User-Token' }, domain, list, children = null }) => {
-    const [Image, Icon, usePreset] = remoteModules;
+    const [Image, Icon, usePreset, Modal] = remoteModules;
     const { oidc: oidcClient } = usePreset();
     const logout = useLogout({ storeKeys, domain, oidcClient });
     const { formatMessage } = useIntl();
@@ -94,12 +94,14 @@ const UserTool = createWithRemoteLoader({
           {trigger}
           <Modal
             open={open}
-            onCancel={closePanel}
+            onClose={closePanel}
             footer={null}
             centered
             width={320}
             title={null}
             closable
+            noPadding
+            mobileFullscreen={false}
             destroyOnHidden
             getContainer={getPopupContainer}
             className={classnames(style['mobile-modal'], fixedModeClass)}
