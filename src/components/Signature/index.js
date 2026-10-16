@@ -82,16 +82,17 @@ const CreateButton = createWithRemoteLoader({
     'components-core:FormInfo',
     'components-core:FormInfo@useFormModal',
     'components-core:Global@usePreset',
-    'components-core:InfoPage@CentralContent'
+    'components-core:InfoPage@CentralContent',
+    'components-core:Modal@useModal'
   ]
 })(
   withLocale(({ remoteModules, onSuccess, ...props }) => {
-    const [FormInfo, useFormModal, usePreset, CentralContent] = remoteModules;
+    const [FormInfo, useFormModal, usePreset, CentralContent, useModal] = remoteModules;
     const { formatMessage } = useIntl();
     const { ajax, apis } = usePreset();
     const { TextArea } = FormInfo.fields;
     const formModal = useFormModal();
-    const { modal } = App.useApp();
+    const modal = useModal();
 
     return (
       <Button
@@ -113,12 +114,10 @@ const CreateButton = createWithRemoteLoader({
                 }
                 onSuccess && onSuccess();
                 formModalApi.close();
-                modal.info({
-                  icon: null,
-                  size: 'large',
-                  width: '800px',
+                modal({
                   title: formatMessage({ id: 'SecretKeyGenerated' }),
-                  content: (
+                  footerButtons: [{ type: 'primary', children: formatMessage({ id: 'Close' }) }],
+                  children: (
                     <Flex vertical gap={10}>
                       <Alert type="error" message={formatMessage({ id: 'SaveSecretKeyWarning' })} />
                       <CentralContent

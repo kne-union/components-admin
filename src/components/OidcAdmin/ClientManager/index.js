@@ -10,12 +10,13 @@ import FormInner from './FormInner';
 import { toFormData, toPayload } from './utils';
 
 const RotateSecretButton = createWithRemoteLoader({
-  modules: ['components-core:ConfirmButton', 'components-core:Global@usePreset']
+  modules: ['components-core:ConfirmButton', 'components-core:Global@usePreset', 'components-core:Modal@useModal']
 })(
   withLocale(({ remoteModules, data, onSuccess, apis: _apis, options, getFormInner, fetchOptions, ...props }) => {
-    const [ConfirmButton, usePreset] = remoteModules;
+    const [ConfirmButton, usePreset, useModal] = remoteModules;
     const { ajax, apis } = usePreset();
-    const { modal, message } = App.useApp();
+    const { message } = App.useApp();
+    const modal = useModal();
     const { formatMessage } = useIntl();
     return (
       <ConfirmButton
@@ -27,11 +28,11 @@ const RotateSecretButton = createWithRemoteLoader({
             return;
           }
           message.success(formatMessage({ id: 'SecretRotated' }));
-          modal.info({
-            icon: null,
-            width: 640,
+          modal({
+            size: 'small',
             title: formatMessage({ id: 'SecretRotated' }),
-            content: <SecretResult formatMessage={formatMessage} {...resData.data} />
+            children: <SecretResult formatMessage={formatMessage} {...resData.data} />,
+            footerButtons: [{ type: 'primary', children: formatMessage({ id: 'Close' }) }]
           });
           onSuccess && onSuccess();
         }}>
@@ -42,13 +43,13 @@ const RotateSecretButton = createWithRemoteLoader({
 );
 
 const ClientManager = createWithRemoteLoader({
-  modules: ['components-core:Global@usePreset', 'components-core:Filter']
+  modules: ['components-core:Global@usePreset', 'components-core:Filter', 'components-core:Modal@useModal']
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {} }) => {
-    const [usePreset, Filter] = remoteModules;
+    const [usePreset, Filter, useModal] = remoteModules;
     const { SuperSelectFilterItem } = Filter.fields;
     const { ajax, apis: presetApis } = usePreset();
-    const { modal } = App.useApp();
+    const modal = useModal();
     const { formatMessage } = useIntl();
     const apis = presetApis.oidc.client;
     const bizName = formatMessage({ id: 'Client' });
@@ -95,11 +96,11 @@ const ClientManager = createWithRemoteLoader({
                   return false;
                 }
                 if (resData.data?.clientSecret) {
-                  modal.info({
-                    icon: null,
-                    width: 640,
+                  modal({
+                    size: 'small',
                     title: formatMessage({ id: 'ClientCreated' }),
-                    content: <SecretResult formatMessage={formatMessage} {...resData.data} />
+                    children: <SecretResult formatMessage={formatMessage} {...resData.data} />,
+                    footerButtons: [{ type: 'primary', children: formatMessage({ id: 'Close' }) }]
                   });
                 }
                 onSuccess && onSuccess();

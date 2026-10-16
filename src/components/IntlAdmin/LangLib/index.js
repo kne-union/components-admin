@@ -94,17 +94,21 @@ const LangLib = createWithRemoteLoader({
     'components-core:TablePage@Table',
     'components-core:FormInfo@useFormModal',
     'components-core:FormInfo',
-    'components-admin:GroupSelect'
+    'components-admin:GroupSelect',
+    'components-core:Modal@useModal',
+    'components-core:Modal@useConfirmModal'
   ]
 })(
   withLocale(({ remoteModules, menu, pageProps = {} }) => {
-    const [usePreset, useGlobalValue, Filter, Table, useFormModal, FormInfo, GroupSelect] = remoteModules;
+    const [usePreset, useGlobalValue, Filter, Table, useFormModal, FormInfo, GroupSelect, useModal, useConfirmModal] = remoteModules;
     const { SuperSelectFilterItem } = Filter.fields || Filter;
     const { apis, ajax } = usePreset();
     const locale = useGlobalValue('locale');
     const language = locale || 'zh-CN';
     const { formatMessage } = useIntl();
-    const { message, modal } = App.useApp();
+    const { message } = App.useApp();
+    const modal = useModal();
+    const confirmModal = useConfirmModal();
     const formModal = useFormModal();
     const dataRef = useRef([]);
     const { selectedRowKeys, selectedRows, setSelectedRowKeys, clearSelectedRows } = Table.useSelectedRow({ rowKey: 'id' });
@@ -305,10 +309,11 @@ const LangLib = createWithRemoteLoader({
           return;
         }
         const ids = leafRows.map(row => row.id);
-        modal.confirm({
+        confirmModal({
+          danger: true,
           title: formatMessage({ id: 'BatchRemoveConfirmTitle' }),
-          content: formatMessage({ id: 'BatchRemoveConfirm' }, { count: ids.length }),
-          onOk: async () => {
+          message: formatMessage({ id: 'BatchRemoveConfirm' }, { count: ids.length }),
+          onConfirm: async () => {
             const resData = await requestRemove({ ajax, apis: langLibApis, ids });
             if (resData.code !== 0) {
               return;
@@ -318,7 +323,7 @@ const LangLib = createWithRemoteLoader({
           }
         });
       },
-      [ajax, formatMessage, langLibApis, message, modal, reloadAfterChange]
+      [ajax, confirmModal, formatMessage, langLibApis, message, reloadAfterChange]
     );
 
     const openBatchSetStatus = useCallback(
@@ -330,10 +335,10 @@ const LangLib = createWithRemoteLoader({
         }
         const ids = leafRows.map(row => row.id);
         const isOpen = status === OPEN_STATUS;
-        modal.confirm({
+        confirmModal({
           title: formatMessage({ id: isOpen ? 'BatchOpenConfirmTitle' : 'BatchCloseConfirmTitle' }),
-          content: formatMessage({ id: isOpen ? 'BatchOpenConfirm' : 'BatchCloseConfirm' }, { count: ids.length }),
-          onOk: async () => {
+          message: formatMessage({ id: isOpen ? 'BatchOpenConfirm' : 'BatchCloseConfirm' }, { count: ids.length }),
+          onConfirm: async () => {
             const resData = await requestSetStatus({ ajax, apis: langLibApis, ids, status });
             if (resData.code !== 0) {
               return;
@@ -343,7 +348,7 @@ const LangLib = createWithRemoteLoader({
           }
         });
       },
-      [ajax, formatMessage, langLibApis, message, modal, reloadAfterChange]
+      [ajax, confirmModal, formatMessage, langLibApis, message, reloadAfterChange]
     );
 
     const handleExport = useCallback(async () => {
