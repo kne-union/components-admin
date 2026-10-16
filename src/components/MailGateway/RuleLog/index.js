@@ -1,6 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useFetch } from '@kne/react-fetch';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
 import enums from '../enums';
@@ -29,9 +29,12 @@ const RuleLog = createWithRemoteLoader({
     const renderPage = usePageRender();
     const title = formatMessage({ id: 'RuleLog' });
     const ListPage = renderPage ? TablePage : LayoutTablePage;
+    const listRef = useRef(null);
+    const reloadList = () => listRef.current?.reload?.();
 
     const table = (
       <ListPage
+        ref={listRef}
         {...(renderPage ? {} : { isNext: true, page: Object.assign({ title, menu: <Menu baseUrl={baseUrl} /> }, pageProps) })}
         name="mail-gateway-rule-log"
         {...Object.assign({}, apis.mailGateway.ruleLog.list, { params: { filter: {} } })}
@@ -102,7 +105,7 @@ const RuleLog = createWithRemoteLoader({
             title: formatMessage({ id: 'ActionResults' }),
             width: 120,
             render: (value, { dataSource }) => (
-              <ResultDetail type="link" size="small" data={dataSource} actionMap={actionMap} ruleName={dataSource.rule?.name || dataSource.ruleId}>
+              <ResultDetail type="link" size="small" data={dataSource} actionMap={actionMap} ruleName={dataSource.rule?.name || dataSource.ruleId} onSuccess={reloadList}>
                 {formatMessage({ id: 'ViewDetail' })}
               </ResultDetail>
             )
@@ -121,7 +124,7 @@ const RuleLog = createWithRemoteLoader({
             ],
             footer: formatDateTime(item.createdAt),
             actions: (
-              <ResultDetail type="link" size="small" data={item} actionMap={actionMap} ruleName={ruleName}>
+              <ResultDetail type="link" size="small" data={item} actionMap={actionMap} ruleName={ruleName} onSuccess={reloadList}>
                 {formatMessage({ id: 'ViewDetail' })}
               </ResultDetail>
             )
