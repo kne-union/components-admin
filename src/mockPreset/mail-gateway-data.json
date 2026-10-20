@@ -3,6 +3,7 @@
     {
       "id": "acc-1",
       "name": "客服中心",
+      "isDefault": true,
       "address": "service@leapin-ai.com",
       "username": "service@leapin-ai.com",
       "imap": {

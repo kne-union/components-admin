@@ -124,7 +124,14 @@ const Mailbox = createWithRemoteLoader({
           setCurrent(key);
         }}
         stats={stats}
-        onCompose={() => openCompose({ accountId: accountId || accounts.find(item => item.status === 'enabled')?.id, onSuccess: reloadAll })}
+        onCompose={() =>
+          openCompose({
+            accountId:
+              accountId ||
+              (accounts.find(item => item.isDefault && item.status === 'enabled') || accounts.find(item => item.status === 'enabled'))?.id,
+            onSuccess: reloadAll
+          })
+        }
       />
     );
 
