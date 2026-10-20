@@ -891,6 +891,7 @@ const getApis = options => {
         save: { url: `${prefix}/mail-gateway/accounts/{id}`, method: 'PUT' },
         remove: { url: `${prefix}/mail-gateway/accounts/{id}`, method: 'DELETE' },
         setStatus: { url: `${prefix}/mail-gateway/accounts/{id}/status`, method: 'POST' },
+        setDefault: { url: `${prefix}/mail-gateway/accounts/{id}/default`, method: 'POST' },
         testConnection: { url: `${prefix}/mail-gateway/accounts/test-connection`, method: 'POST' },
         sync: { url: `${prefix}/mail-gateway/accounts/{id}/sync`, method: 'POST' },
         syncHistory: { url: `${prefix}/mail-gateway/accounts/{id}/sync-history`, method: 'POST' }

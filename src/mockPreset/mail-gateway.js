@@ -247,7 +247,15 @@ const mailGatewayMock = {
       loader: ({ data }) => {
         const { password, skipVerify, ...rest } = data || {};
         const account = Object.assign(
-          { id: createId('acc'), status: 'enabled', syncState: null, lastSyncAt: null, lastError: null, createdAt: now() },
+          {
+            id: createId('acc'),
+            status: 'enabled',
+            isDefault: state.accounts.length === 0,
+            syncState: null,
+            lastSyncAt: null,
+            lastError: null,
+            createdAt: now()
+          },
           rest
         );
         state.accounts.push(account);
@@ -264,7 +272,11 @@ const mailGatewayMock = {
     },
     remove: {
       loader: ({ urlParams }) => {
+        const removed = findById(state.accounts, urlParams?.id);
         state.accounts = state.accounts.filter(item => String(item.id) !== String(urlParams?.id));
+        if (removed?.isDefault && state.accounts[0]) {
+          state.accounts[0].isDefault = true;
+        }
         state.mails = state.mails.filter(item => String(item.accountId) !== String(urlParams?.id));
         state.labels = state.labels.filter(item => String(item.accountId) !== String(urlParams?.id));
         return {};
@@ -275,6 +287,14 @@ const mailGatewayMock = {
         const account = findById(state.accounts, urlParams?.id);
         account && Object.assign(account, { status: data?.status });
         return account;
+      }
+    },
+    setDefault: {
+      loader: ({ urlParams }) => {
+        state.accounts.forEach(item => {
+          item.isDefault = String(item.id) === String(urlParams?.id);
+        });
+        return findById(state.accounts, urlParams?.id);
       }
     },
     testConnection: {

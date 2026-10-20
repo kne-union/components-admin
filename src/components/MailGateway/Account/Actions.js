@@ -29,6 +29,30 @@ export const TestConnectionButton = createWithRemoteLoader({
   })
 );
 
+export const SetDefaultButton = createWithRemoteLoader({
+  modules: ['components-core:LoadingButton', 'components-core:Global@usePreset']
+})(
+  withLocale(({ remoteModules, ...props }) => {
+    const [LoadingButton, usePreset] = remoteModules;
+    const { ajax, apis } = usePreset();
+    const { message } = App.useApp();
+    const { formatMessage } = useIntl();
+    return (
+      <LoadingButton
+        {...pickButtonProps(props)}
+        onClick={async () => {
+          const { data: resData } = await ajax(Object.assign({}, apis.mailGateway.account.setDefault, { urlParams: { id: props.data.id } }));
+          if (resData.code !== 0) {
+            return;
+          }
+          message.success(formatMessage({ id: 'SetDefaultSuccess' }));
+          props.onSuccess && props.onSuccess();
+        }}
+      />
+    );
+  })
+);
+
 export const SyncButton = createWithRemoteLoader({
   modules: ['components-core:LoadingButton', 'components-core:Global@usePreset']
 })(

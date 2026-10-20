@@ -8,7 +8,8 @@ import enums from '../enums';
 import { useBizUnitPage } from '../PageLayout';
 import getColumns from './getColumns';
 import FormInner, { toAccountFormData, toAccountPayload } from './FormInner';
-import { SyncButton, SyncHistoryButton, TestConnectionButton } from './Actions';
+import { Space, Tag } from 'antd';
+import { SetDefaultButton, SyncButton, SyncHistoryButton, TestConnectionButton } from './Actions';
 import { createCardRenders, EnumTag, formatDateTime } from '../CardList';
 import style from '../style.module.scss';
 
@@ -43,6 +44,12 @@ const Account = createWithRemoteLoader({
         getColumns={() => getColumns({ formatMessage })}
         getFormInner={({ action, data }) => <FormInner action={action} data={data} />}
         getActionList={props => [
+          {
+            ...props,
+            buttonComponent: SetDefaultButton,
+            children: formatMessage({ id: 'SetDefault' }),
+            hidden: !!props.data?.isDefault
+          },
           {
             ...props,
             buttonComponent: TestConnectionButton,
@@ -100,7 +107,12 @@ const Account = createWithRemoteLoader({
           closeButtonProps: { children: formatMessage({ id: 'Disable' }) },
           tableProps: createCardRenders(item => ({
             title: item.name,
-            extra: <EnumTag moduleName="mailAccountStatus" value={item.status} locale={locale} />,
+            extra: (
+              <Space size={4}>
+                {item.isDefault && <Tag color="blue">{formatMessage({ id: 'DefaultAccount' })}</Tag>}
+                <EnumTag moduleName="mailAccountStatus" value={item.status} locale={locale} />
+              </Space>
+            ),
             subtitle: item.address,
             muted: item.status !== 'enabled',
             description: item.lastError && <span className={style['card-error']}>{item.lastError}</span>,
