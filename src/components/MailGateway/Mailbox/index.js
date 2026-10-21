@@ -5,7 +5,6 @@ import { App, Badge, Button, Flex } from 'antd';
 import { FormOutlined, MenuOutlined } from '@ant-design/icons';
 import { useIntl } from '@kne/react-intl';
 import { useNavigate } from 'react-router-dom';
-import { useIsMobile } from '@kne/responsive-utils';
 import withLocale from '../withLocale';
 import Sidebar from './Sidebar';
 import MailDetail from './MailDetail';
@@ -39,7 +38,6 @@ const Mailbox = createWithRemoteLoader({
     const [current, setCurrent] = useState('inbox');
     const [detailId, setDetailId] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const isMobile = useIsMobile();
     const ref = useRef(null);
     const { list: accounts } = useAccountList(apis);
     const { data: stats, reload: reloadStats } = useFetch(Object.assign({}, apis.mailGateway.mail.stats, { params: { accountId } }));
@@ -209,13 +207,14 @@ const Mailbox = createWithRemoteLoader({
               title: formatMessage({ id: 'Mailbox' }),
               children: (
                 <div className={style['mailbox-page']}>
-                  {isMobile ? mobileBar : <div className={style['mailbox-page-sidebar']}>{sidebar}</div>}
+                  {mobileBar}
+                  <div className={style['mailbox-page-sidebar']}>{sidebar}</div>
                   <div className={style['mailbox-page-main']}>{table}</div>
                 </div>
               )
             })
           : table}
-        {renderPage && isMobile && (
+        {renderPage && (
           <Drawer
             open={sidebarOpen}
             placement="left"

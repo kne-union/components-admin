@@ -162,7 +162,7 @@ const renderPage = ({ title, children }) => <Page title={title}>{children}</Page
 </SystemLayout>;
 ```
 
-列表页的操作按钮随表格工具栏渲染；邮箱页的账号切换、文件夹与标签侧栏放在页面内容区左侧，移动端改为上下排列。见示例「SystemLayout 布局」。
+列表页的操作按钮随表格工具栏渲染；邮箱页的账号切换、文件夹与标签侧栏放在页面内容区左侧；内容区宽度不足（按容器宽度判断，宽屏下的窄内容区同样生效）时侧栏收起为顶部切换条，点击从左侧抽屉打开。见示例「SystemLayout 布局」。
 
 ### Compose
 
