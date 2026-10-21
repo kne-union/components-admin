@@ -288,7 +288,7 @@ render(<CustomActionExample />);
 
 ### Account
 
-邮箱账号列表页：新增 / 编辑 IMAP、SMTP 配置，启用 / 停用、删除、测试连接、立即同步。编辑时密码留空表示不修改。
+邮箱账号列表页：新增 / 编辑 IMAP、SMTP 配置，启用 / 停用、删除、设为默认、测试连接、立即同步。编辑时密码留空表示不修改。第一个添加的邮箱自动成为默认邮箱，卡片上显示「默认」标签；写信时发件邮箱默认选中默认邮箱。
 
 #### 属性说明
 
@@ -332,7 +332,7 @@ render(<CustomActionExample />);
 
 ### Rule
 
-收发规则页：按触发时机（收信 / 发信）、适用邮箱、优先级配置条件与动作链，支持启用 / 停用、排序和试运行。
+收发规则页：按触发时机（收信后 / 发信前 / 发信后）、适用邮箱、优先级配置条件与动作链，支持启用 / 停用、排序和试运行。发信前规则可拦截发送或修改主题、正文、收件人，只在发信时执行，试运行不提供「执行规则」。
 
 #### 属性说明
 
@@ -387,7 +387,7 @@ fastify.mailGateway.services.condition.register('aiJudge', {
 
 ### RuleLog
 
-规则日志页：按规则、邮箱、触发时机、执行结果筛选，查看每个动作的执行结果与耗时。
+规则日志页：按规则、邮箱、触发时机、执行结果筛选，查看每个动作的执行结果与耗时。发信前规则拦截或出错的邮件未入库，主题显示为「邮件未发送」，且不提供重新执行。
 
 #### 属性说明
 
@@ -501,7 +501,7 @@ const renderPage = ({ title, children }) => <Page title={title}>{children}</Page
 | --------------------- | ---------------------------------------------------------- |
 | mailFolder            | inbox、sent、draft、trash                                  |
 | mailAccountStatus     | enabled、disabled                                          |
-| mailRuleDirection     | receive、send                                              |
+| mailRuleDirection     | receive、beforeSend、send                                  |
 | mailRuleStatus        | enabled、disabled                                          |
 | mailTemplateStatus    | enabled、disabled                                          |
 | mailTemplateLevel     | 0（系统默认）、1（自定义）                                 |

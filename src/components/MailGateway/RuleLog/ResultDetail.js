@@ -42,7 +42,10 @@ export const ResultItem = ({ item, index, actionMap, formatMessage }) => (
   </div>
 );
 
-const canReexecute = status => status === 'failed' || status === 'partial';
+const canReexecute = log => (log.status === 'failed' || log.status === 'partial') && log.direction !== 'beforeSend';
+
+// 发信前规则拦截或出错时邮件未入库，日志没有关联邮件
+export const getLogSubject = (log, formatMessage) => log.mail?.subject || formatMessage({ id: log.mail || log.mailId ? 'NoSubject' : 'MailNotSent' });
 
 const LogDetailContent = withLocale(
   createWithRemoteLoader({
@@ -97,7 +100,7 @@ const LogDetailContent = withLocale(
             <span className={style['log-result-label']}>{formatMessage({ id: 'RuleName' })}</span>
             <Typography.Text strong>{ruleName}</Typography.Text>
           </div>
-          {canReexecute(current.status) && (
+          {canReexecute(current) && (
             <Button type="primary" loading={loading} onClick={reexecute}>
               {formatMessage({ id: 'Reexecute' })}
             </Button>
@@ -105,7 +108,7 @@ const LogDetailContent = withLocale(
         </Flex>
         <div>
           <span className={style['log-result-label']}>{formatMessage({ id: 'Subject' })}</span>
-          <Typography.Text>{current.mail?.subject || formatMessage({ id: 'NoSubject' })}</Typography.Text>
+          <Typography.Text>{getLogSubject(current, formatMessage)}</Typography.Text>
         </div>
         <Flex wrap gap={24}>
           <div>

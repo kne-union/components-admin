@@ -138,7 +138,7 @@ const MailTestItem = ({ result, conditions, maps, formatMessage }) => {
   );
 };
 
-const TestResult = withLocale(({ payload, conditions, actions, actionMap, conditionMap }) => {
+const TestResult = withLocale(({ payload, conditions, actions, actionMap, conditionMap, direction }) => {
   const { formatMessage, locale } = useIntl();
   const maps = createConditionMaps({ locale, conditionMap });
   const results = payload.results || [];
@@ -152,7 +152,14 @@ const TestResult = withLocale(({ payload, conditions, actions, actionMap, condit
         icon={matchedCount > 0 ? <CheckCircleFilled /> : <CloseCircleFilled />}
         title={formatMessage({ id: 'TestBatchSummary' }, { matched: matchedCount, total })}
         description={formatMessage({
-          id: matchedCount > 0 ? (willExecute ? 'TestMatchedDesc' : 'TestMatchedNoActionDesc') : 'TestNotMatchedDesc'
+          id:
+            matchedCount > 0
+              ? willExecute
+                ? direction === 'beforeSend'
+                  ? 'TestMatchedBeforeSendDesc'
+                  : 'TestMatchedDesc'
+                : 'TestMatchedNoActionDesc'
+              : 'TestNotMatchedDesc'
         })}
       />
       <ResultSection title={formatMessage({ id: 'TestMail' })}>
@@ -223,9 +230,7 @@ const ExecuteResult = withLocale(({ payload, actionMap }) => {
         return (
           <div key={item.mailId} className={style['test-mail-item']}>
             <div className={style['test-mail-item-head']}>
-              <span className={classnames(style['test-condition-icon'], style[`is-${banner.type}`])}>
-                {banner.icon}
-              </span>
+              <span className={classnames(style['test-condition-icon'], style[`is-${banner.type}`])}>{banner.icon}</span>
               <Typography.Text ellipsis className={style['test-mail-item-subject']}>
                 {item.subject || formatMessage({ id: 'NoSubject' })}
               </Typography.Text>
@@ -299,7 +304,7 @@ const TestRuleButton = createWithRemoteLoader({
                 if (resData.code !== 0) {
                   return false;
                 }
-                const executable = resData.data.matchedCount > 0 && actions.length > 0;
+                const executable = data.direction !== 'beforeSend' && resData.data.matchedCount > 0 && actions.length > 0;
                 const matchedMailIds = (resData.data.results || []).filter(item => item.matched).map(item => item.mailId);
                 modal({
                   title: formatMessage({ id: 'TestResult' }),
@@ -308,6 +313,7 @@ const TestRuleButton = createWithRemoteLoader({
                     <TestResult
                       payload={resData.data}
                       conditions={data.conditions}
+                      direction={data.direction}
                       actions={actions}
                       actionMap={actionMap}
                       conditionMap={conditionMap}
@@ -336,7 +342,7 @@ const TestRuleButton = createWithRemoteLoader({
                       label={formatMessage({ id: 'TestMail' })}
                       rule="REQ"
                       tips={formatMessage({ id: 'TestMailMaxCount' })}
-                      folder={data.direction === 'send' ? 'sent' : 'inbox'}
+                      folder={data.direction === 'receive' ? 'inbox' : 'sent'}
                     />
                   ]}
                 />

@@ -9,6 +9,9 @@ export const formatAddressList = list => (list || []).map(formatAddress).join(',
 
 export const formatAddressNames = list => (list || []).map(item => item.name || item.address).join(', ');
 
+export const getDefaultAccountId = accounts =>
+  ((accounts || []).find(item => item.isDefault && item.status === 'enabled') || (accounts || []).find(item => item.status === 'enabled'))?.id;
+
 export const formatSize = size => {
   if (!size && size !== 0) {
     return '';

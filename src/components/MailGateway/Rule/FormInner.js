@@ -54,6 +54,7 @@ const FormInner = createWithRemoteLoader({
               label={formatMessage({ id: 'Direction' })}
               rule="REQ"
               defaultValue="receive"
+              tips={formatMessage({ id: 'DirectionTips' })}
               options={enums.mailRuleDirection({ locale }).map(item => ({ label: item.description, value: item.value }))}
             />,
             <AccountSelectField

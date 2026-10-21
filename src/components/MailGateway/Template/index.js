@@ -5,7 +5,7 @@ import { useIntl } from '@kne/react-intl';
 import BizUnit from '@components/BizUnit';
 import withLocale from '../withLocale';
 import enums from '../enums';
-import Menu from '../Menu';
+import { useBizUnitPage } from '../PageLayout';
 import { useTemplateCategoryList } from '../fields';
 import getColumns from './getColumns';
 import FormInner, { toTemplatePayload } from './FormInner';
@@ -30,11 +30,7 @@ const Template = createWithRemoteLoader({
       <BizUnit
         isNext
         name="mail-gateway-template"
-        page={{
-          title: formatMessage({ id: 'TemplateManage' }),
-          menu: <Menu baseUrl={baseUrl} />,
-          ...pageProps
-        }}
+        {...useBizUnitPage({ title: formatMessage({ id: 'TemplateManage' }), baseUrl, pageProps })}
         titleExtra={<Button onClick={() => navigate(`${baseUrl}/template-categories`)}>{formatMessage({ id: 'TemplateCategoryManage' })}</Button>}
         apis={{
           list: Object.assign({}, templateApis.list, { params: { filter: {} } }),
