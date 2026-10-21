@@ -24,9 +24,9 @@ const toAttachment = ({ id, url, filename, originalName, contentType, size, mail
   index
 });
 
-const getComposeData = ({ mode, mail, accountId, accountAddress, formatMessage }) => {
+const getComposeData = ({ mode, mail, accountId, accountAddress, to, formatMessage }) => {
   if (!mail) {
-    return { form: { accountId }, extra: {} };
+    return { form: { accountId, to: toAddressValue(to) }, extra: {} };
   }
   if (mode === 'draft') {
     const { uploaded, pending } = splitAttachments(mail.attachments);
@@ -87,9 +87,9 @@ export const useOpenCompose = ({ FormInfo, usePreset, getContacts: getContactsPr
   const { formatMessage } = useIntl();
 
   return useCallback(
-    ({ mode = 'new', mail, accountId, accountAddress, onSuccess } = {}) => {
+    ({ mode = 'new', mail, accountId, accountAddress, to, onSuccess } = {}) => {
       const draftId = mode === 'draft' ? mail?.id : null;
-      const { form, extra } = getComposeData({ mode, mail, accountId, accountAddress, formatMessage });
+      const { form, extra } = getComposeData({ mode, mail, accountId, accountAddress, to, formatMessage });
       const buildPayload = formData => {
         const { __templateId, ...rest } = formData || {};
         return Object.assign({}, extra, rest, {

@@ -769,10 +769,142 @@
       }
     },
     {
+      "type": "blockSend",
+      "label": "拦截发送",
+      "description": "不发送这封邮件，发件人会看到拦截提示；可与其它动作组合，如先调用 Webhook 通知再拦截",
+      "directions": ["beforeSend"],
+      "builtIn": true,
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "type": "TextArea",
+                "name": "message",
+                "label": "拦截提示",
+                "props": {
+                  "rows": 3,
+                  "placeholder": "如：外部邮件不允许携带附件"
+                },
+                "id": "params-message"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "modifySubject",
+      "label": "修改主题",
+      "description": "给主题加前缀或后缀，支持 {{mail.subject}}、{{account.name}} 等变量；主题已带相同前缀 / 后缀时不重复添加",
+      "directions": ["beforeSend"],
+      "builtIn": true,
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "type": "MailTemplateText",
+                "name": "prefix",
+                "label": "前缀",
+                "id": "params-prefix"
+              },
+              {
+                "type": "MailTemplateText",
+                "name": "suffix",
+                "label": "后缀",
+                "id": "params-suffix"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "appendContent",
+      "label": "正文追加内容",
+      "description": "在正文顶部或底部追加内容，如免责声明、签名；支持 {{mail.subject}}、{{account.name}} 等变量",
+      "directions": ["beforeSend"],
+      "builtIn": true,
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "type": "MailEditor",
+                "name": "html",
+                "label": "追加内容",
+                "rule": "REQ",
+                "id": "params-html"
+              },
+              {
+                "type": "RadioGroup",
+                "name": "position",
+                "label": "位置",
+                "props": {
+                  "defaultValue": "bottom",
+                  "options": [
+                    {
+                      "label": "正文底部",
+                      "value": "bottom"
+                    },
+                    {
+                      "label": "正文顶部",
+                      "value": "top"
+                    }
+                  ]
+                },
+                "id": "params-position"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "addRecipients",
+      "label": "添加抄送 / 密送",
+      "description": "给邮件追加抄送或密送地址，已在收件人、抄送、密送中的地址不重复添加",
+      "directions": ["beforeSend"],
+      "builtIn": true,
+      "formSchema": {
+        "blocks": [
+          {
+            "id": "params",
+            "kind": "formInfo",
+            "column": 1,
+            "list": [
+              {
+                "type": "MailContactSelect",
+                "name": "cc",
+                "label": "抄送",
+                "id": "params-cc"
+              },
+              {
+                "type": "MailContactSelect",
+                "name": "bcc",
+                "label": "密送",
+                "id": "params-bcc"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "type": "webhook",
       "label": "调用 Webhook",
       "description": "POST JSON 到指定地址，可选用 secret 对请求体做 HMAC-SHA256 签名（请求头 X-Mail-Gateway-Signature）",
-      "directions": ["receive", "send"],
+      "directions": ["receive", "beforeSend", "send"],
       "builtIn": true,
       "formSchema": {
         "blocks": [

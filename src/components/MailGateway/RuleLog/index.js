@@ -9,7 +9,7 @@ import { useAccountList } from '../fields';
 import { useActionList } from '../Rule/ActionsField';
 import { toFilterObject } from '../utils';
 import { usePageRender } from '../PageLayout';
-import ResultDetail from './ResultDetail';
+import ResultDetail, { getLogSubject } from './ResultDetail';
 import { createCardRenders, EnumTag, formatDateTime } from '../CardList';
 
 const RuleLog = createWithRemoteLoader({
@@ -84,7 +84,7 @@ const RuleLog = createWithRemoteLoader({
             title: formatMessage({ id: 'Subject' }),
             renderType: 'description',
             width: 260,
-            getValueOf: item => item.mail?.subject || formatMessage({ id: 'NoSubject' })
+            getValueOf: item => getLogSubject(item, formatMessage)
           },
           {
             name: 'accountId',
@@ -116,7 +116,7 @@ const RuleLog = createWithRemoteLoader({
           return {
             title: ruleName,
             extra: <EnumTag moduleName="mailRuleLogStatus" value={item.status} locale={locale} />,
-            subtitle: item.mail?.subject || formatMessage({ id: 'NoSubject' }),
+            subtitle: getLogSubject(item, formatMessage),
             fields: [
               { label: formatMessage({ id: 'Account' }), value: accountMap.get(String(item.accountId))?.name || item.accountId },
               { label: formatMessage({ id: 'Direction' }), value: <EnumTag moduleName="mailRuleDirection" value={item.direction} locale={locale} /> },

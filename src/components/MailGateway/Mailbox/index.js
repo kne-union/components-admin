@@ -1,9 +1,11 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useFetch } from '@kne/react-fetch';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { App } from 'antd';
+import { App, Badge, Button, Flex } from 'antd';
+import { FormOutlined, MenuOutlined } from '@ant-design/icons';
 import { useIntl } from '@kne/react-intl';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@kne/responsive-utils';
 import withLocale from '../withLocale';
 import Sidebar from './Sidebar';
 import MailDetail from './MailDetail';
@@ -11,7 +13,7 @@ import getMailColumns, { getMailCardItem } from './getMailColumns';
 import { createCardRenders } from '../CardList';
 import { useOpenCompose } from './Compose';
 import { useAccountList } from '../fields';
-import { parseCurrentKey, toFilterObject } from '../utils';
+import { getDefaultAccountId, parseCurrentKey, toFilterObject } from '../utils';
 import { usePageRender } from '../PageLayout';
 import style from '../style.module.scss';
 
@@ -36,6 +38,8 @@ const Mailbox = createWithRemoteLoader({
     const [accountId, setAccountId] = useState(null);
     const [current, setCurrent] = useState('inbox');
     const [detailId, setDetailId] = useState(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const isMobile = useIsMobile();
     const ref = useRef(null);
     const { list: accounts } = useAccountList(apis);
     const { data: stats, reload: reloadStats } = useFetch(Object.assign({}, apis.mailGateway.mail.stats, { params: { accountId } }));
@@ -104,6 +108,12 @@ const Mailbox = createWithRemoteLoader({
       onOpenAccount: account => navigate(`${baseUrl}/accounts?${new URLSearchParams({ id: account.id, accountName: account.name })}`)
     };
 
+    const handleCompose = () =>
+      openCompose({
+        accountId: accountId || getDefaultAccountId(accounts),
+        onSuccess: reloadAll
+      });
+
     const sidebar = (
       <Sidebar
         baseUrl={baseUrl}
@@ -122,17 +132,43 @@ const Mailbox = createWithRemoteLoader({
           }
           clearSelectedRows();
           setCurrent(key);
+          setSidebarOpen(false);
         }}
         stats={stats}
-        onCompose={() =>
-          openCompose({
-            accountId:
-              accountId ||
-              (accounts.find(item => item.isDefault && item.status === 'enabled') || accounts.find(item => item.status === 'enabled'))?.id,
-            onSuccess: reloadAll
-          })
-        }
+        onCompose={() => {
+          setSidebarOpen(false);
+          handleCompose();
+        }}
       />
+    );
+
+    const folderTitleIds = { inbox: 'Inbox', sent: 'Sent', draft: 'Draft', trash: 'Trash' };
+    const currentTitle = labelId
+      ? (stats?.labels || []).find(item => String(item.id) === String(labelId))?.name || formatMessage({ id: 'Label' })
+      : formatMessage({ id: folderTitleIds[folder] || 'Inbox' });
+    const currentAccount = accountId ? accountMap.get(String(accountId)) : null;
+    const hasUnread = (stats?.folders?.inbox?.unread || 0) > 0;
+
+    const mobileBar = (
+      <Flex align="center" gap={8} className={style['mailbox-mobile-bar']}>
+        <Button
+          className={style['mailbox-mobile-bar-switch']}
+          icon={
+            <Badge dot={hasUnread}>
+              <MenuOutlined />
+            </Badge>
+          }
+          onClick={() => setSidebarOpen(true)}
+        >
+          <span className={style['mailbox-mobile-bar-text']}>
+            <span className={style['mailbox-mobile-bar-title']}>{currentTitle}</span>
+            <span className={style['mailbox-mobile-bar-account']}>{currentAccount ? currentAccount.name : formatMessage({ id: 'AllAccounts' })}</span>
+          </span>
+        </Button>
+        <Button type="primary" icon={<FormOutlined />} onClick={handleCompose}>
+          {formatMessage({ id: 'Compose' })}
+        </Button>
+      </Flex>
     );
 
     const ListPage = renderPage ? TablePage : LayoutTablePage;
@@ -140,29 +176,29 @@ const Mailbox = createWithRemoteLoader({
       <ListPage
         {...(renderPage ? {} : { isNext: true, page: Object.assign({ menu: sidebar }, pageProps) })}
         key={listKey}
-          ref={ref}
-          name={`mail-gateway-mailbox-${folder}`}
-          {...Object.assign({}, mailApis.list, { params: { filter: baseFilter } })}
-          search={{ name: 'keyword', label: formatMessage({ id: 'Keyword' }), placeholder: formatMessage({ id: 'MailSearchPlaceholder' }) }}
-          filter={{
-            list: [],
-            mapFilterValue: value => ({ filter: Object.assign({}, baseFilter, toFilterObject(value)) })
-          }}
-          pagination={{ paramsType: 'params' }}
-          dataFormat={data => {
-            dataRef.current = data.pageData || [];
-            return { list: dataRef.current, total: data.totalCount, data };
-          }}
-          rowSelection={{
-            type: 'checkbox',
-            selectedRowKeys,
-            allowSelectedAll: false,
-            onChange: keys => setSelectedRowKeys(keys, dataRef.current || [])
-          }}
-          selectedRows={selectedRows}
-          batchActions={batchActions}
-          columns={getMailColumns(columnOptions)}
-          {...createCardRenders(getMailCardItem(columnOptions))}
+        ref={ref}
+        name={`mail-gateway-mailbox-${folder}`}
+        {...Object.assign({}, mailApis.list, { params: { filter: baseFilter } })}
+        search={{ name: 'keyword', label: formatMessage({ id: 'Keyword' }), placeholder: formatMessage({ id: 'MailSearchPlaceholder' }) }}
+        filter={{
+          list: [],
+          mapFilterValue: value => ({ filter: Object.assign({}, baseFilter, toFilterObject(value)) })
+        }}
+        pagination={{ paramsType: 'params' }}
+        dataFormat={data => {
+          dataRef.current = data.pageData || [];
+          return { list: dataRef.current, total: data.totalCount, data };
+        }}
+        rowSelection={{
+          type: 'checkbox',
+          selectedRowKeys,
+          allowSelectedAll: true,
+          onChange: keys => setSelectedRowKeys(keys, dataRef.current || [])
+        }}
+        selectedRows={selectedRows}
+        batchActions={batchActions}
+        columns={getMailColumns(columnOptions)}
+        {...createCardRenders(getMailCardItem(columnOptions))}
       />
     );
 
@@ -173,12 +209,24 @@ const Mailbox = createWithRemoteLoader({
               title: formatMessage({ id: 'Mailbox' }),
               children: (
                 <div className={style['mailbox-page']}>
-                  <div className={style['mailbox-page-sidebar']}>{sidebar}</div>
+                  {isMobile ? mobileBar : <div className={style['mailbox-page-sidebar']}>{sidebar}</div>}
                   <div className={style['mailbox-page-main']}>{table}</div>
                 </div>
               )
             })
           : table}
+        {renderPage && isMobile && (
+          <Drawer
+            open={sidebarOpen}
+            placement="left"
+            title={formatMessage({ id: 'Mailbox' })}
+            footer={null}
+            noPadding
+            onClose={() => setSidebarOpen(false)}
+          >
+            {sidebar}
+          </Drawer>
+        )}
         <Drawer
           open={!!detailId}
           width={820}

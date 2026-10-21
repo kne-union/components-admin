@@ -4,7 +4,7 @@ import { useIntl } from '@kne/react-intl';
 import BizUnit from '@components/BizUnit';
 import withLocale from '../withLocale';
 import enums from '../enums';
-import Menu from '../Menu';
+import { useBizUnitPage } from '../PageLayout';
 import { getMoveSortActions } from '../MoveSortButton';
 import { ContactsProvider, useAccountList, useGetContacts } from '../fields';
 import { useActionList } from './ActionsField';
@@ -37,11 +37,7 @@ const Rule = createWithRemoteLoader({
       <BizUnit
         isNext
         name="mail-gateway-rule"
-        page={{
-          title: formatMessage({ id: 'RuleManage' }),
-          menu: <Menu baseUrl={baseUrl} />,
-          ...pageProps
-        }}
+        {...useBizUnitPage({ title: formatMessage({ id: 'RuleManage' }), baseUrl, pageProps })}
         apis={{
           list: Object.assign({}, ruleApis.list, {
             params: { filter: {} },
