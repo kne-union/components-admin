@@ -109,6 +109,10 @@ const Rule = createWithRemoteLoader({
                   ? item.accountIds.map(id => accountMap.get(String(id))?.name || id).join('、')
                   : formatMessage({ id: 'AllAccounts' })
               },
+              item.direction === 'schedule' && {
+                label: formatMessage({ id: 'ScheduleTrigger' }),
+                value: formatMessage({ id: 'ScheduleTriggerSummary' }, { window: item.trigger?.windowDays ?? '-', count: item.trigger?.minCount ?? '-' })
+              },
               { label: formatMessage({ id: 'Conditions' }), value: formatConditions(item.conditions, { formatMessage, locale, conditionMap }) },
               {
                 label: formatMessage({ id: 'Actions' }),

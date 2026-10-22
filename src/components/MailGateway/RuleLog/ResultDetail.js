@@ -42,10 +42,15 @@ export const ResultItem = ({ item, index, actionMap, formatMessage }) => (
   </div>
 );
 
-const canReexecute = log => (log.status === 'failed' || log.status === 'partial') && log.direction !== 'beforeSend';
+const canReexecute = log => (log.status === 'failed' || log.status === 'partial') && !['beforeSend', 'schedule'].includes(log.direction);
 
-// 发信前规则拦截或出错时邮件未入库，日志没有关联邮件
-export const getLogSubject = (log, formatMessage) => log.mail?.subject || formatMessage({ id: log.mail || log.mailId ? 'NoSubject' : 'MailNotSent' });
+// 发信前规则拦截或出错时邮件未入库，日志没有关联邮件；定时规则一次处理一批邮件，显示数量
+export const getLogSubject = (log, formatMessage) => {
+  if (log.direction === 'schedule') {
+    return formatMessage({ id: 'ScheduleMailCount' }, { count: (log.mailIds || []).length });
+  }
+  return log.mail?.subject || formatMessage({ id: log.mail || log.mailId ? 'NoSubject' : 'MailNotSent' });
+};
 
 const LogDetailContent = withLocale(
   createWithRemoteLoader({

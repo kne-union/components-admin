@@ -69,7 +69,7 @@
 
 ### Rule
 
-收发规则页：按触发时机（收信后 / 发信前 / 发信后）、适用邮箱、优先级配置条件与动作链，支持启用 / 停用、排序和试运行。发信前规则可拦截发送或修改主题、正文、收件人，只在发信时执行，试运行不提供「执行规则」。
+收发规则页：按触发时机（收信后 / 发信前 / 发信后 / 未读邮件）、适用邮箱、优先级配置条件与动作链，支持启用 / 停用、排序和试运行。发信前规则可拦截发送、修改主题、正文、收件人或改存草稿，只在发信时执行，试运行不提供「执行规则」。未读邮件规则定时检查，需配置统计时间窗口、未读邮件数量和触发间隔，条件用于筛选计入统计的未读邮件，达到数量后批量执行动作（如汇总转发、标为已读），同样不提供「执行规则」。发信被规则改存草稿时，写信弹窗提示「邮件未发送，已存入草稿箱」。
 
 #### 属性说明
 
@@ -238,7 +238,7 @@ const renderPage = ({ title, children }) => <Page title={title}>{children}</Page
 | --------------------- | ---------------------------------------------------------- |
 | mailFolder            | inbox、sent、draft、trash                                  |
 | mailAccountStatus     | enabled、disabled                                          |
-| mailRuleDirection     | receive、beforeSend、send                                  |
+| mailRuleDirection     | receive、beforeSend、send、schedule                        |
 | mailRuleStatus        | enabled、disabled                                          |
 | mailTemplateStatus    | enabled、disabled                                          |
 | mailTemplateLevel     | 0（系统默认）、1（自定义）                                 |
