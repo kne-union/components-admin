@@ -130,7 +130,12 @@ export const useOpenCompose = ({ FormInfo, usePreset, getContacts: getContactsPr
             if (resData.code !== 0) {
               return false;
             }
-            message.success(formatMessage({ id: 'MailSent' }));
+            // 发信前规则可能要求改存草稿（如翻译后待核对），此时邮件未发出
+            if (resData.data?.folder === 'draft') {
+              message.info(formatMessage({ id: 'MailSavedToDraftByRule' }));
+            } else {
+              message.success(formatMessage({ id: 'MailSent' }));
+            }
             onSuccess && onSuccess();
           }
         },

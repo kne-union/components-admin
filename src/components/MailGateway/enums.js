@@ -22,7 +22,8 @@ const mailAccountStatus = createEnum([
 const mailRuleDirection = createEnum([
   { value: 'receive', id: 'DirectionReceive', type: 'info' },
   { value: 'beforeSend', id: 'DirectionBeforeSend', type: 'progress' },
-  { value: 'send', id: 'DirectionSend', type: 'other' }
+  { value: 'send', id: 'DirectionSend', type: 'other' },
+  { value: 'schedule', id: 'DirectionSchedule', type: 'success' }
 ]);
 
 const mailRuleStatus = createEnum([

@@ -157,7 +157,9 @@ const TestResult = withLocale(({ payload, conditions, actions, actionMap, condit
               ? willExecute
                 ? direction === 'beforeSend'
                   ? 'TestMatchedBeforeSendDesc'
-                  : 'TestMatchedDesc'
+                  : direction === 'schedule'
+                    ? 'TestMatchedScheduleDesc'
+                    : 'TestMatchedDesc'
                 : 'TestMatchedNoActionDesc'
               : 'TestNotMatchedDesc'
         })}
@@ -304,7 +306,7 @@ const TestRuleButton = createWithRemoteLoader({
                 if (resData.code !== 0) {
                   return false;
                 }
-                const executable = data.direction !== 'beforeSend' && resData.data.matchedCount > 0 && actions.length > 0;
+                const executable = !['beforeSend', 'schedule'].includes(data.direction) && resData.data.matchedCount > 0 && actions.length > 0;
                 const matchedMailIds = (resData.data.results || []).filter(item => item.matched).map(item => item.mailId);
                 modal({
                   title: formatMessage({ id: 'TestResult' }),
@@ -342,7 +344,7 @@ const TestRuleButton = createWithRemoteLoader({
                       label={formatMessage({ id: 'TestMail' })}
                       rule="REQ"
                       tips={formatMessage({ id: 'TestMailMaxCount' })}
-                      folder={data.direction === 'receive' ? 'inbox' : 'sent'}
+                      folder={['receive', 'schedule'].includes(data.direction) ? 'inbox' : 'sent'}
                     />
                   ]}
                 />

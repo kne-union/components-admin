@@ -245,6 +245,13 @@
   font-family: inherit;
 }
 
+.part-title-tips {
+  margin-left: 12px;
+  font-size: 12px;
+  font-weight: normal;
+  color: var(--font-color-grey, #8c8c8c);
+}
+
 .label-hidden-part :global(.react-form__field-label):not(.rule-row-extension *) {
   display: none;
 }
