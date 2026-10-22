@@ -5,3 +5,4 @@ export { default as OidcAuthenticate } from './OidcAuthenticate';
 export { default as TenantSwitch } from './TenantSwitch';
 export { default as OidcLogout } from './OidcLogout';
 export { createProof, decodeJwtPayload } from './dpop';
+export { appUrl } from '../../utils/publicUrl';

@@ -177,8 +177,8 @@ render(<BaseExample />);
 |--------|------|------|--------|------|
 | clientId | string | 是 | - | 在 IdP 注册的 client_id（fastify-oidc 的 `OIDC_CLIENT_ID`） |
 | issuer | string | 否 | `${origin}/oidc` | IdP issuer 地址，需与 fastify-oidc 的 `issuer` 一致 |
-| redirectUri | string | 否 | `${origin}${PUBLIC_URL}/oidc-callback` | 登录回调地址，需在 client 的 `redirect_uris` 中登记 |
-| postLogoutRedirectUri | string | 否 | `${origin}${PUBLIC_URL}/` | 退出后回跳地址，需在 client 的 `post_logout_redirect_uris` 中登记 |
+| redirectUri | string | 否 | `${origin}${appUrl.basePath()}/oidc-callback` | 登录回调地址，需在 client 的 `redirect_uris` 中登记 |
+| postLogoutRedirectUri | string | 否 | `${origin}${appUrl.basePath()}/` | 退出后回跳地址，需在 client 的 `post_logout_redirect_uris` 中登记 |
 | resource | string | 否 | - | 资源指示（audience），不传时 IdP 使用 client 允许的第一个资源 |
 | scope | string | 否 | `openid profile offline_access api` | 申请的 scope |
 | dpop | boolean | 否 | false | 是否开启 DPoP，开启后令牌绑定浏览器密钥（密钥存于 IndexedDB） |
@@ -287,6 +287,23 @@ IdP 登录交互页，路由路径需与 fastify-oidc 的 `interactionPage`（�
 |--------|------|--------|------|
 | createProof | `{ keyPair, method, url, accessToken?, nonce? }` | `Promise<string>` | 生成访问资源服务用的 DPoP proof |
 | decodeJwtPayload | `token: string` | object \| null | 解码 JWT payload（不验签） |
+
+### appUrl
+
+应用地址工具，统一处理子应用挂载前缀（App Manager 注入的 `window.runtimePublicUrl`）、静态资源根与接口根（`window.runtimeApiUrl`）。所有方法对已带前缀的路径、`http(s)://`、`//`、`data:`、`blob:` 地址原样返回，不会重复拼接。业务项目通过 `components-admin:Oidc@appUrl` 获取，`createOidcClient` 的默认回调地址也基于它计算。
+
+#### 方法说明
+
+| 方法名 | 参数 | 返回值 | 说明 |
+|--------|------|--------|------|
+| basePath | - | string | 页面挂载前缀，如 `/app/questionnaire`；未挂载或 `runtimePublicUrl` 为 CDN 地址时为空字符串 |
+| page | `pathname: string` | string | 以 `/` 开头的页面路径补上挂载前缀，用于 `window.location` 整页跳转 |
+| strip | `pathname: string` | string | 去掉挂载前缀，用于路由 `navigate`，避免 basename 重复 |
+| absolute | `pathname: string` | string | `origin` + 挂载前缀 + 路径，用于对外分享的完整链接、二维码 |
+| routerBasename | - | string \| undefined | `BrowserRouter` 的 `basename`，无挂载前缀时为 `undefined` |
+| asset | `pathname: string` | string | 静态资源地址，基于 `runtimePublicUrl`（可为 CDN）或 `window.PUBLIC_URL` |
+| apiBase | - | string | 接口根，`runtimeApiUrl` 去尾斜杠；为 `/` 或未注入时为空字符串 |
+| api | `pathname: string` | string | 接口或服务端返回的文件地址补上接口根，已带前缀的地址不重复拼接 |
 
 ### 依赖接口
 
