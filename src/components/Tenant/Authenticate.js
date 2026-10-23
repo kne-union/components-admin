@@ -4,6 +4,7 @@ import Fetch from '@kne/react-fetch';
 import { App, Result, Button, Flex } from 'antd';
 import dayjs from 'dayjs';
 import withLocale from './withLocale';
+import isManagedTenant from './isManagedTenant';
 import { withPublicUrl } from '../../utils/publicUrl';
 import { useIntl } from '@kne/react-intl';
 
@@ -11,14 +12,14 @@ const getTenantName = item => item?.tenant?.tenantCompany?.name || item?.tenant?
 
 /**
  * 读取租户身份失败时按可用租户分流：没有可用租户给出说明与切换账号；有则直接选择进入；可用租户也取不到时回到通用错误页。
- * OIDC 子应用切换租户须带宿主租户 id 重新授权，托管租户用 managedBy.hostTenantId
+ * OIDC 下普通租户换令牌重新授权；托管租户在 independent 子应用里由本地默认租户决定，只切默认租户
  */
 const TenantUnavailable = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
 })(({ remoteModules, error }) => {
   const [usePreset] = remoteModules;
   const { formatMessage } = useIntl();
-  const { apis, oidc } = usePreset();
+  const { apis, ajax, oidc } = usePreset();
   const [switching, setSwitching] = useState(null);
   const referer = encodeURIComponent(window.location.pathname + window.location.search);
   const switchAccount = () => {
@@ -28,14 +29,22 @@ const TenantUnavailable = createWithRemoteLoader({
     }
     window.location.href = `${withPublicUrl('/account/login')}?referer=${referer}`;
   };
-  const enterTenant = item => {
+  const enterTenant = async item => {
     if (!oidc) {
       window.location.href = `${withPublicUrl('/login-tenant')}?referer=${referer}`;
       return;
     }
-    const tenantId = item.tenant?.options?.managedBy?.hostTenantId || item.tenantId;
     setSwitching(String(item.tenantId));
-    Promise.resolve(oidc.switchTenant(tenantId, { returnTo: window.location.pathname + window.location.search })).finally(() => setSwitching(null));
+    if (isManagedTenant(item.tenant)) {
+      const { data: resData } = await ajax(Object.assign({}, apis.tenant.switchDefaultTenant, { data: { tenantId: item.tenantId } }));
+      if (resData.code !== 0) {
+        setSwitching(null);
+        return;
+      }
+      window.location.reload();
+      return;
+    }
+    Promise.resolve(oidc.switchTenant(item.tenantId, { returnTo: window.location.pathname + window.location.search })).finally(() => setSwitching(null));
   };
   const renderFailed = () => (
     <Result status="500" title={error || formatMessage({ id: 'UserInfoFetchFailed' })} subTitle={formatMessage({ id: 'ContactAdminOrAction' })}>

@@ -5,6 +5,7 @@ import Fetch from '@kne/react-fetch';
 import { useState } from 'react';
 import classnames from 'classnames';
 import withLocale from '../withLocale';
+import isManagedTenant from '../isManagedTenant';
 import { withPublicUrl } from '../../../utils/publicUrl';
 import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
@@ -28,6 +29,12 @@ const getTenantDisplay = item => {
 
 const isSameTenant = (a, b) => a != null && b != null && String(a) === String(b);
 
+// 托管租户在 independent 子应用里，当前租户由本地默认租户决定，令牌里的宿主租户不参与，换租户不需要重新授权
+const usesTokenTenant = (oidc, item) => !!oidc && !isManagedTenant(item?.tenant);
+
+const isCurrentTenantOf = ({ oidc, tokenTenantId, defaultTenantId }) => item =>
+  isSameTenant(item?.tenantId, usesTokenTenant(oidc, item) ? tokenTenantId : defaultTenantId);
+
 /** 嵌入宿主 Page（如 @kne/system-layout）时使用：样式与 Oidc 交互页的选择租户一致，点击租户直接进入 */
 const EmbeddedSelectTenant = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:Image']
@@ -43,19 +50,20 @@ const EmbeddedSelectTenant = createWithRemoteLoader({
       render={({ data }) => {
         const list = data?.list || [];
         const tokenTenantId = oidc?.getTenantId?.();
-        const currentTenantId = (oidc && tokenTenantId) || data?.defaultTenantId;
+        const isCurrentTenant = isCurrentTenantOf({ oidc, tokenTenantId, defaultTenantId: data?.defaultTenantId });
+        const currentTenantId = list.find(isCurrentTenant)?.tenantId;
 
         const enter = async item => {
           if (item.status !== 'open' || switchingId) {
             return;
           }
-          // OIDC 下当前租户由令牌决定，换租户需重新签发令牌
-          if (isSameTenant(item.tenantId, oidc ? tokenTenantId : data?.defaultTenantId)) {
+          if (isCurrentTenant(item)) {
             window.location.href = withPublicUrl(tenantPath);
             return;
           }
           setSwitchingId(item.tenantId);
-          if (oidc) {
+          // OIDC 下当前租户由令牌决定，换租户需重新签发令牌
+          if (usesTokenTenant(oidc, item)) {
             oidc.switchTenant(item.tenantId, { returnTo: withPublicUrl(tenantPath) });
             return;
           }
@@ -158,7 +166,8 @@ const SelectTenant = createWithRemoteLoader({
           render={({ data, reload }) => {
             const list = data?.list || [];
             const tokenTenantId = oidc?.getTenantId?.();
-            const currentTenantId = (oidc && tokenTenantId) || data?.defaultTenantId;
+            const isCurrentTenant = isCurrentTenantOf({ oidc, tokenTenantId, defaultTenantId: data?.defaultTenantId });
+            const currentTenantId = list.find(isCurrentTenant)?.tenantId;
             const selectedTenantId = (oidc && pickedId) || currentTenantId;
             const selectedTenantUser = list.find(item => isSameTenant(item.tenantId, selectedTenantId));
             const canEnter = selectedTenantUser && selectedTenantUser.status === 'open';
@@ -279,10 +288,23 @@ const SelectTenant = createWithRemoteLoader({
                       loading={!!switchingId}
                       icon={<RightOutlined />}
                       iconPosition="end"
-                      onClick={() => {
-                        if (oidc && !isSameTenant(selectedTenantId, tokenTenantId)) {
-                          setSwitchingId(selectedTenantId);
+                      onClick={async () => {
+                        if (isCurrentTenant(selectedTenantUser)) {
+                          window.location.href = withPublicUrl(tenantPath);
+                          return;
+                        }
+                        setSwitchingId(selectedTenantId);
+                        if (usesTokenTenant(oidc, selectedTenantUser)) {
                           oidc.switchTenant(selectedTenantId, { returnTo: withPublicUrl(tenantPath) });
+                          return;
+                        }
+                        const { data: resData } = await ajax(
+                          Object.assign({}, apis.tenant.switchDefaultTenant, {
+                            data: { tenantId: selectedTenantId }
+                          })
+                        );
+                        if (resData.code !== 0) {
+                          setSwitchingId(null);
                           return;
                         }
                         window.location.href = withPublicUrl(tenantPath);
