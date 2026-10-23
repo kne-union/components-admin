@@ -6,19 +6,24 @@ import { useState } from 'react';
 import transform from 'lodash/transform';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
+import isManagedTenant from '../isManagedTenant';
+import ManagedTenantAlert from '../ManagedTenantAlert';
 
 const PermissionInner = createWithRemoteLoader({
   modules: [
     'components-core:Layout@Page',
     'components-core:Global@usePreset',
+    'components-core:Global@useGlobalContext',
     'components-core:Permissions',
     'components-core:Permissions@usePermissionsPass',
     'components-core:StateBar'
   ]
 })(({ remoteModules, menu, pageProps: originPageProps, children }) => {
-  const [Page, usePreset, Permissions, usePermissionsPass, StateBar] = remoteModules;
+  const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass, StateBar] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
+  const { global } = useGlobalContext('userInfo');
+  const managed = isManagedTenant(global?.tenant);
   const allowRole = usePermissionsPass({ request: ['setting:permission:role'] });
   const allowSharedGroup = usePermissionsPass({ request: ['setting:permission:shared-group'] });
   const allowRoleCreate = usePermissionsPass({ request: ['setting:permission:role:create'] });
@@ -29,11 +34,11 @@ const PermissionInner = createWithRemoteLoader({
   const allowSharedGroupRemove = usePermissionsPass({ request: ['setting:permission:shared-group:remove'] });
   const [activeKey, setActiveKey] = useState(allowRole ? 'role' : 'sharedGroup');
   const rolePermissions = {
-    create: allowRoleCreate,
-    save: allowRoleEdit,
-    setStatus: allowRoleEdit,
-    permissionSave: allowRoleEdit,
-    remove: allowRoleRemove
+    create: !managed && allowRoleCreate,
+    save: !managed && allowRoleEdit,
+    setStatus: !managed && allowRoleEdit,
+    permissionSave: !managed && allowRoleEdit,
+    remove: !managed && allowRoleRemove
   };
   const sharedGroupPermissions = {
     list: true,
@@ -70,7 +75,9 @@ const PermissionInner = createWithRemoteLoader({
         </Permissions>
         {activeKey === 'role' && (
           <Permissions request={['setting:permission:role:view']} type="error">
+            {managed && <ManagedTenantAlert />}
             <Role
+              readOnly={managed}
               apis={transform(
                 apis.tenant.role,
                 (result, value, key) => {

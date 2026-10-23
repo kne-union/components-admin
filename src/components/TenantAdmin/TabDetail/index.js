@@ -11,6 +11,7 @@ import Setting from './Setting';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import get from 'lodash/get';
+import { isManagedTenant } from '@components/Tenant';
 
 const contentMap = {
   company: Company,
@@ -76,6 +77,7 @@ const TabDetailInner = createWithRemoteLoader({
                   ) : (
                     <StateTag type="danger" text={formatMessage({ id: 'Close' })} />
                   ),
+                  ...(isManagedTenant(data) ? [<StateTag type="info" text={formatMessage({ id: 'ManagedByHost' })} />] : []),
                   `${formatMessage({ id: 'ServiceTimeRange' })}:${dayjs(data.serviceStartTime).format('YYYY-MM-DD')}~${dayjs(data.serviceEndTime).format('YYYY-MM-DD')}`,
                   `${formatMessage({ id: 'AccountCountTag' })}:${data.accountCount}`
                 ]}

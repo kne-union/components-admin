@@ -1,3 +1,5 @@
+import { isManagedTenant } from '@components/Tenant';
+
 const resolveTenantRowId = item => {
   const id = item?.id ?? item?.tenantId;
   if (id == null || id === '') {
@@ -38,6 +40,14 @@ const getColumns = ({ navigate, formatMessage }) => {
       renderType: 'tag',
       getValueOf: item => {
         return item.status === 'open' ? { type: 'success', text: formatMessage({ id: 'Open' }) } : { type: 'danger', text: formatMessage({ id: 'Close' }) };
+      }
+    },
+    {
+      name: 'source',
+      title: formatMessage({ id: 'TenantSource' }),
+      renderType: 'tag',
+      getValueOf: item => {
+        return isManagedTenant(item) ? { type: 'info', text: formatMessage({ id: 'ManagedByHost' }) } : { type: 'default', text: formatMessage({ id: 'LocalTenant' }) };
       }
     },
     {

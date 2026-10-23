@@ -1,5 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { OrgInfo } from '@components/Tenant';
+import { OrgInfo, isManagedTenant } from '@components/Tenant';
+import ManagedTenantAlert from '@components/Tenant/ManagedTenantAlert';
 import Fetch from '@kne/react-fetch';
 import { useSearchParams } from 'react-router-dom';
 import withLocale from '../../withLocale';
@@ -12,6 +13,7 @@ const Org = createWithRemoteLoader({
     const [usePreset] = remoteModules;
     const { apis } = usePreset();
     const [searchParams, setSearchParams] = useSearchParams();
+    const managed = isManagedTenant(tenant);
     return (
       <Fetch
         {...Object.assign({}, apis.tenantAdmin.orgLinkConfig, {
@@ -29,13 +31,15 @@ const Org = createWithRemoteLoader({
               })}
               render={({ data, reload }) => {
                 return (
+                  <Flex vertical gap={16}>
+                  {managed && <ManagedTenantAlert style={{ marginBottom: 0 }} />}
                   <OrgInfo
                     data={data}
                     tenantId={tenant.id}
                     companyName={tenant?.tenantCompany?.name}
                     onSuccess={reload}
                     linkedSource={linkedSource}
-                    linkSettingProps={syncSupported ? {
+                    linkSettingProps={syncSupported && !managed ? {
                       tenantId: tenant.id,
                       envArgs: tenant.tenantSetting?.args || [],
                       onLinkChange: reloadLinkConfig
@@ -54,13 +58,13 @@ const Org = createWithRemoteLoader({
                       setSearchParams(next);
                     }}
                     apis={{
-                      create: Object.assign({}, apis.tenantAdmin.orgCreate, {
+                      create: !managed && Object.assign({}, apis.tenantAdmin.orgCreate, {
                         data: { tenantId: tenant.id }
                       }),
-                      save: Object.assign({}, apis.tenantAdmin.orgSave, {
+                      save: !managed && Object.assign({}, apis.tenantAdmin.orgSave, {
                         data: { tenantId: tenant.id }
                       }),
-                      remove: Object.assign({}, apis.tenantAdmin.orgRemove, {
+                      remove: !managed && Object.assign({}, apis.tenantAdmin.orgRemove, {
                         data: { tenantId: tenant.id }
                       }),
                       userList: Object.assign({}, apis.tenantAdmin.userList, {
@@ -69,7 +73,7 @@ const Org = createWithRemoteLoader({
                       orgList: Object.assign({}, apis.tenantAdmin.orgList, {
                         params: { tenantId: tenant.id }
                       }),
-                      import: apis.tenantAdmin.orgBatchImport,
+                      import: !managed && apis.tenantAdmin.orgBatchImport,
                       orgLinkConfig: Object.assign({}, apis.tenantAdmin.orgLinkConfig, {
                         params: { tenantId: tenant.id }
                       }),
@@ -93,6 +97,7 @@ const Org = createWithRemoteLoader({
                       })
                     }}
                   />
+                  </Flex>
                 );
               }}
             />

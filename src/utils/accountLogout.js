@@ -42,18 +42,18 @@ export const clearAppTokens = (storeKeys, domain) => {
 
 export const createLogoutHandler = ({ storeKeys, domain, loginUrl = '/account/login', oidcClient, referer } = {}) => {
   return async () => {
-    const returnTo = buildLogoutReturnTo({ loginUrl, referer });
     const client = oidcClient || findActiveOidcClient();
 
     clearAppTokens(storeKeys, domain);
 
+    // post_logout_redirect_uri 须与 IdP 登记值完全一致，带 referer 的登录页地址无法登记，交给 client 默认的 postLogoutRedirectUri
     if (client?.isAuthenticated?.()) {
-      await client.logout({ returnTo });
+      await client.logout();
       return;
     }
 
     if (typeof window !== 'undefined') {
-      window.location.href = returnTo;
+      window.location.href = buildLogoutReturnTo({ loginUrl, referer });
     }
   };
 };

@@ -4,29 +4,39 @@ import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import get from 'lodash/get';
 import TablePageRender from '@components/BizUnit/TablePageRender';
+import isManagedTenant from '../isManagedTenant';
+import ManagedTenantAlert from '../ManagedTenantAlert';
 
 const User = createWithRemoteLoader({
   modules: [
     'components-core:Layout@Page',
     'components-core:Global@usePreset',
+    'components-core:Global@useGlobalContext',
     'components-core:Permissions',
     'components-core:Permissions@usePermissionsPass'
   ]
 })(({ remoteModules, menu, children, pageProps: originPageProps, apis: extraApis = {} }) => {
-  const [Page, usePreset, Permissions, usePermissionsPass] = remoteModules;
+  const [Page, usePreset, useGlobalContext, Permissions, usePermissionsPass] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis, plugins } = usePreset();
+  const { global } = useGlobalContext('userInfo');
+  const managed = isManagedTenant(global?.tenant);
   const getActions = get(plugins, 'tenant.getUserListActions');
-  const allowCreate = usePermissionsPass({ request: ['setting:user-manager:create'] });
-  const allowSave = usePermissionsPass({ request: ['setting:user-manager:edit'] });
-  const allowRemove = usePermissionsPass({ request: ['setting:user-manager:remove'] });
-  const allowInvite = usePermissionsPass({ request: ['setting:user-manager:invite'] });
+  const passCreate = usePermissionsPass({ request: ['setting:user-manager:create'] });
+  const passSave = usePermissionsPass({ request: ['setting:user-manager:edit'] });
+  const passRemove = usePermissionsPass({ request: ['setting:user-manager:remove'] });
+  const passInvite = usePermissionsPass({ request: ['setting:user-manager:invite'] });
+  const allowCreate = !managed && passCreate;
+  const allowSave = !managed && passSave;
+  const allowRemove = !managed && passRemove;
+  const allowInvite = !managed && passInvite;
 
   const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'UserManagement' }),
     children: (
       <Permissions request={['setting:user-manager:view']} type="error">
+        {managed && <ManagedTenantAlert />}
         <UserList
           topOptionsSize="small"
           allowQueryIdForUserFilter

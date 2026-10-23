@@ -1,6 +1,6 @@
 {
   "tenantList": {
-    "totalCount": 5,
+    "totalCount": 6,
     "pageData": [
       {
         "id": "tenant-001",
@@ -61,6 +61,25 @@
         "serviceStartTime": "2024-09-01",
         "serviceEndTime": "2025-08-31",
         "createdAt": "2024-08-15T11:20:00Z"
+      },
+      {
+        "id": "tenant-host-001",
+        "name": "华南物流集团（宿主）",
+        "status": "open",
+        "description": "由宿主系统同步的租户，基本信息、成员、角色与组织架构以宿主为准，本地只读。",
+        "logo": "https://api.dicebear.com/7.x/identicon/svg?seed=logistics",
+        "themeColor": "#fa8c16",
+        "accountCount": 300,
+        "serviceStartTime": "2026-01-01",
+        "serviceEndTime": "2027-12-31",
+        "createdAt": "2026-10-22T10:00:00Z",
+        "options": {
+          "managedBy": {
+            "issuer": "https://hr.example.com/oidc",
+            "hostTenantId": "host-tenant-88",
+            "syncedAt": "2026-10-22T10:00:00.000Z"
+          }
+        }
       }
     ]
   },

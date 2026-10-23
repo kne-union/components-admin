@@ -3,6 +3,8 @@ import ClientManager from './ClientManager';
 import ResourceServerManager from './ResourceServerManager';
 import KeyManager from './KeyManager';
 import SessionManager from './SessionManager';
+import AppManager from './AppManager';
+import TenantApps from './TenantApps';
 
 const OidcAdmin = ({ baseUrl, children, ...props }) => {
   return (
@@ -23,8 +25,13 @@ const OidcAdmin = ({ baseUrl, children, ...props }) => {
         {
           path: 'sessions',
           element: <SessionManager {...props} baseUrl={baseUrl} />
+        },
+        {
+          path: 'apps',
+          element: <AppManager {...props} baseUrl={baseUrl} />
         }
-      ]}>
+      ]}
+    >
       {children}
     </AppChildrenRouter>
   );
@@ -32,5 +39,6 @@ const OidcAdmin = ({ baseUrl, children, ...props }) => {
 
 export default OidcAdmin;
 
-export { ClientManager, ResourceServerManager, KeyManager, SessionManager };
+export { ClientManager, ResourceServerManager, KeyManager, SessionManager, AppManager, TenantApps };
+export { toggleAppCodes } from './TenantApps/utils';
 export { toFormData as clientToFormData, toPayload as clientToPayload } from './ClientManager/utils';

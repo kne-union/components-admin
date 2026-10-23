@@ -434,6 +434,30 @@
           "packageName": "react-router-dom"
         }
       ]
+    },
+    {
+      "title": "宿主同步租户只读",
+      "description": "当前租户 options.managedBy 标记为宿主同步时，组织架构、用户管理、角色均只读并提示到宿主修改，角色「查看权限」以只读权限树打开；公司信息与共享组仍可编辑。",
+      "isFull": true,
+      "code": "./managed-setting.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        }
+      ]
     }
   ]
 }

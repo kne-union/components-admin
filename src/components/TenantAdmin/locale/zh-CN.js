@@ -97,6 +97,9 @@ const locale = {
   OrgLinkSyncRunningTip: '正在同步中，请等待完成后再操作',
   OrgSourceFrom: '来源：{source}',
   EditOrgLeader: '修改负责人',
+  TenantSource: '来源',
+  ManagedByHost: '宿主同步',
+  LocalTenant: '本地',
 };
 
 export default locale;

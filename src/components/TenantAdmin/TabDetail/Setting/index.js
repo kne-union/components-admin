@@ -2,6 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useState, useMemo } from 'react';
 import { Flex } from 'antd';
 import get from 'lodash/get';
+import { isManagedTenant } from '@components/Tenant';
 import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
 import Args from './Args';
@@ -49,6 +50,7 @@ const Setting = createWithRemoteLoader({
           ? appendSettingMenusProp
           : get(plugins, 'admin.tenant.appendSettingMenus', []) || [];
 
+      const managed = isManagedTenant(tenant);
       const { menuItems, contentMap } = useMemo(() => {
         const items = [
           {
@@ -60,7 +62,8 @@ const Setting = createWithRemoteLoader({
             label: formatMessage({ id: 'CustomComponents' })
           }
         ];
-        if (showLanguageSetting) {
+        // 托管租户的语言由宿主同步，本地不可改
+        if (showLanguageSetting && !managed) {
           items.push({
             key: 'language',
             label: formatMessage({ id: 'LanguageSetting' })
@@ -83,7 +86,7 @@ const Setting = createWithRemoteLoader({
           map[item.key] = item.component;
         });
         return { menuItems: items, contentMap: map };
-      }, [formatMessage, showLanguageSetting, appendSettingMenus]);
+      }, [formatMessage, showLanguageSetting, managed, appendSettingMenus]);
 
       const [activeKey, setActiveKey] = useState('args');
       const resolvedActiveKey = menuItems.some(item => item.key === activeKey) ? activeKey : 'args';

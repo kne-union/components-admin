@@ -5,6 +5,8 @@ import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import { useNavigate } from 'react-router-dom';
 import { Flex } from 'antd';
+import isManagedTenant from '../isManagedTenant';
+import ManagedTenantAlert from '../ManagedTenantAlert';
 
 const OrgInner = createWithRemoteLoader({
   modules: [
@@ -19,10 +21,14 @@ const OrgInner = createWithRemoteLoader({
   const { formatMessage } = useIntl();
   const { apis } = usePreset();
   const { global } = useGlobalContext('userInfo');
-  const allowCreate = usePermissionsPass({ request: ['setting:org:create'] });
-  const allowSave = usePermissionsPass({ request: ['setting:org:edit'] });
-  const allowRemove = usePermissionsPass({ request: ['setting:org:remove'] });
-  const allowImport = usePermissionsPass({ request: ['setting:org:create'] }) || usePermissionsPass({ request: ['setting:org:edit'] });
+  const managed = isManagedTenant(global?.tenant);
+  const passCreate = usePermissionsPass({ request: ['setting:org:create'] });
+  const passSave = usePermissionsPass({ request: ['setting:org:edit'] });
+  const passRemove = usePermissionsPass({ request: ['setting:org:remove'] });
+  const allowCreate = !managed && passCreate;
+  const allowSave = !managed && passSave;
+  const allowRemove = !managed && passRemove;
+  const allowImport = !managed && (passCreate || passSave);
   const allowViewUsers = usePermissionsPass({ request: ['setting:user-manager:view'] });
   const navigate = useNavigate();
 
@@ -42,13 +48,14 @@ const OrgInner = createWithRemoteLoader({
                 render={({ data, reload }) => {
                   return (
                     <Flex vertical gap={16}>
+                      {managed && <ManagedTenantAlert style={{ marginBottom: 0 }} />}
                       <OrgInfo
                         data={data}
                         tenantId={global.tenant?.id}
                         companyName={global.tenant?.tenantCompany?.name || global.tenant.name}
                         onSuccess={reload}
                         linkedSource={linkedSource}
-                        linkSettingProps={syncSupported ? {
+                        linkSettingProps={syncSupported && !managed ? {
                           tenantId: global.tenant?.id,
                           envArgs: global.tenant?.tenantSetting?.args || [],
                           onLinkChange: () => {
@@ -56,12 +63,12 @@ const OrgInner = createWithRemoteLoader({
                             reload();
                           }
                         } : null}
-                        thirdLoginSettingProps={{
+                        thirdLoginSettingProps={!managed ? {
                           envArgs: global.tenant?.tenantSetting?.args || [],
                           onChange: () => {
                             reloadLinkConfig();
                           }
-                        }}
+                        } : null}
                         onViewUsers={
                           allowViewUsers
                             ? org => {

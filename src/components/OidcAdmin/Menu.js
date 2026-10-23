@@ -16,7 +16,8 @@ const Menu = createWithRemoteLoader({
           { label: formatMessage({ id: 'ClientManager' }), key: 'clients', path: rootPath },
           { label: formatMessage({ id: 'ResourceServerManager' }), key: 'resourceServers', path: `${rootPath}/resource-servers` },
           { label: formatMessage({ id: 'KeyManager' }), key: 'keys', path: `${rootPath}/keys` },
-          { label: formatMessage({ id: 'SessionManager' }), key: 'sessions', path: `${rootPath}/sessions` }
+          { label: formatMessage({ id: 'SessionManager' }), key: 'sessions', path: `${rootPath}/sessions` },
+          { label: formatMessage({ id: 'AppManager' }), key: 'apps', path: `${rootPath}/apps` }
         ]}
       />
     );

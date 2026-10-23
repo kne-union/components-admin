@@ -7,7 +7,7 @@ import { useIntl } from '@kne/react-intl';
 
 const SetRolePermissionInner = createWithRemoteLoader({
   modules: ['components-core:Modal@useModal']
-})(({ remoteModules, onSuccess, data, apis, options, getFormInner, ...props }) => {
+})(({ remoteModules, onSuccess, data, apis, options, getFormInner, readOnly = false, ...props }) => {
   const [useModal] = remoteModules;
   const modal = useModal();
   const { formatMessage } = useIntl();
@@ -16,11 +16,12 @@ const SetRolePermissionInner = createWithRemoteLoader({
       {...props}
       onClick={() => {
         modal({
-          title: formatMessage({ id: 'SetRolePermission' }),
+          title: formatMessage({ id: readOnly ? 'ViewRolePermission' : 'SetRolePermission' }),
           size: 'large',
           footer: null,
           children: (
             <TenantPermission
+              disabled={readOnly}
               apis={{
                 list: merge({}, apis.permissionList, {
                   params: {

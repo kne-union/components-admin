@@ -96,7 +96,10 @@ const locale = {
   OrgLinkSyncPendingTip: 'The first sync has not completed yet. Please wait for it to finish before manually syncing.',
   OrgLinkSyncRunningTip: 'Sync is in progress. Please wait for it to complete.',
   OrgSourceFrom: 'Source: {source}',
-  EditOrgLeader: 'Edit Leader'
+  EditOrgLeader: 'Edit Leader',
+  TenantSource: 'Source',
+  ManagedByHost: 'Synced from Host',
+  LocalTenant: 'Local'
 };
 
 export default locale;
