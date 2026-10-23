@@ -2,6 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { App, Button, Flex } from 'antd';
 import { FolderFilled } from '@ant-design/icons';
 import Fetch from '@kne/react-fetch';
+import useControlValue from '@kne/use-control-value';
 import merge from 'lodash/merge';
 import { useIntl } from '@kne/react-intl';
 import withLocale from './withLocale';
@@ -67,6 +68,7 @@ const createComponent = (callback = item => item) => {
         const { message } = App.useApp();
         const formModal = useFormModal();
         const locale = useGlobalValue('locale');
+        const [open, setOpen] = useControlValue(props, { defaultValue: 'defaultOpen', value: 'open', onChange: 'onOpenChange' });
 
         const language = propsLanguage || locale || 'zh-CN';
 
@@ -104,7 +106,7 @@ const createComponent = (callback = item => item) => {
               }
             : undefined;
 
-        const openGroupForm = ({ editingGroup = null, treeData = [], reload } = {}) => {
+        const openGroupForm = ({ editingGroup = null, treeData = [], reload, afterClose } = {}) => {
           const allLabel = formatMessage({ id: 'GroupSelectAll' });
           const parentNode =
             showParent && editingGroup?.parentId != null ? findGroupInTree(treeData, editingGroup.parentId, valueKey) : null;
@@ -137,6 +139,7 @@ const createComponent = (callback = item => item) => {
           const modalApi = formModal({
             title: formatMessage({ id: editingGroup ? 'GroupSelectEdit' : 'GroupSelectAdd' }, { name: groupName }),
             size: 'small',
+            afterClose,
             formProps: {
               data: formData,
               rules: buildFormRules(editingGroup),
@@ -311,6 +314,8 @@ const createComponent = (callback = item => item) => {
                   labelKey={labelKey}
                   isPopup={false}
                   {...props}
+                  open={open}
+                  onOpenChange={setOpen}
                   dataType="tree"
                   defaultExpandedKeys
                   options={treeData}
@@ -339,7 +344,7 @@ const createComponent = (callback = item => item) => {
                             type="link"
                             onClick={() => {
                               close?.();
-                              openGroupForm({ treeData, reload });
+                              openGroupForm({ treeData, reload, afterClose: () => setOpen(true) });
                             }}
                           >
                             {formatMessage({ id: 'GroupSelectAdd' }, { name: groupName })}
