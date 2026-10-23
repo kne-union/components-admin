@@ -2,6 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { App, Button } from 'antd';
 import { FolderFilled } from '@ant-design/icons';
 import Fetch from '@kne/react-fetch';
+import useControlValue from '@kne/use-control-value';
 import merge from 'lodash/merge';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from '@kne/react-intl';
@@ -58,6 +59,7 @@ const createComponent = (callback = item => item) =>
         const [treeSyncKey, emitGroupTreeChange] = useGroupTreeSync(type, language);
         const groupName = propsGroupName || formatMessage({ id: 'GroupSelectDefaultName' });
         const allLabel = formatMessage({ id: 'GroupSelectAll' });
+        const [open, setOpen] = useControlValue(props, { defaultValue: 'defaultOpen', value: 'open', onChange: 'onOpenChange' });
 
         const groupApis = propsApis || presetApis?.group || {};
         const hasApis = propsApis !== undefined;
@@ -80,7 +82,7 @@ const createComponent = (callback = item => item) =>
         );
 
         const openGroupForm = useCallback(
-          ({ editingGroup = null, treeData = [], reload } = {}) => {
+          ({ editingGroup = null, treeData = [], reload, afterClose } = {}) => {
             const parentNode =
               showParent && editingGroup?.parentId != null
                 ? findGroupInTree(treeData, editingGroup.parentId, valueKey)
@@ -114,6 +116,7 @@ const createComponent = (callback = item => item) =>
             const modalApi = formModal({
               title: formatMessage({ id: editingGroup ? 'GroupSelectEdit' : 'GroupSelectAdd' }, { name: groupName }),
               size: 'small',
+              afterClose,
               formProps: {
                 data: formData,
                 rules:
@@ -227,6 +230,8 @@ const createComponent = (callback = item => item) =>
                 <Component
                   {...props}
                   {...colorProps}
+                  open={open}
+                  onOpenChange={setOpen}
                   single={single}
                   valueKey={valueKey}
                   labelKey={labelKey}
@@ -239,7 +244,7 @@ const createComponent = (callback = item => item) =>
                             type="link"
                             onClick={() => {
                               close?.();
-                              openGroupForm({ treeData, reload });
+                              openGroupForm({ treeData, reload, afterClose: () => setOpen(true) });
                             }}
                           >
                             {formatMessage({ id: 'GroupSelectAdd' }, { name: groupName })}
