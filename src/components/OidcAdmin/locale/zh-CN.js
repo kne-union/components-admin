@@ -4,6 +4,7 @@ const locale = {
   ResourceServerManager: '资源服务',
   KeyManager: '签名密钥',
   SessionManager: '登录会话',
+  AppManager: '应用中心',
 
   // Common
   Status: '状态',
@@ -86,7 +87,26 @@ const locale = {
   ForceLogout: '强制下线',
   ForceLogoutConfirm: '强制下线会结束该用户全部会话并撤销令牌，确定执行吗？',
   RevokeUserSuccess: '已撤销 {grants} 个授权，结束 {sessions} 个会话',
-  Close: '关闭'
+  Close: '关闭',
+
+  // App Center
+  App: '子应用',
+  AppName: '子应用名称',
+  AppCode: '应用编码',
+  TenantMode: '租户模式',
+  TenantModeClient: 'client（宿主提供）',
+  TenantModeIndependent: 'independent（本地接管）',
+  BoundClient: '关联应用',
+  AppResource: '资源标识',
+  PermissionCount: '权限数',
+  RegisteredAt: '注册时间',
+  ViewPermissions: '查看权限',
+  AppPermissionTitle: '{name} 的权限树',
+  RemoveAppConfirm: '删除后该子应用的权限将从所有租户中移除，子应用重启后会重新注册，确定删除吗？',
+  NoRegisteredApps: '暂无已注册的子应用',
+  TenantAppsTips: '开通后该租户可使用子应用的全部功能，如需关闭部分功能请在「权限」页签中调整',
+  AppEnabled: '已为租户开通 {name}',
+  AppDisabled: '已为租户关闭 {name}'
 };
 
 export default locale;

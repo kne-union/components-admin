@@ -110,6 +110,10 @@ const locale = {
   ContactAdminOrAction: '请联系管理员，或者进行以下操作',
   LoginOtherAccount: '登录其他账号',
   SwitchOtherTenant: '切换其他租户',
+  NoTenantIdentity: '暂无可用的租户身份',
+  NoTenantIdentityDescription: '当前账号还没有加入开通了本应用的租户，请联系租户管理员开通本应用或邀请你加入',
+  SelectTenantToEnter: '请选择要进入的租户',
+  SwitchAccount: '切换账号',
   ImportantNotice: '重要通知',
   ServicePeriodWarning: '您的系统服务期限为{startDate}～{endDate}，请联系管理员，超出服务期限系统可能会被禁用，目前暂时不影响使用',
 
@@ -124,6 +128,9 @@ const locale = {
   // Role
   SetPermission: '管理权限',
   SetRolePermission: '设置角色权限',
+  ViewPermission: '查看权限',
+  ViewRolePermission: '查看角色权限',
+  ManagedTenantTips: '该租户由宿主系统同步管理，请在宿主中修改',
   Description: '描述',
 
   // FormInner labels

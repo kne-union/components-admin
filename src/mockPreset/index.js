@@ -58,6 +58,9 @@ const collectOrgSubtreeIds = (orgs, rootId) => {
   return [...ids];
 };
 
+// 示例内按租户记住开通的权限 code，便于演示 TenantApps 开关后的刷新结果
+const tenantPermissionCodes = {};
+
 const orgLinkConfigMock = () => ({
   enabled: false,
   syncSupported: true,
@@ -1038,8 +1041,11 @@ const apis = merge({}, getApis(), {
       }
     },
     detail: {
-      loader: () => {
-        return import('./tenant-admin-data.json').then(({ default: data }) => data.tenantDetail);
+      loader: ({ params } = {}) => {
+        return import('./tenant-admin-data.json').then(({ default: data }) => {
+          const managed = data.tenantList.pageData.find(item => item.id === params?.id && item.options?.managedBy);
+          return managed ? Object.assign({}, data.tenantDetail, managed, { tenantCompany: { name: managed.name, logo: managed.logo } }) : data.tenantDetail;
+        });
       }
     },
     create: {
@@ -1199,12 +1205,19 @@ const apis = merge({}, getApis(), {
     },
     permission: {
       list: {
-        loader: () => {
-          return import('./tenant-data.json').then(({ default: data }) => data.permissionList);
+        loader: ({ params } = {}) => {
+          return import('./tenant-data.json').then(({ default: data }) =>
+            Object.assign({}, data.permissionList, { codes: tenantPermissionCodes[params?.tenantId] || data.permissionList.codes })
+          );
         }
       },
       save: {
-        loader: () => ({ code: 0 })
+        loader: ({ data } = {}) => {
+          if (data?.tenantId) {
+            tenantPermissionCodes[data.tenantId] = data.permissions || [];
+          }
+          return { code: 0 };
+        }
       }
     },
     appendArgs: {
@@ -1581,6 +1594,29 @@ const apis = merge({}, getApis(), {
       },
       revokeUser: {
         loader: ({ data }) => ({ grants: 3, sessions: data?.logout ? oidcData.sessionList.length : 0 })
+      }
+    },
+    app: {
+      list: {
+        loader: ({ params } = {}) => {
+          const filter = params?.filter || {};
+          const pageData = oidcData.appList.pageData.filter(
+            item =>
+              (!filter.status || item.status === filter.status) &&
+              (!filter.tenantMode || item.tenantMode === filter.tenantMode) &&
+              (!filter.keyword || item.code.includes(filter.keyword) || item.name.includes(filter.keyword))
+          );
+          return { pageData, totalCount: pageData.length };
+        }
+      },
+      detail: {
+        loader: ({ params } = {}) => oidcData.appList.pageData.find(item => item.id === params?.id)
+      },
+      setStatus: {
+        loader: () => ({})
+      },
+      remove: {
+        loader: () => ({})
       }
     }
   },

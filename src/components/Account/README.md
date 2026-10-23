@@ -397,6 +397,6 @@ const logout = useLogout({ storeKeys, domain, loginUrl });
 | loginUrl  | 登出后跳转的登录页面地址 | string            | '/account/login'          |
 | oidcClient | OIDC 客户端（可选，通常来自 preset.oidc） | object | - |
 
-返回值：`() => Promise<void>` - 执行登出：若存在已登录的 OIDC 会话则走 IdP 登出并带上 `post_logout_redirect_uri`（与 `loginUrl` + referer 一致），否则清本地 Token 后跳转应用登录页。`runtimePublicUrl` 为 CDN 绝对地址时不参与路径拼接。
+返回值：`() => Promise<void>` - 执行登出：若存在已登录的 OIDC 会话则走 IdP 登出，`post_logout_redirect_uri` 使用 client 的 `postLogoutRedirectUri`（默认 `${origin}${basePath}/`，需在 client 的 `post_logout_redirect_uris` 中登记），否则清本地 Token 后跳转应用登录页（`loginUrl` + referer）。`runtimePublicUrl` 为 CDN 绝对地址时不参与路径拼接。
 
 子应用挂载在路径前缀下时（App Manager 注入 `window.runtimePublicUrl`，如 `/app/talent-saas`），以 `/` 开头的 `loginUrl` 会自动补上该前缀；登录成功按 `referer` 跳回时也会去掉该前缀，避免路由 basename 重复。

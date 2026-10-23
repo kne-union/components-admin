@@ -70,6 +70,33 @@
           "packageName": "react-router-dom"
         }
       ]
+    },
+    {
+      "title": "宿主同步租户详情",
+      "description": "宿主同步的租户带「宿主同步」标签，隐藏编辑 / 开启关闭 / 删除，组织、用户、权限页签只读；同时演示通过 plugins.admin.tenant.appendTabDetails 挂载 OidcAdmin 的 TenantApps「子应用」页签。",
+      "code": "./managed-detail.js",
+      "scope": [
+        {
+          "name": "_TenantAdmin",
+          "packageName": "@components/TenantAdmin"
+        },
+        {
+          "name": "_OidcAdmin",
+          "packageName": "@components/OidcAdmin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        }
+      ]
     }
   ]
 }

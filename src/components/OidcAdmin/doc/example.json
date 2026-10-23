@@ -3,7 +3,7 @@
   "list": [
     {
       "title": "基础用法",
-      "description": "OIDC 管理后台：左侧菜单切换应用管理、资源服务、签名密钥、登录会话四个页面。",
+      "description": "OIDC 管理后台：左侧菜单切换应用管理、资源服务、签名密钥、登录会话、应用中心五个页面。",
       "code": "./base.js",
       "scope": [
         { "name": "_OidcAdmin", "packageName": "@components/OidcAdmin" },
@@ -20,6 +20,27 @@
         { "name": "_OidcAdmin", "packageName": "@components/OidcAdmin" },
         { "name": "_mockPreset", "packageName": "@root/mockPreset" },
         { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
+      ]
+    },
+    {
+      "title": "应用中心",
+      "description": "单独使用 AppManager：查看子应用注册的租户模式、关联应用与权限数，「查看权限」以只读权限树展示注册内容，可启用 / 停用或删除子应用。",
+      "code": "./app-manager.js",
+      "scope": [
+        { "name": "_OidcAdmin", "packageName": "@components/OidcAdmin" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" }
+      ]
+    },
+    {
+      "title": "租户开通子应用",
+      "description": "TenantApps 按租户开关子应用：开通写入该应用全部功能权限，关闭移除其下全部权限；通常经 plugins.admin.tenant.appendTabDetails 挂到租户详情页签。",
+      "code": "./tenant-apps.js",
+      "scope": [
+        { "name": "_OidcAdmin", "packageName": "@components/OidcAdmin" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
       ]
     }
   ]

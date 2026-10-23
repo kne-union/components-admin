@@ -46,6 +46,7 @@
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | apis | API 配置 | object | - |
+| readOnly | 只读：「管理权限」变为「查看权限」并以只读方式打开权限树；增删改按钮由是否传入对应 `apis` 决定 | boolean | false |
 
 角色列表 `apis.list` 支持 `params.filter`：
 
@@ -60,7 +61,24 @@
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | apis | API 配置 | object | - |
+| readOnly | 只读：租户权限树不可勾选，角色只保留列表与查看权限（共享组不受影响） | boolean | false |
 | children | 自定义渲染 | function | - |
+
+### PermissionPanel 权限树
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| settings | 权限树 `{ modules }` | object | - |
+| value / defaultValue / onChange | 已选权限 code（受控 / 非受控） | string[] | - |
+| disabled | 只读：禁用勾选并隐藏「全选」 | boolean | false |
+
+### 宿主同步的托管租户
+
+子应用以 fastify-oidc `independent` 模式接入宿主时，宿主同步过来的租户在 `tenant.options.managedBy.hostTenantId` 上有标记，其基本信息、成员、角色、权限与组织架构均以宿主为准，后端拒绝本地修改。前端相应只读：
+
+- `isManagedTenant(tenant)`：判断是否托管租户
+- `Setting` 的组织架构、用户管理、权限管理（角色）页隐藏新建 / 编辑 / 删除 / 导入 / 组织关联，顶部提示「该租户由宿主系统同步管理，请在宿主中修改」；公司信息与共享组仍可编辑
+- 当前租户取自 `useGlobalContext('userInfo').global.tenant`
 
 ### LoginTenant 租户登录
 

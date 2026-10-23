@@ -4,6 +4,7 @@ const locale = {
   ResourceServerManager: 'Resource Servers',
   KeyManager: 'Signing Keys',
   SessionManager: 'Sessions',
+  AppManager: 'App Center',
 
   // Common
   Status: 'Status',
@@ -86,7 +87,26 @@ const locale = {
   ForceLogout: 'Force Logout',
   ForceLogoutConfirm: 'This ends all sessions of the user and revokes all tokens. Continue?',
   RevokeUserSuccess: 'Revoked {grants} grants and ended {sessions} sessions',
-  Close: 'Close'
+  Close: 'Close',
+
+  // App Center
+  App: 'Sub-application',
+  AppName: 'Sub-application Name',
+  AppCode: 'App Code',
+  TenantMode: 'Tenant Mode',
+  TenantModeClient: 'client (provided by host)',
+  TenantModeIndependent: 'independent (taken over locally)',
+  BoundClient: 'Bound Clients',
+  AppResource: 'Resource Indicator',
+  PermissionCount: 'Permissions',
+  RegisteredAt: 'Registered At',
+  ViewPermissions: 'View Permissions',
+  AppPermissionTitle: 'Permission tree of {name}',
+  RemoveAppConfirm: 'The permissions of this sub-application will be removed from all tenants and it will register again after restart. Delete it?',
+  NoRegisteredApps: 'No registered sub-applications',
+  TenantAppsTips: 'Enabling grants all features of the sub-application; adjust individual features in the "Permission" tab',
+  AppEnabled: '{name} enabled for the tenant',
+  AppDisabled: '{name} disabled for the tenant'
 };
 
 export default locale;

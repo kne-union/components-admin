@@ -2,6 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useState } from 'react';
 import { Flex } from 'antd';
 import merge from 'lodash/merge';
+import pick from 'lodash/pick';
 import Role from '../Role';
 import SharedGroup from '../SharedGroup';
 import TenantPermission from '../TenantPermission';
@@ -11,11 +12,12 @@ import { useIntl } from '@kne/react-intl';
 
 const Permission = createWithRemoteLoader({
   modules: ['components-core:StateBar']
-})(({ remoteModules, apis, children }) => {
+})(({ remoteModules, apis, readOnly = false, children }) => {
   const [StateBar] = remoteModules;
   const { formatMessage } = useIntl();
   const [activeKey, setActiveKey] = useState('tenant-permission');
   const useCustomRender = typeof children === 'function';
+  const roleApis = readOnly ? pick(apis.role, ['list', 'permissionList']) : apis.role;
 
   const stateBar = (
     <StateBar
@@ -43,12 +45,14 @@ const Permission = createWithRemoteLoader({
     <Flex vertical gap={8}>
       {useCustomRender ? null : stateBar}
       {activeKey === 'tenant-permission' && (
-        <TenantPermission apis={apis.permission}>
+        <TenantPermission apis={apis.permission} disabled={readOnly}>
           {useCustomRender ? wrapChildren : null}
         </TenantPermission>
       )}
       {activeKey === 'role' && (
-        <Role apis={apis.role}>{useCustomRender ? wrapChildren : renderBizList}</Role>
+        <Role apis={roleApis} readOnly={readOnly}>
+          {useCustomRender ? wrapChildren : renderBizList}
+        </Role>
       )}
       {activeKey === 'sharedGroup' && (
         <SharedGroup

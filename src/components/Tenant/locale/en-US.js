@@ -110,6 +110,10 @@ const locale = {
   ContactAdminOrAction: 'Please contact the administrator or perform the following actions',
   LoginOtherAccount: 'Login with another account',
   SwitchOtherTenant: 'Switch to another tenant',
+  NoTenantIdentity: 'No tenant identity available',
+  NoTenantIdentityDescription: 'This account has not joined any tenant that has this application enabled. Please ask a tenant administrator to enable it or invite you',
+  SelectTenantToEnter: 'Select a tenant to enter',
+  SwitchAccount: 'Switch account',
   ImportantNotice: 'Important Notice',
   ServicePeriodWarning:
     'Your system service period is {startDate}～{endDate}. Please contact the administrator. The system may be disabled after the service period expires, but it currently does not affect usage',
@@ -125,6 +129,9 @@ const locale = {
   // Role
   SetPermission: 'Manage Permission',
   SetRolePermission: 'Manage Role Permissions',
+  ViewPermission: 'View Permissions',
+  ViewRolePermission: 'View Role Permissions',
+  ManagedTenantTips: 'This tenant is synced and managed by the host system. Please make changes in the host.',
   Description: 'Description',
 
   // FormInner labels

@@ -11,4 +11,6 @@ export { default as AfterTenantLoginLayout } from './AfterTenantLoginLayout';
 export { default as Setting } from './Setting';
 export { default as TenantUserSelect } from './TenantUserSelect';
 export { default as ThirdLogin, ThirdLoginResult } from './ThirdLogin';
+export { PermissionPanel } from './TenantPermission';
+export { default as isManagedTenant } from './isManagedTenant';
 export { default } from './Tenant';

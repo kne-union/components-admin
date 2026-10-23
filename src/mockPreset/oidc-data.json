@@ -192,5 +192,108 @@
       "expiresAt": "2026-10-23T06:45:00.000Z",
       "clients": [{ "clientId": "hr-portal", "sid": "g7h8i9" }]
     }
-  ]
+  ],
+  "appList": {
+    "totalCount": 3,
+    "pageData": [
+      {
+        "id": "app-1",
+        "code": "crm",
+        "name": "客户关系管理",
+        "description": "销售线索、客户与合同管理",
+        "tenantMode": "client",
+        "serviceClientId": "crm-service",
+        "clientIds": ["crm-web"],
+        "resource": "https://crm.example.com/api",
+        "permissions": {
+          "modules": [
+            {
+              "code": "customer",
+              "name": "客户管理",
+              "permissions": [
+                { "code": "view", "name": "查看客户" },
+                { "code": "edit", "name": "编辑客户" },
+                { "code": "export", "name": "导出客户" }
+              ]
+            },
+            {
+              "code": "contract",
+              "name": "合同管理",
+              "permissions": [
+                { "code": "view", "name": "查看合同" },
+                { "code": "approve", "name": "审批合同" }
+              ]
+            }
+          ]
+        },
+        "permissionsHash": "9f2c1a7e",
+        "permissionCount": 5,
+        "tenantSyncUri": null,
+        "registeredAt": "2026-10-20T09:12:00.000Z",
+        "status": "open"
+      },
+      {
+        "id": "app-2",
+        "code": "recruit",
+        "name": "招聘管理",
+        "description": "职位发布与简历筛选，本地另有自建租户",
+        "tenantMode": "independent",
+        "serviceClientId": "recruit-service",
+        "clientIds": ["recruit-web", "recruit-h5"],
+        "resource": "https://recruit.example.com/api",
+        "permissions": {
+          "modules": [
+            {
+              "code": "job",
+              "name": "职位管理",
+              "permissions": [
+                { "code": "view", "name": "查看职位" },
+                { "code": "publish", "name": "发布职位" }
+              ]
+            },
+            {
+              "code": "resume",
+              "name": "简历库",
+              "permissions": [
+                { "code": "view", "name": "查看简历" },
+                { "code": "download", "name": "下载简历" }
+              ]
+            }
+          ]
+        },
+        "permissionsHash": "4be7d0c2",
+        "permissionCount": 4,
+        "tenantSyncUri": "https://recruit.example.com/api/oidc/tenant-sync",
+        "registeredAt": "2026-10-21T14:30:00.000Z",
+        "status": "open"
+      },
+      {
+        "id": "app-3",
+        "code": "expense",
+        "name": "费用报销",
+        "description": "差旅与日常费用报销，已停用后不再出现在租户权限树中",
+        "tenantMode": "client",
+        "serviceClientId": "expense-service",
+        "clientIds": [],
+        "resource": "https://expense.example.com/api",
+        "permissions": {
+          "modules": [
+            {
+              "code": "claim",
+              "name": "报销单",
+              "permissions": [
+                { "code": "submit", "name": "提交报销" },
+                { "code": "approve", "name": "审批报销" }
+              ]
+            }
+          ]
+        },
+        "permissionsHash": "c03a55b9",
+        "permissionCount": 2,
+        "tenantSyncUri": null,
+        "registeredAt": "2026-09-02T08:00:00.000Z",
+        "status": "closed"
+      }
+    ]
+  }
 }

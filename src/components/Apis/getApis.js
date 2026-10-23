@@ -881,6 +881,24 @@ const getApis = options => {
           url: `${oidcPrefix}/admin/session/revoke-user`,
           method: 'POST'
         }
+      },
+      app: {
+        list: {
+          url: `${oidcPrefix}/admin/app/list`,
+          method: 'GET'
+        },
+        detail: {
+          url: `${oidcPrefix}/admin/app/detail`,
+          method: 'GET'
+        },
+        setStatus: {
+          url: `${oidcPrefix}/admin/app/set-status`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${oidcPrefix}/admin/app/remove`,
+          method: 'POST'
+        }
       }
     },
     mailGateway: {

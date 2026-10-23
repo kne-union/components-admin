@@ -252,3 +252,83 @@
   height: 27.7%;
   pointer-events: none;
 }
+
+// 移动端横幅：标题在左，整块插画按比例缩小放在右侧；按横幅宽度逐级收起副标题、缩小插画
+@container login-illustration (max-height: 320px) {
+  .title-layer {
+    top: 60px;
+    left: 24px;
+    right: 360px;
+    width: auto;
+    max-width: none;
+    transform: none;
+    text-align: left;
+    gap: 6px;
+    z-index: 1;
+  }
+
+  .title {
+    font-size: 24px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .subtitle p {
+    font-size: 13px;
+    font-weight: 400;
+    color: #4b5563;
+  }
+
+  .visual {
+    top: 16px;
+    left: auto;
+    right: 24px;
+    max-width: none;
+    transform: scale(0.6);
+    transform-origin: top right;
+  }
+}
+
+@container login-illustration (max-height: 320px) and (max-width: 760px) {
+  .title-layer {
+    top: 72px;
+    right: 220px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  .visual {
+    right: -24px;
+    transform: scale(0.45);
+  }
+}
+
+@container login-illustration (max-height: 180px) {
+  .title-layer {
+    top: 64px;
+    right: 140px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  .visual {
+    top: 12px;
+    right: -84px;
+    transform: scale(0.42);
+    opacity: 0.9;
+  }
+}

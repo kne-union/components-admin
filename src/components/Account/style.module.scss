@@ -60,12 +60,12 @@
 
   .top-banner-inner {
     position: absolute;
-    top: 40px;
-    left: 20%;
-    transform: translate(-50%, -50%);
+    top: 24px;
+    left: 24px;
     z-index: 20;
-    font-size: 24px;
+    font-size: 16px;
     font-weight: 600;
+    line-height: 1.4;
     color: var(--primary-color);
   }
 
@@ -134,7 +134,7 @@
   .out-container {
     width: 100%;
     max-width: 100%;
-    height: calc(var(--kne-viewport-height) * 0.9);
+    height: var(--kne-viewport-height);
     min-height: 500px;
     border-radius: 0;
     background: transparent;

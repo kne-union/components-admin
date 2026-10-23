@@ -11,7 +11,7 @@ import { useIntl } from '@kne/react-intl';
 
 const Role = createWithRemoteLoader({
   modules: ['components-core:Filter']
-})(({ remoteModules, apis, ...props }) => {
+})(({ remoteModules, apis, readOnly = false, ...props }) => {
   const { formatMessage } = useIntl();
   const [Filter] = remoteModules;
   const { SuperSelectFilterItem, createFilterValueMapper } = Filter;
@@ -47,7 +47,7 @@ const Role = createWithRemoteLoader({
         return <FormInner {...props} />;
       }}
       getActionList={({ data, ...props }) => {
-        return ['remove', 'setStatusOpen', 'setStatusClose', 'save']
+        return (readOnly ? [] : ['remove', 'setStatusOpen', 'setStatusClose', 'save'])
           .map(name => {
             return {
               name,
@@ -59,8 +59,9 @@ const Role = createWithRemoteLoader({
               ...props,
               buttonComponent: SetRolePermission,
               data,
-              children: formatMessage({ id: 'SetPermission' }),
-              hidden: data.code === 'admin' || !apis.permissionSave
+              readOnly,
+              children: formatMessage({ id: readOnly ? 'ViewPermission' : 'SetPermission' }),
+              hidden: data.code === 'admin' || (!readOnly && !apis.permissionSave)
             }
           ]);
       }}

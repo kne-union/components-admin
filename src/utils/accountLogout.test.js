@@ -1,6 +1,5 @@
 import { createLogoutHandler, registerOidcClient, buildLogoutReturnTo, resetOidcClientsForTests } from './accountLogout';
 import { removeToken } from '@kne/token-storage';
-import { withPublicUrl } from './publicUrl';
 
 jest.mock('@kne/token-storage', () => ({
   removeToken: jest.fn()
@@ -57,9 +56,7 @@ describe('accountLogout', () => {
     await logout();
 
     expect(removeToken).toHaveBeenCalledWith('X-User-Token', undefined);
-    expect(oidcLogout).toHaveBeenCalledWith({
-      returnTo: `${withPublicUrl('/account/login')}?referer=${encodeURIComponent('https://host/page')}`
-    });
+    expect(oidcLogout).toHaveBeenCalledWith();
   });
 
   it('uses registered oidc client when no explicit client passed', async () => {

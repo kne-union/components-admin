@@ -4,6 +4,8 @@ import Fetch from '@kne/react-fetch';
 import { App } from 'antd';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
+import isManagedTenant from '../isManagedTenant';
+import ManagedTenantAlert from '../ManagedTenantAlert';
 
 const CompanyInner = createWithRemoteLoader({
   modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:Permissions', 'components-core:Global@useGlobalContext']
@@ -14,12 +16,14 @@ const CompanyInner = createWithRemoteLoader({
   const { message } = App.useApp();
   const { global } = useGlobalContext('userInfo');
   const tenantId = global?.tenant?.id;
+  const managed = isManagedTenant(global?.tenant);
 
   const pageProps = Object.assign({}, originPageProps, {
     menu,
     title: formatMessage({ id: 'CompanyInfoPage' }),
     children: (
       <Permissions request={['setting:company-setting:view']} type="error">
+        {managed && <ManagedTenantAlert />}
         <Fetch
           {...Object.assign({}, apis.tenant.companyDetail)}
           render={({ data, reload }) => {
@@ -30,7 +34,7 @@ const CompanyInner = createWithRemoteLoader({
                     <CompanyInfo
                       data={data}
                       tenantId={tenantId}
-                      hasEdit={isPass}
+                      hasEdit={!managed && isPass}
                       onSubmit={async formData => {
                         const { data: resData } = await ajax(
                           Object.assign({}, apis.tenant.companySave, {

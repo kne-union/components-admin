@@ -474,10 +474,80 @@
             { "code": "permission", "name": "权限管理" },
             { "code": "user-manager", "name": "用户管理" }
           ]
+        },
+        {
+          "code": "apps",
+          "name": "应用中心",
+          "index": -2,
+          "modules": [
+            {
+              "code": "crm",
+              "name": "客户关系管理",
+              "modules": [
+                {
+                  "code": "customer",
+                  "name": "客户管理",
+                  "permissions": [
+                    { "code": "view", "name": "查看客户" },
+                    { "code": "edit", "name": "编辑客户" },
+                    { "code": "export", "name": "导出客户" }
+                  ]
+                },
+                {
+                  "code": "contract",
+                  "name": "合同管理",
+                  "permissions": [
+                    { "code": "view", "name": "查看合同" },
+                    { "code": "approve", "name": "审批合同" }
+                  ]
+                }
+              ]
+            },
+            {
+              "code": "recruit",
+              "name": "招聘管理",
+              "modules": [
+                {
+                  "code": "job",
+                  "name": "职位管理",
+                  "permissions": [
+                    { "code": "view", "name": "查看职位" },
+                    { "code": "publish", "name": "发布职位" }
+                  ]
+                },
+                {
+                  "code": "resume",
+                  "name": "简历库",
+                  "permissions": [
+                    { "code": "view", "name": "查看简历" },
+                    { "code": "download", "name": "下载简历" }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     },
-    "codes": ["user:view", "user:create", "user:edit", "role:view", "setting:company-setting", "setting:org", "setting:permission", "setting:user-manager"]
+    "codes": [
+      "user:view",
+      "user:create",
+      "user:edit",
+      "role:view",
+      "setting:company-setting",
+      "setting:org",
+      "setting:permission",
+      "setting:user-manager",
+      "apps",
+      "apps:crm",
+      "apps:crm:customer",
+      "apps:crm:customer:view",
+      "apps:crm:customer:edit",
+      "apps:crm:customer:export",
+      "apps:crm:contract",
+      "apps:crm:contract:view",
+      "apps:crm:contract:approve"
+    ]
   },
   "permissionPageList": {
     "totalCount": 12,
