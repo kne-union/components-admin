@@ -29,7 +29,7 @@ const GroupFormFields = createWithRemoteLoader({
       allowCustomCode = true
     }) => {
       const [FormInfo, usePreset] = remoteModules;
-      const { formatMessage } = useIntl();
+      const { formatMessage, locale } = useIntl();
       const { fields } = FormInfo;
       const { Input, TextArea, SuperSelectTree } = fields;
       const { ajax } = usePreset();
@@ -65,7 +65,7 @@ const GroupFormFields = createWithRemoteLoader({
 
       const parentColorProps = showColor
         ? {
-            renderItemContent: createGroupItemContentRender({ valueKey, labelKey }),
+            renderItemContent: createGroupItemContentRender({ valueKey, labelKey, locale }),
             prefix: ({ value }) => {
               const selected = Array.isArray(value) ? value[0] : value;
               if (!selected) {

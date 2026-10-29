@@ -15,6 +15,7 @@ OIDC client 默认取 preset 的 `oidc`（`components-admin:Oidc` 的 `createOid
 |----|----|----|----|
 | sso | SSO 配置；传 `false` 关闭自动探测 | `false` \| `{ client? }` | - |
 | sso.client | 显式指定 OIDC client | object | preset.oidc |
+| registerGuide | 注册页引导内容，透传给 Register 的 `guide` | ReactNode | - |
 
 ### Login 登录组件
 
@@ -37,6 +38,7 @@ OIDC client 默认取 preset 的 `oidc`（`components-admin:Oidc` 的 `createOid
 | sendVerificationCode | 发送验证码回调函数     | ({ type, data }) => void | -       |
 | onSubmit             | 表单提交回调函数      | (formData) => void       | -       |
 | topBanner            | 顶部横幅自定义内容     | ReactNode                | -       |
+| guide                | 引导内容：传入后桌面端左侧展示引导、右侧为表单；平板与手机端引导堆叠在表单上方 | ReactNode | -       |
 | className            | 自定义样式类名       | string                   | -       |
 
 ### Modify 修改密码组件

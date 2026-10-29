@@ -16,8 +16,13 @@ import {
   getAllGroupOption,
   getGroupColor,
   applyGroupColorToPayload,
+  applyGroupLangToPayload,
   DEFAULT_GROUP_COLOR,
+  DEFAULT_GROUP_LANGUAGE,
+  getGroupLabel,
+  getGroupLangFormData,
   isAllGroupOption,
+  normalizeGroupLang,
   resolveGroupParentIdForSave,
   resolveGroupPermissions,
   resolveGroupSelectValue,
@@ -40,6 +45,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
       remoteModules,
       type,
       language: propsLanguage,
+      lang: propsLang,
       apis: propsApis,
       valueKey = 'code',
       labelKey = 'name',
@@ -60,7 +66,8 @@ const GroupFolderToolbar = createWithRemoteLoader({
       const formModal = useFormModal();
       const { message } = App.useApp();
       const locale = useGlobalValue('locale');
-      const language = propsLanguage || locale || 'zh-CN';
+      const lang = useMemo(() => normalizeGroupLang(propsLang), [propsLang]);
+      const language = propsLanguage || (lang ? DEFAULT_GROUP_LANGUAGE : locale) || 'zh-CN';
       const [treeSyncKey, emitGroupTreeChange] = useGroupTreeSync(type, language);
       const groupName = propsGroupName || formatMessage({ id: 'GroupSelectDefaultName' });
       const allLabel = formatMessage({ id: 'GroupSelectAll' });
@@ -96,7 +103,8 @@ const GroupFolderToolbar = createWithRemoteLoader({
             ? {
                 code: editingGroup.code,
                 name: editingGroup.name,
-                description: editingGroup.description
+                description: editingGroup.description,
+                ...getGroupLangFormData(editingGroup, lang)
               }
             : {};
           if (showColor) {
@@ -125,6 +133,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
             size: 'small',
             formProps: {
               data: formData,
+              lang,
               rules:
                 allowCustomCode && !editingGroup
                   ? {
@@ -139,7 +148,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
                     }
                   : undefined,
               onSubmit: async values => {
-                let payload = Object.assign({}, values, { type, language });
+                let payload = applyGroupLangToPayload(Object.assign({}, values, { type, language }), { lang, existingOptions: editingGroup?.options });
                 if (showParent) {
                   payload.parentId = resolveGroupParentIdForSave(values.parentId, treeData, valueKey);
                 }
@@ -200,6 +209,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
           groupApis,
           groupName,
           labelKey,
+          lang,
           language,
           message,
           showColor,
@@ -256,7 +266,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
                     const selected = Array.isArray(selectValue) ? selectValue[0] : selectValue;
                     return <FolderFilled className={styles['group-folder-toolbar-color-icon']} style={{ color: getGroupIconColor(selected, { valueKey }) }} />;
                   },
-                  renderItemContent: createGroupItemContentRender({ valueKey, labelKey })
+                  renderItemContent: createGroupItemContentRender({ valueKey, labelKey, locale })
                 }
               : null;
 
@@ -304,7 +314,7 @@ const GroupFolderToolbar = createWithRemoteLoader({
                           isDelete
                           icon={<DeleteOutlined />}
                           wave={{ disabled: true }}
-                          message={formatMessage({ id: 'GroupSelectDeleteConfirm' }, { name: groupName, title: selectedGroup.name })}
+                          message={formatMessage({ id: 'GroupSelectDeleteConfirm' }, { name: groupName, title: getGroupLabel(selectedGroup, { labelKey, locale }) })}
                           onClick={() => handleDelete({ group: selectedGroup, reload })}
                         />
                       ) : null}

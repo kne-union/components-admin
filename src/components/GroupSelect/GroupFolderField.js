@@ -16,7 +16,11 @@ import {
   getAllGroupOption,
   getGroupColor,
   applyGroupColorToPayload,
+  applyGroupLangToPayload,
   DEFAULT_GROUP_COLOR,
+  DEFAULT_GROUP_LANGUAGE,
+  getGroupLangFormData,
+  normalizeGroupLang,
   resolveGroupParentIdForSave,
   resolveGroupPermissions,
   resolveGroupTreeData
@@ -34,6 +38,7 @@ const createComponent = (callback = item => item) =>
         remoteModules,
         type,
         language: propsLanguage,
+        lang: propsLang,
         apis: propsApis,
         valueKey = 'code',
         labelKey = 'name',
@@ -55,7 +60,8 @@ const createComponent = (callback = item => item) =>
         const formModal = useFormModal();
         const { message } = App.useApp();
         const locale = useGlobalValue('locale');
-        const language = propsLanguage || locale || 'zh-CN';
+        const lang = useMemo(() => normalizeGroupLang(propsLang), [propsLang]);
+        const language = propsLanguage || (lang ? DEFAULT_GROUP_LANGUAGE : locale) || 'zh-CN';
         const [treeSyncKey, emitGroupTreeChange] = useGroupTreeSync(type, language);
         const groupName = propsGroupName || formatMessage({ id: 'GroupSelectDefaultName' });
         const allLabel = formatMessage({ id: 'GroupSelectAll' });
@@ -92,7 +98,8 @@ const createComponent = (callback = item => item) =>
               ? {
                   code: editingGroup.code,
                   name: editingGroup.name,
-                  description: editingGroup.description
+                  description: editingGroup.description,
+                  ...getGroupLangFormData(editingGroup, lang)
                 }
               : {};
             if (showColor) {
@@ -119,6 +126,7 @@ const createComponent = (callback = item => item) =>
               afterClose,
               formProps: {
                 data: formData,
+                lang,
                 rules:
                   allowCustomCode && !editingGroup
                     ? {
@@ -133,7 +141,7 @@ const createComponent = (callback = item => item) =>
                       }
                     : undefined,
                 onSubmit: async values => {
-                  let payload = Object.assign({}, values, { type, language });
+                  let payload = applyGroupLangToPayload(Object.assign({}, values, { type, language }), { lang, existingOptions: editingGroup?.options });
                   if (showParent) {
                     payload.parentId = resolveGroupParentIdForSave(values.parentId, treeData, valueKey);
                   }
@@ -192,6 +200,7 @@ const createComponent = (callback = item => item) =>
             groupApis,
             groupName,
             labelKey,
+            lang,
             language,
             message,
             showColor,
@@ -223,7 +232,7 @@ const createComponent = (callback = item => item) =>
                         />
                       );
                     },
-                    renderItemContent: createGroupItemContentRender({ valueKey, labelKey })
+                    renderItemContent: createGroupItemContentRender({ valueKey, labelKey, locale })
                   }
                 : null;
               return (

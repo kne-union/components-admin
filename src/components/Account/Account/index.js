@@ -53,7 +53,7 @@ const AccountInner = ({ className, ...p }) => {
 
   const loginUrl = `${baseUrl}/${props.loginPath}`;
 
-  // sso 直接取原始属性：lodash/merge 会深拷贝 sso.client
+  // sso、registerGuide 直接取原始属性：lodash/merge 会深拷贝 sso.client 与 React 元素
   return (
     <SsoConfig sso={p.sso}>
       {sso => {
@@ -65,6 +65,7 @@ const AccountInner = ({ className, ...p }) => {
               baseUrl,
               ...props,
               sso,
+              registerGuide: p.registerGuide,
               loginUrl,
               registerUrl: `${baseUrl}/${props.registerPath}`,
               forgetUrl: `${baseUrl}/${props.forgetPath}`

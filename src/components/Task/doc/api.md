@@ -12,6 +12,8 @@
 |baseUrl|基础路由路径，用于菜单导航|string|-|
 |getManualTaskAction|手动任务的自定义操作按钮渲染函数|(data) => ReactNode|-|
 
+URL 带 `?id=<任务ID>` 进入时，首屏只按该任务 ID 筛选（不再默认「待执行」），参数读取后从 URL 移除。
+
 ## AllTask 子组件
 
 |属性名|说明|类型|默认值|
