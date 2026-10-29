@@ -1,6 +1,7 @@
-import { defaultColors } from '@kne/react-box';
+import { createThemeColors, defaultColors } from '@kne/react-box';
+import { CHART_NEUTRAL } from '../../../utils/dashboard/chart';
 
-export const RANGE_OPTIONS = ['7d', '1m', '3m', '1y'];
+export * from '../../../utils/dashboard/chart';
 
 export const buildUrlWithParams = (url, params = {}) => {
   const query = Object.keys(params)
@@ -11,26 +12,20 @@ export const buildUrlWithParams = (url, params = {}) => {
   return `${url}${url.includes('?') ? '&' : '?'}${query}`;
 };
 
+/** 看板语义色取自 @kne/react-box 的 defaultColors；颜色只用来表达状态 / 执行方式，其余界面保持中性灰阶 */
 export const PALETTE = {
-  total: '#3b82f6',
-  success: '#10b981',
-  failed: '#ef4444',
-  running: '#f59e0b',
-  pending: '#6366f1',
-  canceled: '#94a3b8',
-  waiting: '#06b6d4',
-  manual: '#8b5cf6',
-  system: '#3b82f6',
-  pie: ['#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#94a3b8', '#ec4899'],
-  period: { dawn: '#818cf8', morning: '#f59e0b', afternoon: '#f97316', evening: '#6366f1' }
+  total: defaultColors.Blue,
+  success: defaultColors.Green,
+  failed: defaultColors.Red,
+  running: defaultColors.Orange,
+  pending: defaultColors.Purple,
+  canceled: createThemeColors(defaultColors.Gray).glow,
+  waiting: defaultColors.Blue,
+  manual: defaultColors.Purple,
+  system: defaultColors.Blue,
+  rate: defaultColors.Purple,
+  ...CHART_NEUTRAL
 };
-
-export const TIME_PERIODS = [
-  { id: 'Dawn', start: 0, end: 6, color: PALETTE.period.dawn },
-  { id: 'Morning', start: 6, end: 12, color: PALETTE.period.morning },
-  { id: 'Afternoon', start: 12, end: 18, color: PALETTE.period.afternoon },
-  { id: 'Evening', start: 18, end: 24, color: PALETTE.period.evening }
-];
 
 export const TASK_STATUS_LIST = ['pending', 'running', 'waiting', 'success', 'failed', 'canceled'];
 
@@ -43,109 +38,16 @@ export const STATUS_COLOR_MAP = {
   canceled: PALETTE.canceled
 };
 
-/**
- * 任务类型折线/柱状：色值全部来自 @kne/react-box 的 defaultColors（与 ColorfulCard 同源）。
- * 顺序按 key 打散，减轻相邻系列里橙/黄等相近色贴在一起；不含 Black，避免细线对比度不足。
- */
+/** 任务类型色：按 key 打散 defaultColors，减轻相邻系列色相过近；不含 Black */
 const TASK_TYPE_COLOR_KEYS = ['Purple', 'Green', 'Orange', 'Blue', 'Pink', 'Yellow', 'Red', 'Gray'];
 
 export const TASK_TYPE_COLOR_MAP = TASK_TYPE_COLOR_KEYS.map(key => defaultColors[key]);
 
-/** 任务类型 key 稳定排序：折线图 series 与下方 Tag 等共用，保证同一 type 色标一致 */
+/** 任务类型 key 稳定排序：图表 series 与列表共用，保证同一 type 色标一致 */
 export const sortTaskTypeKeys = types => {
   const arr = types == null ? [] : [...types];
-  return arr.sort((a, b) =>
-    String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' })
-  );
+  return arr.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }));
 };
-
-export const tooltipStyle = {
-  trigger: 'axis',
-  axisPointer: {
-    type: 'line',
-    lineStyle: { color: 'rgba(100, 116, 139, 0.45)', width: 1 },
-    label: { show: false }
-  },
-  backgroundColor: 'rgba(255,255,255,0.96)',
-  borderColor: '#e2e8f0',
-  borderWidth: 1,
-  textStyle: { color: '#334155', fontSize: 12 },
-  confine: true
-};
-
-export const itemTooltipStyle = {
-  trigger: 'item',
-  formatter: '{b}: {c} ({d}%)',
-  backgroundColor: 'rgba(255,255,255,0.96)',
-  borderColor: '#e2e8f0',
-  borderWidth: 1,
-  textStyle: { color: '#334155', fontSize: 12 },
-  confine: true,
-  position(point, params, dom, rect, size) {
-    const x = point[0];
-    const y = point[1];
-    const cw = size?.contentSize?.[0] ?? 140;
-    const ch = size?.contentSize?.[1] ?? 48;
-    const vw = size?.viewSize?.[0] ?? 400;
-    const vh = size?.viewSize?.[1] ?? 300;
-    let left = x + 12;
-    let top = y - ch - 12;
-    if (top < 8) top = y + 12;
-    if (left + cw > vw - 8) left = Math.max(8, vw - cw - 8);
-    if (top + ch > vh - 8) top = Math.max(8, vh - ch - 8);
-    return [left, top];
-  },
-  extraCssText: 'border-radius:8px;box-shadow:0 4px 14px rgba(15,23,42,0.12);'
-};
-
-export const pieSeries = (center = ['50%', '46%'], radius = ['46%', '64%']) => ({
-  type: 'pie',
-  radius,
-  center,
-  clockwise: true,
-  padAngle: 1.25,
-  avoidLabelOverlap: true,
-  itemStyle: { borderRadius: 5, borderColor: '#fff', borderWidth: 2 },
-  label: { show: false },
-  labelLine: { show: false },
-  emphasis: {
-    scale: false,
-    itemStyle: { shadowBlur: 14, shadowColor: 'rgba(15,23,42,0.14)', borderWidth: 3, borderColor: '#fff' },
-    label: { show: false }
-  }
-});
-
-export const legendPieStyle = {
-  type: 'scroll',
-  orient: 'horizontal',
-  left: 'center',
-  bottom: 4,
-  width: '88%',
-  height: 44,
-  pageButtonItemGap: 8,
-  pageIconSize: 11,
-  pageTextStyle: { color: '#94a3b8' },
-  icon: 'roundRect',
-  itemWidth: 10,
-  itemHeight: 10,
-  itemGap: 14,
-  textStyle: { color: '#64748b', fontSize: 11 }
-};
-
-export const legendCenterStyle = {
-  top: 4,
-  left: 'center',
-  itemGap: 18,
-  padding: [0, 0, 6, 0],
-  textStyle: { color: '#64748b', fontSize: 12 }
-};
-
-export const lineChartGrid = { left: 12, right: 16, bottom: 12, top: 52, containLabel: true };
-export const lineChartGridWithRotatedLabels = { ...lineChartGrid, bottom: 20, left: 14, right: 14 };
-export const lineSmooth = 0.38;
-export const axisLineStyle = { lineStyle: { color: '#e2e8f0' } };
-export const axisLabelStyle = { color: '#94a3b8' };
-export const splitLineStyle = { lineStyle: { color: '#f1f5f9', type: 'dashed', width: 1 } };
 
 /** 接口约定为毫秒；超出此上限视为异常数据（如错误聚合），不参与展示与加权回算 */
 export const MAX_STATISTICS_DURATION_MS = 7 * 24 * 60 * 60 * 1000;

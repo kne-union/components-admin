@@ -72,7 +72,19 @@ const messages = {
   Afternoon: 'Afternoon',
   Evening: 'Evening',
   PeriodCompare: 'Period Compare',
-  WaitingForData: 'Waiting for data...'
+  WaitingForData: 'Waiting for data...',
+  Now: 'Now',
+  TodayHourly: 'Today by Hour',
+  ChannelComposition: 'Channel Mix',
+  Composition: 'Composition',
+  ShareOfToday: 'Share of today',
+  Share: 'Share',
+  StatusDistribution: 'Status',
+  StatusSuccess: 'Success',
+  StatusFailed: 'Failed',
+  StatusRunning: 'Running',
+  StatusPending: 'Pending',
+  StatusCanceled: 'Canceled'
 };
 
 export default messages;

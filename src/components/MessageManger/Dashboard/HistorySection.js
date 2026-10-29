@@ -2,30 +2,26 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
 import { useIsMobile } from '@kne/responsive-utils';
 import { useState, useRef } from 'react';
-import { Button, Col, Row, Space, Segmented } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
-import { Card as BoxCard } from '@kne/react-box';
+import { Tooltip } from 'antd';
+import { BarChartOutlined, ReloadOutlined } from '@ant-design/icons';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import {
   PALETTE,
+  CHANNELS,
+  CODE_COLOR_MAP,
   RANGE_OPTIONS,
   tooltipStyle,
-  itemTooltipStyle,
-  pieSeries,
-  legendPieTypeStyle,
-  legendPieCodeStyle,
   legendCenterStyle,
   lineChartGrid,
-  lineChartGridWithRotatedLabels,
-  lineSmooth,
   axisLineStyle,
   axisLabelStyle,
-  splitLineStyle
+  splitLineStyle,
+  roundStackedBarTops
 } from './constants';
-import SectionHeader from './SectionHeader';
+import { Panel, Metric, Sparkline, StackBar, Legend, RankList, SectionIcon, formatPercent } from '../../../utils/dashboard/ui';
 import { getClientIanaTimezone } from '../utils';
-import style from './dashboard.module.scss';
+import style from '../../../utils/dashboard/dashboard.module.scss';
 
 const RANGE_DAY_COUNT = { '7d': 7, '1m': 30, '3m': 90, '1y': 365 };
 const RANGE_AXIS_UNIT = { '7d': 'day', '1m': 'month', '3m': 'month', '1y': 'year' };
@@ -60,26 +56,152 @@ const buildLocalAxisForRange = rangeKey => {
 
     const months = [];
     while (cursor <= end) {
-      const y = cursor.getFullYear();
-      const m = String(cursor.getMonth() + 1).padStart(2, '0');
-      months.push(`${y}-${m}`);
+      months.push(`${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`);
       cursor.setMonth(cursor.getMonth() + 1);
     }
     return months;
   }
 
   const days = RANGE_DAY_COUNT[rangeKey] || 7;
-  const dates = [];
-  for (let i = days - 1; i >= 0; i -= 1) {
+  return Array.from({ length: days }, (_, index) => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() - i);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    dates.push(`${y}-${m}-${day}`);
-  }
-  return dates;
+    d.setDate(d.getDate() - (days - 1 - index));
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
+};
+
+/** recentTrend / recentTrendByType → 按时间轴排序的 { date, total, email, sms } */
+const buildTrendRows = (data, range) => {
+  const recentTrend = data?.recentTrend || [];
+  const recentTrendByType = data?.recentTrendByType || [];
+  const axisUnit = getAxisUnit(range);
+  const dateMap = {};
+  const ensure = date => (dateMap[date] = dateMap[date] || { date, total: 0, email: 0, sms: 0 });
+
+  buildLocalAxisForRange(range).forEach(ensure);
+  recentTrend.forEach(item => {
+    ensure(formatAxisKey(item.date, axisUnit)).total += Number(item.count) || 0;
+  });
+  recentTrendByType.forEach(item => {
+    const row = ensure(formatAxisKey(item.date, axisUnit));
+    row[item.type === 0 ? 'email' : 'sms'] += Number(item.count) || 0;
+  });
+  return Object.values(dateMap)
+    .map(row => ({ ...row, total: row.total || row.email + row.sms }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+};
+
+const HistoryContent = ({ Echart, data, range }) => {
+  const { formatMessage } = useIntl();
+  const isMobile = useIsMobile();
+
+  const byType = data?.byType || {};
+  const templateStats = data?.templateStats || {};
+  const totalRecords = Number(data?.totalRecords) || 0;
+  const channelValue = { email: Number(byType['0']) || 0, sms: Number(byType['1']) || 0 };
+  const channelItems = CHANNELS.map(channel => ({
+    key: channel.key,
+    label: formatMessage({ id: channel.labelId }),
+    value: channelValue[channel.key],
+    color: channel.color
+  }));
+  const templateItems = [
+    { key: 'enabled', label: formatMessage({ id: 'EnabledTemplates' }), value: Number(templateStats.byStatus?.['0']) || 0, color: PALETTE.enabled },
+    { key: 'disabled', label: formatMessage({ id: 'DisabledTemplates' }), value: Number(templateStats.byStatus?.['1']) || 0, color: PALETTE.disabled }
+  ];
+  const codeItems = Object.entries(data?.byCode || {})
+    .map(([code, count]) => ({ key: code, label: code, value: Number(count) || 0 }))
+    .sort((a, b) => b.value - a.value)
+    .map((item, index) => ({ ...item, color: CODE_COLOR_MAP[index % CODE_COLOR_MAP.length] }));
+
+  const rows = buildTrendRows(data, range);
+  const totalLabel = formatMessage({ id: 'TotalCount' });
+  const trendOption = {
+    tooltip: {
+      ...tooltipStyle,
+      formatter: params => {
+        const list = Array.isArray(params) ? params : [params];
+        const row = rows[list[0]?.dataIndex] || {};
+        const lines = list.map(p => `${p.marker} ${p.seriesName}　<b>${p.value}</b>`).join('<br/>');
+        return `<div style="font-weight:600;margin-bottom:4px">${row.date || ''}</div>${lines}<div style="color:${PALETTE.muted};margin-top:4px">${totalLabel} ${row.total ?? 0}</div>`;
+      }
+    },
+    legend: legendCenterStyle,
+    grid: lineChartGrid,
+    xAxis: {
+      type: 'category',
+      data: rows.map(row => row.date),
+      axisLine: axisLineStyle,
+      axisTick: { show: false },
+      axisLabel: { ...axisLabelStyle, hideOverlap: true }
+    },
+    yAxis: { type: 'value', minInterval: 1, min: 0, splitLine: splitLineStyle, axisLabel: axisLabelStyle },
+    series: roundStackedBarTops(
+      CHANNELS.map(channel => ({
+        name: formatMessage({ id: channel.labelId }),
+        type: 'bar',
+        stack: 'total',
+        barMaxWidth: 24,
+        data: rows.map(row => row[channel.key]),
+        itemStyle: { color: channel.color },
+        emphasis: { focus: 'series' }
+      }))
+    )
+  };
+
+  const noData = formatMessage({ id: 'NoData' });
+
+  return (
+    <>
+      <div className={style.metricStrip} style={{ gridTemplateColumns: isMobile ? undefined : 'repeat(4, minmax(0, 1fr))' }}>
+        <Metric card label={formatMessage({ id: 'TotalRecords' })} value={totalRecords.toLocaleString()} hint={'\u00a0'}>
+          <Sparkline values={rows.map(row => row.total)} color={PALETTE.total} />
+        </Metric>
+        {CHANNELS.map(channel => (
+          <Metric
+            key={channel.key}
+            card
+            label={formatMessage({ id: channel.labelId })}
+            value={channelValue[channel.key].toLocaleString()}
+            hint={`${formatMessage({ id: 'Share' })} ${formatPercent(channelValue[channel.key], totalRecords)}`}
+          >
+            <Sparkline values={rows.map(row => row[channel.key])} color={channel.color} />
+          </Metric>
+        ))}
+        <Metric
+          card
+          label={formatMessage({ id: 'TemplateTotal' })}
+          value={(Number(templateStats.total) || 0).toLocaleString()}
+          segments={templateItems}
+        />
+      </div>
+
+      <Panel title={formatMessage({ id: 'RecentTrend' })}>
+        <Echart key={range} style={{ height: isMobile ? 260 : 320 }} option={trendOption} />
+      </Panel>
+
+      <div className={style.splitGrid}>
+        <Panel title={formatMessage({ id: 'Composition' })}>
+          <div className={style.block}>
+            <div className={style.blockTitle}>{formatMessage({ id: 'TypeDistribution' })}</div>
+            <StackBar items={channelItems} />
+            <Legend items={channelItems} />
+          </div>
+          <div className={style.block}>
+            <div className={style.blockTitle}>{formatMessage({ id: 'TemplateStatus' })}</div>
+            <StackBar items={templateItems} />
+            <Legend items={templateItems} />
+          </div>
+        </Panel>
+        <Panel title={formatMessage({ id: 'ByCodeStats' })}>
+          <div className={style.scrollList}>
+            <RankList items={codeItems} emptyText={noData} />
+          </div>
+        </Panel>
+      </div>
+    </>
+  );
 };
 
 const HistorySection = createWithRemoteLoader({
@@ -88,33 +210,49 @@ const HistorySection = createWithRemoteLoader({
   withLocale(({ remoteModules, apis }) => {
     const [Echart] = remoteModules;
     const { formatMessage } = useIntl();
-    const isMobile = useIsMobile();
-    const trendChartHeight = isMobile ? 280 : 380;
-    const pieChartHeight = isMobile ? 240 : 320;
     const [range, setRange] = useState('7d');
+    const [spinning, setSpinning] = useState(false);
     const reloadRef = useRef(() => {});
 
     return (
-      <>
-        <SectionHeader
-          title={formatMessage({ id: 'HistoricalData' })}
-          extra={
-            <Space className={style.historyHeaderExtra} wrap={isMobile}>
-              <Segmented
-                block={isMobile}
-                options={RANGE_OPTIONS.map(r => ({
-                  label: formatMessage({ id: `Range_${r}` }),
-                  value: r
-                }))}
-                value={range}
-                onChange={setRange}
-              />
-              <Button type="link" icon={<ReloadOutlined />} onClick={() => reloadRef.current()}>
-                {formatMessage({ id: 'Refresh' })}
-              </Button>
-            </Space>
-          }
-        />
+      <div className={style.section}>
+        <div className={style.sectionHead}>
+          <div className={style.sectionHeadMain}>
+            <h3 className={style.sectionTitle}>
+              <SectionIcon icon={<BarChartOutlined />} tone={PALETTE.email} />
+              {formatMessage({ id: 'HistoricalData' })}
+            </h3>
+            <span className={style.sectionCaption}>{formatMessage({ id: `Range_${range}` })}</span>
+          </div>
+          <div className={style.rangeSwitch} role="tablist">
+            {RANGE_OPTIONS.map(r => (
+              <button
+                key={r}
+                type="button"
+                role="tab"
+                aria-selected={range === r}
+                className={`${style.rangeItem}${range === r ? ` ${style.rangeItemActive}` : ''}`}
+                onClick={() => setRange(r)}
+              >
+                {formatMessage({ id: `Range_${r}` })}
+              </button>
+            ))}
+            <span className={style.rangeDivider} />
+            <Tooltip title={formatMessage({ id: 'Refresh' })}>
+              <button
+                type="button"
+                className={`${style.rangeRefresh}${spinning ? ` ${style.rangeRefreshSpin}` : ''}`}
+                onClick={() => {
+                  setSpinning(true);
+                  reloadRef.current();
+                }}
+                onAnimationEnd={() => setSpinning(false)}
+              >
+                <ReloadOutlined />
+              </button>
+            </Tooltip>
+          </div>
+        </div>
 
         <Fetch
           {...Object.assign({}, apis.messageManger.statistics.getOverview, {
@@ -122,233 +260,10 @@ const HistorySection = createWithRemoteLoader({
           })}
           render={({ data, reload }) => {
             reloadRef.current = reload;
-
-            const templateStats = data?.templateStats || {};
-            const byType = data?.byType || {};
-
-          // 发送趋势折线图
-          const trendOption = (() => {
-            const recentTrend = data?.recentTrend || [];
-            const recentTrendByType = data?.recentTrendByType || [];
-            const axisUnit = getAxisUnit(range);
-            const axisDates = recentTrend.length > 0 ? null : buildLocalAxisForRange(range);
-
-            const dateMap = {};
-            if (recentTrend.length > 0) {
-              recentTrend.forEach(item => {
-                const date = formatAxisKey(item.date, axisUnit);
-                if (!dateMap[date]) {
-                  dateMap[date] = { date, total: 0 };
-                }
-                dateMap[date].total += Number(item.count) || 0;
-              });
-            } else {
-              axisDates.forEach(d => {
-                dateMap[d] = { date: d, total: 0 };
-              });
-            }
-            recentTrendByType.forEach(item => {
-              const date = formatAxisKey(item.date, axisUnit);
-              if (!dateMap[date]) {
-                dateMap[date] = { date, total: 0 };
-              }
-              const key = item.type === 0 ? 'email' : 'sms';
-              dateMap[date][key] = (dateMap[date][key] || 0) + (Number(item.count) || 0);
-            });
-
-            const sorted = Object.values(dateMap).sort((a, b) => a.date.localeCompare(b.date));
-            const dates = sorted.map(item => item.date);
-            const totals = sorted.map(item => item.total);
-            const emails = sorted.map(item => item.email || 0);
-            const smsList = sorted.map(item => item.sms || 0);
-            const manyPoints = dates.length > 14;
-
-            return {
-              color: [PALETTE.total, PALETTE.email, PALETTE.sms],
-              tooltip: tooltipStyle,
-              legend: { ...legendCenterStyle, data: [formatMessage({ id: 'TotalCount' }), formatMessage({ id: 'EmailChannel' }), formatMessage({ id: 'SMS' })] },
-              grid: manyPoints ? lineChartGridWithRotatedLabels : lineChartGrid,
-              xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: dates,
-                axisLine: axisLineStyle,
-                axisTick: { show: false },
-                axisLabel: {
-                  ...axisLabelStyle,
-                  fontSize: 11,
-                  rotate: manyPoints ? 28 : 0,
-                  hideOverlap: true
-                }
-              },
-              yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1 },
-              series: [
-                {
-                  name: formatMessage({ id: 'TotalCount' }),
-                  type: 'line',
-                  smooth: lineSmooth,
-                  symbol: 'circle',
-                  symbolSize: 6,
-                  data: totals,
-                  lineStyle: { width: 2.5, color: PALETTE.total },
-                  itemStyle: { color: PALETTE.total, borderColor: '#fff', borderWidth: 2 },
-                  emphasis: { focus: 'series' },
-                  areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(59,130,246,0.18)' }, { offset: 1, color: 'rgba(59,130,246,0.02)' }] } }
-                },
-                {
-                  name: formatMessage({ id: 'EmailChannel' }),
-                  type: 'line',
-                  smooth: lineSmooth,
-                  symbol: 'circle',
-                  symbolSize: 6,
-                  data: emails,
-                  lineStyle: { width: 2.5, color: PALETTE.email },
-                  itemStyle: { color: PALETTE.email, borderColor: '#fff', borderWidth: 2 },
-                  emphasis: { focus: 'series' },
-                  areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(99,102,241,0.18)' }, { offset: 1, color: 'rgba(99,102,241,0.02)' }] } }
-                },
-                {
-                  name: formatMessage({ id: 'SMS' }),
-                  type: 'line',
-                  smooth: lineSmooth,
-                  symbol: 'circle',
-                  symbolSize: 6,
-                  data: smsList,
-                  lineStyle: { width: 2.5, color: PALETTE.sms },
-                  itemStyle: { color: PALETTE.sms, borderColor: '#fff', borderWidth: 2 },
-                  emphasis: { focus: 'series' },
-                  areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(6,182,212,0.16)' }, { offset: 1, color: 'rgba(6,182,212,0.02)' }] } }
-                }
-              ]
-            };
-          })();
-
-          // 编码饼图
-          const codePieOption = (() => {
-            const byCode = data?.byCode || {};
-            const entries = Object.entries(byCode);
-            if (entries.length === 0) {
-              return {
-                tooltip: { show: false },
-                legend: { show: false },
-                graphic: [
-                  {
-                    type: 'text',
-                    left: 'center',
-                    top: 'center',
-                    style: {
-                      text: formatMessage({ id: 'NoData' }),
-                      fill: '#94a3b8',
-                      fontSize: 14,
-                      fontWeight: 500
-                    }
-                  }
-                ],
-                series: [
-                  {
-                    ...pieSeries(['50%', '42%'], ['44%', '62%']),
-                    silent: true,
-                    data: [{ value: 1, name: '', itemStyle: { color: '#f1f5f9' }, label: { show: false } }]
-                  }
-                ]
-              };
-            }
-            return {
-              color: PALETTE.pie,
-              tooltip: itemTooltipStyle,
-              legend: legendPieCodeStyle,
-              series: [
-                {
-                  ...pieSeries(['50%', '42%'], ['44%', '62%']),
-                  data: entries.map(([code, count]) => ({ name: code, value: count }))
-                }
-              ]
-            };
-          })();
-
-          // 类型饼图
-          const typePieOption = {
-            color: [PALETTE.email, PALETTE.sms],
-            tooltip: itemTooltipStyle,
-            legend: legendPieTypeStyle,
-            series: [
-              {
-                ...pieSeries(['50%', '44%'], ['46%', '66%']),
-                data: [
-                  { name: formatMessage({ id: 'EmailChannel' }), value: Number(byType['0']) || 0 },
-                  { name: formatMessage({ id: 'SMS' }), value: Number(byType['1']) || 0 }
-                ]
-              }
-            ]
-          };
-
-          const historyStatItems = [
-            {
-              label: formatMessage({ id: 'TotalRecords' }),
-              value: data?.totalRecords || 0,
-              color: PALETTE.total
-            },
-            {
-              label: `${formatMessage({ id: 'EmailChannel' })}${formatMessage({ id: 'TotalRecords' })}`,
-              value: Number(byType['0']) || 0,
-              color: PALETTE.email
-            },
-            {
-              label: `${formatMessage({ id: 'SMS' })}${formatMessage({ id: 'TotalRecords' })}`,
-              value: Number(byType['1']) || 0,
-              color: PALETTE.sms
-            },
-            {
-              label: formatMessage({ id: 'TemplateTotal' }),
-              value: templateStats.total || 0,
-              color: '#d97706'
-            },
-            {
-              label: formatMessage({ id: 'EnabledTemplates' }),
-              value: Number(templateStats.byStatus?.['0']) || 0,
-              color: PALETTE.enabled
-            },
-            {
-              label: formatMessage({ id: 'DisabledTemplates' }),
-              value: Number(templateStats.byStatus?.['1']) || 0,
-              color: PALETTE.disabled
-            }
-          ];
-
-          return (
-            <>
-              <div className={style.historyStatsGrid}>
-                {historyStatItems.map(item => (
-                  <div key={item.label} className={style.historyStatCell} style={{ borderLeftColor: item.color }}>
-                    <div className={style.historyStatLabel}>{item.label}</div>
-                    <div className={style.historyStatValue} style={{ color: item.color }}>
-                      {item.value}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <BoxCard className={`${style.chartCardSurface} ${style.historyTrendCard}`}>
-                <Echart style={{ height: trendChartHeight }} option={trendOption} />
-              </BoxCard>
-
-              <Row gutter={[20, 24]} className={style.historyPiesRow}>
-                <Col xs={24} lg={12} className={style.chartCol}>
-                  <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'TypeDistribution' })} style={{ height: '100%' }}>
-                    {typePieOption ? <Echart style={{ height: pieChartHeight }} option={typePieOption} /> : null}
-                  </BoxCard>
-                </Col>
-                <Col xs={24} lg={12} className={style.chartCol}>
-                  <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'ByCodeStats' })} style={{ height: '100%' }}>
-                    <Echart style={{ height: pieChartHeight }} option={codePieOption} />
-                  </BoxCard>
-                </Col>
-              </Row>
-            </>
-          );
-        }}
+            return <HistoryContent Echart={Echart} data={data} range={range} />;
+          }}
         />
-      </>
+      </div>
     );
   })
 );

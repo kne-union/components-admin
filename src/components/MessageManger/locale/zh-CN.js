@@ -72,7 +72,19 @@ const messages = {
   Afternoon: '下午',
   Evening: '晚间',
   PeriodCompare: '时段对比',
-  WaitingForData: '等待数据...'
+  WaitingForData: '等待数据...',
+  Now: '当前',
+  TodayHourly: '今日每小时',
+  ChannelComposition: '渠道构成',
+  Composition: '构成分布',
+  ShareOfToday: '占今日发送',
+  Share: '占比',
+  StatusDistribution: '状态分布',
+  StatusSuccess: '成功',
+  StatusFailed: '失败',
+  StatusRunning: '执行中',
+  StatusPending: '等待中',
+  StatusCanceled: '已取消'
 };
 
 export default messages;
