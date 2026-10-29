@@ -22,6 +22,7 @@ import traceList from './trace-list.json';
 import messageMangerData from './message-manger-data.json';
 import oidcData from './oidc-data.json';
 import mailGatewayMock, { mailGatewayData } from './mail-gateway';
+import { buildTaskStatisticsOverview } from './task-statistics';
 import { enums as mailGatewayEnums } from '@components/MailGateway';
 
 export {
@@ -210,146 +211,7 @@ const apis = merge({}, getApis(), {
     },
     statistics: {
       getOverview: {
-        loader: ({ params }) => {
-          const range = params?.range || '7d';
-          const now = new Date();
-          const days = range === '1y' ? 365 : range === '3m' ? 90 : range === '1m' ? 30 : 7;
-          const recentTrend = [];
-          const recentTrendByStatus = [];
-          const recentTrendByType = [];
-          const durationTrend = [];
-          const hourlyCompletionTrend = [];
-          for (let i = days - 1; i >= 0; i--) {
-            const d = new Date(now);
-            d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
-            const success = Math.floor(Math.random() * 30) + 5;
-            const failed = Math.floor(Math.random() * 8) + 1;
-            const running = Math.floor(Math.random() * 5);
-            const pending = Math.floor(Math.random() * 6) + 1;
-            const canceled = Math.floor(Math.random() * 3);
-            const total = success + failed + running + pending + canceled;
-            recentTrend.push({ date: dateStr, count: total });
-            recentTrendByStatus.push({ date: dateStr, status: 'success', count: success });
-            recentTrendByStatus.push({ date: dateStr, status: 'failed', count: failed });
-            recentTrendByStatus.push({ date: dateStr, status: 'running', count: running });
-            recentTrendByStatus.push({ date: dateStr, status: 'pending', count: pending });
-            recentTrendByStatus.push({ date: dateStr, status: 'canceled', count: canceled });
-            recentTrendByType.push({ date: dateStr, type: 'export', count: Math.floor(total * 0.6) });
-            recentTrendByType.push({ date: dateStr, type: 'import', count: Math.ceil(total * 0.4) });
-            durationTrend.push({
-              date: dateStr,
-              completedCount: success + failed + canceled,
-              successCount: success,
-              failedCount: failed,
-              canceledCount: canceled,
-              avgWaitingTime: Math.floor(Math.random() * 3000) + 500,
-              avgExecutionTime: Math.floor(Math.random() * 8000) + 2000,
-              avgTotalTime: Math.floor(Math.random() * 10000) + 3000,
-              byType: {
-                export: {
-                  count: Math.floor(total * 0.6),
-                  avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
-                  avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
-                  avgTotalTime: Math.floor(Math.random() * 8000) + 3000
-                },
-                import: {
-                  count: Math.ceil(total * 0.4),
-                  avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
-                  avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
-                  avgTotalTime: Math.floor(Math.random() * 8000) + 3000
-                }
-              },
-              byRunnerType: {
-                manual: {
-                  count: Math.floor(total * 0.4),
-                  avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
-                  avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
-                  avgTotalTime: Math.floor(Math.random() * 8000) + 3000
-                },
-                system: {
-                  count: Math.ceil(total * 0.6),
-                  avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
-                  avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
-                  avgTotalTime: Math.floor(Math.random() * 8000) + 3000
-                }
-              },
-              byTypeByRunnerType: {
-                manual: {
-                  export: {
-                    count: Math.floor(total * 0.25),
-                    avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
-                    avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
-                    avgTotalTime: Math.floor(Math.random() * 8000) + 3000
-                  },
-                  import: {
-                    count: Math.ceil(total * 0.15),
-                    avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
-                    avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
-                    avgTotalTime: Math.floor(Math.random() * 8000) + 3000
-                  }
-                },
-                system: {
-                  export: {
-                    count: Math.floor(total * 0.35),
-                    avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
-                    avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
-                    avgTotalTime: Math.floor(Math.random() * 8000) + 3000
-                  },
-                  import: {
-                    count: Math.ceil(total * 0.25),
-                    avgWaitingTime: Math.floor(Math.random() * 2000) + 500,
-                    avgExecutionTime: Math.floor(Math.random() * 6000) + 2000,
-                    avgTotalTime: Math.floor(Math.random() * 8000) + 3000
-                  }
-                }
-              }
-            });
-            ['import', 'export'].forEach(type => {
-              [9, 12, 15, 18].forEach(h => {
-                const ok = Math.floor(Math.random() * 3) + 1;
-                const bad = Math.random() < 0.15 ? 1 : 0;
-                hourlyCompletionTrend.push({
-                  date: dateStr,
-                  hour: h,
-                  type,
-                  runnerType: type === 'import' ? 'system' : 'manual',
-                  totalCompleted: ok + bad,
-                  successCount: ok,
-                  failedCount: bad,
-                  canceledCount: 0
-                });
-              });
-            });
-          }
-          const totalSuccess = recentTrendByStatus.filter(item => item.status === 'success').reduce((sum, item) => sum + item.count, 0);
-          const totalFailed = recentTrendByStatus.filter(item => item.status === 'failed').reduce((sum, item) => sum + item.count, 0);
-          const totalRunning = recentTrendByStatus.filter(item => item.status === 'running').reduce((sum, item) => sum + item.count, 0);
-          const totalPending = recentTrendByStatus.filter(item => item.status === 'pending').reduce((sum, item) => sum + item.count, 0);
-          const totalCanceled = recentTrendByStatus.filter(item => item.status === 'canceled').reduce((sum, item) => sum + item.count, 0);
-          const totalWaiting = recentTrendByStatus.filter(item => item.status === 'waiting').reduce((sum, item) => sum + item.count, 0);
-          return {
-            range,
-            rangeLabel: range === '7d' ? '近7天' : range === '1m' ? '近1个月' : range === '3m' ? '近3个月' : '近1年',
-            totalTasks: totalSuccess + totalFailed + totalRunning + totalPending + totalCanceled + totalWaiting,
-            byStatus: {
-              success: totalSuccess,
-              failed: totalFailed,
-              running: totalRunning,
-              pending: totalPending,
-              canceled: totalCanceled,
-              waiting: totalWaiting
-            },
-            byType: { export: Math.floor((totalSuccess + totalFailed) * 0.6), import: Math.ceil((totalSuccess + totalFailed) * 0.4) },
-            byRunnerType: { manual: Math.floor((totalSuccess + totalFailed) * 0.4), system: Math.ceil((totalSuccess + totalFailed) * 0.6) },
-            byTargetType: { project: Math.floor((totalSuccess + totalFailed) * 0.5), document: Math.ceil((totalSuccess + totalFailed) * 0.5) },
-            recentTrend,
-            recentTrendByStatus,
-            recentTrendByType,
-            durationTrend,
-            hourlyCompletionTrend
-          };
-        }
+        loader: ({ params }) => buildTaskStatisticsOverview(params?.range || '7d')
       },
       sse: {
         loader: () => {

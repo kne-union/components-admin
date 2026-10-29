@@ -1,110 +1,230 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useIsMobile } from '@kne/responsive-utils';
 import { useMemo } from 'react';
-import { Col, Row, Space, Tag } from 'antd';
-import { BarChartOutlined, MailOutlined, MessageOutlined } from '@ant-design/icons';
-import { Card as BoxCard, ColorfulCard } from '@kne/react-box';
+import { ThunderboltFilled } from '@ant-design/icons';
+import { defaultColors } from '@kne/react-box';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
-import { PALETTE, TIME_PERIODS, tooltipStyle, legendCenterStyle, lineChartGrid, axisLineStyle, axisLabelStyle, splitLineStyle } from './constants';
+import {
+  PALETTE,
+  CHANNELS,
+  TIME_PERIODS,
+  tooltipStyle,
+  legendCenterStyle,
+  lineChartGrid,
+  axisLineStyle,
+  axisLabelStyle,
+  splitLineStyle,
+  roundStackedBarTops
+} from './constants';
+import { Panel, Metric, StackBar, Legend, DurationList, LiveBadge, SectionIcon, formatPercent } from '../../../utils/dashboard/ui';
 import useRealtimeStatisticsSSE from './useRealtimeStatisticsSSE';
-import style from './dashboard.module.scss';
+import style from '../../../utils/dashboard/dashboard.module.scss';
 
-const HOURS_IN_DAY = 24;
-const STATUS_SERIES = [
-  { key: 'success', label: '成功', color: '#10b981' },
-  { key: 'running', label: '执行中', color: '#3b82f6' },
-  { key: 'pending', label: '等待', color: '#f59e0b' },
-  { key: 'canceled', label: '取消', color: '#94a3b8' },
-  { key: 'failed', label: '错误', color: '#ef4444' }
+const HOURS = Array.from({ length: 24 }, (_, h) => `${String(h).padStart(2, '0')}:00`);
+const STATUS_LIST = [
+  { key: 'success', labelId: 'StatusSuccess', color: defaultColors.Green },
+  { key: 'failed', labelId: 'StatusFailed', color: defaultColors.Red },
+  { key: 'running', labelId: 'StatusRunning', color: defaultColors.Orange },
+  { key: 'pending', labelId: 'StatusPending', color: defaultColors.Blue },
+  { key: 'canceled', labelId: 'StatusCanceled', color: PALETTE.disabled }
 ];
 
 /**
- * 合并 hourlyTrend（按小时总量）与 hourlyTrendByType（按小时+类型），得到 0–23 点完整序列。
- * 新接口示例：hourlyTrend:[{hour:4,count:1}], hourlyTrendByType:[{hour:4,type:0,count:1}]
+ * 合并 hourlyTrend（按小时总量）与 hourlyTrendByType（按小时+类型），得到 0–23 点完整序列；
+ * 后端未返回 hourly 聚合时，退回 records 计算。
  */
 const buildTodayHourlySlots = raw => {
-  const slots = Array.from({ length: HOURS_IN_DAY }, (_, h) => ({
-    hour: h,
-    total: 0,
-    email: 0,
-    sms: 0,
-    hasTotalFromApi: false
-  }));
-
+  const slots = Array.from({ length: 24 }, () => ({ total: 0, email: 0, sms: 0, hasTotal: false }));
   const hourlyTrend = Array.isArray(raw?.hourlyTrend) ? raw.hourlyTrend : [];
   const hourlyTrendByType = Array.isArray(raw?.hourlyTrendByType) ? raw.hourlyTrendByType : [];
-  const hasHourly = hourlyTrend.length > 0 || hourlyTrendByType.length > 0;
+  const validHour = h => Number.isInteger(h) && h >= 0 && h < 24;
 
-  if (hasHourly) {
-    // 参考 fastify-task：前端图表主口径使用后端聚合的 hourly 数据
+  if (hourlyTrend.length > 0 || hourlyTrendByType.length > 0) {
     hourlyTrend.forEach(item => {
       const h = Number(item?.hour);
-      if (!Number.isFinite(h) || h < 0 || h >= HOURS_IN_DAY) return;
+      if (!validHour(h)) return;
       slots[h].total = Number(item?.count) || 0;
-      slots[h].hasTotalFromApi = true;
+      slots[h].hasTotal = true;
     });
-
     hourlyTrendByType.forEach(item => {
       const h = Number(item?.hour);
-      if (!Number.isFinite(h) || h < 0 || h >= HOURS_IN_DAY) return;
+      if (!validHour(h)) return;
       const n = Number(item?.count) || 0;
-      const typ = Number(item?.type);
-      if (!Number.isFinite(typ)) return;
-      if (typ === 0) slots[h].email += n;
-      else if (typ === 1) slots[h].sms += n;
+      const type = Number(item?.type);
+      if (type === 0) slots[h].email += n;
+      else if (type === 1) slots[h].sms += n;
     });
-
-    for (let h = 0; h < HOURS_IN_DAY; h++) {
-      const s = slots[h];
-      const parts = s.email + s.sms;
-      if (!s.hasTotalFromApi && parts > 0) {
-        s.total = parts;
-      }
-    }
   } else {
-    // 仅在后端未返回 hourly 聚合时，退回 records 计算
-    const records = Array.isArray(raw?.records) ? raw.records : [];
-    records.forEach(item => {
+    (Array.isArray(raw?.records) ? raw.records : []).forEach(item => {
       const date = item?.createdAt ? new Date(item.createdAt) : null;
       if (!date || Number.isNaN(date.getTime())) return;
-      const h = date.getHours();
-      if (!Number.isFinite(h) || h < 0 || h >= HOURS_IN_DAY) return;
-      const typ = Number(item?.type);
-      if (typ === 0) slots[h].email += 1;
-      else if (typ === 1) slots[h].sms += 1;
-      slots[h].total += 1;
-      slots[h].hasTotalFromApi = true;
+      const slot = slots[date.getHours()];
+      const type = Number(item?.type);
+      if (type === 0) slot.email += 1;
+      else if (type === 1) slot.sms += 1;
+      slot.total += 1;
+      slot.hasTotal = true;
     });
   }
-
+  slots.forEach(slot => {
+    if (!slot.hasTotal) slot.total = slot.email + slot.sms;
+  });
   return slots;
 };
 
-/** 消息实时统计：type 0 邮件、1 短信（与 enums messageManagerType 一致） */
-const messageTypeLabel = (typeKey, formatMessage) => {
-  if (typeKey === '0') return formatMessage({ id: 'EmailChannel' });
-  if (typeKey === '1') return formatMessage({ id: 'SMS' });
-  return `${formatMessage({ id: 'Type' })} ${typeKey}`;
+const groupStatus = rows => {
+  const map = {};
+  (Array.isArray(rows) ? rows : []).forEach(item => {
+    const key = String(item?.status || '');
+    if (!key) return;
+    map[key] = (map[key] || 0) + (Number(item?.count) || 0);
+  });
+  return map;
 };
 
-const messageTypeLineColor = (typeKey, index) => {
-  if (typeKey === '0') return PALETTE.email;
-  if (typeKey === '1') return PALETTE.sms;
-  return PALETTE.pie[index % PALETTE.pie.length];
-};
+const RealtimeContent = ({ Echart, data }) => {
+  const { formatMessage } = useIntl();
+  const isMobile = useIsMobile();
 
-/** 当前接口：byType 为 { "0": n, "1": m }，totalRecords 为数字 */
-const buildRealtimeDisplayStats = raw => {
-  if (!raw || typeof raw !== 'object') {
-    return { totalRecords: 0, email: 0, sms: 0 };
-  }
-  const bt = raw.byType && typeof raw.byType === 'object' ? raw.byType : {};
-  const email = Number(bt['0']) || 0;
-  const sms = Number(bt['1']) || 0;
-  let totalRecords = Number(raw.totalRecords);
-  if (!Number.isFinite(totalRecords)) totalRecords = 0;
-  return { totalRecords, email, sms };
+  const byType = data.byType && typeof data.byType === 'object' ? data.byType : {};
+  const channelValue = { email: Number(byType['0']) || 0, sms: Number(byType['1']) || 0 };
+  const totalRecords = Number.isFinite(Number(data.totalRecords)) ? Number(data.totalRecords) : channelValue.email + channelValue.sms;
+  const channelItems = CHANNELS.map(channel => ({
+    key: channel.key,
+    label: formatMessage({ id: channel.labelId }),
+    value: channelValue[channel.key],
+    color: channel.color
+  }));
+
+  const slots = useMemo(() => buildTodayHourlySlots(data), [data]);
+  const currentHour = new Date().getHours();
+  const periods = TIME_PERIODS.map(period => {
+    const range = slots.slice(period.start, period.end);
+    const sum = field => range.reduce((n, slot) => n + slot[field], 0);
+    return {
+      ...period,
+      total: sum('total'),
+      email: sum('email'),
+      sms: sum('sms'),
+      active: currentHour >= period.start && currentHour < period.end
+    };
+  });
+
+  const hasChannelHourly = slots.some(slot => slot.email + slot.sms > 0);
+  const hourlySeries = hasChannelHourly
+    ? CHANNELS.map(channel => ({ name: formatMessage({ id: channel.labelId }), values: slots.map(slot => slot[channel.key]), color: channel.color }))
+    : [{ name: formatMessage({ id: 'TotalCount' }), values: slots.map(slot => slot.total), color: PALETTE.total }];
+  const hourlyOption = {
+    tooltip: tooltipStyle,
+    legend: legendCenterStyle,
+    grid: lineChartGrid,
+    xAxis: {
+      type: 'category',
+      data: HOURS,
+      axisLine: axisLineStyle,
+      axisTick: { show: false },
+      axisLabel: { ...axisLabelStyle, interval: isMobile ? 5 : 2 }
+    },
+    yAxis: { type: 'value', minInterval: 1, min: 0, splitLine: splitLineStyle, axisLabel: axisLabelStyle },
+    series: roundStackedBarTops(
+      hourlySeries.map(({ name, values, color }, index) => ({
+        name,
+        type: 'bar',
+        stack: 'total',
+        barMaxWidth: 18,
+        data: values,
+        itemStyle: { color },
+        emphasis: { focus: 'series' },
+        ...(index === 0
+          ? {
+              markLine: {
+                silent: true,
+                symbol: 'none',
+                lineStyle: { color: PALETTE.ink, opacity: 0.35, type: 'dashed' },
+                label: { formatter: formatMessage({ id: 'Now' }), color: PALETTE.muted, fontSize: 11 },
+                data: [{ xAxis: HOURS[currentHour] }]
+              }
+            }
+          : {})
+      }))
+    )
+  };
+
+  const statusMap = groupStatus(data.hourlyTrendByStatus);
+  const statusItems = STATUS_LIST.filter(item => statusMap[item.key] !== undefined).map(item => ({
+    key: item.key,
+    label: formatMessage({ id: item.labelId }),
+    value: statusMap[item.key],
+    color: item.color
+  }));
+
+  const periodItems = periods.map(period => ({
+    key: period.id,
+    label: `${formatMessage({ id: period.id })} ${String(period.start).padStart(2, '0')}–${String(period.end).padStart(2, '0')}`,
+    waiting: period.email,
+    execution: period.sms
+  }));
+
+  const shareHint = value => `${formatMessage({ id: 'ShareOfToday' })} ${formatPercent(value, totalRecords)}`;
+
+  return (
+    <>
+      <div className={style.metricStrip} style={{ gridTemplateColumns: isMobile ? undefined : 'repeat(3, minmax(0, 1fr))' }}>
+        <Metric card label={formatMessage({ id: 'TodayRecords' })} value={totalRecords.toLocaleString()} segments={channelItems} />
+        <Metric card label={formatMessage({ id: 'TodayEmail' })} value={channelValue.email.toLocaleString()} hint={shareHint(channelValue.email)} />
+        <Metric card label={formatMessage({ id: 'TodaySMS' })} value={channelValue.sms.toLocaleString()} hint={shareHint(channelValue.sms)} />
+      </div>
+
+      <div className={style.mainGrid}>
+        <Panel title={formatMessage({ id: 'TodayHourly' })} className={style.panelFill}>
+          <div className={style.periodRow}>
+            {periods.map(period => (
+              <div key={period.id} className={`${style.periodCell}${period.active ? ` ${style.periodCellActive}` : ''}`}>
+                <span className={style.periodLabel}>
+                  {formatMessage({ id: period.id })}
+                  <span className={style.periodRange}>
+                    {String(period.start).padStart(2, '0')}–{String(period.end).padStart(2, '0')}
+                  </span>
+                </span>
+                <span className={style.periodValue}>{period.total.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+          <div className={style.chartFill}>
+            <Echart option={hourlyOption} />
+          </div>
+        </Panel>
+
+        <div className={style.sideStack}>
+          <Panel title={formatMessage({ id: 'ChannelComposition' })}>
+            <div className={style.block}>
+              <StackBar items={channelItems} />
+              <Legend items={channelItems} />
+            </div>
+            {statusItems.length > 0 ? (
+              <div className={style.block}>
+                <div className={style.blockTitle}>{formatMessage({ id: 'StatusDistribution' })}</div>
+                <StackBar items={statusItems} />
+                <Legend items={statusItems} />
+              </div>
+            ) : null}
+          </Panel>
+          <Panel title={formatMessage({ id: 'PeriodCompare' })}>
+            <DurationList
+              items={periodItems}
+              waitingLabel={formatMessage({ id: 'EmailChannel' })}
+              executionLabel={formatMessage({ id: 'SMS' })}
+              waitingColor={PALETTE.email}
+              executionColor={PALETTE.sms}
+              format={value => value.toLocaleString()}
+              emptyText={formatMessage({ id: 'NoData' })}
+            />
+          </Panel>
+        </div>
+      </div>
+    </>
+  );
 };
 
 const RealtimeSection = createWithRemoteLoader({
@@ -113,466 +233,45 @@ const RealtimeSection = createWithRemoteLoader({
   withLocale(({ remoteModules, apis, ajax }) => {
     const [Echart] = remoteModules;
     const { formatMessage } = useIntl();
-    const isMobile = useIsMobile();
-    const chartHeight = isMobile ? 240 : 320;
-    const sseUrl = apis?.messageManger?.statistics?.sse?.url;
-    const { realtimeData, isConnected, lastUpdatedAt } = useRealtimeStatisticsSSE(sseUrl, ajax);
+    const { realtimeData, isConnected, lastUpdatedAt } = useRealtimeStatisticsSSE(apis?.messageManger?.statistics?.sse?.url, ajax);
 
-    const displayStats = useMemo(() => buildRealtimeDisplayStats(realtimeData), [realtimeData]);
-
-    const { emailPct, smsPct } = useMemo(() => {
-      const t = displayStats.totalRecords;
-      if (!t || t <= 0) return { emailPct: null, smsPct: null };
-      const e = (displayStats.email / t) * 100;
-      const s = (displayStats.sms / t) * 100;
-      return { emailPct: e.toFixed(1), smsPct: s.toFixed(1) };
-    }, [displayStats]);
-
-    const lastUpdatedShort = useMemo(() => {
+    const lastUpdatedText = useMemo(() => {
       if (!lastUpdatedAt) return '';
       try {
-        return new Intl.DateTimeFormat(undefined, {
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: false
-        }).format(new Date(lastUpdatedAt));
+        return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(
+          new Date(lastUpdatedAt)
+        );
       } catch {
         return new Date(lastUpdatedAt).toLocaleTimeString();
       }
     }, [lastUpdatedAt]);
 
-    // 时段汇总：与 hourly 序列同源（buildTodayHourlySlots），按四小时段聚合
-    const periodStats = useMemo(() => {
-      if (!realtimeData) return [];
-      const slots = buildTodayHourlySlots(realtimeData);
-      return TIME_PERIODS.map(period => {
-        let email = 0;
-        let sms = 0;
-        let total = 0;
-        for (let h = period.start; h < period.end; h++) {
-          const s = slots[h];
-          email += s.email;
-          sms += s.sms;
-          total += s.hasTotalFromApi ? s.total : s.email + s.sms;
-        }
-        return { ...period, total, email, sms };
-      });
-    }, [realtimeData]);
-
-    /** 今日每小时趋势：有 hourlyTrendByType 时按类型分线，否则按 slots 展示总量与邮件/短信 */
-    const hourlyOption = useMemo(() => {
-      if (!realtimeData) return null;
-
-      const hours = Array.from({ length: HOURS_IN_DAY }, (_, h) => `${String(h).padStart(2, '0')}:00`);
-      const hourlyTrendByType = Array.isArray(realtimeData?.hourlyTrendByType) ? realtimeData.hourlyTrendByType : [];
-
-      if (hourlyTrendByType.length > 0) {
-        const typeMap = {};
-        hourlyTrendByType.forEach(item => {
-          const h = Number(item?.hour);
-          const typeNum = Number(item?.type);
-          if (!Number.isFinite(h) || h < 0 || h >= HOURS_IN_DAY || !Number.isFinite(typeNum)) return;
-          const type = String(typeNum);
-          if (!typeMap[type]) typeMap[type] = Array.from({ length: HOURS_IN_DAY }, () => 0);
-          typeMap[type][h] += Number(item?.count) || 0;
-        });
-
-        const typeKeys = Object.keys(typeMap).sort((a, b) => Number(a) - Number(b));
-        if (typeKeys.length > 0) {
-          return {
-            color: typeKeys.map((key, index) => messageTypeLineColor(key, index)),
-            tooltip: tooltipStyle,
-            legend: {
-              ...legendCenterStyle,
-              data: typeKeys.map(key => messageTypeLabel(key, formatMessage))
-            },
-            grid: { ...lineChartGrid, bottom: 28 },
-            xAxis: {
-              type: 'category',
-              boundaryGap: false,
-              data: hours,
-              axisLine: axisLineStyle,
-              axisTick: { show: false },
-              axisLabel: {
-                ...axisLabelStyle,
-                fontSize: 10,
-                interval: 1,
-                rotate: 0
-              }
-            },
-            yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
-            series: typeKeys.map((key, index) => {
-              const color = messageTypeLineColor(key, index);
-              return {
-                name: messageTypeLabel(key, formatMessage),
-                type: 'line',
-                symbol: 'circle',
-                symbolSize: 5,
-                smooth: 0.28,
-                data: typeMap[key],
-                lineStyle: { width: 2.5, color },
-                itemStyle: { color, borderColor: '#fff', borderWidth: 2 },
-                emphasis: { focus: 'series' }
-              };
-            })
-          };
-        }
-      }
-
-      const slots = buildTodayHourlySlots(realtimeData);
-      const totalLabel = formatMessage({ id: 'TotalCount' });
-      const emailLabel = formatMessage({ id: 'EmailChannel' });
-      const smsLabel = formatMessage({ id: 'SMS' });
-      const lineFor = (data, color) => ({
-        type: 'line',
-        symbol: 'circle',
-        symbolSize: 5,
-        smooth: 0.28,
-        data,
-        lineStyle: { width: 2.5, color },
-        itemStyle: { color, borderColor: '#fff', borderWidth: 2 },
-        emphasis: { focus: 'series' }
-      });
-
-      return {
-        color: [PALETTE.total, PALETTE.email, PALETTE.sms],
-        tooltip: tooltipStyle,
-        legend: { ...legendCenterStyle, data: [totalLabel, emailLabel, smsLabel] },
-        grid: { ...lineChartGrid, bottom: 28 },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: hours,
-          axisLine: axisLineStyle,
-          axisTick: { show: false },
-          axisLabel: { ...axisLabelStyle, fontSize: 10, interval: 1, rotate: 0 }
-        },
-        yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
-        series: [
-          { name: totalLabel, ...lineFor(slots.map(s => (s.hasTotalFromApi ? s.total : s.email + s.sms)), PALETTE.total) },
-          { name: emailLabel, ...lineFor(slots.map(s => s.email), PALETTE.email) },
-          { name: smsLabel, ...lineFor(slots.map(s => s.sms), PALETTE.sms) }
-        ]
-      };
-    }, [realtimeData, formatMessage]);
-
-    /**
-     * 时段对比：优先按状态（hourlyTrendByStatus）；消息统计接口无该字段时，
-     * 用 hourly 数据按时段汇总邮件/短信，与上方时段条一致。
-     */
-    const periodCompareOption = useMemo(() => {
-      const labels = TIME_PERIODS.map(p => formatMessage({ id: p.id }));
-      const hourlyTrendByStatus = Array.isArray(realtimeData?.hourlyTrendByStatus) ? realtimeData.hourlyTrendByStatus : [];
-
-      if (hourlyTrendByStatus.length > 0) {
-        const statusData = STATUS_SERIES.reduce((acc, cur) => ({ ...acc, [cur.key]: [0, 0, 0, 0] }), {});
-
-        hourlyTrendByStatus.forEach(item => {
-          const h = Number(item?.hour);
-          const status = String(item?.status || '');
-          const count = Number(item?.count) || 0;
-          if (!Number.isFinite(h) || !statusData[status]) return;
-          const periodIndex = TIME_PERIODS.findIndex(p => h >= p.start && h < p.end);
-          if (periodIndex >= 0) statusData[status][periodIndex] += count;
-        });
-
-        return {
-          color: STATUS_SERIES.map(item => item.color),
-          tooltip: {
-            ...tooltipStyle,
-            trigger: 'axis',
-            axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(148,163,184,0.15)' } }
-          },
-          legend: { ...legendCenterStyle, data: STATUS_SERIES.map(item => item.label) },
-          grid: { ...lineChartGrid, bottom: 20 },
-          xAxis: {
-            type: 'category',
-            data: labels,
-            axisLine: axisLineStyle,
-            axisTick: { show: false },
-            axisLabel: { color: '#64748b', fontSize: 12 }
-          },
-          yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
-          series: STATUS_SERIES.map((item, index) => ({
-            name: item.label,
-            type: 'bar',
-            data: statusData[item.key],
-            barMaxWidth: 24,
-            itemStyle: { color: item.color, borderRadius: [4, 4, 0, 0] },
-            emphasis: { focus: 'series' },
-            z: 10 - index
-          }))
-        };
-      }
-
-      if (!realtimeData) {
-        const emailLabel = formatMessage({ id: 'EmailChannel' });
-        const smsLabel = formatMessage({ id: 'SMS' });
-        return {
-          color: [PALETTE.email, PALETTE.sms],
-          tooltip: {
-            ...tooltipStyle,
-            trigger: 'axis',
-            axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(148,163,184,0.15)' } }
-          },
-          legend: { ...legendCenterStyle, data: [emailLabel, smsLabel] },
-          grid: { ...lineChartGrid, bottom: 20 },
-          xAxis: {
-            type: 'category',
-            data: labels,
-            axisLine: axisLineStyle,
-            axisTick: { show: false },
-            axisLabel: { color: '#64748b', fontSize: 12 }
-          },
-          yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
-          series: [
-            {
-              name: emailLabel,
-              type: 'bar',
-              data: [0, 0, 0, 0],
-              barMaxWidth: 28,
-              barGap: '12%',
-              itemStyle: { color: PALETTE.email, borderRadius: [4, 4, 0, 0] },
-              emphasis: { focus: 'series' },
-              z: 2
-            },
-            {
-              name: smsLabel,
-              type: 'bar',
-              data: [0, 0, 0, 0],
-              barMaxWidth: 28,
-              barGap: '12%',
-              itemStyle: { color: PALETTE.sms, borderRadius: [4, 4, 0, 0] },
-              emphasis: { focus: 'series' },
-              z: 1
-            }
-          ]
-        };
-      }
-
-      const slots = buildTodayHourlySlots(realtimeData);
-      const emailData = TIME_PERIODS.map(period => {
-        let sum = 0;
-        for (let h = period.start; h < period.end; h++) sum += slots[h].email;
-        return sum;
-      });
-      const smsData = TIME_PERIODS.map(period => {
-        let sum = 0;
-        for (let h = period.start; h < period.end; h++) sum += slots[h].sms;
-        return sum;
-      });
-
-      const emailLabel = formatMessage({ id: 'EmailChannel' });
-      const smsLabel = formatMessage({ id: 'SMS' });
-
-      return {
-        color: [PALETTE.email, PALETTE.sms],
-        tooltip: {
-          ...tooltipStyle,
-          trigger: 'axis',
-          axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(148,163,184,0.15)' } }
-        },
-        legend: { ...legendCenterStyle, data: [emailLabel, smsLabel] },
-        grid: { ...lineChartGrid, bottom: 20 },
-        xAxis: {
-          type: 'category',
-          data: labels,
-          axisLine: axisLineStyle,
-          axisTick: { show: false },
-          axisLabel: { color: '#64748b', fontSize: 12 }
-        },
-        yAxis: { type: 'value', ...splitLineStyle, axisLabel: axisLabelStyle, minInterval: 1, min: 0 },
-        series: [
-          {
-            name: emailLabel,
-            type: 'bar',
-            data: emailData,
-            barMaxWidth: 28,
-            barGap: '12%',
-            itemStyle: { color: PALETTE.email, borderRadius: [4, 4, 0, 0] },
-            emphasis: { focus: 'series' },
-            z: 2
-          },
-          {
-            name: smsLabel,
-            type: 'bar',
-            data: smsData,
-            barMaxWidth: 28,
-            barGap: '12%',
-            itemStyle: { color: PALETTE.sms, borderRadius: [4, 4, 0, 0] },
-            emphasis: { focus: 'series' },
-            z: 1
-          }
-        ]
-      };
-    }, [realtimeData, formatMessage]);
-
     return (
-      <>
-        <div className={style.realtimeHeader}>
-          <div className={style.realtimeHeaderMain}>
-            <h3 className={style.realtimeTitle}>{formatMessage({ id: 'RealtimeData' })}</h3>
-            {realtimeData ? (
-              <div className={style.realtimeSubline}>
-                <strong style={{ color: '#334155', fontWeight: 600 }}>{formatMessage({ id: 'Today' })}</strong>
-                {' · '}
-                {formatMessage({ id: 'TotalCount' })} <strong style={{ color: PALETTE.total }}>{displayStats.totalRecords}</strong>
-                {' · '}
-                <span style={{ color: PALETTE.email }}>{formatMessage({ id: 'EmailChannel' })}</span>{' '}
-                <strong style={{ color: PALETTE.email }}>{displayStats.email}</strong>
-                {emailPct != null ? <span> ({emailPct}%)</span> : null}
-                {' · '}
-                <span style={{ color: PALETTE.sms }}>{formatMessage({ id: 'SMS' })}</span>{' '}
-                <strong style={{ color: PALETTE.sms }}>{displayStats.sms}</strong>
-                {smsPct != null ? <span> ({smsPct}%)</span> : null}
-              </div>
-            ) : (
-              <div className={style.realtimeSubline}>{formatMessage({ id: isConnected ? 'WaitingForData' : 'RealtimeDisconnected' })}</div>
-            )}
+      <div className={style.section}>
+        <div className={style.sectionHead}>
+          <div className={style.sectionHeadMain}>
+            <h3 className={style.sectionTitle}>
+              <SectionIcon icon={<ThunderboltFilled />} tone={PALETTE.total} />
+              {formatMessage({ id: 'RealtimeData' })}
+            </h3>
+            <span className={style.sectionCaption}>
+              {formatMessage({ id: 'Today' })} {realtimeData?.date || new Date().toLocaleDateString()}
+            </span>
           </div>
-          <div className={style.realtimeHeaderMeta}>
-            <Tag color={isConnected ? 'green' : 'default'} style={{ margin: 0 }}>
-              {formatMessage({ id: isConnected ? 'RealtimeConnected' : 'RealtimeDisconnected' })}
-            </Tag>
-            {lastUpdatedAt ? (
-              <span className={style.realtimeTime} title={new Date(lastUpdatedAt).toLocaleString()}>
-                {formatMessage({ id: 'LastUpdatedAt' })} {lastUpdatedShort}
-              </span>
-            ) : null}
-          </div>
+          <LiveBadge
+            connected={isConnected}
+            text={formatMessage({ id: isConnected ? 'RealtimeConnected' : 'RealtimeDisconnected' })}
+            time={lastUpdatedText ? `${formatMessage({ id: 'LastUpdatedAt' })} ${lastUpdatedText}` : ''}
+          />
         </div>
-
         {realtimeData ? (
-          <>
-            <div className={`${style.kpiRow} ${style.kpiRowDense}`}>
-              <ColorfulCard
-                className={`${style.kpiCard} ${style.kpiCardDense}`}
-                color={PALETTE.total}
-                icon={<BarChartOutlined />}
-                title={<span className={style.kpiValueDense} style={{ color: PALETTE.total }}>{displayStats.totalRecords}</span>}
-                description={
-                  <span className={style.kpiDescDense}>
-                    {formatMessage({ id: 'TodayRecords' })}
-                    {displayStats.totalRecords > 0 &&
-                    displayStats.email + displayStats.sms !== displayStats.totalRecords ? (
-                      <>
-                        {' · '}
-                        {formatMessage({ id: 'EmailChannel' })}+{formatMessage({ id: 'SMS' })}={displayStats.email + displayStats.sms}
-                      </>
-                    ) : null}
-                  </span>
-                }
-              />
-              <ColorfulCard
-                className={`${style.kpiCard} ${style.kpiCardDense}`}
-                color={PALETTE.email}
-                icon={<MailOutlined />}
-                title={<span className={style.kpiValueDense} style={{ color: PALETTE.email }}>{displayStats.email}</span>}
-                description={
-                  <span className={style.kpiDescDense}>
-                    {formatMessage({ id: 'TodayEmail' })}
-                    {emailPct != null ? ` · ${emailPct}%` : ''}
-                  </span>
-                }
-              />
-              <ColorfulCard
-                className={`${style.kpiCard} ${style.kpiCardDense}`}
-                color={PALETTE.sms}
-                icon={<MessageOutlined />}
-                title={<span className={style.kpiValueDense} style={{ color: PALETTE.sms }}>{displayStats.sms}</span>}
-                description={
-                  <span className={style.kpiDescDense}>
-                    {formatMessage({ id: 'TodaySMS' })}
-                    {smsPct != null ? ` · ${smsPct}%` : ''}
-                  </span>
-                }
-              />
-            </div>
-
-            <div className={style.periodStrip}>
-              {periodStats.map(period => (
-                <div key={period.id} className={style.periodStripCell}>
-                  <div className={style.periodStripLabel}>
-                    <Space size={6} wrap className={style.periodStripLabelInner}>
-                      <Tag
-                        style={{
-                          margin: 0,
-                          color: period.color,
-                          background: `${period.color}18`,
-                          borderColor: `${period.color}55`
-                        }}
-                      >
-                        {formatMessage({ id: period.id })}
-                      </Tag>
-                      <Tag
-                        style={{
-                          margin: 0,
-                          color: '#475569',
-                          background: '#f1f5f9',
-                          borderColor: '#e2e8f0'
-                        }}
-                      >
-                        {String(period.start).padStart(2, '0')}:00–{String(period.end).padStart(2, '0')}:00
-                      </Tag>
-                    </Space>
-                  </div>
-                  <div className={style.periodStripValue} style={{ color: period.color }}>
-                    {period.total}
-                  </div>
-                  <div className={style.periodStripMeta}>
-                    <Space size={[6, 6]} wrap className={style.periodStripMetaInner}>
-                      <Tag
-                        style={{
-                          margin: 0,
-                          color: PALETTE.email,
-                          background: `${PALETTE.email}14`,
-                          borderColor: `${PALETTE.email}50`
-                        }}
-                      >
-                        {formatMessage({ id: 'EmailChannel' })}{' '}
-                        <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{period.email}</span>
-                      </Tag>
-                      <Tag
-                        style={{
-                          margin: 0,
-                          color: PALETTE.sms,
-                          background: `${PALETTE.sms}14`,
-                          borderColor: `${PALETTE.sms}50`
-                        }}
-                      >
-                        {formatMessage({ id: 'SMS' })}{' '}
-                        <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{period.sms}</span>
-                      </Tag>
-                    </Space>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <Row gutter={[20, 24]} className={style.chartsRow}>
-              <Col xs={24} lg={12} className={style.chartCol}>
-                <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'PeriodCompare' })} style={{ height: '100%' }}>
-                  <Echart style={{ height: chartHeight }} option={periodCompareOption} />
-                </BoxCard>
-              </Col>
-              <Col xs={24} lg={12} className={style.chartCol}>
-                <BoxCard className={style.chartCardSurface} title={formatMessage({ id: 'TodayHourlyTrend' })} style={{ height: '100%' }}>
-                  <Echart style={{ height: chartHeight }} option={hourlyOption} />
-                </BoxCard>
-              </Col>
-            </Row>
-          </>
+          <RealtimeContent Echart={Echart} data={realtimeData} />
         ) : (
-          <BoxCard>
-            <div className={style.emptyStateLarge}>
-              {isConnected ? formatMessage({ id: 'WaitingForData' }) : formatMessage({ id: 'RealtimeDisconnected' })}
-            </div>
-          </BoxCard>
+          <Panel>
+            <div className={style.emptyLarge}>{formatMessage({ id: isConnected ? 'WaitingForData' : 'RealtimeDisconnected' })}</div>
+          </Panel>
         )}
-      </>
+      </div>
     );
   })
 );
