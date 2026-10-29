@@ -1,3 +1,5 @@
+@use '~@kne/responsive-utils/scss' as resp;
+
 .code-field {
   flex: 1;
 }
@@ -5,4 +7,69 @@
 .get-code {
   vertical-align: 30px;
   min-width: 105px;
+}
+
+.guide-layout {
+  display: flex;
+  align-items: stretch;
+}
+
+.guide-side {
+  display: flex;
+  flex: 0 0 400px;
+  min-width: 0;
+
+  > * {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.guide-main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+
+  > form > :global(.ant-space) {
+    width: 360px !important;
+    max-width: 100%;
+  }
+}
+
+@mixin guide-stacked {
+  .guide-layout {
+    flex-direction: column;
+  }
+
+  .guide-side {
+    flex: none;
+    padding: 24px 24px 0;
+  }
+
+  .guide-main > form > :global(.ant-space) {
+    width: 100% !important;
+    margin-top: 32px;
+  }
+}
+
+@mixin guide-phone {
+  .guide-side {
+    padding: 12px 12px 0;
+  }
+}
+
+@include resp.down(lg) {
+  @include guide-stacked;
+}
+
+@include resp.down(sm) {
+  @include guide-phone;
+}
+
+@include resp.container-down(lg) {
+  @include guide-stacked;
+}
+
+@include resp.container-down(sm) {
+  @include guide-phone;
 }

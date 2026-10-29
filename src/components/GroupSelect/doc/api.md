@@ -8,7 +8,8 @@
 | label | 字段标签 | string \| ReactNode | - |
 | rule | 校验规则 | string | - |
 | type | 分组类型，透传到 create/save/remove/groupList | string | - |
-| language | 语言，默认取全局 locale | string | - |
+| language | 语言，默认取全局 locale；传了 `lang` 时默认为 `zh-CN` | string | - |
+| lang | 多语言配置，同 FormInfo `Form` 的 `lang`；传入后新建/编辑表单为名称、描述生成对应语言字段，详见「多语言」 | array | - |
 | apis | API 配置对象，不传则使用 `preset.apis.group` | object | - |
 | apis.groupList | 分组树接口（列表展示、父级选择）；`output: 'tree'` | object | - |
 | apis.create | 创建接口 | object | - |
@@ -71,6 +72,7 @@ const { FilterItem: GroupSelectFilterItem } = GroupSelect;
 | showColor | 已选与下拉项是否按分组 `color` 显示文件夹图标 | boolean | `false` |
 | overlayWidth | 弹出层宽度 | string \| number | `'280px'` |
 | interceptor | 覆盖默认拦截器 | object | 内置 |
+| lang | 多语言配置，同 FormInfo `Form` 的 `lang`；传入后下拉项按当前语言展示，详见「多语言」 | array | - |
 
 ```jsx
 <GroupFolderFilterItem label="文件夹" name="folder" type="skill" single />
@@ -85,7 +87,8 @@ const { FilterItem: GroupSelectFilterItem } = GroupSelect;
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | type | 分组类型 | string | - |
-| language | 语言 | string | 全局 locale |
+| language | 语言 | string | 全局 locale；传了 `lang` 时为 `zh-CN` |
+| lang | 多语言配置，同 FormInfo `Form` 的 `lang`；传入后新建/编辑表单为名称、描述生成对应语言字段，详见「多语言」 | array | - |
 | value / onChange | 受控选中值；`onChange(key, item)`，选「全部」时为 `(null, null)` | any / function | - |
 | apis | 覆盖 `groupList` / `create` / `save` / `remove` | object | `preset.apis.group` |
 | valueKey | 值字段 | string | 'code' |
@@ -134,7 +137,8 @@ const Example = createWithRemoteLoader({
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | type | 分组类型 | string | - |
-| language | 语言 | string | 全局 locale |
+| language | 语言 | string | 全局 locale；传了 `lang` 时为 `zh-CN` |
+| lang | 多语言配置，同 FormInfo `Form` 的 `lang`；传入后树节点按当前语言展示，详见「多语言」 | array | - |
 | showRoot | 是否显示「全部」根节点 | boolean | true |
 | rootTitle | 根节点文案 | string | '全部' |
 | value / onChange | 受控；`onChange(key, node)`，根节点为 `(null, null)` | any / function | - |
@@ -168,6 +172,12 @@ const Example = createWithRemoteLoader({
 - 默认支持多选
 - 设置 `single={true}` 切换为单选模式
 
+### 5. 多语言
+- `lang` 与 FormInfo `Form` 的 `lang` 格式一致，如 `['cn', { name: 'EnUS', label: '英文' }]`；未指定 `options.fields` 时默认对 `name`、`description` 生成字段（`nameEnUS`、`descriptionEnUS`）
+- 提交时多语言字段合并进 `options`（如 `options.nameEnUS`），编辑时从 `options` 回填；清空的字段保存为 `null`
+- 展示时按全局 locale 取 `options[labelKey + 语言名]`（`en-US` 对应 `EnUS`），没有则回退 `labelKey` 字段
+- 多语言文案存在同一条分组上，传了 `lang` 时 `language` 默认固定为 `zh-CN`，不再随界面语言过滤分组
+
 ## 默认 API 配置
 
 组件默认使用 `apis.group`：
@@ -184,7 +194,7 @@ const Example = createWithRemoteLoader({
 典型请求参数：
 
 - `groupList`：`{ type, language, output: 'tree' | 'list' }`
-- `create` / `save`：`{ type, language, code?, name, parentId, description, id? }`（`code` 可省略由后端生成）
+- `create` / `save`：`{ type, language, code?, name, parentId, description, options?, id? }`（`code` 可省略由后端生成；颜色、多语言文案在 `options` 中）
 - `remove`：`{ id, code, type }`
 
 需要在全局 preset 中配置，或通过 `apis` 属性传入。

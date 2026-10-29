@@ -42,6 +42,72 @@ export const applyGroupColorToPayload = (payload, { color, existingOptions } = {
   return next;
 };
 
+const DEFAULT_GROUP_LANG_FIELDS = ['name', 'description'];
+
+/** 传了 lang 时分组只按默认语言存一条，多语言文案放 options，不再按界面语言过滤 */
+export const DEFAULT_GROUP_LANGUAGE = 'zh-CN';
+
+const getGroupLangItems = lang => (Array.isArray(lang) ? lang.filter(item => item && typeof item === 'object' && item.name) : []);
+
+/** FormInfo lang 配置：未指定 options.fields 时默认为名称、描述生成多语言字段 */
+export const normalizeGroupLang = lang => {
+  if (!getGroupLangItems(lang).length) {
+    return undefined;
+  }
+  return lang.map(item =>
+    item && typeof item === 'object'
+      ? Object.assign({}, item, {
+          options: Object.assign({ fields: DEFAULT_GROUP_LANG_FIELDS.map(name => ({ name })) }, item.options)
+        })
+      : item
+  );
+};
+
+/** FormInfo lang 生成的字段名：`${字段}${语言 name}`，如 nameEnUS */
+export const getGroupLangKeys = lang =>
+  getGroupLangItems(normalizeGroupLang(lang)).flatMap(item => item.options.fields.map(field => `${field.name}${item.name}`));
+
+/** 表单多语言字段 → 持久化到 options；清空的字段写 null，避免沿用旧值 */
+export const applyGroupLangToPayload = (payload, { lang, existingOptions } = {}) => {
+  const keys = getGroupLangKeys(lang);
+  if (!keys.length) {
+    return payload;
+  }
+  const next = Object.assign({}, payload);
+  const langOptions = {};
+  keys.forEach(key => {
+    langOptions[key] = next[key] || null;
+    delete next[key];
+  });
+  next.options = Object.assign({}, existingOptions, next.options, langOptions);
+  return next;
+};
+
+/** 编辑时从 options 回填多语言字段 */
+export const getGroupLangFormData = (group, lang) => {
+  const options = group?.options || {};
+  return getGroupLangKeys(lang).reduce((result, key) => {
+    if (options[key] != null) {
+      result[key] = options[key];
+    }
+    return result;
+  }, {});
+};
+
+/** 'en-US' → 'EnUS'，与 FormInfo lang 的语言 name 约定一致 */
+export const getLocaleLangName = locale =>
+  (locale || '')
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((part, index) => (index === 0 ? part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() : part.toUpperCase()))
+    .join('');
+
+/** 展示名称：有当前语言的文案就用，没有回退默认名称 */
+export const getGroupLabel = (item, { labelKey = 'name', locale } = {}) => {
+  const langName = getLocaleLangName(locale);
+  return (langName && item?.options?.[`${labelKey}${langName}`]) || item?.[labelKey] || item?.name;
+};
+
 const hoistGroupColor = nodes =>
   (nodes || []).map(node => {
     const next = Object.assign({}, node, {

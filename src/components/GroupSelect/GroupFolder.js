@@ -8,7 +8,7 @@ import merge from 'lodash/merge';
 import { useIntl } from '@kne/react-intl';
 import withLocale from './withLocale';
 import GroupFolderStateIcon, { getGroupIconColor } from './GroupFolderIcon';
-import { resolveGroupTreeData } from './groupHelpers';
+import { DEFAULT_GROUP_LANGUAGE, getGroupLabel, normalizeGroupLang, resolveGroupTreeData } from './groupHelpers';
 import useGroupTreeSync from './useGroupTreeSync';
 import styles from './style.module.scss';
 
@@ -20,6 +20,7 @@ const GroupFolder = createWithRemoteLoader({
       remoteModules,
       type,
       language: propsLanguage,
+      lang: propsLang,
       showRoot = true,
       rootTitle,
       children,
@@ -36,7 +37,8 @@ const GroupFolder = createWithRemoteLoader({
       const { apis: presetApis } = usePreset();
       const locale = useGlobalValue('locale');
 
-      const language = propsLanguage || locale || 'zh-CN';
+      const lang = useMemo(() => normalizeGroupLang(propsLang), [propsLang]);
+      const language = propsLanguage || (lang ? DEFAULT_GROUP_LANGUAGE : locale) || 'zh-CN';
       const [treeSyncKey] = useGroupTreeSync(type, language);
       const displayRootTitle = rootTitle || formatMessage({ id: 'GroupSelectAll' });
       const groupApis = propsApis || presetApis?.group || {};
@@ -90,7 +92,7 @@ const GroupFolder = createWithRemoteLoader({
                 defaultExpandAll
                 selectedKeys={selectedKeys}
                 treeData={treeData}
-                titleRender={item => item[labelKey] || item.name}
+                titleRender={item => getGroupLabel(item, { labelKey, locale })}
                 fieldNames={{ title: labelKey, key: valueKey, children: 'children' }}
                 onSelect={(keys, info) => {
                   const selectedKey = keys[0];

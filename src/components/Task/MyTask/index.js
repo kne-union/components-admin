@@ -1,5 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 
@@ -15,19 +16,29 @@ const MyTask = createWithRemoteLoader({
     const [TablePage, usePreset, Filter, Enum] = remoteModules;
     const { formatMessage } = useIntl();
     const { apis } = usePreset();
-    const { getFilterValue, fields: filterFields } = Filter;
+    const { getFilterValue, useSearchParamsValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem, TypeDateRangePickerFilterItem } = filterFields;
     const ref = useRef(null);
-    const [filter, setFilter] = useState([
-      {
-        name: 'status',
-        label: formatMessage({ id: 'Status' }),
-        value: {
-          value: 'pending',
-          label: formatMessage({ id: 'PendingExecution' })
-        }
-      }
-    ]);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const fromUrl = useSearchParamsValue({
+      searchParams,
+      setSearchParams,
+      fields: [{ name: 'id', label: formatMessage({ id: 'TaskID' }) }]
+    });
+    const [filter, setFilter] = useState(() =>
+      fromUrl?.length
+        ? fromUrl
+        : [
+            {
+              name: 'status',
+              label: formatMessage({ id: 'Status' }),
+              value: {
+                value: 'pending',
+                label: formatMessage({ id: 'PendingExecution' })
+              }
+            }
+          ]
+    );
     const [sort, setSortChange] = useState([]);
     const [selected, setSelected] = useState({
       selectedRowKeys: [],

@@ -1,7 +1,7 @@
 import { Flex } from 'antd';
 import { FolderFilled, FolderOpenFilled } from '@ant-design/icons';
 import classnames from 'classnames';
-import { DEFAULT_GROUP_COLOR, getGroupColor, isAllGroupOption } from './groupHelpers';
+import { DEFAULT_GROUP_COLOR, getGroupColor, getGroupLabel, isAllGroupOption } from './groupHelpers';
 import styles from './style.module.scss';
 
 export const getGroupIconColor = (item, { valueKey = 'code' } = {}) => {
@@ -17,11 +17,11 @@ const GroupFolderStateIcon = ({ color, className }) => (
 );
 
 export const createGroupItemContentRender =
-  ({ valueKey = 'code', labelKey = 'name' } = {}) =>
+  ({ valueKey = 'code', labelKey = 'name', locale } = {}) =>
   ({ item }) => (
     <Flex align="center" gap={8} className={styles['group-folder-menu-item']}>
       <GroupFolderStateIcon color={getGroupIconColor(item, { valueKey })} />
-      <span className={styles['group-folder-menu-item-label']}>{item[labelKey] || item.name}</span>
+      <span className={styles['group-folder-menu-item-label']}>{getGroupLabel(item, { labelKey, locale })}</span>
     </Flex>
   );
 

@@ -20,7 +20,12 @@ import {
   getAllGroupOption,
   getGroupColor,
   applyGroupColorToPayload,
+  applyGroupLangToPayload,
   DEFAULT_GROUP_COLOR,
+  DEFAULT_GROUP_LANGUAGE,
+  getGroupLabel,
+  getGroupLangFormData,
+  normalizeGroupLang,
   resolveGroupParentIdForSave,
   resolveGroupPermissions,
   resolveGroupTreeData
@@ -44,6 +49,7 @@ const createComponent = (callback = item => item) => {
         label,
         type,
         language: propsLanguage,
+        lang: propsLang,
         rule,
         apis,
         valueKey = 'code',
@@ -70,7 +76,8 @@ const createComponent = (callback = item => item) => {
         const locale = useGlobalValue('locale');
         const [open, setOpen] = useControlValue(props, { defaultValue: 'defaultOpen', value: 'open', onChange: 'onOpenChange' });
 
-        const language = propsLanguage || locale || 'zh-CN';
+        const lang = useMemo(() => normalizeGroupLang(propsLang), [propsLang]);
+        const language = propsLanguage || (lang ? DEFAULT_GROUP_LANGUAGE : locale) || 'zh-CN';
 
         const hasApis = apis !== undefined;
         const groupApis = hasApis ? apis || {} : presetApis?.group || {};
@@ -115,7 +122,8 @@ const createComponent = (callback = item => item) => {
             ? {
                 code: editingGroup.code,
                 name: editingGroup.name,
-                description: editingGroup.description
+                description: editingGroup.description,
+                ...getGroupLangFormData(editingGroup, lang)
               }
             : {};
           if (showColor) {
@@ -142,9 +150,10 @@ const createComponent = (callback = item => item) => {
             afterClose,
             formProps: {
               data: formData,
+              lang,
               rules: buildFormRules(editingGroup),
               onSubmit: async formDataValues => {
-                let payload = Object.assign({}, formDataValues, { type, language });
+                let payload = applyGroupLangToPayload(Object.assign({}, formDataValues, { type, language }), { lang, existingOptions: editingGroup?.options });
                 if (showParent) {
                   payload.parentId = resolveGroupParentIdForSave(formDataValues.parentId, treeData, valueKey);
                 }
@@ -241,11 +250,11 @@ const createComponent = (callback = item => item) => {
                       className={style['group-folder-toolbar-color-icon']}
                       style={{ color: getGroupIconColor(item, { valueKey }) }}
                     />
-                    <span>{item[labelKey] || item.name}</span>
+                    <span>{getGroupLabel(item, { labelKey, locale })}</span>
                   </Flex>
                 )
               }
-            : { title: formatMessage({ id: 'GroupSelectName' }), name: 'name' },
+            : { title: formatMessage({ id: 'GroupSelectName' }), name: 'name', getValueOf: item => getGroupLabel(item, { labelKey, locale }) },
           {
             title: formatMessage({ id: 'GroupSelectDescription' }),
             name: 'description'
@@ -279,7 +288,7 @@ const createComponent = (callback = item => item) => {
                 actions.push({
                   children: formatMessage({ id: 'GroupSelectDelete' }),
                   isDelete: true,
-                  message: formatMessage({ id: 'GroupSelectDeleteConfirm' }, { name: groupName, title: item.name }),
+                  message: formatMessage({ id: 'GroupSelectDeleteConfirm' }, { name: groupName, title: getGroupLabel(item, { labelKey, locale }) }),
                   onClick: e => {
                     e?.stopPropagation?.();
                     return handleDelete(item, { reload, value, setValue });

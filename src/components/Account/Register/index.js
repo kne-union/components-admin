@@ -38,7 +38,8 @@ const CaptchaButton = createWithRemoteLoader({
       onClick={async () => {
         const res = onClick && (await onClick());
         res !== false && setCountdown(duration);
-      }}>
+      }}
+    >
       {time === 0 ? children : `${time}s`}
     </LoadingButton>
   );
@@ -48,7 +49,7 @@ const RegisterInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
 })(({ remoteModules, ...p }) => {
   const { formatMessage } = useIntl();
-  const { onSubmit, title, systemName, type, sendVerificationCode, loginUrl, topBanner, className } = Object.assign(
+  const { onSubmit, title, guide, systemName, type, sendVerificationCode, loginUrl, topBanner, className } = Object.assign(
     {},
     {
       title: formatMessage({ id: 'Register' }),
@@ -65,6 +66,57 @@ const RegisterInner = createWithRemoteLoader({
   const { Form, SubmitButton, fields } = FormInfo;
   const { Input, PhoneNumber } = fields;
   const navigate = useNavigate();
+  const form = (
+    <Form type="inner" size="large" ref={formRef} onSubmit={onSubmit}>
+      <Button
+        className={commonStyle['back-link']}
+        type="link"
+        size="large"
+        icon={<LeftOutlined />}
+        onClick={() => {
+          navigate(loginUrl);
+        }}
+      >
+        {formatMessage({ id: 'HasAccountLogin' })}
+      </Button>
+      <Space className={classnames(commonStyle['form-inner'])} size={38} direction="vertical">
+        <div className={commonStyle['title']}>{title}</div>
+        <div>
+          {type === 'phone' && (
+            <PhoneNumber
+              name="phone"
+              label={formatMessage({ id: 'PhoneCode' })}
+              rule="REQ"
+              codeType="code"
+              realtime
+              interceptor="phone-number-string"
+            />
+          )}
+          {type === 'email' && <Input name="email" label={formatMessage({ id: 'Email' })} rule="REQ EMAIL" realtime />}
+          <Row align={'bottom'} justify={'space-between'}>
+            <Col className={style['code-field']}>
+              <Input name="code" label={formatMessage({ id: 'VerificationCode' })} rule="REQ LEN-6 VALIDATE_CODE" />
+            </Col>
+            <Col>
+              <CaptchaButton
+                className={style['get-code']}
+                type={'link'}
+                target={{ name: type }}
+                onClick={() => sendVerificationCode({ type, data: get(formRef.current.data, type) })}
+              >
+                {formatMessage({ id: 'SendCode' })}
+              </CaptchaButton>
+            </Col>
+          </Row>
+          <Input.Password name="password" label={formatMessage({ id: 'Password' })} rule="REQ LEN-6-50" />
+          <Input.Password name="repeatPwd" label={formatMessage({ id: 'RepeatPassword' })} rule="REQ LEN-6-50 REPEAT-password" />
+        </div>
+        <SubmitButton block size="large">
+          {formatMessage({ id: 'Register' })}
+        </SubmitButton>
+      </Space>
+    </Form>
+  );
   return (
     <div className={classnames(commonStyle['out-container'], className)}>
       {topBanner && (
@@ -74,53 +126,14 @@ const RegisterInner = createWithRemoteLoader({
         </div>
       )}
       <div className={commonStyle['out-inner']}>
-        <Form type="inner" size="large" ref={formRef} onSubmit={onSubmit}>
-          <Button
-            className={commonStyle['back-link']}
-            type="link"
-            size="large"
-            icon={<LeftOutlined />}
-            onClick={() => {
-              navigate(loginUrl);
-            }}>
-            {formatMessage({ id: 'HasAccountLogin' })}
-          </Button>
-          <Space className={classnames(commonStyle['form-inner'])} size={38} direction="vertical">
-            <div className={commonStyle['title']}>{title}</div>
-            <div>
-              {type === 'phone' && (
-                <PhoneNumber
-                  name="phone"
-                  label={formatMessage({ id: 'PhoneCode' })}
-                  rule="REQ"
-                  codeType="code"
-                  realtime
-                  interceptor="phone-number-string"
-                />
-              )}
-              {type === 'email' && <Input name="email" label={formatMessage({ id: 'Email' })} rule="REQ EMAIL" realtime />}
-              <Row align={'bottom'} justify={'space-between'}>
-                <Col className={style['code-field']}>
-                  <Input name="code" label={formatMessage({ id: 'VerificationCode' })} rule="REQ LEN-6 VALIDATE_CODE" />
-                </Col>
-                <Col>
-                  <CaptchaButton
-                    className={style['get-code']}
-                    type={'link'}
-                    target={{ name: type }}
-                    onClick={() => sendVerificationCode({ type, data: get(formRef.current.data, type) })}>
-                    {formatMessage({ id: 'SendCode' })}
-                  </CaptchaButton>
-                </Col>
-              </Row>
-              <Input.Password name="password" label={formatMessage({ id: 'Password' })} rule="REQ LEN-6-50" />
-              <Input.Password name="repeatPwd" label={formatMessage({ id: 'RepeatPassword' })} rule="REQ LEN-6-50 REPEAT-password" />
-            </div>
-            <SubmitButton block size="large">
-              {formatMessage({ id: 'Register' })}
-            </SubmitButton>
-          </Space>
-        </Form>
+        {guide ? (
+          <div className={style['guide-layout']}>
+            <div className={style['guide-side']}>{guide}</div>
+            <div className={style['guide-main']}>{form}</div>
+          </div>
+        ) : (
+          form
+        )}
       </div>
     </div>
   );

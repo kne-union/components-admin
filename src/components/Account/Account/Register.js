@@ -14,7 +14,7 @@ const RegisterInner = createWithRemoteLoader({
   const [usePreset] = remoteModules;
   const { formatMessage } = useIntl();
   const { apis: presetApis, ajax } = usePreset();
-  const { apis, accountType, loginUrl, registerTitle, loginLeftInner, systemName } = useProps();
+  const { apis, accountType, loginUrl, registerTitle, loginLeftInner, systemName, registerGuide } = useProps();
   const navigate = useNavigate();
   const { message } = App.useApp();
   const account = Object.assign({}, presetApis.account, apis);
@@ -24,6 +24,7 @@ const RegisterInner = createWithRemoteLoader({
       type={accountType}
       loginUrl={loginUrl}
       title={registerTitle}
+      guide={registerGuide}
       systemName={systemName}
       validateCode={async data => {
         const { data: resData } = await ajax(
