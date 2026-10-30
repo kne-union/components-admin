@@ -7,6 +7,7 @@ import Company from './Company';
 import Org from './Org';
 import User from './User';
 import Permission from './Permission';
+import Mail from './Mail';
 
 const Setting = createWithRemoteLoader({
   modules: ['components-core:Layout@Menu']
@@ -36,6 +37,12 @@ const Setting = createWithRemoteLoader({
             label: formatMessage({ id: 'UserManagement' }),
             path: `${baseUrl}/user`,
             request: ['setting:user-manager']
+          },
+          {
+            key: 'mail',
+            label: formatMessage({ id: 'MailSettingPage' }),
+            path: `${baseUrl}/mail`,
+            request: ['setting:mail-setting']
           }
         ]}
       />
@@ -64,6 +71,10 @@ const Setting = createWithRemoteLoader({
           {
             path: 'user',
             element: <User menu={menu} apis={apis} pageProps={pageProps} baseUrl={baseUrl} />
+          },
+          {
+            path: 'mail',
+            element: <Mail menu={menu} pageProps={pageProps} baseUrl={baseUrl} />
           }
         ]}
       />
@@ -75,5 +86,6 @@ Setting.Company = Company;
 Setting.Org = Org;
 Setting.User = User;
 Setting.Permission = Permission;
+Setting.Mail = Mail;
 
 export default Setting;

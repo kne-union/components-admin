@@ -189,6 +189,52 @@ const getApis = options => {
       }
     },
     tenantAdmin: {
+      mailSetting: {
+        smtpDetail: {
+          url: `${prefix}/tenant/admin/mail-setting/smtp-detail`,
+          method: 'GET'
+        },
+        smtpSave: {
+          url: `${prefix}/tenant/admin/mail-setting/smtp-save`,
+          method: 'POST'
+        },
+        smtpRemove: {
+          url: `${prefix}/tenant/admin/mail-setting/smtp-remove`,
+          method: 'POST'
+        },
+        smtpTest: {
+          url: `${prefix}/tenant/admin/mail-setting/smtp-test`,
+          method: 'POST'
+        },
+        templateList: {
+          url: `${prefix}/tenant/admin/mail-setting/template-list`,
+          method: 'GET'
+        },
+        templateDetail: {
+          url: `${prefix}/tenant/admin/mail-setting/template-detail`,
+          method: 'GET'
+        },
+        templateCustomize: {
+          url: `${prefix}/tenant/admin/mail-setting/template-customize`,
+          method: 'POST'
+        },
+        templateSave: {
+          url: `${prefix}/tenant/admin/mail-setting/template-save`,
+          method: 'POST'
+        },
+        templateSetStatus: {
+          url: `${prefix}/tenant/admin/mail-setting/template-set-status`,
+          method: 'POST'
+        },
+        templateReset: {
+          url: `${prefix}/tenant/admin/mail-setting/template-reset`,
+          method: 'POST'
+        },
+        templatePreview: {
+          url: `${prefix}/tenant/admin/mail-setting/template-preview`,
+          method: 'POST'
+        }
+      },
       create: {
         url: `${prefix}/tenant/admin/create`,
         method: 'POST'
@@ -501,6 +547,52 @@ const getApis = options => {
       thirdLoginUnbind: {
         url: `${prefix}/tenant/third-login-unbind`,
         method: 'POST'
+      },
+      mailSetting: {
+        smtpDetail: {
+          url: `${prefix}/tenant/mail-setting/smtp-detail`,
+          method: 'GET'
+        },
+        smtpSave: {
+          url: `${prefix}/tenant/mail-setting/smtp-save`,
+          method: 'POST'
+        },
+        smtpRemove: {
+          url: `${prefix}/tenant/mail-setting/smtp-remove`,
+          method: 'POST'
+        },
+        smtpTest: {
+          url: `${prefix}/tenant/mail-setting/smtp-test`,
+          method: 'POST'
+        },
+        templateList: {
+          url: `${prefix}/tenant/mail-setting/template-list`,
+          method: 'GET'
+        },
+        templateDetail: {
+          url: `${prefix}/tenant/mail-setting/template-detail`,
+          method: 'GET'
+        },
+        templateCustomize: {
+          url: `${prefix}/tenant/mail-setting/template-customize`,
+          method: 'POST'
+        },
+        templateSave: {
+          url: `${prefix}/tenant/mail-setting/template-save`,
+          method: 'POST'
+        },
+        templateSetStatus: {
+          url: `${prefix}/tenant/mail-setting/template-set-status`,
+          method: 'POST'
+        },
+        templateReset: {
+          url: `${prefix}/tenant/mail-setting/template-reset`,
+          method: 'POST'
+        },
+        templatePreview: {
+          url: `${prefix}/tenant/mail-setting/template-preview`,
+          method: 'POST'
+        }
       },
       userList: {
         url: `${prefix}/tenant/user-list`,
