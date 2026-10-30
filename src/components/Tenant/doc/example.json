@@ -21,6 +21,25 @@
       ]
     },
     {
+      "title": "邮件设置",
+      "description": "MailSetting 组件用于配置租户 SMTP 与自定义邮件模版；租户端传 apis.tenant.mailSetting，管理端传 apis.tenantAdmin.mailSetting 并带 tenantId",
+      "code": "./mail-setting.js",
+      "scope": [
+        {
+          "name": "_Tenant",
+          "packageName": "@components/Tenant"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        }
+      ]
+    },
+    {
       "title": "组织架构",
       "description": "OrgInfo 组件用于管理组织架构；示例与 TenantAdmin 详情内「组织架构」Tab 一致（Fetch + tenantAdmin orgList 与完整 apis）",
       "code": "./org-info.js",

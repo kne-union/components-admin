@@ -245,6 +245,7 @@ const locale = {
 
   // Setting
   CompanyInfoPage: '公司信息',
+  MailSettingPage: '邮件设置',
   CompanyInfoSaveSuccess: '公司信息保存成功',
   OrgStructure: '组织架构',
   PermissionManagement: '权限管理',

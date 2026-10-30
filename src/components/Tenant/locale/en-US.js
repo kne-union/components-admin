@@ -249,6 +249,7 @@ const locale = {
 
   // Setting
   CompanyInfoPage: 'Company Information',
+  MailSettingPage: 'Mail Settings',
   CompanyInfoSaveSuccess: 'Company information saved successfully',
   OrgStructure: 'Organization',
   PermissionManagement: 'Roles & Permissions',
