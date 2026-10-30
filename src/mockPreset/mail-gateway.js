@@ -1,4 +1,5 @@
 import { getPublicPath } from '@kne/remote-loader';
+import { renderTemplate as renderLiquid } from '@kne/message-template';
 import { filterPageData } from '@components/MessageQueue/utils';
 import mailGatewayData from './mail-gateway-data.json';
 
@@ -37,20 +38,7 @@ const parseAddressList = value => {
     });
 };
 
-const escapeHtml = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-const renderTemplate = (template, context, { html = false } = {}) =>
-  String(template || '').replace(/{{\s*([\w.[\]]+)\s*}}/g, (match, path) => {
-    const value = path
-      .replace(/\[(\w+)\]/g, '.$1')
-      .split('.')
-      .reduce((current, key) => (current == null ? undefined : current[key]), context);
-    if (value == null) {
-      return '';
-    }
-    const text = typeof value === 'object' ? JSON.stringify(value) : String(value);
-    return html ? escapeHtml(text) : text;
-  });
+const renderTemplate = (template, context, { html = false } = {}) => renderLiquid(String(template || ''), context || {}, html ? {} : { type: 'text' });
 
 const withTemplateCategory = template => {
   if (!template) {

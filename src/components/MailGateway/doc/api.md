@@ -47,7 +47,7 @@
 
 ### Template
 
-邮件模版页：富文本编辑模版正文，按分类、类型（系统默认 / 自定义）、状态筛选，按名称 / 主题搜索；支持启用 / 停用、复制（副本默认停用）、示例数据预览。系统默认模版由服务端 `templateDir` 在启动时载入，界面上不提供编辑和删除，需要调整时复制为自定义模版后修改。主题和正文可使用 `{{mail.subject}}`、`{{mail.from[0].name}}`、`{{account.name}}` 等变量，写信套用或自动回复时由服务端渲染。
+邮件模版页：富文本编辑模版正文，按分类、类型（系统默认 / 自定义）、状态筛选，按名称 / 主题搜索；支持启用 / 停用、复制（副本默认停用）、示例数据预览。系统默认模版由服务端 `templateDir` 在启动时载入，界面上不提供编辑和删除，需要调整时复制为自定义模版后修改。主题和正文为 Liquid 模版（`@kne/message-template`），可通过编辑器工具栏插入 `{{ mail.subject }}`、`{{ mail.from.first.name }}`、`{{ account.name }}` 等变量和 `{% if %}` 条件（旧写法 `{{mail.from[0].name}}` 仍兼容），写信套用或自动回复时由服务端渲染；正文编辑器内置「内容 / 预览」切换，列表预览为左右分栏（渲染结果 / 示例数据）。
 
 #### 属性说明
 
@@ -168,7 +168,7 @@ const renderPage = ({ title, children }) => <Page title={title}>{children}</Page
 
 写信按钮，点击打开写信弹窗，可发送或存草稿。弹窗顶部可选择邮件模版套用主题和正文（回复 / 转发时保留原邮件引用，并以原邮件与当前发件邮箱渲染变量）。其余属性透传给 antd `Button`。
 
-写信、回复、转发、草稿与邮件模版、自动回复正文的富文本统一使用 `components-thirdparty:CKEditor` 的邮件预设（`EMAIL_TOOLBAR_ITEMS` 工具栏 + `EMAIL_STYLE_DEFINITIONS` 样式），输出内容自带 inline style，可直接投递。写信类编辑器不显示模版变量；模版与自动回复保留模版变量。服务端只做 `{{path}}` 替换，因此均不提供模版条件。
+写信、回复、转发、草稿与邮件模版、自动回复正文的富文本统一使用 `components-thirdparty:CKEditor` 的邮件预设（`EMAIL_TOOLBAR_ITEMS` 工具栏 + `EMAIL_STYLE_DEFINITIONS` 样式），输出内容自带 inline style，可直接投递。写信类编辑器不显示模版变量与条件；邮件模版正文使用 `components-thirdparty:TemplateEditor`（内置「内容 / 预览」），自动回复、追加内容等规则动作的富文本与主题前后缀可插入模版变量和 Liquid 条件（主题等单行文本只允许行内条件），由服务端 `@kne/message-template` 渲染并在保存时校验语法。
 
 #### 属性说明
 

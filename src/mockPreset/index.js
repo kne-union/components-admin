@@ -5,7 +5,8 @@ import { enums as intlAdminEnums } from '@components/IntlAdmin';
 import merge from 'lodash/merge';
 import localStorage from '@kne/local-storage';
 import { filterPageData } from '@components/MessageQueue/utils';
-import { filterMessagePageData } from '@components/MessageManger/utils';
+import { filterMessagePageData, getTemplateVariables, buildExampleProps } from '@components/MessageManger/utils';
+import { renderTemplate } from '@kne/message-template';
 
 import taskList from './task-list.json';
 import signatureList from './signature-list.json';
@@ -41,6 +42,9 @@ export {
   messageMangerData,
   mailGatewayData
 };
+
+const messageTemplates = () => messageMangerData.templates.pageData;
+const findMessageTemplate = id => messageTemplates().find(item => String(item.id) === String(id));
 
 const collectOrgSubtreeIds = (orgs, rootId) => {
   const ids = new Set([String(rootId)]);
@@ -155,7 +159,11 @@ export const loadFilteredTaskList = ({ params } = {}) =>
 
     if (filter.targetName) {
       const keyword = String(filter.targetName).toLowerCase();
-      pageData = pageData.filter(item => String(item.input?.name || '').toLowerCase().includes(keyword));
+      pageData = pageData.filter(item =>
+        String(item.input?.name || '')
+          .toLowerCase()
+          .includes(keyword)
+      );
     }
 
     if (filter.createdAt) {
@@ -424,9 +432,7 @@ const apis = merge({}, getApis(), {
       namespaces: {
         loader: () =>
           import('./intl-admin-data.json').then(({ default: fileData }) => {
-            const namespaces = [
-              ...new Set((fileData.langLib?.pageData || []).map(item => item.namespace).filter(Boolean))
-            ].sort();
+            const namespaces = [...new Set((fileData.langLib?.pageData || []).map(item => item.namespace).filter(Boolean))].sort();
             return {
               pageData: namespaces.map(namespace => ({ namespace })),
               totalCount: namespaces.length
@@ -703,7 +709,10 @@ const apis = merge({}, getApis(), {
     userCreate: {
       loader: ({ data } = {}) => {
         const email = String(data?.email ?? '').trim();
-        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        const phone =
+          data?.phone == null || data?.phone === ''
+            ? ''
+            : String(typeof data.phone === 'object' ? (data.phone.phone ?? data.phone.value ?? '') : data.phone).trim();
         if (!email && !phone) {
           return { code: 400, msg: '手机号或邮箱不能同时为空' };
         }
@@ -716,7 +725,10 @@ const apis = merge({}, getApis(), {
           return { code: 0 };
         }
         const email = String(data?.email ?? '').trim();
-        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        const phone =
+          data?.phone == null || data?.phone === ''
+            ? ''
+            : String(typeof data.phone === 'object' ? (data.phone.phone ?? data.phone.value ?? '') : data.phone).trim();
         if (!email && !phone) {
           return { code: 400, msg: '手机号或邮箱不能同时为空' };
         }
@@ -793,7 +805,10 @@ const apis = merge({}, getApis(), {
     createUser: {
       loader: ({ data } = {}) => {
         const email = String(data?.email ?? '').trim();
-        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        const phone =
+          data?.phone == null || data?.phone === ''
+            ? ''
+            : String(typeof data.phone === 'object' ? (data.phone.phone ?? data.phone.value ?? '') : data.phone).trim();
         if (!email && !phone) {
           return { code: 400, msg: '手机号或邮箱不能同时为空' };
         }
@@ -806,7 +821,10 @@ const apis = merge({}, getApis(), {
           return { code: 0 };
         }
         const email = String(data?.email ?? '').trim();
-        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        const phone =
+          data?.phone == null || data?.phone === ''
+            ? ''
+            : String(typeof data.phone === 'object' ? (data.phone.phone ?? data.phone.value ?? '') : data.phone).trim();
         if (!email && !phone) {
           return { code: 400, msg: '手机号或邮箱不能同时为空' };
         }
@@ -906,7 +924,9 @@ const apis = merge({}, getApis(), {
       loader: ({ params } = {}) => {
         return import('./tenant-admin-data.json').then(({ default: data }) => {
           const managed = data.tenantList.pageData.find(item => item.id === params?.id && item.options?.managedBy);
-          return managed ? Object.assign({}, data.tenantDetail, managed, { tenantCompany: { name: managed.name, logo: managed.logo } }) : data.tenantDetail;
+          return managed
+            ? Object.assign({}, data.tenantDetail, managed, { tenantCompany: { name: managed.name, logo: managed.logo } })
+            : data.tenantDetail;
         });
       }
     },
@@ -992,7 +1012,10 @@ const apis = merge({}, getApis(), {
     userCreate: {
       loader: ({ data } = {}) => {
         const email = String(data?.email ?? '').trim();
-        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        const phone =
+          data?.phone == null || data?.phone === ''
+            ? ''
+            : String(typeof data.phone === 'object' ? (data.phone.phone ?? data.phone.value ?? '') : data.phone).trim();
         if (!email && !phone) {
           return { code: 400, msg: '手机号或邮箱不能同时为空' };
         }
@@ -1005,7 +1028,10 @@ const apis = merge({}, getApis(), {
           return { code: 0 };
         }
         const email = String(data?.email ?? '').trim();
-        const phone = data?.phone == null || data?.phone === '' ? '' : String(typeof data.phone === 'object' ? data.phone.phone ?? data.phone.value ?? '' : data.phone).trim();
+        const phone =
+          data?.phone == null || data?.phone === ''
+            ? ''
+            : String(typeof data.phone === 'object' ? (data.phone.phone ?? data.phone.value ?? '') : data.phone).trim();
         if (!email && !phone) {
           return { code: 400, msg: '手机号或邮箱不能同时为空' };
         }
@@ -1128,25 +1154,92 @@ const apis = merge({}, getApis(), {
     templates: {
       list: {
         loader: ({ params }) => {
-          return filterMessagePageData({
-            pageData: messageMangerData.templates.pageData,
+          return filterPageData({
+            pageData: messageTemplates(),
             params,
             filters: {
               type: (item, value) => Number(item.type) === Number(value),
               code: (item, value) => item.code === value,
               level: (item, value) => Number(item.level) === Number(value),
-              status: (item, value) => Number(item.status) === Number(value)
+              status: (item, value) => Number(item.status) === Number(value),
+              keyword: (item, value) => [item.name, item.code].some(text => String(text || '').includes(value))
             }
           });
         }
       },
       detail: {
-        loader: ({ params }) => {
-          return messageMangerData.templates.pageData.find(item => String(item.id) === String(params?.id));
+        loader: ({ params, urlParams }) => findMessageTemplate(urlParams?.id || params?.id)
+      },
+      create: {
+        loader: ({ data }) => {
+          const template = Object.assign({ id: `tpl_${Date.now()}`, level: 1, status: 0, createdAt: new Date().toISOString() }, data, {
+            updatedAt: new Date().toISOString()
+          });
+          messageMangerData.templates.pageData.unshift(template);
+          return template;
+        }
+      },
+      save: {
+        loader: ({ urlParams, data }) => {
+          const template = findMessageTemplate(urlParams?.id);
+          if (!template || Number(template.level) === 0) {
+            return { code: 403, msg: '系统模板不允许修改' };
+          }
+          return Object.assign(template, data, { updatedAt: new Date().toISOString() });
+        }
+      },
+      remove: {
+        loader: ({ urlParams }) => {
+          const template = findMessageTemplate(urlParams?.id);
+          if (!template || Number(template.level) === 0) {
+            return { code: 403, msg: '系统模板不允许删除' };
+          }
+          messageMangerData.templates.pageData = messageTemplates().filter(item => item !== template);
+          return {};
+        }
+      },
+      setStatus: {
+        loader: ({ urlParams, data }) => Object.assign(findMessageTemplate(urlParams?.id) || {}, { status: Number(data?.status) })
+      },
+      copy: {
+        loader: ({ urlParams }) => {
+          const source = findMessageTemplate(urlParams?.id);
+          const codes = messageTemplates().map(item => item.code);
+          let code = `${source.code}_copy`;
+          for (let index = 2; codes.includes(code); index++) {
+            code = `${source.code}_copy${index}`;
+          }
+          const template = Object.assign({}, source, {
+            id: `tpl_${Date.now()}`,
+            name: `${source.name}（副本）`,
+            code,
+            level: 1,
+            status: 1,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+          messageMangerData.templates.pageData.unshift(template);
+          return template;
+        }
+      },
+      render: {
+        loader: ({ data }) => {
+          const template = data?.templateId ? findMessageTemplate(data.templateId) : data?.template;
+          const variables = getTemplateVariables(template);
+          const props = data?.props || buildExampleProps(variables);
+          if (Number(template.type) === 1) {
+            return { type: 1, props, text: renderTemplate(template.content || '', props, { type: 'text' }) };
+          }
+          return {
+            type: 0,
+            props,
+            subject: renderTemplate(template.subject || '', props, { type: 'text' }),
+            html: renderTemplate(template.content || '', props, { type: 'html' })
+          };
         }
       },
       send: {
-        loader: () => ({ code: 0, data: { id: `record_${Date.now()}` } })
+        loader: () => ({ success: true, recordId: `record_${Date.now()}` })
       }
     },
     statistics: {
@@ -1403,7 +1496,10 @@ const apis = merge({}, getApis(), {
         loader: ({ data }) => ({
           id: `c-${Date.now()}`,
           clientId: data?.clientId || `client_${Math.random().toString(36).slice(2, 14)}`,
-          clientSecret: data?.metadata?.token_endpoint_auth_method === 'none' ? undefined : `cs_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`
+          clientSecret:
+            data?.metadata?.token_endpoint_auth_method === 'none'
+              ? undefined
+              : `cs_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`
         })
       },
       save: {

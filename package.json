@@ -1,6 +1,6 @@
 {
   "name": "@kne-components/components-admin",
-  "version": "1.1.134",
+  "version": "1.1.135",
   "description": "用于实现一个后台管理系统的必要组件",
   "scripts": {
     "init": "husky",
@@ -93,6 +93,7 @@
     "@kne/ensure-slash": "^0.1.0",
     "@kne/is-empty": "^1.0.1",
     "@kne/json-view": "^0.1.1",
+    "@kne/message-template": "^0.1.2",
     "@kne/react-box": "^0.1.13",
     "@kne/react-icon": "^0.1.4",
     "@kne/react-intl": "^0.1.15",

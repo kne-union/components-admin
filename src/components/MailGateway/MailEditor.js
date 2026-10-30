@@ -7,8 +7,8 @@ import style from './style.module.scss';
 
 export const TEMPLATE_VARIABLES = [
   { name: 'mail.subject', id: 'VarMailSubject' },
-  { name: 'mail.from[0].name', id: 'VarMailFromName' },
-  { name: 'mail.from[0].address', id: 'VarMailFromAddress' },
+  { name: 'mail.from.first.name', id: 'VarMailFromName' },
+  { name: 'mail.from.first.address', id: 'VarMailFromAddress' },
   { name: 'mail.date', id: 'VarMailDate' },
   { name: 'account.name', id: 'VarAccountName' },
   { name: 'account.address', id: 'VarAccountAddress' }
@@ -16,9 +16,9 @@ export const TEMPLATE_VARIABLES = [
 
 const MAIL_PRESET_MODULES = ['components-thirdparty:CKEditor@EMAIL_TOOLBAR_ITEMS', 'components-thirdparty:CKEditor@EMAIL_STYLE_DEFINITIONS'];
 
-// 服务端 renderTemplate 只做 {{path}} 替换，不执行 <% %> 条件
-const UNSUPPORTED_TOOLBAR_ITEMS = ['insertTemplateCondition'];
 const TEMPLATE_TOOLBAR_ITEMS = ['insertTemplateVariable', 'insertTemplateCondition'];
+
+export const getTemplateVariables = formatMessage => TEMPLATE_VARIABLES.map(item => ({ name: item.name, label: formatMessage({ id: item.id }) }));
 
 const filterToolbarItems = (items, excludes) =>
   (items || [])
@@ -31,17 +31,10 @@ export const useMailEditorConfig = ({ toolbarItems, styleDefinitions, template =
     () =>
       Object.assign(
         {
-          toolbar: { items: filterToolbarItems(toolbarItems, template ? UNSUPPORTED_TOOLBAR_ITEMS : TEMPLATE_TOOLBAR_ITEMS) },
+          toolbar: { items: filterToolbarItems(toolbarItems, template ? [] : TEMPLATE_TOOLBAR_ITEMS) },
           style: { definitions: styleDefinitions || [] }
         },
-        template
-          ? {
-              templateVariable: {
-                variables: TEMPLATE_VARIABLES.map(item => ({ name: item.name, label: formatMessage({ id: item.id }) })),
-                interpolate: /\{\{([\s\S]+?)\}\}/g
-              }
-            }
-          : {},
+        template ? { templateVariable: { variables: getTemplateVariables(formatMessage) } } : {},
         config
       ),
     [formatMessage, toolbarItems, styleDefinitions, template, config]
@@ -58,7 +51,7 @@ export const MailEditorField = createWithRemoteLoader({
   })
 );
 
-const TEMPLATE_TAG = /\{\{[\s\S]+?\}\}/g;
+const TEMPLATE_TAG = /\{\{[\s\S]+?\}\}|\{%[\s\S]+?%\}/g;
 
 const withTemplateTokens = (value, transform) => {
   const tokens = [];
@@ -94,7 +87,11 @@ export const templateTextToEditorHtml = value => {
   return `<p>${withTemplateTokens(value, text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'))}</p>`;
 };
 
-const TEMPLATE_TEXT_CONFIG = { toolbar: { items: ['undo', 'redo', '|', 'insertTemplateVariable', '|', 'sourceEditing'] } };
+// 单行文本（如主题）只允许行内条件，块级条件转成纯文本后无法识别
+const TEMPLATE_TEXT_CONFIG = {
+  toolbar: { items: ['undo', 'redo', '|', 'insertTemplateVariable', 'insertTemplateCondition', '|', 'sourceEditing'] },
+  templateCondition: { allowBlock: false }
+};
 
 const MailEditor = createWithRemoteLoader({
   modules: ['components-thirdparty:CKEditor', 'components-core:Global@usePreset', ...MAIL_PRESET_MODULES]

@@ -694,7 +694,7 @@ const getApis = options => {
           method: 'GET'
         },
         detail: {
-          url: `${prefix}/message/records/:id`,
+          url: `${prefix}/message/records/{id}`,
           method: 'GET'
         }
       },
@@ -704,11 +704,35 @@ const getApis = options => {
           method: 'GET'
         },
         detail: {
-          url: `${prefix}/message/templates/:id`,
+          url: `${prefix}/message/templates/{id}`,
           method: 'GET'
         },
         send: {
           url: `${prefix}/message/templates/send`,
+          method: 'POST'
+        },
+        create: {
+          url: `${prefix}/message/templates`,
+          method: 'POST'
+        },
+        save: {
+          url: `${prefix}/message/templates/{id}`,
+          method: 'PUT'
+        },
+        remove: {
+          url: `${prefix}/message/templates/{id}`,
+          method: 'DELETE'
+        },
+        setStatus: {
+          url: `${prefix}/message/templates/{id}/status`,
+          method: 'POST'
+        },
+        copy: {
+          url: `${prefix}/message/templates/{id}/copy`,
+          method: 'POST'
+        },
+        render: {
+          url: `${prefix}/message/templates/render`,
           method: 'POST'
         }
       },
