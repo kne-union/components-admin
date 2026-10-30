@@ -28,7 +28,7 @@ const sanitizeHtml = html =>
     FORBID_TAGS: ['form', 'input', 'button', 'textarea', 'select', 'option', 'base', 'meta', 'link', 'iframe', 'frame', 'frameset', 'object', 'embed']
   });
 
-const HtmlPreview = ({ html }) => {
+const HtmlPreview = ({ html, bordered = true }) => {
   const iframeRef = useRef(null);
   const isMobile = useIsMobile();
   const [iframeHeight, setIframeHeight] = useState(300);
@@ -65,7 +65,10 @@ const HtmlPreview = ({ html }) => {
     <iframe
       ref={iframeRef}
       onLoad={updateHeight}
-      style={{ display: 'block', width: '100%', height: iframeHeight, border: '1px solid #d9d9d9', borderRadius: 6, background: '#fff' }}
+      style={Object.assign(
+        { display: 'block', width: '100%', height: iframeHeight, border: 'none', background: '#fff' },
+        bordered ? { border: '1px solid #d9d9d9', borderRadius: 6 } : {}
+      )}
       title="HTML Preview"
       // 不给 allow-scripts / allow-forms / allow-top-navigation：正文脚本不执行、不能提交表单、不能把宿主页面导走；
       // allow-popups(-to-escape-sandbox) 只为让 target=_blank 的链接能在不受沙箱限制的新标签页打开

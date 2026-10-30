@@ -11,8 +11,31 @@
         "type": 0,
         "level": 0,
         "status": 0,
-        "content": "<!-- subject -->欢迎加入<!-- html --><h1>你好，<%= name %>！</h1><!-- text -->欢迎加入我们",
-        "createdAt": "2026-05-10T09:30:00.000Z"
+        "content": "<h1>你好，{{ name }}！</h1>{% if inviter %}<p>{{ inviter }} 邀请你加入。</p>{% endif %}",
+        "createdAt": "2026-05-10T09:30:00.000Z",
+        "subject": "欢迎加入 {{ company }}",
+        "description": "新用户注册后发送",
+        "variables": [
+          {
+            "name": "name",
+            "label": "用户名",
+            "example": "Alice"
+          },
+          {
+            "name": "company",
+            "label": "公司名",
+            "example": "Leapin"
+          },
+          {
+            "name": "inviter",
+            "label": "邀请人",
+            "example": "Bob"
+          }
+        ],
+        "extra": {
+          "text": "欢迎加入我们"
+        },
+        "updatedAt": "2026-05-10T09:30:00.000Z"
       },
       {
         "id": "tpl_1002",
@@ -21,8 +44,19 @@
         "type": 1,
         "level": 0,
         "status": 0,
-        "content": "<!-- text -->您的验证码是 <%= code %>，5分钟内有效。",
-        "createdAt": "2026-05-10T10:00:00.000Z"
+        "content": "您的验证码是 {{ code }}，5分钟内有效。",
+        "createdAt": "2026-05-10T10:00:00.000Z",
+        "subject": null,
+        "description": "登录短信验证码",
+        "variables": [
+          {
+            "name": "code",
+            "label": "验证码",
+            "example": "123456"
+          }
+        ],
+        "extra": {},
+        "updatedAt": "2026-05-10T10:00:00.000Z"
       },
       {
         "id": "tpl_1003",
@@ -31,8 +65,19 @@
         "type": 0,
         "level": 1,
         "status": 0,
-        "content": "<!-- subject -->订单已发货<!-- html --><p>订单 <%= orderNo %> 已发货。</p>",
-        "createdAt": "2026-05-10T11:20:00.000Z"
+        "content": "<p>订单 {{ orderNo }} 已发货。</p>",
+        "createdAt": "2026-05-10T11:20:00.000Z",
+        "subject": "订单 {{ orderNo }} 已发货",
+        "description": "",
+        "variables": [
+          {
+            "name": "orderNo",
+            "label": "订单号",
+            "example": "SO20260510001"
+          }
+        ],
+        "extra": {},
+        "updatedAt": "2026-05-10T11:20:00.000Z"
       },
       {
         "id": "tpl_1004",
@@ -41,8 +86,13 @@
         "type": 0,
         "level": 1,
         "status": 1,
-        "content": "<!-- subject -->通知<!-- html --><p>这是一条旧版通知。</p>",
-        "createdAt": "2026-05-09T08:15:00.000Z"
+        "content": "<p>这是一条旧版通知。</p>",
+        "createdAt": "2026-05-09T08:15:00.000Z",
+        "subject": "通知",
+        "description": "",
+        "variables": [],
+        "extra": {},
+        "updatedAt": "2026-05-09T08:15:00.000Z"
       }
     ]
   },

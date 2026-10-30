@@ -17,8 +17,10 @@ export const openTemplatePreview = ({ modal, formatMessage, template }) => {
   }
   modal({
     title: `${formatMessage({ id: 'TemplatePreview' })} - ${template.name}`,
-    children: <TemplatePreview template={template} />,
-    footerButtons: [{ type: 'primary', children: formatMessage({ id: 'Close' }) }]
+    size: 'large',
+    bodyScroll: false,
+    footer: null,
+    children: <TemplatePreview template={template} />
   });
 };
 

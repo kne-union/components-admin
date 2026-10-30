@@ -58,7 +58,7 @@ export const globalInit = async () => {
     //url: 'http://localhost:3001',
     //tpl: '{{url}}',
     remote: 'components-core',
-    defaultVersion: '0.6.13'
+    defaultVersion: '0.6.16'
   };
   remoteLoaderPreset({
     remotes: {
@@ -74,7 +74,7 @@ export const globalInit = async () => {
         //url: 'http://localhost:3010',
         //tpl: '{{url}}',
         remote: 'components-thirdparty',
-        defaultVersion: '0.1.49'
+        defaultVersion: '0.1.59'
       },
       'components-admin':
         process.env.NODE_ENV === 'development'

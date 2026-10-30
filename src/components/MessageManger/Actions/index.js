@@ -1,9 +1,11 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
-import Detail from './Detail';
+import Detail, { openDetail } from './Detail';
 import SendMessage from './SendMessage';
 import Resend from './Resend';
+import Preview, { openTemplatePreview } from './Preview';
+import Copy from './Copy';
 
 const ActionsInner = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
@@ -20,6 +22,16 @@ const ActionsInner = createWithRemoteLoader({
     children: formatMessage({ id: 'Detail' }),
     onSuccess
   });
+
+  if (detailType !== 'record') {
+    list.push({
+      ...props,
+      buttonComponent: Preview,
+      data,
+      detailType,
+      children: formatMessage({ id: 'Preview' })
+    });
+  }
 
   if (detailType !== 'record' && Number(data.status) === 0) {
     list.push({
@@ -52,5 +64,5 @@ const ActionsInner = createWithRemoteLoader({
 
 const Actions = withLocale(ActionsInner);
 
-export { Detail, SendMessage, Resend };
+export { Detail, SendMessage, Resend, Preview, Copy, openTemplatePreview, openDetail };
 export default Actions;
