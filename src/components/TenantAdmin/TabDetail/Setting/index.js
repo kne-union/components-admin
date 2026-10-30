@@ -8,12 +8,14 @@ import { useIntl } from '@kne/react-intl';
 import Args from './Args';
 import CustomComponents from './CustomComponents';
 import Language from './Language';
+import MailSetting from './MailSetting';
 import style from './style.module.scss';
 
 const builtinContentMap = {
   args: Args,
   customComponents: CustomComponents,
-  language: Language
+  language: Language,
+  mailSetting: MailSetting
 };
 
 const Setting = createWithRemoteLoader({
@@ -60,6 +62,10 @@ const Setting = createWithRemoteLoader({
           {
             key: 'customComponents',
             label: formatMessage({ id: 'CustomComponents' })
+          },
+          {
+            key: 'mailSetting',
+            label: formatMessage({ id: 'MailSetting' })
           }
         ];
         // 托管租户的语言由宿主同步，本地不可改

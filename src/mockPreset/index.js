@@ -23,6 +23,7 @@ import traceList from './trace-list.json';
 import messageMangerData from './message-manger-data.json';
 import oidcData from './oidc-data.json';
 import mailGatewayMock, { mailGatewayData } from './mail-gateway';
+import createMailSettingMock from './mail-setting';
 import { buildTaskStatisticsOverview } from './task-statistics';
 import { enums as mailGatewayEnums } from '@components/MailGateway';
 
@@ -688,6 +689,7 @@ const apis = merge({}, getApis(), {
     orgLinkSync: {
       loader: () => ({ code: 0 })
     },
+    mailSetting: createMailSettingMock(),
     thirdLoginConfig: {
       loader: thirdLoginConfigMock
     },
@@ -991,6 +993,7 @@ const apis = merge({}, getApis(), {
     orgLinkSync: {
       loader: () => ({ code: 0 })
     },
+    mailSetting: createMailSettingMock(),
     thirdLoginConfig: {
       loader: thirdLoginConfigMock
     },
