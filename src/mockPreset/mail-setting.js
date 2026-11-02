@@ -12,8 +12,12 @@ const getStore = tenantId => {
   return stores[key];
 };
 
-const systemTemplates = () => messageMangerData.templates.pageData.filter(item => Number(item.type) === 0 && Number(item.status) === 0);
-const findSystemTemplate = code => systemTemplates().find(item => item.code === code);
+const TEMPLATE_TYPES = [0, 1];
+const toType = type => Number(type || 0);
+const templateKey = (code, type) => `${code}:${toType(type)}`;
+
+const systemTemplates = type => messageMangerData.templates.pageData.filter(item => Number(item.type) === type && Number(item.status) === 0);
+const findSystemTemplate = (code, type) => systemTemplates(toType(type)).find(item => item.code === code);
 
 const getInput = ({ params, data } = {}) => Object.assign({}, params, data);
 
@@ -24,11 +28,29 @@ const toSmtpDetail = smtp =>
 
 const renderPreview = (template, props) => {
   const values = props || buildExampleProps(getTemplateVariables(template));
+  if (toType(template.type) === 1) {
+    return { props: values, text: renderTemplate(template.content || '', values, { type: 'text' }) };
+  }
   return {
     props: values,
     subject: renderTemplate(template.subject || '', values, { type: 'text' }),
     html: renderTemplate(template.content || '', values, { type: 'html' })
   };
+};
+
+const customize = (tenantId, code, type) => {
+  const store = getStore(tenantId);
+  const key = templateKey(code, type);
+  if (!store.templates[key]) {
+    store.templates[key] = Object.assign({}, findSystemTemplate(code, type), {
+      id: `tenant_${key}`,
+      tenantId: tenantId || 'current',
+      level: 1,
+      status: 0,
+      updatedAt: new Date().toISOString()
+    });
+  }
+  return store.templates[key];
 };
 
 const createMailSettingMock = () => ({
@@ -54,12 +76,15 @@ const createMailSettingMock = () => ({
   },
   templateList: {
     loader: options => {
-      const store = getStore(getInput(options).tenantId);
+      const { tenantId, type } = getInput(options);
+      const store = getStore(tenantId);
+      const types = type === undefined || type === '' ? TEMPLATE_TYPES : [toType(type)];
       return {
-        list: systemTemplates().map(tpl => {
-          const own = store.templates[tpl.code];
+        list: types.flatMap(systemTemplates).map(tpl => {
+          const own = store.templates[templateKey(tpl.code, tpl.type)];
           return {
             code: tpl.code,
+            type: Number(tpl.type),
             name: tpl.name,
             description: tpl.description,
             systemTemplateId: tpl.id,
@@ -74,53 +99,42 @@ const createMailSettingMock = () => ({
   },
   templateDetail: {
     loader: options => {
-      const { tenantId, code } = getInput(options);
-      const own = getStore(tenantId).templates[code];
-      return { customized: !!own, template: own || findSystemTemplate(code) };
+      const { tenantId, code, type } = getInput(options);
+      const own = getStore(tenantId).templates[templateKey(code, type)];
+      return { customized: !!own, template: own || findSystemTemplate(code, type) };
     }
   },
   templateCustomize: {
     loader: options => {
-      const { tenantId, code } = getInput(options);
-      const store = getStore(tenantId);
-      if (!store.templates[code]) {
-        store.templates[code] = Object.assign({}, findSystemTemplate(code), {
-          id: `tenant_${code}`,
-          tenantId: tenantId || 'current',
-          level: 1,
-          status: 0,
-          updatedAt: new Date().toISOString()
-        });
-      }
-      return store.templates[code];
+      const { tenantId, code, type } = getInput(options);
+      return customize(tenantId, code, type);
     }
   },
   templateSave: {
     loader: options => {
-      const { tenantId, code, ...input } = getInput(options);
-      const own = getStore(tenantId).templates[code];
-      return Object.assign(own, input, { updatedAt: new Date().toISOString() });
+      const { tenantId, code, type, ...input } = getInput(options);
+      return Object.assign(customize(tenantId, code, type), input, { updatedAt: new Date().toISOString() });
     }
   },
   templateSetStatus: {
     loader: options => {
-      const { tenantId, code, status } = getInput(options);
-      const own = getStore(tenantId).templates[code];
+      const { tenantId, code, type, status } = getInput(options);
+      const own = getStore(tenantId).templates[templateKey(code, type)];
       return Object.assign(own, { status: Number(status), updatedAt: new Date().toISOString() });
     }
   },
   templateReset: {
     loader: options => {
-      const { tenantId, code } = getInput(options);
-      delete getStore(tenantId).templates[code];
+      const { tenantId, code, type } = getInput(options);
+      delete getStore(tenantId).templates[templateKey(code, type)];
       return {};
     }
   },
   templatePreview: {
     loader: options => {
-      const { tenantId, code, template, props } = getInput(options);
-      const current = getStore(tenantId).templates[code] || findSystemTemplate(code);
-      return renderPreview(template ? Object.assign({ variables: current.variables }, template) : current, props);
+      const { tenantId, code, type, template, props } = getInput(options);
+      const current = getStore(tenantId).templates[templateKey(code, type)] || findSystemTemplate(code, type);
+      return renderPreview(template ? Object.assign({ type: current.type, variables: current.variables }, template) : current, props);
     }
   }
 });

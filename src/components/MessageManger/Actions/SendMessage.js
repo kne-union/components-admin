@@ -17,10 +17,8 @@ export const createSendModalOptions = ({ template, title, data, apis, ajax, mess
     title,
     width: 1100,
     bodyScroll: false,
-    footerButtons: [
-      { buttonType: 'CancelButton', children: formatMessage({ id: 'Cancel' }) },
-      { buttonType: 'SubmitButton', type: 'primary', children: formatMessage({ id: 'Send' }) }
-    ],
+    cancelText: formatMessage({ id: 'Cancel' }),
+    okText: formatMessage({ id: 'Send' }),
     formProps: {
       data: Object.assign({ props: '{}' }, data),
       onSubmit: async formData => {

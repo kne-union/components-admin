@@ -12,18 +12,18 @@ import { createRequest } from './utils';
 const TemplatePreview = createWithRemoteLoader({
   modules: ['components-core:Modal@ScrollRegion']
 })(
-  withLocale(({ remoteModules, apis, tenantId, code, template }) => {
+  withLocale(({ remoteModules, apis, tenantId, code, type = 0, template }) => {
     const [ScrollRegion] = remoteModules;
     const { formatMessage } = useIntl();
     const props = useMemo(() => buildPreviewProps(template), [template]);
-    const { data, isComplete } = useFetch(createRequest(apis.templatePreview, tenantId, { code, props }));
+    const { data, isComplete } = useFetch(createRequest(apis.templatePreview, tenantId, { code, type, props }));
 
     return (
       <ScrollRegion inset>
         {!isComplete ? (
           <Skeleton active />
         ) : data ? (
-          <MessageView type={0} subject={data.subject} html={data.html} text={data.text} />
+          <MessageView type={Number(type)} subject={data.subject} html={data.html} text={data.text} />
         ) : (
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={formatMessage({ id: 'NoData' })} />
         )}
