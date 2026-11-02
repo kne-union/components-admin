@@ -1,5 +1,5 @@
 const locale = {
-  MailSetting: '邮件设置',
+  MailSetting: '消息设置',
   SmtpSetting: 'SMTP 设置',
   MailTemplate: '消息模版',
   Edit: '编辑',

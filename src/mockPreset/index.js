@@ -1204,6 +1204,9 @@ const apis = merge({}, getApis(), {
       setStatus: {
         loader: ({ urlParams, data }) => Object.assign(findMessageTemplate(urlParams?.id) || {}, { status: Number(data?.status) })
       },
+      setTenantOpen: {
+        loader: ({ urlParams, data }) => Object.assign(findMessageTemplate(urlParams?.id) || {}, { tenantOpen: !!data?.tenantOpen })
+      },
       copy: {
         loader: ({ urlParams }) => {
           const source = findMessageTemplate(urlParams?.id);

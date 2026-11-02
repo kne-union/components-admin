@@ -10,7 +10,7 @@ import Dashboard from './Dashboard';
 import { getTemplateBaseColumns, getRecordColumns, getTemplateCardItem, getRecordCardItem } from './getColumns';
 import { createCardRenders } from '@components/MailGateway/CardList';
 import TemplateFormInner, { toTemplateFormData, toTemplatePayload } from './TemplateFormInner';
-import { Copy, Detail, Preview, SendMessage, openDetail, openTemplatePreview } from './Actions';
+import { Copy, Detail, Preview, SendMessage, TenantOpen, openDetail, openTemplatePreview } from './Actions';
 
 // 系统模板由服务端模板文件导入并在启动时覆盖，界面上不提供编辑和删除
 const getSystemLockedActions = data =>
@@ -52,6 +52,12 @@ const TemplateList = createWithRemoteLoader({
           ...getSystemLockedActions(props.data),
           { ...props, buttonComponent: Preview, children: formatMessage({ id: 'Preview' }) },
           { ...props, buttonComponent: Copy, children: formatMessage({ id: 'Copy' }) },
+          {
+            ...props,
+            buttonComponent: TenantOpen,
+            hidden: !props.data?.tenantCustomizable,
+            children: formatMessage({ id: props.data?.tenantOpen === false ? 'OpenToTenant' : 'CloseToTenant' })
+          },
           {
             buttonComponent: SendMessage,
             data: props.data,

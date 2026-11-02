@@ -6,6 +6,7 @@ import SendMessage from './SendMessage';
 import Resend from './Resend';
 import Preview, { openTemplatePreview } from './Preview';
 import Copy from './Copy';
+import TenantOpen from './TenantOpen';
 
 const ActionsInner = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
@@ -64,5 +65,5 @@ const ActionsInner = createWithRemoteLoader({
 
 const Actions = withLocale(ActionsInner);
 
-export { Detail, SendMessage, Resend, Preview, Copy, openTemplatePreview, openDetail };
+export { Detail, SendMessage, Resend, Preview, Copy, TenantOpen, openTemplatePreview, openDetail };
 export default Actions;

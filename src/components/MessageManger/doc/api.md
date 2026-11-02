@@ -29,6 +29,7 @@
 | messageManger.templates.remove    | DELETE | `/message/templates/:id`        | 删除业务模板                                                |
 | messageManger.templates.setStatus | POST   | `/message/templates/:id/status` | 启用 / 停用模板                                             |
 | messageManger.templates.copy      | POST   | `/message/templates/:id/copy`   | 复制为停用状态的业务模板                                    |
+| messageManger.templates.setTenantOpen | POST | `/message/templates/:id/tenant-open` | 设置系统模板是否开放给租户定制（`{ tenantOpen }`），仅列表中 `tenantCustomizable` 为 `true` 的模板可用；列表「开放租户」列显示当前状态 |
 | messageManger.templates.render    | POST   | `/message/templates/render`     | 按模板 id 或模板内容渲染预览，未传 `props` 时使用变量示例值 |
 | messageManger.templates.send      | POST   | `/message/templates/send`       | 按模板发送消息                                              |
 | messageManger.records.list        | GET    | `/message/records`              | 发送记录列表                                                |

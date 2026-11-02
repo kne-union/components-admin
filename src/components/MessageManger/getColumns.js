@@ -50,6 +50,16 @@ const getTemplateBaseColumns = ({ formatMessage, onPreview }) => [
     title: formatMessage({ id: 'Status' }),
     getValueOf: item => renderEnumTag({ formatMessage, value: item.status, moduleName: 'messageTemplateStatus' })
   },
+  {
+    name: 'tenantOpen',
+    title: formatMessage({ id: 'TenantOpen' }),
+    getValueOf: item =>
+      item.tenantCustomizable ? (
+        <Tag color={item.tenantOpen === false ? 'default' : 'green'}>
+          {formatMessage({ id: item.tenantOpen === false ? 'TenantClosed' : 'TenantOpened' })}
+        </Tag>
+      ) : null
+  },
   { name: 'subject', title: formatMessage({ id: 'Subject' }), renderType: 'description', width: 220 },
   { name: 'description', title: formatMessage({ id: 'Description' }), renderType: 'description', width: 220 },
   { name: 'updatedAt', title: formatMessage({ id: 'UpdatedAt' }), format: 'datetime' }
