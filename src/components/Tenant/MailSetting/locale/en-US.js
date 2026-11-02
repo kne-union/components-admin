@@ -1,7 +1,7 @@
 const locale = {
   MailSetting: 'Mail Settings',
   SmtpSetting: 'SMTP Settings',
-  MailTemplate: 'Mail Templates',
+  MailTemplate: 'Message Templates',
   Edit: 'Edit',
   Save: 'Save',
   Cancel: 'Cancel',
@@ -11,6 +11,8 @@ const locale = {
   Status: 'Status',
   Action: 'Action',
   SmtpNotConfigured: 'SMTP is not configured. Emails of this tenant are sent by the system default sender',
+  SmtpEmptyDescription: 'Once configured, emails are sent from your own mailbox and recipients see your address as the sender',
+  SmtpConfigureNow: 'Configure now',
   SmtpDisabledTips: 'Disabled. Emails of this tenant are sent by the system default sender',
   SmtpEnabled: 'Send with tenant SMTP',
   SmtpHost: 'SMTP host',
@@ -30,6 +32,9 @@ const locale = {
   TestSmtpNeedFields: 'Please fill in the SMTP host and username first',
   TestSmtpSuccess: 'Connection succeeded',
   TestMailSent: 'Test email sent',
+  SmtpTestRequired: 'Test the connection first; you can save once it passes',
+  SmtpTestOutdated: 'Connection settings changed, please test again',
+  SmtpTestPassed: 'Connection test passed, ready to save',
   RemoveSmtp: 'Clear',
   RemoveSmtpConfirm: 'Emails of this tenant will be sent by the system default sender after clearing. Continue?',
   RemoveSuccess: 'Cleared',
@@ -40,7 +45,8 @@ const locale = {
   UseSystemTemplate: 'System default',
   UpdatedAt: 'Updated at',
   Customize: 'Customize',
-  CustomizeSuccess: 'System template copied, you can edit it now',
+  CustomizeSuccess: 'Saved as a custom template',
+  CustomizeTemplate: 'Customize template',
   Enable: 'Enable',
   Disable: 'Disable',
   Reset: 'Reset',
@@ -49,10 +55,15 @@ const locale = {
   Preview: 'Preview',
   EditTemplate: 'Edit template',
   Subject: 'Subject',
-  SubjectTips: 'Supports Liquid variable placeholders',
   TemplateContent: 'Body',
   NoData: 'No data',
-  NoTemplate: 'No customizable email templates'
+  NoTemplate: 'No customizable message templates',
+  Keyword: 'Keyword',
+  SearchTemplate: 'Search template name or code',
+  TemplateType: 'Type',
+  EmailType: 'Email',
+  SmsType: 'SMS',
+  SmsContent: 'SMS content'
 };
 
 export default locale;

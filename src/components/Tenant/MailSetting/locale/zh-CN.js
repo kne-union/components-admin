@@ -1,7 +1,7 @@
 const locale = {
   MailSetting: '邮件设置',
   SmtpSetting: 'SMTP 设置',
-  MailTemplate: '邮件模版',
+  MailTemplate: '消息模版',
   Edit: '编辑',
   Save: '保存',
   Cancel: '取消',
@@ -11,6 +11,8 @@ const locale = {
   Status: '状态',
   Action: '操作',
   SmtpNotConfigured: '尚未配置 SMTP，本租户邮件使用系统默认发件服务',
+  SmtpEmptyDescription: '配置后，邮件将通过自有邮箱发送，收件人看到的发件人为你的邮箱地址',
+  SmtpConfigureNow: '立即配置',
   SmtpDisabledTips: '已停用，本租户邮件使用系统默认发件服务',
   SmtpEnabled: '使用租户 SMTP 发送',
   SmtpHost: 'SMTP 服务器',
@@ -30,6 +32,9 @@ const locale = {
   TestSmtpNeedFields: '请先填写 SMTP 服务器与账号',
   TestSmtpSuccess: '连接成功',
   TestMailSent: '测试邮件已发送',
+  SmtpTestRequired: '请先测试连接，通过后才能保存',
+  SmtpTestOutdated: '连接参数已修改，请重新测试',
+  SmtpTestPassed: '连接测试通过，可以保存',
   RemoveSmtp: '清除配置',
   RemoveSmtpConfirm: '清除后本租户邮件将使用系统默认发件服务，确定清除？',
   RemoveSuccess: '已清除',
@@ -40,7 +45,8 @@ const locale = {
   UseSystemTemplate: '系统默认',
   UpdatedAt: '更新时间',
   Customize: '自定义',
-  CustomizeSuccess: '已复制系统模版，可开始编辑',
+  CustomizeSuccess: '已保存为自定义模版',
+  CustomizeTemplate: '自定义模版',
   Enable: '启用',
   Disable: '禁用',
   Reset: '恢复默认',
@@ -49,10 +55,15 @@ const locale = {
   Preview: '预览',
   EditTemplate: '编辑模版',
   Subject: '邮件主题',
-  SubjectTips: '支持 Liquid 变量占位',
   TemplateContent: '邮件正文',
   NoData: '暂无数据',
-  NoTemplate: '暂无可自定义的邮件模版'
+  NoTemplate: '暂无可自定义的消息模版',
+  Keyword: '关键词',
+  SearchTemplate: '搜索模版名称或编码',
+  TemplateType: '类型',
+  EmailType: '邮件',
+  SmsType: '短信',
+  SmsContent: '短信内容'
 };
 
 export default locale;

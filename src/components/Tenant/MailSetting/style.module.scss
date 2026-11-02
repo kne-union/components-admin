@@ -1,0 +1,63 @@
+@use '~@kne/responsive-utils/scss' as resp;
+
+.smtpEmpty {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  padding: 48px 32px;
+  text-align: center;
+}
+
+.smtpEmptyIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary-color, #1677ff) 10%, transparent);
+  color: var(--primary-color, #1677ff);
+  font-size: 32px;
+}
+
+.smtpEmptyTitle {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(15, 23, 42, 0.88);
+}
+
+.smtpEmptyDescription {
+  max-width: 420px;
+  margin: 0 0 28px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(15, 23, 42, 0.5);
+}
+
+@include resp.mobile-container {
+  .smtpEmpty {
+    min-height: 280px;
+    padding: 32px 16px;
+  }
+
+  .smtpEmptyIcon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 16px;
+    font-size: 26px;
+  }
+
+  .smtpEmptyTitle {
+    font-size: 15px;
+  }
+
+  .smtpEmptyDescription {
+    margin-bottom: 20px;
+  }
+}

@@ -1,22 +1,31 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import Fetch from '@kne/react-fetch';
-import { App, Empty, Tag } from 'antd';
+import { useRef } from 'react';
+import { App, Empty } from 'antd';
 import { useIntl } from '@kne/react-intl';
 import dayjs from 'dayjs';
 import withLocale from './withLocale';
 import TemplateForm, { toTemplateFormData } from './TemplateForm';
 import TemplatePreview from './TemplatePreview';
-import { createRequest } from './utils';
+import { createRequest, filterTemplates, filterTemplatesByType } from './utils';
 
-const TemplateTable = createWithRemoteLoader({
+// 模版类型：0 邮件，1 短信
+const TEMPLATE_TYPES = [0, 1];
+const isSms = item => Number(item?.type) === 1;
+
+// 用带搜索工具栏的 TablePage，与 system-layout 列表页的表格样式保持一致；模版数量少，不分页，前端按关键词过滤
+const TemplateList = createWithRemoteLoader({
   modules: [
     'components-core:Global@usePreset',
-    'components-core:TablePage@Table',
+    'components-core:TablePage',
+    'components-core:Filter',
     'components-core:FormInfo@useFormModal',
     'components-core:Modal@useModal'
   ]
-})(({ remoteModules, list, apis, tenantId, hasEdit, reload }) => {
-  const [usePreset, Table, useFormModal, useModal] = remoteModules;
+})(({ remoteModules, apis, tenantId, hasEdit, editableTypes }) => {
+  const [usePreset, TablePage, Filter, useFormModal, useModal] = remoteModules;
+  const { SuperSelectFilterItem } = Filter.fields;
+  const ref = useRef(null);
+  const reload = () => ref.current?.reload();
   const { ajax } = usePreset();
   const formModal = useFormModal();
   const modal = useModal();
@@ -28,28 +37,29 @@ const TemplateTable = createWithRemoteLoader({
     return resData.code === 0 ? resData : null;
   };
 
-  const loadTemplate = async code => {
-    const resData = await request(apis.templateDetail, { code });
+  const loadTemplate = async ({ code, type }) => {
+    const resData = await request(apis.templateDetail, { code, type });
     return resData ? resData.data.template : null;
   };
 
+  // 未定制时以系统模版为底稿编辑，保存后才成为租户自定义模版
   const openEdit = async item => {
-    const template = await loadTemplate(item.code);
+    const template = await loadTemplate(item);
     if (!template) {
       return;
     }
     formModal({
-      title: `${formatMessage({ id: 'EditTemplate' })} - ${item.name || item.code}`,
+      title: `${formatMessage({ id: item.customized ? 'EditTemplate' : 'CustomizeTemplate' })} - ${item.name || item.code}`,
       size: 'large',
       children: <TemplateForm template={template} />,
       formProps: {
         data: toTemplateFormData(template),
         onSubmit: async formData => {
-          const resData = await request(apis.templateSave, Object.assign({ code: item.code }, formData));
+          const resData = await request(apis.templateSave, Object.assign({ code: item.code, type: item.type }, formData));
           if (!resData) {
             return false;
           }
-          message.success(formatMessage({ id: 'SaveSuccess' }));
+          message.success(formatMessage({ id: item.customized ? 'SaveSuccess' : 'CustomizeSuccess' }));
           reload();
         }
       }
@@ -57,7 +67,7 @@ const TemplateTable = createWithRemoteLoader({
   };
 
   const openPreview = async item => {
-    const template = await loadTemplate(item.code);
+    const template = await loadTemplate(item);
     if (!template) {
       return;
     }
@@ -66,30 +76,59 @@ const TemplateTable = createWithRemoteLoader({
       size: 'large',
       bodyScroll: false,
       footer: null,
-      children: <TemplatePreview apis={apis} tenantId={tenantId} code={item.code} template={template} />
+      children: <TemplatePreview apis={apis} tenantId={tenantId} code={item.code} type={item.type} template={template} />
     });
   };
 
   return (
-    <Table
-      rowKey="code"
-      dataSource={list}
+    <TablePage
+      ref={ref}
+      rowKey="key"
+      loader={async ({ data }) => {
+        const resData = await request(apis.templateList);
+        const list = filterTemplatesByType(filterTemplates(resData?.data?.list, data?.keyword), data?.type).map(item => Object.assign({ key: `${item.code}:${item.type}` }, item));
+        return { pageData: list, totalCount: list.length };
+      }}
+      pagination={{ open: false }}
+      search={{ name: 'keyword', label: formatMessage({ id: 'Keyword' }), placeholder: formatMessage({ id: 'SearchTemplate' }) }}
+      filter={{
+        list: [
+          {
+            type: SuperSelectFilterItem,
+            props: {
+              name: 'type',
+              label: formatMessage({ id: 'TemplateType' }),
+              single: true,
+              options: [
+                { value: 0, label: formatMessage({ id: 'EmailType' }) },
+                { value: 1, label: formatMessage({ id: 'SmsType' }) }
+              ]
+            }
+          }
+        ]
+      }}
+      empty={<Empty description={formatMessage({ id: 'NoTemplate' })} />}
       columns={[
         { name: 'name', title: formatMessage({ id: 'TemplateName' }), type: 'mainInfo', primary: false, hover: false },
+        {
+          name: 'type',
+          title: formatMessage({ id: 'TemplateType' }),
+          renderType: 'tag',
+          getValueOf: item => (isSms(item) ? { type: 'info', text: formatMessage({ id: 'SmsType' }) } : { type: 'default', text: formatMessage({ id: 'EmailType' }) })
+        },
         { name: 'code', title: formatMessage({ id: 'TemplateCode' }) },
         { name: 'description', title: formatMessage({ id: 'Description' }), renderType: 'description' },
         {
           name: 'customized',
           title: formatMessage({ id: 'Status' }),
+          renderType: 'tag',
           getValueOf: item => {
             if (!item.customized) {
-              return <Tag>{formatMessage({ id: 'UseSystemTemplate' })}</Tag>;
+              return { type: 'default', text: formatMessage({ id: 'UseSystemTemplate' }) };
             }
-            return Number(item.status) === 0 ? (
-              <Tag color="green">{formatMessage({ id: 'Customized' })}</Tag>
-            ) : (
-              <Tag color="orange">{`${formatMessage({ id: 'Customized' })} · ${formatMessage({ id: 'Disabled' })}`}</Tag>
-            );
+            return Number(item.status) === 0
+              ? { type: 'success', text: formatMessage({ id: 'Customized' }) }
+              : { type: 'warning', text: `${formatMessage({ id: 'Customized' })} · ${formatMessage({ id: 'Disabled' })}` };
           }
         },
         {
@@ -104,24 +143,11 @@ const TemplateTable = createWithRemoteLoader({
           fixed: 'right',
           getValueOf: item => {
             const preview = { children: formatMessage({ id: 'Preview' }), onClick: () => openPreview(item) };
-            if (!hasEdit) {
+            if (!hasEdit || !editableTypes.includes(Number(item.type || 0))) {
               return [preview];
             }
             if (!item.customized) {
-              return [
-                {
-                  children: formatMessage({ id: 'Customize' }),
-                  onClick: async () => {
-                    if (!(await request(apis.templateCustomize, { code: item.code }))) {
-                      return;
-                    }
-                    message.success(formatMessage({ id: 'CustomizeSuccess' }));
-                    reload();
-                    openEdit(item);
-                  }
-                },
-                preview
-              ];
+              return [{ children: formatMessage({ id: 'Customize' }), onClick: () => openEdit(item) }, preview];
             }
             const enabled = Number(item.status) === 0;
             return [
@@ -130,7 +156,7 @@ const TemplateTable = createWithRemoteLoader({
               {
                 children: formatMessage({ id: enabled ? 'Disable' : 'Enable' }),
                 onClick: async () => {
-                  if (!(await request(apis.templateSetStatus, { code: item.code, status: enabled ? 1 : 0 }))) {
+                  if (!(await request(apis.templateSetStatus, { code: item.code, type: item.type, status: enabled ? 1 : 0 }))) {
                     return;
                   }
                   message.success(formatMessage({ id: 'SaveSuccess' }));
@@ -142,7 +168,7 @@ const TemplateTable = createWithRemoteLoader({
                 confirm: true,
                 message: formatMessage({ id: 'ResetConfirm' }),
                 onClick: async () => {
-                  if (!(await request(apis.templateReset, { code: item.code }))) {
+                  if (!(await request(apis.templateReset, { code: item.code, type: item.type }))) {
                     return;
                   }
                   message.success(formatMessage({ id: 'ResetSuccess' }));
@@ -157,20 +183,4 @@ const TemplateTable = createWithRemoteLoader({
   );
 });
 
-const TemplateList = withLocale(({ apis, tenantId, hasEdit = true }) => {
-  const { formatMessage } = useIntl();
-  return (
-    <Fetch
-      {...createRequest(apis.templateList, tenantId)}
-      render={({ data, reload }) => {
-        const list = data?.list || [];
-        if (!list.length) {
-          return <Empty description={formatMessage({ id: 'NoTemplate' })} />;
-        }
-        return <TemplateTable list={list} apis={apis} tenantId={tenantId} hasEdit={hasEdit} reload={reload} />;
-      }}
-    />
-  );
-});
-
-export default TemplateList;
+export default withLocale(({ hasEdit = true, editableTypes = TEMPLATE_TYPES, ...props }) => <TemplateList {...props} hasEdit={hasEdit} editableTypes={editableTypes} />);

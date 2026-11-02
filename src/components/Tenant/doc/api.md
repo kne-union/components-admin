@@ -108,16 +108,18 @@ preset 中存在 `oidc`（`components-admin:Oidc` 的 `createOidcClient`）时�
 
 ### MailSetting 邮件设置
 
-租户 SMTP 配置与邮件模版自定义，分「SMTP 设置」「邮件模版」两个 Tab。租户端在 `Setting` 中使用，管理端在 `TenantAdmin` 详情「设置 → 邮件设置」中使用。
+租户 SMTP 配置与消息模版（邮件 / 短信）自定义，分「SMTP 设置」「消息模版」两个 Tab。租户端在 `Setting` 中使用，管理端在 `TenantAdmin` 详情「设置 → 邮件设置」中使用。
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | apis | 邮件设置接口：租户端 `apis.tenant.mailSetting`，管理端 `apis.tenantAdmin.mailSetting` | object | - |
 | tenantId | 管理端操作的租户 id，传入后所有请求带上 `tenantId` | string | - |
 | hasEdit | 是否可编辑；为 `false` 时只能查看与预览 | boolean | true |
+| editableTypes | 可自定义的模版类型，`0` 邮件、`1` 短信；不在其中的类型只能预览（如 `[0]` 只开放邮件模版编辑） | number[] | [0, 1] |
+| renderFooter | 自定义 SMTP 表单操作按钮（测试连接、保存、取消）的容器，如 `actions => <Page.Footer>{actions}</Page.Footer>` 放到 system-layout 页面底栏；不传时按钮居中显示在表单下方 | (actions: ReactNode) => ReactNode | - |
 
 - SMTP：未配置或停用时本租户邮件使用系统默认发件服务；密码留空表示不修改，可用「测试连接」校验连接或发送测试邮件
-- 邮件模版：列出可自定义的系统邮件模版，「自定义」复制系统模版到本租户后可编辑主题与正文、启用/禁用、恢复默认、预览
+- 消息模版：列出可自定义的系统邮件与短信模版，「自定义」以系统模版为底稿编辑（邮件改主题与正文，短信改内容），保存后成为本租户模版，可启用/禁用、恢复默认、预览；工具栏可按名称 / 编码搜索、按类型筛选；模版相关请求均带 `type`
 - `MailSetting.SmtpSetting`、`MailSetting.TemplateList` 可单独使用，属性同上
 
 `apis.*.mailSetting` 包含：`smtpDetail`、`smtpSave`、`smtpRemove`、`smtpTest`、`templateList`、`templateDetail`、`templateCustomize`、`templateSave`、`templateSetStatus`、`templateReset`、`templatePreview`，对应 `@kne/fastify-tenant` 的 `/mail-setting/*` 与 `/admin/mail-setting/*` 接口。
