@@ -52,7 +52,7 @@ const locale = {
 
   // Language
   LanguageSetting: 'Language Settings',
-  MailSetting: 'Mail Settings',
+  MailSetting: 'Message Settings',
   SystemLanguage: 'System Language',
   DefaultTag: 'Default',
   SetDefault: 'Set as Default',

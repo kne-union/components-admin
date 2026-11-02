@@ -819,6 +819,10 @@ const getApis = options => {
           url: `${prefix}/message/templates/{id}/status`,
           method: 'POST'
         },
+        setTenantOpen: {
+          url: `${prefix}/message/templates/{id}/tenant-open`,
+          method: 'POST'
+        },
         copy: {
           url: `${prefix}/message/templates/{id}/copy`,
           method: 'POST'

@@ -1,5 +1,5 @@
 const locale = {
-  MailSetting: 'Mail Settings',
+  MailSetting: 'Message Settings',
   SmtpSetting: 'SMTP Settings',
   MailTemplate: 'Message Templates',
   Edit: 'Edit',

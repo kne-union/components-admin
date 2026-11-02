@@ -102,12 +102,11 @@ const CustomComponents = createWithRemoteLoader({
     'components-core:TablePage@Table',
     'components-core:FormInfo',
     'components-core:Modal@useModal',
-    'components-core:Modal@ModalButton',
     'components-thirdparty:LiveComponentView'
   ]
 })(
   withLocale(({ remoteModules, tenant, reload }) => {
-    const [usePreset, Table, FormInfo, useModal, ModalButton, LiveComponentView] = remoteModules;
+    const [usePreset, Table, FormInfo, useModal, LiveComponentView] = remoteModules;
     const { formatMessage } = useIntl();
     const { apis, ajax } = usePreset();
     const { useFormModal, Form } = FormInfo;
@@ -115,6 +114,21 @@ const CustomComponents = createWithRemoteLoader({
     const { message } = App.useApp();
     const modal = useModal();
     const customComponents = tenant.tenantSetting?.customComponents || [];
+
+    const openWithDetail = async (item, getModalProps) => {
+      const { data: resData } = await ajax(
+        Object.assign({}, apis.tenantAdmin.customComponentDetail, {
+          params: {
+            tenantId: tenant.id,
+            key: item.key
+          }
+        })
+      );
+      if (resData.code !== 0) {
+        return;
+      }
+      const modalApi = modal(getModalProps({ data: resData.data, close: () => modalApi.close() }));
+    };
 
     return (
       <Flex vertical gap={8}>
@@ -196,16 +210,9 @@ const CustomComponents = createWithRemoteLoader({
               getValueOf: item => {
                 return [
                   {
-                    buttonComponent: ModalButton,
                     children: formatMessage({ id: 'Preview' }),
-                    api: Object.assign({}, apis.tenantAdmin.customComponentDetail, {
-                      params: {
-                        tenantId: tenant.id,
-                        key: item.key
-                      }
-                    }),
-                    modalProps: ({ data }) => {
-                      return {
+                    onClick: () =>
+                      openWithDetail(item, ({ data }) => ({
                         title: formatMessage({ id: 'Preview' }),
                         footer: null,
                         children: (
@@ -213,20 +220,12 @@ const CustomComponents = createWithRemoteLoader({
                             <LiveComponentView content={data.content} />
                           </Form>
                         )
-                      };
-                    }
+                      }))
                   },
                   {
-                    buttonComponent: ModalButton,
                     children: formatMessage({ id: 'Edit' }),
-                    api: Object.assign({}, apis.tenantAdmin.customComponentDetail, {
-                      params: {
-                        tenantId: tenant.id,
-                        key: item.key
-                      }
-                    }),
-                    modalProps: ({ data, close }) => {
-                      return {
+                    onClick: () =>
+                      openWithDetail(item, ({ data, close }) => ({
                         title: formatMessage({ id: 'Edit' }),
                         size: 'large',
                         children: ({ childrenRef }) => <LiveComponent defaultValue={data.content} ref={childrenRef} />,
@@ -262,8 +261,7 @@ const CustomComponents = createWithRemoteLoader({
                           });
                           return false;
                         }
-                      };
-                    }
+                      }))
                   },
                   {
                     children: formatMessage({ id: 'Copy' }),

@@ -21,7 +21,7 @@
       ]
     },
     {
-      "title": "邮件设置",
+      "title": "消息设置",
       "description": "MailSetting 组件用于配置租户 SMTP 与自定义邮件模版；租户端传 apis.tenant.mailSetting，管理端传 apis.tenantAdmin.mailSetting 并带 tenantId",
       "code": "./mail-setting.js",
       "scope": [
