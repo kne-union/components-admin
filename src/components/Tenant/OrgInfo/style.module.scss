@@ -1088,6 +1088,8 @@
   }
 
   .split > .detail {
+    flex: 1;
+    min-width: 0;
     padding: 16px;
   }
 
