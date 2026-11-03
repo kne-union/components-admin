@@ -9,7 +9,7 @@ const createComponent = (Target, callback = item => item) => {
   return createWithRemoteLoader({
     modules: ['components-core:Global@usePreset']
   })(
-    withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', disabledIds, isPopup, overlayWidth, ...props }) => {
+    withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', disabledIds, disabledLabel, isPopup, overlayWidth, ...props }) => {
       const [usePreset] = remoteModules;
       const { apis } = usePreset();
       const resolvedOrgApi = useMemo(() => merge({}, apis.tenant?.orgList, orgApi), [apis.tenant?.orgList, orgApi]);
@@ -29,6 +29,7 @@ const createComponent = (Target, callback = item => item) => {
           valueKey={valueKey}
           labelKey={labelKey}
           disabledIds={disabledIds}
+          disabledLabel={disabledLabel}
           isPopup={isPopup}
           overlayWidth={overlayWidth}
           orgApi={resolvedOrgApi}

@@ -2,10 +2,11 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useIntl } from '@kne/react-intl';
 import merge from 'lodash/merge';
 import withLocale from '../withLocale';
+import OrgFormContext from './OrgFormContext';
 
 const FormInnerCore = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
-})(({ remoteModules, apis, orgId }) => {
+})(({ remoteModules, apis, orgId, context }) => {
   const [FormInfo] = remoteModules;
   const { formatMessage } = useIntl();
   const { Input, TextArea, SuperSelect } = FormInfo.fields;
@@ -42,7 +43,12 @@ const FormInnerCore = createWithRemoteLoader({
       />
     );
   }
-  return <FormInfo column={1} list={list} />;
+  return (
+    <>
+      {context && <OrgFormContext {...context} />}
+      <FormInfo column={1} list={list} />
+    </>
+  );
 });
 
 /** withLocale 在外层：弹窗/Portal 内仍能加载 Tenant 命名空间文案，且正常转发 apis 等 props */

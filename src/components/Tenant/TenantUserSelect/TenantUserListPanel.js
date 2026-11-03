@@ -1,7 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
 import { CheckOutlined } from '@ant-design/icons';
-import { Avatar, Checkbox, Empty, Flex, Tag } from 'antd';
+import { Avatar, Checkbox, Empty, Flex, Tag, Tooltip } from 'antd';
 import classnames from 'classnames';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
@@ -39,6 +39,13 @@ const getSelectedIds = (value, single) => {
   return (Array.isArray(value) ? value : []).map(item => String(item.id));
 };
 
+const DisabledTag = ({ label }) =>
+  label === false ? null : (
+    <Tooltip title={typeof label === 'string' ? label : null}>
+      <Tag className={style['user-list-disabled-tag']}>{label}</Tag>
+    </Tooltip>
+  );
+
 const getUserDescription = item => [item.position, item.department].filter(Boolean).join(' · ') || item.email;
 
 const TenantUserListPanel = createWithRemoteLoader({
@@ -52,6 +59,7 @@ const TenantUserListPanel = createWithRemoteLoader({
     single,
     disabled,
     disabledIds,
+    disabledLabel,
     formatMessage,
     activeOrgId,
     onTotalCountChange,
@@ -66,6 +74,10 @@ const TenantUserListPanel = createWithRemoteLoader({
       () => new Set((Array.isArray(disabledIds) ? disabledIds : []).map(id => String(id))),
       [disabledIds]
     );
+    const resolveDisabledLabel = item => {
+      const label = typeof disabledLabel === 'function' ? disabledLabel(item) : disabledLabel;
+      return label === undefined || label === null || label === '' ? formatMessage({ id: 'TenantUserSelectItemDisabled' }) : label;
+    };
 
     const handleSelect = item => {
       if (disabled) {
@@ -180,11 +192,7 @@ const TenantUserListPanel = createWithRemoteLoader({
                           <div className={style['user-list-name']}>{itemLabel}</div>
                           {description ? <div className={style['user-list-desc']}>{description}</div> : null}
                         </Flex>
-                        {itemDisabled ? (
-                          <Tag className={style['user-list-disabled-tag']}>
-                            {formatMessage({ id: 'TenantUserSelectItemDisabled' })}
-                          </Tag>
-                        ) : null}
+                        {itemDisabled ? <DisabledTag label={resolveDisabledLabel(item)} /> : null}
                         {single && selected && !itemDisabled ? <CheckOutlined className={style['user-list-check']} /> : null}
                       </div>
                     );

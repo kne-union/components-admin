@@ -5,6 +5,7 @@ const Fetch = reactFetch.default;
 
 const tenant = tenantAdminData.tenantDetail;
 const tenantId = tenant.id;
+const envArgs = [...(tenant.tenantSetting?.args || []), { key: 'TARGET_LINKED_DEMO', name: '示例企业账号' }];
 
 const orgApis = {
   create: Object.assign({}, mockPreset.apis.tenantAdmin.orgCreate, {
@@ -33,6 +34,15 @@ const orgApis = {
     data: { tenantId }
   }),
   orgLinkCancel: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkCancel, {
+    data: { tenantId }
+  }),
+  thirdLoginConfig: Object.assign({}, mockPreset.apis.tenantAdmin.thirdLoginConfig, {
+    params: { tenantId }
+  }),
+  thirdLoginConfigSave: Object.assign({}, mockPreset.apis.tenantAdmin.thirdLoginConfigSave, {
+    data: { tenantId }
+  }),
+  thirdLoginConfigCancel: Object.assign({}, mockPreset.apis.tenantAdmin.thirdLoginConfigCancel, {
     data: { tenantId }
   })
 };
@@ -67,11 +77,12 @@ const OrgInfoExample = createWithRemoteLoader({
                       syncSupported
                         ? {
                             tenantId,
-                            envArgs: tenant.tenantSetting?.args || [],
+                            envArgs,
                             onLinkChange: reloadLinkConfig
                           }
                         : null
                     }
+                    thirdLoginSettingProps={{ envArgs }}
                     apis={orgApis}
                   />
                 )}

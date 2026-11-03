@@ -6,9 +6,9 @@ import { useIntl } from '@kne/react-intl';
 import ThirdLogin, { ThirdLoginResult } from './ThirdLogin';
 
 const Tenant = createWithRemoteLoader({
-  modules: ['components-admin:Authenticate@AfterUserLoginLayout']
-})(({ remoteModules, baseUrl, navigation = {}, list = [], children, ...props }) => {
-  const [AfterUserLoginLayout] = remoteModules;
+  modules: ['components-admin:Authenticate@AfterUserLoginLayout', 'components-admin:Authenticate@AfterUserLogin']
+})(({ remoteModules, baseUrl, navigation = {}, list = [], systemName, systemLogo, children, ...props }) => {
+  const [AfterUserLoginLayout, AfterUserLogin] = remoteModules;
   const { formatMessage } = useIntl();
   return (
     <AppChildrenRouter
@@ -58,24 +58,41 @@ const Tenant = createWithRemoteLoader({
           element: <ThirdLoginResult />
         },
         {
-          path: '*',
+          path: 'join-tenant/*',
           element: (
             <AppChildrenRouter
               baseUrl={baseUrl}
-              element={<AfterUserLoginLayout />}
+              element={<AfterUserLogin />}
               list={[
                 {
-                  path: 'join-tenant',
+                  index: true,
+                  elementProps: { systemName, systemLogo },
                   loader: () => import('./JoinInvitation')
-                },
+                }
+              ]}
+            />
+          )
+        },
+        {
+          path: 'login-tenant/*',
+          element: (
+            <AppChildrenRouter
+              baseUrl={baseUrl}
+              element={<AfterUserLogin />}
+              list={[
                 {
-                  path: 'login-tenant',
-                  elementProps: {
-                    tenantPath: `${baseUrl}/tenant`
-                  },
+                  index: true,
+                  elementProps: { tenantPath: `${baseUrl}/tenant`, systemName, systemLogo },
                   loader: () => import('./LoginTenant')
                 }
-              ]}>
+              ]}
+            />
+          )
+        },
+        {
+          path: '*',
+          element: (
+            <AppChildrenRouter baseUrl={baseUrl} element={<AfterUserLoginLayout />}>
               {children}
             </AppChildrenRouter>
           )

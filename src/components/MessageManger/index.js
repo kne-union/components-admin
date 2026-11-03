@@ -81,6 +81,18 @@ const TemplateList = createWithRemoteLoader({
             {
               type: SuperSelectFilterItem,
               props: { name: 'status', label: formatMessage({ id: 'Status' }), single: true, options: toOptions(['Enabled', 'Disabled']) }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: {
+                name: 'tenantOpen',
+                label: formatMessage({ id: 'TenantOpen' }),
+                single: true,
+                options: [
+                  { label: formatMessage({ id: 'TenantOpened' }), value: 'true' },
+                  { label: formatMessage({ id: 'TenantClosed' }), value: 'false' }
+                ]
+              }
             }
           ]
         }}

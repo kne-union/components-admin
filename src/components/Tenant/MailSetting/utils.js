@@ -46,6 +46,20 @@ export const filterTemplatesByType = (list, type) => {
   return value === undefined || value === null || value === '' ? items : items.filter(item => Number(item.type || 0) === Number(value));
 };
 
+/**
+ * 模版对租户端的开放状态；后端未返回 tenantOpen（旧版 fastify-tenant）时为 null
+ * @returns {'open'|'closed'|'platformClosed'|null}
+ */
+export const getTenantOpenState = item => {
+  if (typeof item?.tenantOpen !== 'boolean') {
+    return null;
+  }
+  if (item.platformOpen === false) {
+    return 'platformClosed';
+  }
+  return item.tenantOpen ? 'open' : 'closed';
+};
+
 /** 影响 SMTP 连接的字段指纹；测试通过后这些字段变化需要重新测试 */
 export const getSmtpConnectionKey = formData => {
   const { host, port, secure, user, pass } = toSmtpPayload(formData || {});

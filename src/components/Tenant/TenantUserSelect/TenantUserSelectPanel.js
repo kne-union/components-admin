@@ -1,6 +1,6 @@
 import Fetch from '@kne/react-fetch';
-import { ApartmentOutlined, UserOutlined } from '@ant-design/icons';
-import { Empty, Flex, Tag, Tree } from 'antd';
+import { ApartmentOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Empty, Flex, Input, Tree } from 'antd';
 import classnames from 'classnames';
 import merge from 'lodash/merge';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -25,6 +25,15 @@ const normalizeOrgList = data => {
   return [];
 };
 
+const filterOrgTree = (nodes, keyword) =>
+  (nodes || []).reduce((acc, node) => {
+    const children = filterOrgTree(node.children, keyword);
+    if (String(node.name || '').toLowerCase().includes(keyword) || children.length) {
+      acc.push(Object.assign({}, node, { children }));
+    }
+    return acc;
+  }, []);
+
 const toCssSize = value => (typeof value === 'number' ? `${value}px` : value);
 
 const TenantUserSelectPanel = ({
@@ -33,6 +42,7 @@ const TenantUserSelectPanel = ({
   onSelectComplete,
   disabled,
   disabledIds,
+  disabledLabel,
   formatMessage,
   orgApi,
   userApi,
@@ -57,6 +67,8 @@ const TenantUserSelectPanel = ({
   }, [height]);
   const [orgId, setOrgId] = useState(null);
   const [orgName, setOrgName] = useState('');
+  const [orgKeyword, setOrgKeyword] = useState('');
+  const orgSearchKey = orgKeyword.trim().toLowerCase();
   const [orgUserTotal, setOrgUserTotal] = useState(null);
   const [orgList, setOrgList] = useState([]);
   const [orgIdByUserId, setOrgIdByUserId] = useState({});
@@ -269,16 +281,23 @@ const TenantUserSelectPanel = ({
     <div className={classnames(style.shell, className)}>
       <div className={style.container} style={containerStyle}>
         <div className={style['org-panel']}>
-          <Flex className={style['panel-header']} align="center" gap={8}>
-            <ApartmentOutlined className={style['panel-header-icon']} />
-            <span className={style['panel-header-title']}>{formatMessage({ id: 'TenantUserSelectOrgTitle' })}</span>
-          </Flex>
+          <div className={style['org-search']}>
+            <Input
+              allowClear
+              size="small"
+              prefix={<SearchOutlined />}
+              placeholder={formatMessage({ id: 'OrgSearchPlaceholder' })}
+              value={orgKeyword}
+              onChange={e => setOrgKeyword(e.target.value)}
+            />
+          </div>
           <div className={`${style['panel-body']} ${style['org-panel-body']}`}>
             <Fetch
               {...orgApi}
               render={({ data }) => {
                 const list = normalizeOrgList(data);
-                const treeData = buildOrgTreeData(list, orgTreeOptions);
+                const fullTreeData = buildOrgTreeData(list, orgTreeOptions);
+                const treeData = orgSearchKey ? filterOrgTree(fullTreeData, orgSearchKey) : fullTreeData;
                 const orgSelectedCounts = getOrgSelectedCounts(
                   list,
                   effectiveSelectedList,
@@ -291,11 +310,12 @@ const TenantUserSelectPanel = ({
                       <Empty
                         className={style['panel-empty']}
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        description={formatMessage({ id: 'TenantUserSelectEmptyOrg' })}
+                        description={formatMessage({ id: orgSearchKey ? 'OrgSearchEmpty' : 'TenantUserSelectEmptyOrg' })}
                       />
                     ) : (
                       <div className={`${style['panel-scroller']} ${style['org-panel-scroller']}`}>
                         <Tree
+                          key={orgSearchKey}
                           className={style['org-tree']}
                           blockNode
                           defaultExpandAll
@@ -312,6 +332,7 @@ const TenantUserSelectPanel = ({
                             return (
                               <OrgTreeNodeTitle
                                 name={node.name}
+                                keyword={orgSearchKey}
                                 userCount={userCount}
                                 selectedCount={orgSelectedCounts.get(String(node.id)) || 0}
                               />
@@ -340,19 +361,14 @@ const TenantUserSelectPanel = ({
         </div>
         <div className={style['user-panel']}>
           <Flex className={style['panel-header']} align="center" gap={8}>
-            <UserOutlined className={style['panel-header-icon']} />
-            <span className={style['panel-header-title']}>{formatMessage({ id: 'TenantUserSelectUserTitle' })}</span>
-            {orgName ? (
-              <div className={style['panel-header-meta']}>
-                <Tag className={style['selected-org-tag']} color="processing">
-                  {orgName}
-                </Tag>
-                {orgUserTotal != null ? (
-                  <span className={style['org-member-total']}>
-                    {formatMessage({ id: 'TenantUserSelectOrgMemberTotal' }, { count: orgUserTotal })}
-                  </span>
-                ) : null}
-              </div>
+            {orgName ? <ApartmentOutlined className={style['panel-header-icon']} /> : <UserOutlined className={style['panel-header-icon']} />}
+            <span className={style['panel-header-title']} title={orgName || undefined}>
+              {orgName || formatMessage({ id: 'TenantUserSelectUserTitle' })}
+            </span>
+            {orgName && orgUserTotal != null ? (
+              <span className={style['org-member-total']}>
+                {formatMessage({ id: 'TenantUserSelectOrgMemberTotal' }, { count: orgUserTotal })}
+              </span>
             ) : null}
           </Flex>
           <div className={`${style['panel-body']} ${style['user-panel-body']}`}>
@@ -364,6 +380,7 @@ const TenantUserSelectPanel = ({
                 single={single}
                 disabled={disabled}
                 disabledIds={disabledIds}
+                disabledLabel={disabledLabel}
                 value={effectiveValue}
                 onChange={next => handleChange(next, { source: 'user' })}
                 formatMessage={formatMessage}

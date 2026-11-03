@@ -63,7 +63,16 @@ const locale = {
   TemplateType: 'Type',
   EmailType: 'Email',
   SmsType: 'SMS',
-  SmsContent: 'SMS content'
+  SmsContent: 'SMS content',
+  TenantManage: 'Tenant management',
+  TenantOpen: 'Open',
+  TenantClosed: 'Closed',
+  PlatformClosed: 'Closed by platform',
+  OpenTenantManage: 'Open to tenant',
+  CloseTenantManage: 'Close tenant management',
+  OpenTenantManageConfirm: 'The tenant will be able to view and customize this template. Continue?',
+  CloseTenantManageConfirm:
+    'The tenant will no longer see this template. Customized content still applies and the platform can still manage it. Continue?'
 };
 
 export default locale;

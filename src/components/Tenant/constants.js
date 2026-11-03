@@ -37,6 +37,14 @@ const getSourceIcon = (source, props = {}) => {
   return <IconComponent {...props} />;
 };
 
+// 宿主同步的来源形如 oidc:https://host/oidc，只展示冒号前的渠道名，完整值放 title
+const getSourceLabel = source => {
+  if (!source) {
+    return '';
+  }
+  return SOURCE_LABEL_MAP[source] || String(source).split(':')[0].toUpperCase();
+};
+
 const SOURCE_TAG_CLASS = style['source-tag'];
 
-export { SOURCE_LABEL_MAP, SOURCE_ICON_MAP, getSourceIcon, BEISEN_LOGO_URL, SOURCE_TAG_CLASS };
+export { SOURCE_LABEL_MAP, SOURCE_ICON_MAP, getSourceIcon, getSourceLabel, BEISEN_LOGO_URL, SOURCE_TAG_CLASS };

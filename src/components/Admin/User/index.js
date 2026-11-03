@@ -195,6 +195,13 @@ const UserInner = createWithRemoteLoader({
     [getActions, showLength]
   );
 
+  const renderCard = useCallback(
+    ({ dataSource } = {}) => (
+      <UserMobileList layout="card" dataSource={dataSource ?? mobileListRef.current} getActions={getActions} showLength={showLength} />
+    ),
+    [getActions, showLength]
+  );
+
   return (
     <TablePage
       isNext
@@ -282,7 +289,7 @@ const UserInner = createWithRemoteLoader({
       ref={ref}
       menuFixed={pageProps?.menuFixed}
       renderMobile={renderMobile}
-      renderCard={renderMobile}
+      renderCard={renderCard}
       columns={[
         ...getColumns({ formatMessage }),
         Object.assign(

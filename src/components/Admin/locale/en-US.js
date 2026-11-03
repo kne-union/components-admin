@@ -5,6 +5,7 @@ const locale = {
   Email: 'Email',
   Phone: 'Phone',
   IsSuperAdmin: 'Is Super Admin',
+  SuperAdmin: 'Super Admin',
   Status: 'Status',
   Bio: 'Bio',
 

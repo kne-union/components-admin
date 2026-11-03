@@ -258,6 +258,21 @@ const UserList = createWithRemoteLoader({
         [apis, getActions, reloadTable, rowSelection, showLength]
       );
 
+      const renderCard = useCallback(
+        ({ dataSource } = {}) => (
+          <UserMobileList
+            layout="card"
+            dataSource={dataSource ?? mobileListRef.current}
+            rowSelection={rowSelection}
+            apis={apis}
+            getActions={getActions}
+            onSuccess={reloadTable}
+            showLength={showLength}
+          />
+        ),
+        [apis, getActions, reloadTable, rowSelection, showLength]
+      );
+
       // 对齐 BizUnit 演示：筛选走 TablePage 内部 reload + mapFilterValue，不要把 filter 抬升进 list.params
       const tableOptions = {
         isNext: true,
@@ -319,7 +334,7 @@ const UserList = createWithRemoteLoader({
         pagination: { paramsType: 'params' },
         rowSelection,
         renderMobile,
-        renderCard: renderMobile,
+        renderCard,
         ...(buttonGroupList.length > 0 ? { buttonGroup: { list: buttonGroupList } } : {})
       };
 

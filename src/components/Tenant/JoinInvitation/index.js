@@ -1,32 +1,44 @@
-import '@kne/react-box/dist/index.css';
 import classnames from 'classnames';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useState } from 'react';
-import { useIsMobile } from '@kne/responsive-utils';
-import { Button, Steps, Result, Typography } from 'antd';
-import { CheckCircleFilled } from '@ant-design/icons';
+import { Button, Result, Typography } from 'antd';
+import { MailOutlined } from '@ant-design/icons';
 import Fetch from '@kne/react-fetch';
-import CountDown from '@kne/count-down';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import CompanyInfo from '../CompanyInfo';
-import TenantUserPersonalCard from '../UserList/UserPersonalCard';
+import CompanySummary from './CompanySummary';
+import EmployeeSummary from './EmployeeSummary';
+import JoinSuccess from './JoinSuccess';
+import TenantPageShell from '../TenantPageShell';
 
 import withLocale from '../withLocale';
 import { withPublicUrl } from '../../../utils/publicUrl';
 import { useIntl } from '@kne/react-intl';
 import style from './style.module.scss';
 
-const companyInitial = name => {
-  const text = String(name || '').trim();
-  return text ? text.charAt(0).toUpperCase() : '?';
-};
+const STEPS = ['ConfirmCompanyInfo', 'ConfirmEmployeeInfo', 'Complete'];
+
+const StepProgress = withLocale(({ current }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <div className={style.progress}>
+      <div className={style.progressText}>
+        <span className={style.progressIndex}>{formatMessage({ id: 'JoinStepProgress' }, { current: current + 1, total: STEPS.length })}</span>
+        <span className={style.progressTitle}>{formatMessage({ id: STEPS[current] })}</span>
+      </div>
+      <div className={style.progressBar}>
+        {STEPS.map((id, index) => (
+          <span key={id} className={classnames(style.progressSegment, { [style.progressSegmentDone]: index <= current })} />
+        ))}
+      </div>
+    </div>
+  );
+});
 
 const JoinInvitation = createWithRemoteLoader({
-  modules: ['components-core:Layout@Page', 'components-core:Global@usePreset', 'components-core:LoadingButton', 'components-core:Image']
-})(({ remoteModules, baseUrl = '', token: propsToken, children }) => {
-  const [Page, usePreset, LoadingButton, Image] = remoteModules;
+  modules: ['components-core:Global@usePreset', 'components-core:LoadingButton']
+})(({ remoteModules, baseUrl = '', token: propsToken, systemName, systemLogo, children }) => {
+  const [usePreset, LoadingButton] = remoteModules;
   const [current, setCurrent] = useState(0);
-  const isMobile = useIsMobile();
   const { formatMessage } = useIntl();
   const { apis, ajax } = usePreset();
   const [searchParams] = useSearchParams();
@@ -35,32 +47,14 @@ const JoinInvitation = createWithRemoteLoader({
   const token = propsToken || searchParams.get('token');
 
   const renderError = (title, subTitle) => (
-    <div className={style.page}>
-      <div className={classnames(style.shell, style.shellError)}>
-        <Result status="error" title={title} subTitle={subTitle} />
-      </div>
-    </div>
+    <TenantPageShell systemName={systemName} systemLogo={systemLogo}>
+      <Result status="error" title={title} subTitle={subTitle} />
+    </TenantPageShell>
   );
 
-  const renderHeader = company => (
-    <header className={style.header}>
-      {company?.logo ? (
-        <div className={style.headerLogo}>
-          <Image.Avatar id={company.logo} size={56} alt={company.name} />
-        </div>
-      ) : (
-        <div className={style.headerLogoFallback} aria-hidden>
-          {companyInitial(company?.name)}
-        </div>
-      )}
-      <div className={style.headerText}>
-        <Typography.Title level={4} className={style.headerTitle}>
-          {formatMessage({ id: 'InviteYouJoin' }, { name: company?.name || '' })}
-        </Typography.Title>
-        <Typography.Paragraph className={style.headerSubtitle}>{formatMessage({ id: 'InviteJoinSubtitle' })}</Typography.Paragraph>
-      </div>
-    </header>
-  );
+  const enterSystem = () => {
+    window.location.href = withPublicUrl(`${baseUrl}/tenant`);
+  };
 
   const pageProps = {
     children: (
@@ -74,118 +68,81 @@ const JoinInvitation = createWithRemoteLoader({
           if (!(tenant && tenant.status === 'open' && tenantUser && tenantUser.status === 'open')) {
             return renderError(formatMessage({ id: 'InviteLinkExpired' }), formatMessage({ id: 'ContactAdmin' }));
           }
+          const companyName = data.company?.name || '';
 
-          const stepItems = [
-            { title: formatMessage({ id: 'ConfirmCompanyInfo' }) },
-            { title: formatMessage({ id: 'ConfirmEmployeeInfo' }) },
-            { title: formatMessage({ id: 'Complete' }) }
-          ];
-
-          let footerClassName = style.footer;
-          let footerNode = null;
-
-          if (current === 0) {
-            footerNode = (
-              <Button
-                type="primary"
-                size="large"
-                className={style.footerBtn}
-                onClick={() => {
-                  setCurrent(1);
-                }}>
-                {formatMessage({ id: 'ConfirmCompanyInfo' })}
-              </Button>
-            );
-          } else if (current === 1) {
-            footerNode = (
-              <>
-                <Button
-                  size="large"
-                  className={style.footerBtn}
-                  onClick={() => {
-                    setCurrent(0);
-                  }}>
-                  {formatMessage({ id: 'StepBack' })}
-                </Button>
-                <LoadingButton
-                  type="primary"
-                  size="large"
-                  className={style.footerBtn}
-                  onClick={async () => {
-                    const { data: resData } = await ajax(
-                      Object.assign({}, apis.tenant.join, {
-                        data: { token }
-                      })
-                    );
-                    if (resData.code !== 0) {
-                      navigate(`${baseUrl}/login-tenant`);
-                      return;
-                    }
-                    setCurrent(2);
-                  }}>
-                  {formatMessage({ id: 'ConfirmEmployeeInfo' })}
-                </LoadingButton>
-              </>
-            );
-          } else if (current === 2) {
-            footerNode = (
-              <Button
-                type="primary"
-                size="large"
-                className={style.footerBtn}
-                onClick={() => {
-                  window.location.href = withPublicUrl(`${baseUrl}/tenant`);
-                }}>
-                {formatMessage({ id: 'EnterDirectly' })}
-              </Button>
+          if (current === 2) {
+            return (
+              <TenantPageShell systemName={systemName} systemLogo={systemLogo}>
+                <JoinSuccess company={data.company} tenantUser={tenantUser} positionList={data.positionList} onEnter={enterSystem} />
+              </TenantPageShell>
             );
           }
 
           return (
-            <div className={style.page}>
-              <div className={style.shell}>
-                {renderHeader(data.company)}
-                <div className={style.content}>
-                  <div className={style.stepsWrap}>
-                    <Steps current={current} size="small" orientation="horizontal" titlePlacement="vertical" responsive={false} items={stepItems} />
-                  </div>
-                  <main className={style.main}>
-                    {current === 0 && (
-                      <div className={classnames(style.stepPanel, style.stepPanelCompany)}>
-                        <CompanyInfo.Detail data={data.company} />
-                      </div>
-                    )}
-                    {current === 1 && (
-                      <div className={classnames(style.stepPanel, style.stepPanelEmployee)}>
-                        <Typography.Paragraph className={style.stepHint}>{formatMessage({ id: 'ConfirmEmployeeInfoHint' })}</Typography.Paragraph>
-                        <TenantUserPersonalCard data={tenantUser} positionList={data.positionList} mode={isMobile ? 'vertical' : 'horizontal'} />
-                      </div>
-                    )}
-                    {current === 2 && (
-                      <div className={classnames(style.stepPanel, style.stepPanelSuccess)}>
-                        <CheckCircleFilled className={style.successIcon} />
-                        <Typography.Title level={4} className={style.successTitle}>
-                          {formatMessage({ id: 'WelcomeJoin' }, { name: data.company.name })}
-                        </Typography.Title>
-                        <Typography.Paragraph className={style.successSub}>
-                          <span className={style.countdownNum}>
-                            <CountDown
-                              duration={5}
-                              format="s"
-                              onComplete={() => {
-                                window.location.href = withPublicUrl(`${baseUrl}/tenant`);
-                              }}
-                            />
-                          </span>
-                          {formatMessage({ id: 'AutoJump' })}
-                        </Typography.Paragraph>
-                      </div>
-                    )}
-                  </main>
-                </div>
-                {footerNode ? <footer className={footerClassName}>{footerNode}</footer> : null}
+            <TenantPageShell systemName={systemName} systemLogo={systemLogo}>
+              <div className={style.join}>
+                <header className={style.header}>
+                  <span className={style.eyebrow}>
+                    <MailOutlined />
+                    {formatMessage({ id: 'InviteEyebrow' })}
+                  </span>
+                  <Typography.Title level={4} className={style.title}>
+                    {formatMessage({ id: 'InviteYouJoin' }, { name: companyName })}
+                  </Typography.Title>
+                  <Typography.Text type="secondary">{formatMessage({ id: 'InviteJoinSubtitle' })}</Typography.Text>
+                </header>
+
+                <StepProgress current={current} />
+
+                <main className={style.main}>
+                  {current === 0 && (
+                    <>
+                      <div className={style.stepHint}>{formatMessage({ id: 'ConfirmCompanyInfoHint' })}</div>
+                      <CompanySummary data={data.company} />
+                    </>
+                  )}
+                  {current === 1 && (
+                    <>
+                      <div className={style.stepHint}>{formatMessage({ id: 'ConfirmEmployeeInfoHint' })}</div>
+                      <EmployeeSummary data={tenantUser} positionList={data.positionList} />
+                    </>
+                  )}
+                </main>
+
+                <footer className={style.footer}>
+                  {current === 0 && (
+                    <Button type="primary" size="large" className={style.footerBtn} onClick={() => setCurrent(1)}>
+                      {formatMessage({ id: 'NextStep' })}
+                    </Button>
+                  )}
+                  {current === 1 && (
+                    <>
+                      <Button size="large" className={style.footerBtn} onClick={() => setCurrent(0)}>
+                        {formatMessage({ id: 'StepBack' })}
+                      </Button>
+                      <LoadingButton
+                        type="primary"
+                        size="large"
+                        className={style.footerBtn}
+                        onClick={async () => {
+                          const { data: resData } = await ajax(
+                            Object.assign({}, apis.tenant.join, {
+                              data: { token }
+                            })
+                          );
+                          if (resData.code !== 0) {
+                            navigate(`${baseUrl}/login-tenant`);
+                            return;
+                          }
+                          setCurrent(2);
+                        }}>
+                        {formatMessage({ id: 'ConfirmJoin' })}
+                      </LoadingButton>
+                    </>
+                  )}
+                </footer>
               </div>
-            </div>
+            </TenantPageShell>
           );
         }}
       />
@@ -196,7 +153,7 @@ const JoinInvitation = createWithRemoteLoader({
     return children(pageProps);
   }
 
-  return <Page backgroundColor="transparent" {...pageProps} />;
+  return pageProps.children;
 });
 
 export default withLocale(JoinInvitation);

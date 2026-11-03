@@ -6,6 +6,7 @@ import getColumns from './getColumns';
 import { useRef } from 'react';
 import Create from '../Actions/Create';
 import Actions from '../Actions';
+import TenantCardList from './TenantCardList';
 
 const ListInner = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Filter', 'components-core:Global@usePreset']
@@ -16,6 +17,17 @@ const ListInner = createWithRemoteLoader({
   const { getFilterValue } = Filter;
   const ref = useRef(null);
   const navigate = useNavigate();
+  const renderCards =
+    layout =>
+    ({ dataSource } = {}) => (
+      <TenantCardList
+        layout={layout}
+        dataSource={dataSource}
+        showLength={showLength}
+        onDetail={item => navigate(`detail?id=${encodeURIComponent(item.id)}`)}
+        onSuccess={() => ref.current?.reload()}
+      />
+    );
 
   return (
     <TablePage
@@ -41,6 +53,8 @@ const ListInner = createWithRemoteLoader({
       ref={ref}
       name="tenant-list"
       pagination={{ paramsType: 'params' }}
+      renderMobile={renderCards('mobile')}
+      renderCard={renderCards('card')}
       buttonGroup={{
         list: [
           {

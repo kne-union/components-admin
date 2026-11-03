@@ -1,6 +1,21 @@
 import style from './style.module.scss';
 
-const OrgTreeNodeTitle = ({ name, selectedCount, userCount }) => {
+const highlight = (name, keyword) => {
+  const text = String(name || '');
+  const index = keyword ? text.toLowerCase().indexOf(keyword) : -1;
+  if (index < 0) {
+    return text;
+  }
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark className={style['org-node-mark']}>{text.slice(index, index + keyword.length)}</mark>
+      {text.slice(index + keyword.length)}
+    </>
+  );
+};
+
+const OrgTreeNodeTitle = ({ name, keyword, selectedCount, userCount }) => {
   const orgTotal = Number(userCount) || 0;
   const selected = Number(selectedCount) || 0;
 
@@ -20,7 +35,7 @@ const OrgTreeNodeTitle = ({ name, selectedCount, userCount }) => {
 
   return (
     <span className={style['org-node-title']}>
-      <span className={style['org-node-name']}>{name}</span>
+      <span className={style['org-node-name']}>{highlight(name, keyword)}</span>
       {badge}
     </span>
   );

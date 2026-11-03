@@ -23,7 +23,7 @@ const PanelControl = ({ value, onChange, disabled }) => {
 const OrgTenantUserField = createWithRemoteLoader({
   modules: ['components-core:FormInfo@hooks']
 })(
-  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', disabledIds, ...props }) => {
+  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height, valueKey = 'id', labelKey = 'name', disabledIds, disabledLabel, ...props }) => {
     const [hooks] = remoteModules;
     const { useDecorator } = hooks;
     const { formatMessage } = useIntl();
@@ -41,7 +41,8 @@ const OrgTenantUserField = createWithRemoteLoader({
       'height',
       'valueKey',
       'labelKey',
-      'disabledIds'
+      'disabledIds',
+      'disabledLabel'
     ]);
     const render = useDecorator(
       merge(
@@ -67,9 +68,10 @@ const OrgTenantUserField = createWithRemoteLoader({
         height,
         valueKey,
         labelKey,
-        disabledIds
+        disabledIds,
+        disabledLabel
       }),
-      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey, labelKey, disabledIds]
+      [formatMessage, orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey, labelKey, disabledIds, disabledLabel]
     );
 
     return (
@@ -86,6 +88,7 @@ OrgTenantUserField.Field = withLocale(
     onChange,
     disabled,
     disabledIds,
+    disabledLabel,
     orgApi,
     userApi,
     userStatus,
@@ -106,6 +109,7 @@ OrgTenantUserField.Field = withLocale(
         onChange={onChange}
         disabled={disabled}
         disabledIds={disabledIds}
+        disabledLabel={disabledLabel}
         formatMessage={formatMessage}
         orgApi={orgApi}
         userApi={userApi}

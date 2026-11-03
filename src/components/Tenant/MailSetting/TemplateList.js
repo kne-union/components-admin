@@ -6,11 +6,17 @@ import dayjs from 'dayjs';
 import withLocale from './withLocale';
 import TemplateForm, { toTemplateFormData } from './TemplateForm';
 import TemplatePreview from './TemplatePreview';
-import { createRequest, filterTemplates, filterTemplatesByType } from './utils';
+import { createRequest, filterTemplates, filterTemplatesByType, getTenantOpenState } from './utils';
 
 // 模版类型：0 邮件，1 短信
 const TEMPLATE_TYPES = [0, 1];
 const isSms = item => Number(item?.type) === 1;
+
+const TENANT_OPEN_TAGS = {
+  open: { type: 'success', id: 'TenantOpen' },
+  closed: { type: 'default', id: 'TenantClosed' },
+  platformClosed: { type: 'default', id: 'PlatformClosed' }
+};
 
 // 用带搜索工具栏的 TablePage，与 system-layout 列表页的表格样式保持一致；模版数量少，不分页，前端按关键词过滤
 const TemplateList = createWithRemoteLoader({
@@ -31,6 +37,8 @@ const TemplateList = createWithRemoteLoader({
   const modal = useModal();
   const { message } = App.useApp();
   const { formatMessage } = useIntl();
+  // 只有管理端 apis 提供该接口：平台对单个租户开放 / 关闭模版管理
+  const canSetTenantOpen = !!apis.templateSetTenantOpen;
 
   const request = async (api, payload) => {
     const { data: resData } = await ajax(createRequest(api, tenantId, payload));
@@ -80,13 +88,75 @@ const TemplateList = createWithRemoteLoader({
     });
   };
 
+  const getTemplateActions = item => {
+    const preview = { children: formatMessage({ id: 'Preview' }), onClick: () => openPreview(item) };
+    if (!hasEdit || !editableTypes.includes(Number(item.type || 0))) {
+      return [preview];
+    }
+    if (!item.customized) {
+      return [{ children: formatMessage({ id: 'Customize' }), onClick: () => openEdit(item) }, preview];
+    }
+    const enabled = Number(item.status) === 0;
+    return [
+      { children: formatMessage({ id: 'Edit' }), onClick: () => openEdit(item) },
+      preview,
+      {
+        children: formatMessage({ id: enabled ? 'Disable' : 'Enable' }),
+        onClick: async () => {
+          if (!(await request(apis.templateSetStatus, { code: item.code, type: item.type, status: enabled ? 1 : 0 }))) {
+            return;
+          }
+          message.success(formatMessage({ id: 'SaveSuccess' }));
+          reload();
+        }
+      },
+      {
+        children: formatMessage({ id: 'Reset' }),
+        confirm: true,
+        message: formatMessage({ id: 'ResetConfirm' }),
+        onClick: async () => {
+          if (!(await request(apis.templateReset, { code: item.code, type: item.type }))) {
+            return;
+          }
+          message.success(formatMessage({ id: 'ResetSuccess' }));
+          reload();
+        }
+      }
+    ];
+  };
+
+  // 平台在消息管理中未开放的模版，单个租户开放也不生效，不提供开关
+  const getTenantOpenActions = item => {
+    const state = getTenantOpenState(item);
+    if (!canSetTenantOpen || !state || state === 'platformClosed') {
+      return [];
+    }
+    const open = state === 'open';
+    return [
+      {
+        children: formatMessage({ id: open ? 'CloseTenantManage' : 'OpenTenantManage' }),
+        confirm: true,
+        message: formatMessage({ id: open ? 'CloseTenantManageConfirm' : 'OpenTenantManageConfirm' }),
+        onClick: async () => {
+          if (!(await request(apis.templateSetTenantOpen, { code: item.code, type: item.type, tenantOpen: !open }))) {
+            return;
+          }
+          message.success(formatMessage({ id: 'SaveSuccess' }));
+          reload();
+        }
+      }
+    ];
+  };
+
   return (
     <TablePage
       ref={ref}
       rowKey="key"
       loader={async ({ data }) => {
         const resData = await request(apis.templateList);
-        const list = filterTemplatesByType(filterTemplates(resData?.data?.list, data?.keyword), data?.type).map(item => Object.assign({ key: `${item.code}:${item.type}` }, item));
+        const list = filterTemplatesByType(filterTemplates(resData?.data?.list, data?.keyword), data?.type).map(item =>
+          Object.assign({ key: `${item.code}:${item.type}` }, item)
+        );
         return { pageData: list, totalCount: list.length };
       }}
       pagination={{ open: false }}
@@ -114,7 +184,8 @@ const TemplateList = createWithRemoteLoader({
           name: 'type',
           title: formatMessage({ id: 'TemplateType' }),
           renderType: 'tag',
-          getValueOf: item => (isSms(item) ? { type: 'info', text: formatMessage({ id: 'SmsType' }) } : { type: 'default', text: formatMessage({ id: 'EmailType' }) })
+          getValueOf: item =>
+            isSms(item) ? { type: 'info', text: formatMessage({ id: 'SmsType' }) } : { type: 'default', text: formatMessage({ id: 'EmailType' }) }
         },
         { name: 'code', title: formatMessage({ id: 'TemplateCode' }) },
         { name: 'description', title: formatMessage({ id: 'Description' }), renderType: 'description' },
@@ -131,6 +202,15 @@ const TemplateList = createWithRemoteLoader({
               : { type: 'warning', text: `${formatMessage({ id: 'Customized' })} · ${formatMessage({ id: 'Disabled' })}` };
           }
         },
+        canSetTenantOpen && {
+          name: 'tenantOpen',
+          title: formatMessage({ id: 'TenantManage' }),
+          renderType: 'tag',
+          getValueOf: item => {
+            const tag = TENANT_OPEN_TAGS[getTenantOpenState(item)];
+            return tag ? { type: tag.type, text: formatMessage({ id: tag.id }) } : null;
+          }
+        },
         {
           name: 'updatedAt',
           title: formatMessage({ id: 'UpdatedAt' }),
@@ -141,46 +221,13 @@ const TemplateList = createWithRemoteLoader({
           renderType: 'options',
           title: formatMessage({ id: 'Action' }),
           fixed: 'right',
-          getValueOf: item => {
-            const preview = { children: formatMessage({ id: 'Preview' }), onClick: () => openPreview(item) };
-            if (!hasEdit || !editableTypes.includes(Number(item.type || 0))) {
-              return [preview];
-            }
-            if (!item.customized) {
-              return [{ children: formatMessage({ id: 'Customize' }), onClick: () => openEdit(item) }, preview];
-            }
-            const enabled = Number(item.status) === 0;
-            return [
-              { children: formatMessage({ id: 'Edit' }), onClick: () => openEdit(item) },
-              preview,
-              {
-                children: formatMessage({ id: enabled ? 'Disable' : 'Enable' }),
-                onClick: async () => {
-                  if (!(await request(apis.templateSetStatus, { code: item.code, type: item.type, status: enabled ? 1 : 0 }))) {
-                    return;
-                  }
-                  message.success(formatMessage({ id: 'SaveSuccess' }));
-                  reload();
-                }
-              },
-              {
-                children: formatMessage({ id: 'Reset' }),
-                confirm: true,
-                message: formatMessage({ id: 'ResetConfirm' }),
-                onClick: async () => {
-                  if (!(await request(apis.templateReset, { code: item.code, type: item.type }))) {
-                    return;
-                  }
-                  message.success(formatMessage({ id: 'ResetSuccess' }));
-                  reload();
-                }
-              }
-            ];
-          }
+          getValueOf: item => [...getTemplateActions(item), ...getTenantOpenActions(item)]
         }
-      ]}
+      ].filter(Boolean)}
     />
   );
 });
 
-export default withLocale(({ hasEdit = true, editableTypes = TEMPLATE_TYPES, ...props }) => <TemplateList {...props} hasEdit={hasEdit} editableTypes={editableTypes} />);
+export default withLocale(({ hasEdit = true, editableTypes = TEMPLATE_TYPES, ...props }) => (
+  <TemplateList {...props} hasEdit={hasEdit} editableTypes={editableTypes} />
+));

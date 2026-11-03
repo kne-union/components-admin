@@ -34,7 +34,8 @@ const TenantUserSelectedFooter = ({ value, onChange, single, disabled, formatMes
                 event.preventDefault();
                 handleRemove(item.id);
               }}>
-              {item.name}
+              <span className={style['footer-tag-avatar']}>{String(item.name || '').trim().charAt(0)}</span>
+              <span className={style['footer-tag-name']}>{item.name}</span>
             </Tag>
           ))
         ) : (

@@ -2,10 +2,11 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useIntl } from '@kne/react-intl';
 import merge from 'lodash/merge';
 import withLocale from '../withLocale';
+import OrgFormContext from './OrgFormContext';
 
 const LeaderFormInnerCore = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
-})(({ remoteModules, apis, orgId }) => {
+})(({ remoteModules, apis, orgId, context }) => {
   const [FormInfo] = remoteModules;
   const { formatMessage } = useIntl();
   const { SuperSelect } = FormInfo.fields;
@@ -35,7 +36,12 @@ const LeaderFormInnerCore = createWithRemoteLoader({
       />
     );
   }
-  return <FormInfo column={1} list={list} />;
+  return (
+    <>
+      {context && <OrgFormContext {...context} />}
+      <FormInfo column={1} list={list} />
+    </>
+  );
 });
 
 export default withLocale(LeaderFormInnerCore);

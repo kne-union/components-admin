@@ -31,6 +31,7 @@ const TenantUserSelectInputControl = ({
   onChange,
   disabled,
   disabledIds,
+  disabledLabel,
   orgApi,
   userApi,
   userStatus,
@@ -93,6 +94,7 @@ const TenantUserSelectInputControl = ({
               }}
               disabled={disabled}
               disabledIds={disabledIds}
+              disabledLabel={disabledLabel}
               formatMessage={formatMessage}
               orgApi={orgApi}
               userApi={userApi}
