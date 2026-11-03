@@ -5,6 +5,7 @@ const locale = {
   Email: '邮箱',
   Phone: '手机',
   IsSuperAdmin: '是否超级管理员',
+  SuperAdmin: '超级管理员',
   Status: '状态',
   Bio: '个人简介',
 

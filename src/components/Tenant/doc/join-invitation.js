@@ -1,24 +1,18 @@
 const { JoinInvitation } = _Tenant;
 const { default: mockPreset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
-const { Card, Flex } = antd;
+const { Divider } = antd;
 
 const JoinInvitationExample = createWithRemoteLoader({
-  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
+  modules: ['components-core:Global@PureGlobal']
 })(({ remoteModules }) => {
-  const [PureGlobal, Layout] = remoteModules;
+  const [PureGlobal] = remoteModules;
   return (
     <PureGlobal preset={mockPreset}>
-      <Layout navigation={{ isFixed: false }}>
-        <Flex vertical gap={24}>
-          <Card title="成功示例（有效token）">
-            <JoinInvitation baseUrl="" token="valid" />
-          </Card>
-          <Card title="失败示例（无效token）">
-            <JoinInvitation baseUrl="" token="invalid" />
-          </Card>
-        </Flex>
-      </Layout>
+      <Divider titlePlacement="start">成功示例（有效token）</Divider>
+      <JoinInvitation baseUrl="" token="valid" systemName="Leapin" />
+      <Divider titlePlacement="start">失败示例（无效token）</Divider>
+      <JoinInvitation baseUrl="" token="invalid" systemName="Leapin" />
     </PureGlobal>
   );
 });

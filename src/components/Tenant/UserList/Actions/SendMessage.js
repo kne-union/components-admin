@@ -4,7 +4,7 @@ import { App, Button, Tag, Flex } from 'antd';
 import withLocale from '../../withLocale';
 import { useIntl } from '@kne/react-intl';
 
-import { SOURCE_LABEL_MAP } from '../../constants';
+import { getSourceLabel } from '../../constants';
 
 const SendMessage = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:FormInfo', 'components-admin:Editor', 'components-core:Global@usePreset']
@@ -17,7 +17,7 @@ const SendMessage = createWithRemoteLoader({
 
   const externalUsers = selectedRows.filter(row => row.syncSource && row.sourceId);
   const syncSource = externalUsers.length > 0 ? externalUsers[0].syncSource : null;
-  const sourceLabel = SOURCE_LABEL_MAP[syncSource] || syncSource || '';
+  const sourceLabel = getSourceLabel(syncSource);
 
   const { TextArea, RadioGroup, Input } = FormInfo.fields;
 

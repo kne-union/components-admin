@@ -12,12 +12,13 @@ const TenantUserSelectInputFieldExample = createWithRemoteLoader({
   // 三个一级组织各禁用一人，点任意一级组织都能看到置灰项：
   // 技术研发中心→张伟；产品设计中心→刘芳；运营中心→周洋
   const disabledIds = ['user-1', 'user-4', 'user-7'];
+  const disabledReasons = { 'user-1': '已是面试官', 'user-4': '已在其他面试中' };
 
   return (
     <PureGlobal preset={mockPreset}>
       <Flex vertical gap={12} style={{ maxWidth: 520 }}>
         <Typography.Text type="secondary">
-          请先在左侧组织树点击「技术研发中心」（不要点灰色的公司根节点）。成员列表中「张伟」应置灰不可选；也可点「产品设计中心」看「刘芳」、「运营中心」看「周洋」。
+          请先在左侧组织树点击「技术研发中心」（不要点灰色的公司根节点）。成员列表中「张伟」应置灰不可选，并显示自定义原因「已是面试官」；也可点「产品设计中心」看「刘芳」（已在其他面试中）、「运营中心」看「周洋」（未指定原因时显示默认文案）。
         </Typography.Text>
         <TenantUserSelect.Input.Field
           value={value}
@@ -27,6 +28,7 @@ const TenantUserSelectInputFieldExample = createWithRemoteLoader({
           companyName="科技创新有限公司"
           placeholder="请选择成员"
           disabledIds={disabledIds}
+          disabledLabel={item => disabledReasons[item.id]}
           height={420}
           overlayWidth={760}
         />

@@ -1,12 +1,15 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Tag, Button, App, Descriptions, Popconfirm, Alert, Space, Tooltip } from 'antd';
+import { Flex, Tag, Button, App, Popconfirm, Tooltip, Typography } from 'antd';
 import { LinkOutlined, DisconnectOutlined, CloudSyncOutlined, LoadingOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import Fetch from '@kne/react-fetch';
 import merge from 'lodash/merge';
 import dayjs from 'dayjs';
+import { getSourceIcon } from '../constants';
+import SettingIntro from './SettingIntro';
+import style from './style.module.scss';
 
 const SOURCE_LOCALE_IDS = {
   wecom: 'SourceWecom',
@@ -30,11 +33,13 @@ const getSyncIntervalLabel = (value, formatMessage) => {
 };
 
 const STATUS_MAP = {
-  pending: { label: '待同步', color: 'default' },
-  running: { label: '同步中', color: 'processing' },
-  success: { label: '同步成功', color: 'success' },
-  failed: { label: '同步失败', color: 'error' }
+  pending: { labelId: 'OrgLinkStatusPending', color: 'default' },
+  running: { labelId: 'OrgLinkStatusRunning', color: 'processing' },
+  success: { labelId: 'OrgLinkStatusSuccess', color: 'success' },
+  failed: { labelId: 'OrgLinkStatusFailed', color: 'error' }
 };
+
+const getLinkedEnvArgs = envArgs => (envArgs || []).filter(item => item.key && item.key.startsWith('TARGET_LINKED_'));
 
 const LinkFormInner = withLocale(
   createWithRemoteLoader({
@@ -74,12 +79,10 @@ const LinkFormInner = withLocale(
             name="targetId"
             label={formatMessage({ id: 'OrgLinkTargetId' })}
             rule="REQ"
-            options={(envArgs || [])
-              .filter(item => item.key && item.key.startsWith('TARGET_LINKED_'))
-              .map(item => ({
-                value: item.key,
-                label: item.name || item.key
-              }))}
+            options={getLinkedEnvArgs(envArgs).map(item => ({
+              value: item.key,
+              label: item.name || item.key
+            }))}
             placeholder={formatMessage({ id: 'OrgLinkTargetIdPlaceholder' })}
             description={formatMessage({ id: 'OrgLinkTargetIdDesc' })}
           />
@@ -132,14 +135,35 @@ const OrgLinkSetting = createWithRemoteLoader({
         const sourceOptions = config.sourceOptions || [];
         const isLinked = config.enabled && config.source;
 
+        const targetOptions = getLinkedEnvArgs(envArgs);
+        const targetName = (targetOptions.find(item => item.key === config.targetId) || {}).name;
+
         if (!isLinked) {
           return (
             <Flex vertical gap={16}>
-              <Alert type="info" showIcon message={formatMessage({ id: 'OrgLinkHint' })} />
+              <SettingIntro
+                icon={<CloudSyncOutlined />}
+                title={formatMessage({ id: 'OrgLinkTitle' })}
+                description={formatMessage({ id: 'OrgLinkHint' })}
+              />
+              {sourceOptions.length ? (
+                <Flex vertical gap={8}>
+                  <span className={style['setting-section-title']}>{formatMessage({ id: 'OrgLinkAvailableSources' })}</span>
+                  <div className={style['setting-source-list']}>
+                    {sourceOptions.map(item => (
+                      <span key={item.value} className={style['setting-source-item']}>
+                        {getSourceIcon(item.value)}
+                        {getSourceLabel(item.value, formatMessage)}
+                      </span>
+                    ))}
+                  </div>
+                </Flex>
+              ) : null}
+              {targetOptions.length ? null : <Typography.Text type="secondary">{formatMessage({ id: 'OrgLinkNoTargetTip' })}</Typography.Text>}
               <Button
                 type="primary"
-                size="small"
                 icon={<LinkOutlined />}
+                disabled={!targetOptions.length}
                 onClick={() => {
                   formModal({
                     title: formatMessage({ id: 'OrgLinkEnable' }),
@@ -162,62 +186,86 @@ const OrgLinkSetting = createWithRemoteLoader({
                     },
                     children: <LinkFormInner envArgs={envArgs} sourceOptions={sourceOptions} />
                   });
-                }}>
+                }}
+              >
                 {formatMessage({ id: 'OrgLinkEnable' })}
               </Button>
             </Flex>
           );
         }
 
+        const statusInfo = STATUS_MAP[config.status];
+        const isRunning = config.status === 'running';
+        const fields = [
+          {
+            key: 'syncInterval',
+            label: formatMessage({ id: 'OrgLinkSyncInterval' }),
+            value: getSyncIntervalLabel(config.syncInterval, formatMessage)
+          },
+          {
+            key: 'targetId',
+            label: formatMessage({ id: 'OrgLinkTargetId' }),
+            value: targetName ? (
+              <Tooltip title={config.targetId}>
+                <span>{targetName}</span>
+              </Tooltip>
+            ) : (
+              config.targetId
+            )
+          },
+          {
+            key: 'lastSyncTime',
+            label: formatMessage({ id: 'OrgLinkLastSyncTime' }),
+            value: config.lastSyncTime && dayjs(config.lastSyncTime).isValid() ? dayjs(config.lastSyncTime).format('YYYY-MM-DD HH:mm:ss') : '—'
+          }
+        ];
+
         return (
           <Flex vertical gap={16}>
-            <Descriptions
-              column={1}
-              size="small"
-              bordered
-              items={[
-                {
-                  key: 'source',
-                  label: formatMessage({ id: 'OrgLinkSource' }),
-                  children: <Tag color="blue">{getSourceLabel(config.source, formatMessage)}</Tag>
-                },
-                {
-                  key: 'syncInterval',
-                  label: formatMessage({ id: 'OrgLinkSyncInterval' }),
-                  children: getSyncIntervalLabel(config.syncInterval, formatMessage)
-                },
-                {
-                  key: 'targetId',
-                  label: formatMessage({ id: 'OrgLinkTargetId' }),
-                  children: <Tag>{config.targetId}</Tag>
-                },
-                {
-                  key: 'lastSyncTime',
-                  label: formatMessage({ id: 'OrgLinkLastSyncTime' }),
-                  children: config.lastSyncTime && dayjs(config.lastSyncTime).isValid() ? dayjs(config.lastSyncTime).format('YYYY-MM-DD HH:mm:ss') : '—'
-                },
-                {
-                  key: 'status',
-                  label: formatMessage({ id: 'OrgLinkStatus' }),
-                  children: (() => {
-                    const statusInfo = STATUS_MAP[config.status] || { label: config.status || '—', color: 'default' };
-                    return <Tag color={statusInfo.color} icon={config.status === 'running' ? <LoadingOutlined /> : null}>{statusInfo.label}</Tag>;
-                  })()
-                }
-              ]}
+            <SettingIntro
+              icon={<CloudSyncOutlined />}
+              title={formatMessage({ id: 'OrgLinkTitle' })}
+              description={formatMessage({ id: 'OrgLinkHint' })}
             />
-            <Flex gap={8} justify="flex-end">
-              <Tooltip title={config.status === 'running' ? formatMessage({ id: 'OrgLinkSyncRunningTip' }) : null}>
-                <Button type="primary" size="small" icon={<CloudSyncOutlined />} loading={syncLoading || config.status === 'running'} disabled={config.status === 'running'} onClick={() => handleManualSync(reload)}>
-                  {formatMessage({ id: 'OrgLinkManualSync' })}
-                </Button>
-              </Tooltip>
-              <Popconfirm title={formatMessage({ id: 'OrgLinkCancelConfirm' })} onConfirm={() => handleCancelLink(reload)}>
-                <Button danger size="small" icon={<DisconnectOutlined />}>
-                  {formatMessage({ id: 'OrgLinkCancel' })}
-                </Button>
-              </Popconfirm>
-            </Flex>
+            <div className={style['setting-card']}>
+              <Flex gap={12} align="center">
+                <span className={style['setting-card-icon']}>{getSourceIcon(config.source)}</span>
+                <Flex vertical className={style['setting-card-main']}>
+                  <span className={style['setting-card-name']}>{getSourceLabel(config.source, formatMessage)}</span>
+                  <span className={style['setting-card-sub']}>{formatMessage({ id: 'OrgLinkSource' })}</span>
+                </Flex>
+                <Tag bordered={false} color={statusInfo ? statusInfo.color : 'default'} icon={isRunning ? <LoadingOutlined /> : null}>
+                  {statusInfo ? formatMessage({ id: statusInfo.labelId }) : config.status || '—'}
+                </Tag>
+              </Flex>
+              <div className={style['setting-card-fields']}>
+                {fields.map(item => (
+                  <Fragment key={item.key}>
+                    <span className={style['setting-card-label']}>{item.label}</span>
+                    <span className={style['setting-card-value']}>{item.value}</span>
+                  </Fragment>
+                ))}
+              </div>
+              <Flex gap={8} justify="flex-end" className={style['setting-card-footer']}>
+                <Popconfirm title={formatMessage({ id: 'OrgLinkCancelConfirm' })} onConfirm={() => handleCancelLink(reload)}>
+                  <Button danger size="small" type="text" icon={<DisconnectOutlined />}>
+                    {formatMessage({ id: 'OrgLinkCancel' })}
+                  </Button>
+                </Popconfirm>
+                <Tooltip title={isRunning ? formatMessage({ id: 'OrgLinkSyncRunningTip' }) : null}>
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<CloudSyncOutlined />}
+                    loading={syncLoading || isRunning}
+                    disabled={isRunning}
+                    onClick={() => handleManualSync(reload)}
+                  >
+                    {formatMessage({ id: 'OrgLinkManualSync' })}
+                  </Button>
+                </Tooltip>
+              </Flex>
+            </div>
           </Flex>
         );
       }}

@@ -763,30 +763,28 @@
   -webkit-box-orient: vertical;
 }
 
+// 两列网格：标签列取最长标签宽度（至少 64px），各行的值左对齐
 .card-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: minmax(64px, max-content) minmax(0, 1fr);
+  gap: 4px 12px;
   padding: 8px 12px;
   border-radius: 6px;
+  font-size: 13px;
+  line-height: 20px;
   background: var(--bg-color-grey-1, #fafafa);
 }
 
 .card-field {
-  display: flex;
-  gap: 12px;
-  min-width: 0;
-  font-size: 13px;
-  line-height: 20px;
+  display: contents;
 }
 
 .card-field-label {
-  flex: 0 0 64px;
+  white-space: nowrap;
   color: var(--font-color-grey-1, #999);
 }
 
 .card-field-value {
-  flex: 1;
   min-width: 0;
   word-break: break-word;
 }

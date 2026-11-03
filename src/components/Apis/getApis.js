@@ -233,6 +233,10 @@ const getApis = options => {
         templatePreview: {
           url: `${prefix}/tenant/admin/mail-setting/template-preview`,
           method: 'POST'
+        },
+        templateSetTenantOpen: {
+          url: `${prefix}/tenant/admin/mail-setting/template-set-tenant-open`,
+          method: 'POST'
         }
       },
       create: {

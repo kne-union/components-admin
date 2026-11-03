@@ -1,6 +1,22 @@
-import { createRequest, filterTemplates, filterTemplatesByType, getSmtpConnectionKey, getSmtpSaveState, toSmtpFormData, toSmtpPayload } from './utils';
+import {
+  createRequest,
+  filterTemplates,
+  filterTemplatesByType,
+  getSmtpConnectionKey,
+  getSmtpSaveState,
+  getTenantOpenState,
+  toSmtpFormData,
+  toSmtpPayload
+} from './utils';
 
 describe('MailSetting utils', () => {
+  test('getTenantOpenState 区分对租户开放、关闭、平台未开放，旧接口无字段时为 null', () => {
+    expect(getTenantOpenState({ platformOpen: true, tenantOpen: true })).toBe('open');
+    expect(getTenantOpenState({ platformOpen: true, tenantOpen: false })).toBe('closed');
+    expect(getTenantOpenState({ platformOpen: false, tenantOpen: true })).toBe('platformClosed');
+    expect(getTenantOpenState({ code: 'A' })).toBe(null);
+  });
+
   test('createRequest 按请求方法放入 params / data，并带上 tenantId', () => {
     expect(createRequest({ url: '/smtp-detail', method: 'GET' }, 't1')).toEqual({ url: '/smtp-detail', method: 'GET', params: { tenantId: 't1' } });
     expect(createRequest({ url: '/template-save', method: 'POST' }, 't1', { code: 'welcome' })).toEqual({

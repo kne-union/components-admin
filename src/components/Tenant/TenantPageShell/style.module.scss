@@ -1,0 +1,9 @@
+.shell :global(.container-right-inner) {
+  max-height: calc(min(var(--out-inner-height), var(--max-height)) - 76px);
+}
+
+.language {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+}

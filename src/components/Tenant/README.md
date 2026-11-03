@@ -82,6 +82,7 @@ const Fetch = reactFetch.default;
 
 const tenant = tenantAdminData.tenantDetail;
 const tenantId = tenant.id;
+const envArgs = [...(tenant.tenantSetting?.args || []), { key: 'TARGET_LINKED_DEMO', name: '示例企业账号' }];
 
 const orgApis = {
   create: Object.assign({}, mockPreset.apis.tenantAdmin.orgCreate, {
@@ -110,6 +111,15 @@ const orgApis = {
     data: { tenantId }
   }),
   orgLinkCancel: Object.assign({}, mockPreset.apis.tenantAdmin.orgLinkCancel, {
+    data: { tenantId }
+  }),
+  thirdLoginConfig: Object.assign({}, mockPreset.apis.tenantAdmin.thirdLoginConfig, {
+    params: { tenantId }
+  }),
+  thirdLoginConfigSave: Object.assign({}, mockPreset.apis.tenantAdmin.thirdLoginConfigSave, {
+    data: { tenantId }
+  }),
+  thirdLoginConfigCancel: Object.assign({}, mockPreset.apis.tenantAdmin.thirdLoginConfigCancel, {
     data: { tenantId }
   })
 };
@@ -144,11 +154,12 @@ const OrgInfoExample = createWithRemoteLoader({
                       syncSupported
                         ? {
                             tenantId,
-                            envArgs: tenant.tenantSetting?.args || [],
+                            envArgs,
                             onLinkChange: reloadLinkConfig
                           }
                         : null
                     }
+                    thirdLoginSettingProps={{ envArgs }}
                     apis={orgApis}
                   />
                 )}
@@ -286,14 +297,12 @@ const { default: mockPreset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
 
 const LoginTenantExample = createWithRemoteLoader({
-  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
+  modules: ['components-core:Global@PureGlobal']
 })(({ remoteModules }) => {
-  const [PureGlobal, Layout] = remoteModules;
+  const [PureGlobal] = remoteModules;
   return (
     <PureGlobal preset={mockPreset}>
-      <Layout navigation={{ isFixed: false }}>
-        <LoginTenant tenantPath="/tenant" />
-      </Layout>
+      <LoginTenant tenantPath="/tenant" systemName="Leapin" />
     </PureGlobal>
   );
 });
@@ -532,24 +541,18 @@ render(<ThirdLoginResultExample />);
 const { JoinInvitation } = _Tenant;
 const { default: mockPreset } = _mockPreset;
 const { createWithRemoteLoader } = remoteLoader;
-const { Card, Flex } = antd;
+const { Divider } = antd;
 
 const JoinInvitationExample = createWithRemoteLoader({
-  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
+  modules: ['components-core:Global@PureGlobal']
 })(({ remoteModules }) => {
-  const [PureGlobal, Layout] = remoteModules;
+  const [PureGlobal] = remoteModules;
   return (
     <PureGlobal preset={mockPreset}>
-      <Layout navigation={{ isFixed: false }}>
-        <Flex vertical gap={24}>
-          <Card title="成功示例（有效token）">
-            <JoinInvitation baseUrl="" token="valid" />
-          </Card>
-          <Card title="失败示例（无效token）">
-            <JoinInvitation baseUrl="" token="invalid" />
-          </Card>
-        </Flex>
-      </Layout>
+      <Divider titlePlacement="start">成功示例（有效token）</Divider>
+      <JoinInvitation baseUrl="" token="valid" systemName="Leapin" />
+      <Divider titlePlacement="start">失败示例（无效token）</Divider>
+      <JoinInvitation baseUrl="" token="invalid" systemName="Leapin" />
     </PureGlobal>
   );
 });
@@ -1034,7 +1037,7 @@ render(<TenantUserSelectInputModalExample />);
 ```
 
 - 按组织选择成员（SelectInput.Field + disabledIds）
-- TenantUserSelect.Input.Field 纯控件示例；演示 disabledIds 禁用指定成员（张伟 user-1 置灰不可选）
+- TenantUserSelect.Input.Field 纯控件示例；演示 disabledIds 禁用指定成员（张伟 user-1 置灰不可选），disabledLabel 按成员自定义禁用原因
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
 
 ```jsx
@@ -1052,12 +1055,13 @@ const TenantUserSelectInputFieldExample = createWithRemoteLoader({
   // 三个一级组织各禁用一人，点任意一级组织都能看到置灰项：
   // 技术研发中心→张伟；产品设计中心→刘芳；运营中心→周洋
   const disabledIds = ['user-1', 'user-4', 'user-7'];
+  const disabledReasons = { 'user-1': '已是面试官', 'user-4': '已在其他面试中' };
 
   return (
     <PureGlobal preset={mockPreset}>
       <Flex vertical gap={12} style={{ maxWidth: 520 }}>
         <Typography.Text type="secondary">
-          请先在左侧组织树点击「技术研发中心」（不要点灰色的公司根节点）。成员列表中「张伟」应置灰不可选；也可点「产品设计中心」看「刘芳」、「运营中心」看「周洋」。
+          请先在左侧组织树点击「技术研发中心」（不要点灰色的公司根节点）。成员列表中「张伟」应置灰不可选，并显示自定义原因「已是面试官」；也可点「产品设计中心」看「刘芳」（已在其他面试中）、「运营中心」看「周洋」（未指定原因时显示默认文案）。
         </Typography.Text>
         <TenantUserSelect.Input.Field
           value={value}
@@ -1067,6 +1071,7 @@ const TenantUserSelectInputFieldExample = createWithRemoteLoader({
           companyName="科技创新有限公司"
           placeholder="请选择成员"
           disabledIds={disabledIds}
+          disabledLabel={item => disabledReasons[item.id]}
           height={420}
           overlayWidth={760}
         />
@@ -1281,17 +1286,24 @@ render(<ManagedSettingExample />);
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | tenantPath | 登录成功跳转路径 | string | - |
-| embedded | 嵌入宿主 Page（如 `@kne/system-layout`）的样式：标题、说明与租户列表居中成一块，点击租户直接进入 | boolean | false |
+| embedded | 嵌入宿主 Page（如 `@kne/system-layout`）时只渲染标题与租户列表，不带登录页外壳 | boolean | false |
+| systemName | 登录页外壳左上角的系统名称 | string | - |
+| systemLogo | 登录页外壳左上角的系统 Logo | string \| ReactNode | - |
 | children | 自定义渲染，参数为 `{ children, backgroundColor }` | function | - |
 
-preset 中存在 `oidc`（`components-admin:Oidc` 的 `createOidcClient`）时：当前租户取令牌中的租户；点击卡片仅选中，点「进入租户」时若与当前租户不同，调用 `oidc.switchTenant` 重新签发令牌后进入 `tenantPath`（`embedded` 时点击即进入）。没有 `oidc` 时沿用切换默认租户接口。
+默认使用与登录页相同的 Layout（`Account` 的 `LoginOuterContainer`），不带系统主导航。样式与 `Oidc` 交互页的选择租户一致，点击租户即进入 `tenantPath`。点击的不是当前租户时：preset 中存在 `oidc`（`components-admin:Oidc` 的 `createOidcClient`）则调用 `oidc.switchTenant` 重新签发令牌（托管租户除外）；否则先调用切换默认租户接口。
 
 ### JoinInvitation 邀请加入
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | baseUrl | 基础路径 | string | '' |
+| token | 邀请 token，不传时取 URL 的 `token` 参数 | string | - |
+| systemName | 登录页外壳左上角的系统名称 | string | - |
+| systemLogo | 登录页外壳左上角的系统 Logo | string \| ReactNode | - |
 | children | 自定义渲染 | function | - |
+
+流程分三步：确认公司信息（公司摘要：Logo、名称、标签、行业、规模、成立日期、地址、主页、简介）→ 确认员工信息 → 完成后倒计时进入 `${baseUrl}/tenant`。
 
 ### Setting 系统设置
 
@@ -1319,7 +1331,7 @@ preset 中存在 `oidc`（`components-admin:Oidc` 的 `createOidcClient`）时�
 - 消息模版：列出可自定义的系统邮件与短信模版（租户端只列出平台在「消息管理 → 消息模版」中开放给租户的模版），「自定义」以系统模版为底稿编辑（邮件改主题与正文，短信改内容），保存后成为本租户模版，可启用/禁用、恢复默认、预览；工具栏可按名称 / 编码搜索、按类型筛选；模版相关请求均带 `type`
 - `MailSetting.SmtpSetting`、`MailSetting.TemplateList` 可单独使用，属性同上
 
-`apis.*.mailSetting` 包含：`smtpDetail`、`smtpSave`、`smtpRemove`、`smtpTest`、`templateList`、`templateDetail`、`templateCustomize`、`templateSave`、`templateSetStatus`、`templateReset`、`templatePreview`，对应 `@kne/fastify-tenant` 的 `/mail-setting/*` 与 `/admin/mail-setting/*` 接口。
+`apis.*.mailSetting` 包含：`smtpDetail`、`smtpSave`、`smtpRemove`、`smtpTest`、`templateList`、`templateDetail`、`templateCustomize`、`templateSave`、`templateSetStatus`、`templateReset`、`templatePreview`，对应 `@kne/fastify-tenant` 的 `/mail-setting/*` 与 `/admin/mail-setting/*` 接口；管理端（`apis.tenantAdmin.mailSetting`）另有 `templateSetTenantOpen`，模版列表据此显示「租户端管理」列与「开放给租户 / 关闭租户管理」操作，只对当前租户生效。
 
 ### TenantUserSelect 按组织选择租户用户
 
@@ -1336,6 +1348,7 @@ preset 中存在 `oidc`（`components-admin:Oidc` 的 `createOidcClient`）时�
 | single | 是否单选 | boolean | true |
 | disabled | 是否禁用 | boolean | false |
 | disabledIds | 不可选中的成员 id 列表（仍展示，置灰不可点选） | array | - |
+| disabledLabel | 禁用成员右侧的原因标签：字符串 / ReactNode 全部共用，或 `(item) => label` 按成员返回；返回空值用默认文案「不可选」，返回 `false` 不显示标签 | string \| ReactNode \| function | - |
 | showSelectedFooter | 是否在底部展示已选成员，支持点击标签移除 | boolean | true |
 | allowSelectAll | 多选时是否展示全选 | boolean | true |
 | userStatus | 成员状态筛选：`open` / `closed`（兼容 `active` → `open`、`inactive` → `closed`） | string | - |

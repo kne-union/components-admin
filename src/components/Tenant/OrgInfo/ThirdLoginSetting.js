@@ -1,11 +1,13 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import { Flex, Tag, Button, App, Alert, Popconfirm, List, Typography } from 'antd';
-import { PlusOutlined, DisconnectOutlined } from '@ant-design/icons';
+import { Flex, Button, App, Popconfirm, Tooltip, Empty } from 'antd';
+import { PlusOutlined, DisconnectOutlined, LoginOutlined } from '@ant-design/icons';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import Fetch from '@kne/react-fetch';
 import merge from 'lodash/merge';
 import { getSourceIcon, SOURCE_LABEL_MAP } from '../constants';
+import SettingIntro from './SettingIntro';
+import style from './style.module.scss';
 
 const getSourceLabel = (value, sourceOptions) => {
   const item = (sourceOptions || []).find(o => o.value === value);
@@ -89,72 +91,90 @@ const ThirdLoginSetting = createWithRemoteLoader({
         const usedTargetIds = list.map(item => item.targetId).filter(Boolean);
         const availableTargets = getLinkedEnvArgs(envArgs).filter(item => !usedTargetIds.includes(item.key));
 
+        const targetNameMap = new Map(getLinkedEnvArgs(envArgs).map(item => [item.key, item.name]));
+        const canAdd = availableTargets.length > 0 && sourceOptions.length > 0;
+
+        const handleAdd = () => {
+          formModal({
+            title: formatMessage({ id: 'ThirdLoginConfigAdd' }),
+            size: 'small',
+            formProps: {
+              onSubmit: async formData => {
+                const { data: resData } = await ajax(
+                  merge({}, apis.thirdLoginConfigSave, {
+                    data: Object.assign({}, formData)
+                  })
+                );
+                if (resData.code !== 0) {
+                  return false;
+                }
+                message.success(formatMessage({ id: 'ThirdLoginConfigSaveSuccess' }));
+                reload();
+                onSuccess && onSuccess();
+              }
+            },
+            children: <LinkFormInner envArgs={envArgs} sourceOptions={sourceOptions} usedTargetIds={usedTargetIds} />
+          });
+        };
+
         return (
           <Flex vertical gap={16}>
-            <Alert type="info" showIcon message={formatMessage({ id: 'ThirdLoginConfigHint' })} />
+            <SettingIntro
+              icon={<LoginOutlined />}
+              title={formatMessage({ id: 'ThirdLoginConfigTitle' })}
+              description={formatMessage({ id: 'ThirdLoginConfigHint' })}
+            />
+            <Flex justify="space-between" align="center">
+              <span className={style['setting-section-title']}>
+                {formatMessage({ id: 'ThirdLoginConfigListTitle' })}
+                <span className={style['setting-section-count']}>{list.length}</span>
+              </span>
+              {canAdd ? (
+                <Button type="link" size="small" icon={<PlusOutlined />} onClick={handleAdd}>
+                  {formatMessage({ id: 'ThirdLoginConfigAdd' })}
+                </Button>
+              ) : null}
+            </Flex>
             {list.length ? (
-              <List
-                size="small"
-                bordered
-                dataSource={list}
-                renderItem={item => (
-                  <List.Item
-                    key={`${item.source}-${item.targetId}`}
-                    actions={[
+              <Flex vertical gap={8}>
+                {list.map(item => {
+                  const targetName = targetNameMap.get(item.targetId);
+                  return (
+                    <Flex key={`${item.source}-${item.targetId}`} className={style['setting-card']} gap={12} align="center">
+                      <span className={style['setting-card-icon']}>{getSourceIcon(item.source)}</span>
+                      <Flex vertical className={style['setting-card-main']}>
+                        <span className={style['setting-card-name']}>
+                          {SOURCE_LABEL_MAP[item.source] || getSourceLabel(item.source, sourceOptions)}
+                        </span>
+                        <Tooltip title={targetName ? item.targetId : null}>
+                          <span className={style['setting-card-sub']}>{targetName || item.targetId}</span>
+                        </Tooltip>
+                      </Flex>
                       <Popconfirm
-                        key="cancel"
                         title={formatMessage({ id: 'ThirdLoginConfigCancelConfirm' })}
-                        onConfirm={() => handleCancel({ source: item.source, targetId: item.targetId }, reload)}>
-                        <Button danger size="small" type="link" icon={<DisconnectOutlined />}>
+                        onConfirm={() => handleCancel({ source: item.source, targetId: item.targetId }, reload)}
+                      >
+                        <Button danger size="small" type="text" icon={<DisconnectOutlined />}>
                           {formatMessage({ id: 'ThirdLoginConfigCancel' })}
                         </Button>
                       </Popconfirm>
-                    ]}>
-                    <List.Item.Meta
-                      avatar={getSourceIcon(item.source, { style: { width: 24, height: 24, maxWidth: 24, maxHeight: 24 } })}
-                      title={
-                        <Flex gap={8} align="center">
-                          <Typography.Text>{SOURCE_LABEL_MAP[item.source] || getSourceLabel(item.source, sourceOptions)}</Typography.Text>
-                          <Tag>{item.targetId}</Tag>
-                        </Flex>
-                      }
-                    />
-                  </List.Item>
-                )}
-              />
+                    </Flex>
+                  );
+                })}
+              </Flex>
             ) : (
-              <Typography.Text type="secondary">{formatMessage({ id: 'ThirdLoginConfigEmpty' })}</Typography.Text>
+              <Empty
+                className={style['setting-empty']}
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={formatMessage({ id: canAdd ? 'ThirdLoginConfigEmpty' : 'ThirdLoginConfigNoTarget' })}
+              >
+                {canAdd ? (
+                  <Button type="primary" size="small" icon={<PlusOutlined />} onClick={handleAdd}>
+                    {formatMessage({ id: 'ThirdLoginConfigAdd' })}
+                  </Button>
+                ) : null}
+              </Empty>
             )}
-            {availableTargets.length && sourceOptions.length ? (
-              <Button
-                type="primary"
-                size="small"
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  formModal({
-                    title: formatMessage({ id: 'ThirdLoginConfigAdd' }),
-                    size: 'small',
-                    formProps: {
-                      onSubmit: async formData => {
-                        const { data: resData } = await ajax(
-                          merge({}, apis.thirdLoginConfigSave, {
-                            data: Object.assign({}, formData)
-                          })
-                        );
-                        if (resData.code !== 0) {
-                          return false;
-                        }
-                        message.success(formatMessage({ id: 'ThirdLoginConfigSaveSuccess' }));
-                        reload();
-                        onSuccess && onSuccess();
-                      }
-                    },
-                    children: <LinkFormInner envArgs={envArgs} sourceOptions={sourceOptions} usedTargetIds={usedTargetIds} />
-                  });
-                }}>
-                {formatMessage({ id: 'ThirdLoginConfigAdd' })}
-              </Button>
-            ) : null}
           </Flex>
         );
       }}

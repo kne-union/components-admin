@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import { Space, Tag } from 'antd';
 import UserOrgTags from './UserOrgTags';
 import buildRolesTitle from '../Role/buildRolesTitle';
-import { getSourceIcon, SOURCE_LABEL_MAP, SOURCE_TAG_CLASS } from '../constants';
+import { getSourceIcon, getSourceLabel, SOURCE_LABEL_MAP, SOURCE_TAG_CLASS } from '../constants';
 import listThirdLoginBindings from './listThirdLoginBindings';
 
 const getColumns = ({ formatMessage }) => {
@@ -52,10 +52,9 @@ const getColumns = ({ formatMessage }) => {
         if (!item.syncSource) {
           return formatMessage({ id: 'SyncedInternal' });
         }
-        const label = SOURCE_LABEL_MAP[item.syncSource] || item.syncSource;
         return (
-          <Tag className={SOURCE_TAG_CLASS} icon={getSourceIcon(item.syncSource)} color="processing">
-            {label}
+          <Tag className={SOURCE_TAG_CLASS} title={item.syncSource} icon={getSourceIcon(item.syncSource)} color="processing">
+            {getSourceLabel(item.syncSource)}
           </Tag>
         );
       }

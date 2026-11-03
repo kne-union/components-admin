@@ -63,7 +63,15 @@ const locale = {
   TemplateType: '类型',
   EmailType: '邮件',
   SmsType: '短信',
-  SmsContent: '短信内容'
+  SmsContent: '短信内容',
+  TenantManage: '租户端管理',
+  TenantOpen: '已开放',
+  TenantClosed: '未开放',
+  PlatformClosed: '平台未开放',
+  OpenTenantManage: '开放给租户',
+  CloseTenantManage: '关闭租户管理',
+  OpenTenantManageConfirm: '开放后该租户可在租户端查看并自定义此模版，确定开放？',
+  CloseTenantManageConfirm: '关闭后该租户在租户端看不到此模版，已自定义的内容仍照常发送，平台仍可代为管理，确定关闭？'
 };
 
 export default locale;

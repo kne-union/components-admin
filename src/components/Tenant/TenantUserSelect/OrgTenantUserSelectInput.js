@@ -21,6 +21,7 @@ const CONFIG_KEYS = [
   'valueKey',
   'labelKey',
   'disabledIds',
+  'disabledLabel',
   'isPopup',
   'overlayWidth'
 ];
@@ -39,7 +40,7 @@ const InputControl = props => {
 const OrgTenantUserSelectInput = createWithRemoteLoader({
   modules: ['components-core:FormInfo@hooks']
 })(
-  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height = 480, valueKey = 'id', labelKey = 'name', disabledIds, isPopup = true, overlayWidth = 720, ...props }) => {
+  withLocale(({ remoteModules, orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height = 480, valueKey = 'id', labelKey = 'name', disabledIds, disabledLabel, isPopup = true, overlayWidth = 720, ...props }) => {
     const [hooks] = remoteModules;
     const { useOnChange } = hooks;
     const { formatMessage } = useIntl();
@@ -69,10 +70,11 @@ const OrgTenantUserSelectInput = createWithRemoteLoader({
         valueKey,
         labelKey,
         disabledIds,
+        disabledLabel,
         isPopup,
         overlayWidth
       }),
-      [orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey, labelKey, disabledIds, isPopup, overlayWidth]
+      [orgApi, userApi, userStatus, companyName, showOrgRoot, single, showSelectedFooter, allowSelectAll, initialSelectedMeta, height, valueKey, labelKey, disabledIds, disabledLabel, isPopup, overlayWidth]
     );
 
     return (
@@ -84,7 +86,7 @@ const OrgTenantUserSelectInput = createWithRemoteLoader({
 );
 
 OrgTenantUserSelectInput.Field = withLocale(
-  ({ orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height = 480, valueKey = 'id', labelKey = 'name', disabledIds, isPopup = true, overlayWidth = 720, ...props }) => (
+  ({ orgApi, userApi, userStatus, companyName, showOrgRoot = true, single = true, showSelectedFooter = true, allowSelectAll = true, initialSelectedMeta, height = 480, valueKey = 'id', labelKey = 'name', disabledIds, disabledLabel, isPopup = true, overlayWidth = 720, ...props }) => (
     <TenantUserSelectInputControl
       {...omit(props, CONFIG_KEYS)}
       orgApi={orgApi}
@@ -100,6 +102,7 @@ OrgTenantUserSelectInput.Field = withLocale(
       valueKey={valueKey}
       labelKey={labelKey}
       disabledIds={disabledIds}
+      disabledLabel={disabledLabel}
       isPopup={isPopup}
       overlayWidth={overlayWidth}
     />
