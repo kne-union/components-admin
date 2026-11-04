@@ -1,10 +1,10 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useSearchParams } from 'react-router-dom';
-import { App, Button, Flex, Result, Spin, Tag, Typography, Empty, Avatar } from 'antd';
-import { CheckOutlined, UserOutlined } from '@ant-design/icons';
+import { App, Button, Flex, Input, Result, Spin, Tag, Typography, Empty, Avatar } from 'antd';
+import { ArrowRightOutlined, CheckOutlined, MobileOutlined, SafetyCertificateOutlined, UserOutlined } from '@ant-design/icons';
 import Fetch from '@kne/react-fetch';
 import { useIntl } from '@kne/react-intl';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import md5 from 'md5';
 import LoginIllustration from '@components/LoginIllustration';
@@ -181,6 +181,125 @@ const ConsentStep = ({ data, apis, submit, loading }) => {
   );
 };
 
+const useCountdown = initial => {
+  const [seconds, setSeconds] = useState(initial || 0);
+  useEffect(() => {
+    if (seconds <= 0) {
+      return;
+    }
+    const timer = setTimeout(() => setSeconds(value => value - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [seconds]);
+  return [seconds, setSeconds];
+};
+
+const MfaPhoneMissing = ({ apis, submit, loading }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <div className={style['mfa']}>
+      <span className={classnames(style['mfa-icon'], style['mfa-icon-warning'])}>
+        <MobileOutlined />
+      </span>
+      <div className={style['mfa-title']}>{formatMessage({ id: 'OidcMfaPhoneMissing' })}</div>
+      <p className={style['mfa-desc']}>{formatMessage({ id: 'OidcMfaPhoneMissingDesc' })}</p>
+      <Button type="primary" block size="large" className={style['mfa-submit']} loading={loading} onClick={() => submit(apis.mfaSend)}>
+        {formatMessage({ id: 'OidcMfaBack' })}
+      </Button>
+    </div>
+  );
+};
+
+const MFA_CODE_LENGTH = 6;
+
+const MfaStep = ({ data, apis, submit, loading }) => {
+  const { formatMessage } = useIntl();
+  const mfa = data.mfa || {};
+  const [wait, setWait] = useCountdown(mfa.resendAfter);
+  const [sending, setSending] = useState(false);
+  const [code, setCode] = useState('');
+  const autoSentRef = useRef(mfa.resendAfter > 0);
+
+  const sendCode = async () => {
+    setSending(true);
+    try {
+      const result = await submit(apis.mfaSend);
+      if (result) {
+        setWait(result.resendAfter || 0);
+      }
+    } finally {
+      setSending(false);
+    }
+  };
+
+  useEffect(() => {
+    if (mfa.phoneMissing || autoSentRef.current) {
+      return;
+    }
+    autoSentRef.current = true;
+    sendCode();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (mfa.phoneMissing) {
+    return <MfaPhoneMissing apis={apis} submit={submit} loading={loading} />;
+  }
+
+  const verify = async (value = code) => {
+    const result = await submit(apis.mfaVerify, { code: value });
+    if (!result) {
+      setCode('');
+    }
+  };
+
+  const handleCodeChange = value => {
+    setCode(value);
+    if (value.length === MFA_CODE_LENGTH && !loading) {
+      verify(value);
+    }
+  };
+
+  return (
+    <div className={style['mfa']}>
+      <span className={style['mfa-icon']}>
+        <SafetyCertificateOutlined />
+      </span>
+      <div className={style['mfa-title']}>{formatMessage({ id: 'OidcMfaTitle' })}</div>
+      <p className={style['mfa-desc']}>{formatMessage({ id: 'OidcMfaCodeSent' }, { length: MFA_CODE_LENGTH, phone: mfa.phoneMasked })}</p>
+      <Input.OTP
+        className={style['mfa-otp']}
+        type="number"
+        size="large"
+        length={MFA_CODE_LENGTH}
+        value={code}
+        onChange={handleCodeChange}
+        autoFocus
+      />
+      <div className={style['mfa-resend']}>
+        <span>{formatMessage({ id: 'OidcMfaNotReceived' })}</span>
+        {wait > 0 ? (
+          <span className={style['mfa-resend-countdown']}>{wait}s</span>
+        ) : (
+          <Button type="link" size="small" className={style['mfa-resend-btn']} loading={sending} onClick={sendCode}>
+            {formatMessage({ id: 'OidcMfaResend' })}
+          </Button>
+        )}
+      </div>
+      <Button
+        type="primary"
+        block
+        size="large"
+        className={style['mfa-submit']}
+        disabled={code.length !== MFA_CODE_LENGTH}
+        loading={loading && !sending}
+        onClick={() => verify()}
+      >
+        {formatMessage({ id: 'OidcMfaVerify' })}
+        <ArrowRightOutlined />
+      </Button>
+    </div>
+  );
+};
+
 const InteractionInner = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset']
 })(({ remoteModules, uid, data, accountType, registerUrl, forgetUrl, loginTitle }) => {
@@ -209,6 +328,9 @@ const InteractionInner = createWithRemoteLoader({
     }
     if (promptName === 'tenant') {
       return <TenantStep {...stepProps} />;
+    }
+    if (promptName === 'mfa') {
+      return <MfaStep {...stepProps} />;
     }
     if (promptName === 'consent') {
       return <ConsentStep {...stepProps} />;

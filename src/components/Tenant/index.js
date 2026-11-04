@@ -10,6 +10,7 @@ export { default as Authenticate } from './Authenticate';
 export { default as AfterTenantLoginLayout } from './AfterTenantLoginLayout';
 export { default as Setting } from './Setting';
 export { default as MailSetting } from './MailSetting';
+export { default as MfaSetting } from './MfaSetting';
 export { default as TenantUserSelect } from './TenantUserSelect';
 export { default as ThirdLogin, ThirdLoginResult } from './ThirdLogin';
 export { PermissionPanel } from './TenantPermission';

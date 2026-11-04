@@ -39,7 +39,7 @@
 
 ### Interaction
 
-IdP 登录交互页，路由路径需与 fastify-oidc 的 `interactionPage`（默认 `/oidc-interaction`）一致。从 URL `uid` 读取交互，按步骤展示登录 / 选择租户 / 授权确认。该路由与 `Callback` 路由都不能被 `OidcAuthenticate` 包裹。
+IdP 登录交互页，路由路径需与 fastify-oidc 的 `interactionPage`（默认 `/oidc-interaction`）一致。从 URL `uid` 读取交互，按步骤展示登录 / 选择租户 / 短信验证（MFA）/ 授权确认。该路由与 `Callback` 路由都不能被 `OidcAuthenticate` 包裹。
 
 #### 属性说明
 
@@ -56,6 +56,8 @@ IdP 登录交互页，路由路径需与 fastify-oidc 的 `interactionPage`（�
 | allowLanguageSwitch | boolean | 否 | `true` | 右上角显示语言切换，与 Account 登录页一致 |
 
 交互页外层与 Account 登录页相同（`Account` 的 `Layout`：主题色全屏背景、卡片居中）。本系统自己登录（交互的 client 即 `preset.oidc` 的 clientId）时不显示「取消登录」；其它 client（子项目）跳转来时显示，取消后带 `access_denied` 回到该子项目。
+
+租户开启短信 MFA 时（prompt 为 `mfa`），交互详情带 `mfa: { method, tenantId, maxAge, phoneMissing, phoneMasked, resendAfter }`：进入该步骤时自动向脱敏手机号发送验证码（`resendAfter` 大于 0 说明刚发过，不再重复发送），用 6 位 OTP 输入框填写，填满即自动验证（也可手动点「验证」），未收到可在倒计时结束后「重新发送」；`phoneMissing` 为 `true` 时提示未绑定手机号，点「返回应用」以 `access_denied` 结束本次登录。
 
 登录会话失效（uid 过期 / 已使用）或缺少 uid 时显示「登录会话已失效」与「返回登录」：有 `preset.oidc` 时调用 `oidc.login({ returnTo: '/' })` 重新发起登录，否则跳回应用首页。
 
@@ -146,5 +148,7 @@ IdP 登录交互页，路由路径需与 fastify-oidc 的 `interactionPage`（�
 | details | GET | `{oidcPrefix}/interaction/{uid}/details` |
 | login | POST | `{oidcPrefix}/interaction/{uid}/login` |
 | tenant | POST | `{oidcPrefix}/interaction/{uid}/tenant` |
+| mfaSend | POST | `{oidcPrefix}/interaction/{uid}/mfa/send` |
+| mfaVerify | POST | `{oidcPrefix}/interaction/{uid}/mfa/verify`（body：`code`） |
 | confirm | POST | `{oidcPrefix}/interaction/{uid}/confirm` |
 | abort | POST | `{oidcPrefix}/interaction/{uid}/abort` |

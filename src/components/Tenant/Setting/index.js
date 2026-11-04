@@ -8,6 +8,7 @@ import Org from './Org';
 import User from './User';
 import Permission from './Permission';
 import Mail from './Mail';
+import Mfa from './Mfa';
 
 const Setting = createWithRemoteLoader({
   modules: ['components-core:Layout@Menu']
@@ -43,6 +44,12 @@ const Setting = createWithRemoteLoader({
             label: formatMessage({ id: 'MailSettingPage' }),
             path: `${baseUrl}/mail`,
             request: ['setting:mail-setting']
+          },
+          {
+            key: 'mfa',
+            label: formatMessage({ id: 'MfaSettingPage' }),
+            path: `${baseUrl}/mfa`,
+            request: ['setting:mfa-setting']
           }
         ]}
       />
@@ -75,6 +82,10 @@ const Setting = createWithRemoteLoader({
           {
             path: 'mail',
             element: <Mail menu={menu} pageProps={pageProps} baseUrl={baseUrl} />
+          },
+          {
+            path: 'mfa',
+            element: <Mfa menu={menu} pageProps={pageProps} baseUrl={baseUrl} />
           }
         ]}
       />
@@ -87,5 +98,6 @@ Setting.Org = Org;
 Setting.User = User;
 Setting.Permission = Permission;
 Setting.Mail = Mail;
+Setting.Mfa = Mfa;
 
 export default Setting;

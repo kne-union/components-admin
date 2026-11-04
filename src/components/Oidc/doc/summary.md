@@ -2,7 +2,7 @@
 
 **核心特性**
 
-- **登录交互页**：`Interaction` 一页覆盖账号登录、多租户选择、第三方授权确认三个步骤，复用账号中心的登录界面风格
+- **登录交互页**：`Interaction` 一页覆盖账号登录、多租户选择、租户短信验证（MFA）、第三方授权确认等步骤，复用账号中心的登录界面风格
 - **浏览器端 OIDC client**：`createOidcClient` 基于 oauth4webapi 实现授权码 + PKCE，自动保存与刷新令牌，多标签页共享登录态
 - **请求自动带令牌**：`client.registerInterceptors` 接入 `@kne/axios-fetch`，自动注入 `Authorization` 头，401 时自动重新登录
 - **可选 DPoP**：开启后令牌与浏览器内不可导出的密钥绑定，令牌被窃取也无法在其它设备使用

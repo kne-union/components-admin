@@ -239,6 +239,16 @@ const getApis = options => {
           method: 'POST'
         }
       },
+      mfaSetting: {
+        detail: {
+          url: `${prefix}/tenant/admin/mfa-setting/detail`,
+          method: 'GET'
+        },
+        save: {
+          url: `${prefix}/tenant/admin/mfa-setting/save`,
+          method: 'POST'
+        }
+      },
       create: {
         url: `${prefix}/tenant/admin/create`,
         method: 'POST'
@@ -598,6 +608,16 @@ const getApis = options => {
           method: 'POST'
         }
       },
+      mfaSetting: {
+        detail: {
+          url: `${prefix}/tenant/mfa-setting/detail`,
+          method: 'GET'
+        },
+        save: {
+          url: `${prefix}/tenant/mfa-setting/save`,
+          method: 'POST'
+        }
+      },
       userList: {
         url: `${prefix}/tenant/user-list`,
         method: 'GET'
@@ -915,6 +935,14 @@ const getApis = options => {
         },
         tenant: {
           url: `${oidcPrefix}/interaction/{uid}/tenant`,
+          method: 'POST'
+        },
+        mfaSend: {
+          url: `${oidcPrefix}/interaction/{uid}/mfa/send`,
+          method: 'POST'
+        },
+        mfaVerify: {
+          url: `${oidcPrefix}/interaction/{uid}/mfa/verify`,
           method: 'POST'
         },
         confirm: {
