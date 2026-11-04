@@ -21,7 +21,7 @@ const renderValue = value => {
  * props 模式可复制参数 JSON，粘贴到发送消息的 JSON 模式中复用
  */
 const VariableTable = createWithRemoteLoader({
-  modules: ['components-core:Table']
+  modules: ['components-core:TablePage@Table']
 })(
   withLocale(({ remoteModules, variables, props }) => {
     const [Table] = remoteModules;

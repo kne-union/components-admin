@@ -74,7 +74,22 @@ const messages = {
   REPLAYED: 'Replayed',
   LOCK_RECOVERED: 'Lock Recovered',
   Yes: 'Yes',
-  No: 'No'
+  No: 'No',
+  NoData: 'No data',
+  RealtimeQueue: 'Realtime Queue',
+  TopicCount: '{count} topics',
+  TopicTrend: 'Topic Trend',
+  TopicBacklog: 'Topic Backlog',
+  AbnormalTopics: 'Abnormal Topics',
+  TopicDetail: 'Topic Details',
+  OtherTopics: 'Others',
+  NoBacklog: 'No backlog',
+  LowestTopic: 'Lowest',
+  NotReplayed: 'Not replayed',
+  AllTopics: 'All topics',
+  QueryDepthCaption: 'Leave the topic empty to count all pending messages',
+  CleanupCaption: 'Delete finished messages by status and time',
+  CleanupResult: 'Deleted messages'
 };
 
 export default messages;

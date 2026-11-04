@@ -58,7 +58,7 @@ export const globalInit = async () => {
     //url: 'http://localhost:3001',
     //tpl: '{{url}}',
     remote: 'components-core',
-    defaultVersion: '0.6.16'
+    defaultVersion: '0.7.2'
   };
   remoteLoaderPreset({
     remotes: {
@@ -67,21 +67,22 @@ export const globalInit = async () => {
       'components-iconfont': {
         ...registry,
         remote: 'components-iconfont',
-        defaultVersion: '0.2.1'
+        defaultVersion: '0.3.0'
       },
       'components-thirdparty': {
         ...registry,
         //url: 'http://localhost:3010',
         //tpl: '{{url}}',
         remote: 'components-thirdparty',
-        defaultVersion: '0.1.59'
+        defaultVersion: '0.1.60'
       },
       'components-admin':
         process.env.NODE_ENV === 'development'
           ? {
               remote: 'components-admin',
               url: '/',
-              tpl: '{{url}}'
+              tpl: '{{url}}',
+              defaultVersion: process.env.DEFAULT_VERSION
             }
           : {
               ...registry,

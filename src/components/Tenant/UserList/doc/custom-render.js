@@ -9,7 +9,7 @@ const { Flex } = antd;
  * 自行组合布局，例如将筛选和表格嵌入到自定义页面结构中。
  */
 const CustomRenderExample = createWithRemoteLoader({
-  modules: ['components-core:Global@PureGlobal', 'components-core:Layout', 'components-core:Table@TablePage']
+  modules: ['components-core:Global@PureGlobal', 'components-core:Layout', 'components-core:TablePage']
 })(({ remoteModules }) => {
   const [PureGlobal, Layout, TablePage] = remoteModules;
   return (

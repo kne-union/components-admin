@@ -1070,7 +1070,29 @@
   }
 
   .org-toolbar-actions {
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+
+    :global(.ant-space-item) {
+      min-width: 0;
+    }
+
+    :global(.ant-space-item:last-child:nth-child(odd)) {
+      grid-column: 1 / -1;
+    }
+
+    :global(.ant-btn) {
+      width: 100%;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    :global(.ant-btn > span:not(.ant-btn-icon)) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .split {

@@ -31,7 +31,7 @@ const normalizeUserSearchParams = (searchParams, { allowQueryIdForUserFilter } =
 };
 
 const UserList = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Table', 'components-core:Filter', 'components-core:Global@usePreset']
+  modules: ['components-core:Layout@TablePage', 'components-core:TablePage@useSelectedRow', 'components-core:Filter', 'components-core:Global@usePreset']
 })(
   withLocale(
     ({
@@ -48,8 +48,7 @@ const UserList = createWithRemoteLoader({
       showLength,
       optionsColumn
     }) => {
-      const [TablePage, Table, Filter, usePreset] = remoteModules;
-      const { useSelectedRow } = Table;
+      const [TablePage, useSelectedRow, Filter, usePreset] = remoteModules;
       const tableRef = useRef();
       const mobileListRef = useRef([]);
       const { formatMessage } = useIntl();
