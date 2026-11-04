@@ -8,6 +8,8 @@ import getTraceColumns from '../getTraceColumns';
 import MessageDetail from '../Actions/MessageDetail';
 import Menu from '../Menu';
 import { buildListParams } from '../utils';
+import { getTraceCardItem } from '../cardItems';
+import { createCardRenders } from '../../MailGateway/CardList';
 
 const TraceList = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Enum']
@@ -90,6 +92,7 @@ const TraceList = createWithRemoteLoader({
             }
           }
         ]}
+        {...createCardRenders(getTraceCardItem({ formatMessage }))}
         page={{
           menu: <Menu baseUrl={baseUrl} />,
           ...pageProps

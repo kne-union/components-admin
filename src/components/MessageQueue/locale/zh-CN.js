@@ -74,7 +74,22 @@ const messages = {
   REPLAYED: '死信重放',
   LOCK_RECOVERED: '锁定恢复',
   Yes: '是',
-  No: '否'
+  No: '否',
+  NoData: '暂无数据',
+  RealtimeQueue: '实时队列',
+  TopicCount: '共 {count} 个主题',
+  TopicTrend: '主题趋势',
+  TopicBacklog: '主题积压',
+  AbnormalTopics: '异常主题',
+  TopicDetail: '主题明细',
+  OtherTopics: '其他',
+  NoBacklog: '暂无积压',
+  LowestTopic: '最低',
+  NotReplayed: '未重放',
+  AllTopics: '全部主题',
+  QueryDepthCaption: '不填主题则统计全部等待中的消息',
+  CleanupCaption: '按状态与时间删除已结束的消息',
+  CleanupResult: '本次清理条数'
 };
 
 export default messages;

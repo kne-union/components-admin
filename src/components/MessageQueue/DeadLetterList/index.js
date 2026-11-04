@@ -1,31 +1,62 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState } from 'react';
-import { Space } from 'antd';
+import { App } from 'antd';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 
 import getDeadLetterColumns from '../getDeadLetterColumns';
 import DeadLetterActions from '../Actions/DeadLetterActions';
-import DeadLetterReplay from '../Actions/DeadLetterReplay';
 import Menu from '../Menu';
 import { buildListParams } from '../utils';
+import { getDeadLetterCardItem } from '../cardItems';
+import { createCardRenders } from '../../MailGateway/CardList';
 
 const DeadLetterList = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter']
+  modules: [
+    'components-core:Layout@TablePage',
+    'components-core:TablePage@useSelectedRow',
+    'components-core:Global@usePreset',
+    'components-core:Filter',
+    'components-core:Modal@useConfirmModal'
+  ]
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {} }) => {
-    const [TablePage, usePreset, Filter] = remoteModules;
+    const [TablePage, useSelectedRow, usePreset, Filter, useConfirmModal] = remoteModules;
     const { formatMessage } = useIntl();
-    const { apis } = usePreset();
+    const { ajax, apis } = usePreset();
+    const { message } = App.useApp();
+    const confirmModal = useConfirmModal();
     const { getFilterValue, fields: filterFields } = Filter;
     const { InputFilterItem, SuperSelectFilterItem } = filterFields;
     const ref = useRef(null);
+    const dataRef = useRef([]);
     const [filter, setFilter] = useState([]);
-    const [selected, setSelected] = useState({
-      selectedRowKeys: [],
-      selectedRows: []
-    });
+    const { selectedRowKeys, selectedRows, setSelectedRowKeys, clearSelectedRows } = useSelectedRow({ rowKey: 'id' });
     const filterValue = getFilterValue(filter);
+
+    const handleBatchReplay = ({ selectedRowKeys: keys, reload }) => {
+      const replayedIds = new Set(dataRef.current.concat(selectedRows || []).filter(item => item.replayed).map(item => String(item.id)));
+      const ids = (keys || []).filter(id => !replayedIds.has(String(id)));
+      if (ids.length === 0) {
+        return;
+      }
+      confirmModal({
+        title: formatMessage({ id: 'BatchReplayConfirm' }),
+        onConfirm: async () => {
+          const { data: resData } = await ajax(
+            Object.assign({}, apis.mq.deadLetter.replay, {
+              data: ids.length > 1 ? { ids } : { id: ids[0] }
+            })
+          );
+          if (resData.code !== 0) {
+            return;
+          }
+          message.success(formatMessage({ id: 'ReplaySuccess' }));
+          clearSelectedRows();
+          reload ? reload() : ref.current?.reload?.();
+        }
+      });
+    };
 
     return (
       <TablePage
@@ -66,6 +97,10 @@ const DeadLetterList = createWithRemoteLoader({
         ref={ref}
         pagination={{ paramsType: 'params' }}
         name="mq-dead-letter-list"
+        dataFormat={data => {
+          dataRef.current = data.pageData || [];
+          return { list: dataRef.current, total: data.totalCount, data };
+        }}
         columns={[
           ...getDeadLetterColumns({ formatMessage }),
           {
@@ -88,34 +123,22 @@ const DeadLetterList = createWithRemoteLoader({
             }
           }
         ]}
+        {...createCardRenders(getDeadLetterCardItem({ formatMessage }))}
         rowSelection={{
           type: 'checkbox',
-          selectedRowKeys: selected.selectedRowKeys,
-          onChange: (selectedRowKeys, selectedRows) => {
-            setSelected({ selectedRowKeys, selectedRows });
-          },
-          getCheckboxProps: record => {
-            return {
-              disabled: record.replayed
-            };
-          }
+          selectedRowKeys,
+          allowSelectedAll: false,
+          onChange: keys => setSelectedRowKeys(keys, dataRef.current || []),
+          getCheckboxProps: record => ({ disabled: record.replayed })
         }}
-        topArea={
-          <Space>
-            <span>{formatMessage({ id: 'SelectedCount' }, { count: selected.selectedRowKeys.length })}</span>
-            <DeadLetterReplay
-              ids={selected.selectedRowKeys}
-              type="link"
-              size="small"
-              disabled={selected.selectedRowKeys.length === 0}
-              onSuccess={() => {
-                setSelected({ selectedRowKeys: [], selectedRows: [] });
-                ref.current?.reload?.();
-              }}>
-              {formatMessage({ id: 'BatchReplay' })}
-            </DeadLetterReplay>
-          </Space>
-        }
+        selectedRows={selectedRows}
+        batchActions={[
+          {
+            key: 'batch-replay',
+            label: formatMessage({ id: 'BatchReplay' }),
+            onClick: handleBatchReplay
+          }
+        ]}
         page={{
           menu: <Menu baseUrl={baseUrl} />,
           ...pageProps

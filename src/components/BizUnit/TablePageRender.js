@@ -2,9 +2,9 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import merge from 'lodash/merge';
 
 const TablePageRender = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Table@TablePage', 'components-core:TablePage']
+  modules: ['components-core:Layout@TablePage', 'components-core:TablePage']
 })(({ remoteModules, titleExtra, tableOptions, page, withPage = true }) => {
-  const [LayoutTablePage, LegacyTablePage, NextTablePage] = remoteModules;
+  const [LayoutTablePage, NextTablePage] = remoteModules;
 
   if (tableOptions?.isNext) {
     const { page: layoutPage, isNext, ...nextTableOptions } = tableOptions;
@@ -23,7 +23,7 @@ const TablePageRender = createWithRemoteLoader({
 
   // SystemLayout / 外层已包 Page 时不要再套 Layout@TablePage，否则会调用不存在的 setPageProps
   if (!withPage) {
-    return <LegacyTablePage {...tableOptions} />;
+    return <NextTablePage {...tableOptions} />;
   }
 
   return (

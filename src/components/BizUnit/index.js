@@ -82,7 +82,7 @@ const serializeSearchParamsFieldsKey = prop => {
 const readWindowSearchParams = () => new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
 
 const BizUnit = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Table@TablePage', 'components-core:Filter']
+  modules: ['components-core:Layout@TablePage', 'components-core:TablePage', 'components-core:Filter']
 })(
   withLocale(
     ({
@@ -128,8 +128,8 @@ const BizUnit = createWithRemoteLoader({
         options
       );
       const filterConfig = filter ?? filterList ?? [];
-      const [LayoutTablePage, LegacyTablePage, Filter] = remoteModules;
-      const TablePage = isNext ? LayoutTablePage : LegacyTablePage;
+      const [LayoutTablePage, BaseTablePage, Filter] = remoteModules;
+      const TablePage = isNext ? LayoutTablePage : BaseTablePage;
       const { SearchInput, getFilterValue, useSearchParamsValue } = Filter;
       const ref = useRef(null);
       const navigate = useNavigate();
@@ -331,7 +331,6 @@ const BizUnit = createWithRemoteLoader({
             columns: [
               ...getColumns(),
               buildOptionsColumn({
-                isNext,
                 formatMessage,
                 apis,
                 options,

@@ -60,6 +60,7 @@ const locale = {
   MarkUnread: '标为未读',
   MoveToTrash: '删除',
   Restore: '恢复',
+  Refresh: '刷新',
   RemoveForever: '彻底删除',
   SetLabels: '设置标签',
   ConfirmRemoveMail: '彻底删除后无法恢复，确定继续？',

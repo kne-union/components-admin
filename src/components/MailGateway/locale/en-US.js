@@ -60,6 +60,7 @@ const locale = {
   MarkUnread: 'Mark as unread',
   MoveToTrash: 'Delete',
   Restore: 'Restore',
+  Refresh: 'Refresh',
   RemoveForever: 'Delete forever',
   SetLabels: 'Labels',
   ConfirmRemoveMail: 'This cannot be undone. Continue?',

@@ -2,7 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useFetch } from '@kne/react-fetch';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { App, Badge, Button, Flex } from 'antd';
-import { FormOutlined, MenuOutlined } from '@ant-design/icons';
+import { FormOutlined, MenuOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useIntl } from '@kne/react-intl';
 import { useNavigate } from 'react-router-dom';
 import withLocale from '../withLocale';
@@ -20,14 +20,14 @@ const Mailbox = createWithRemoteLoader({
   modules: [
     'components-core:Layout@TablePage',
     'components-core:TablePage',
-    'components-core:Table',
+    'components-core:TablePage@useSelectedRow',
     'components-core:Drawer',
     'components-core:FormInfo',
     'components-core:Global@usePreset'
   ]
 })(
   withLocale(({ remoteModules, baseUrl, pageProps = {} }) => {
-    const [LayoutTablePage, TablePage, Table, Drawer, FormInfo, usePreset] = remoteModules;
+    const [LayoutTablePage, TablePage, useSelectedRow, Drawer, FormInfo, usePreset] = remoteModules;
     const renderPage = usePageRender();
     const { apis, ajax } = usePreset();
     const { message } = App.useApp();
@@ -41,7 +41,7 @@ const Mailbox = createWithRemoteLoader({
     const ref = useRef(null);
     const { list: accounts } = useAccountList(apis);
     const { data: stats, reload: reloadStats } = useFetch(Object.assign({}, apis.mailGateway.mail.stats, { params: { accountId } }));
-    const { selectedRowKeys, selectedRows, setSelectedRowKeys, clearSelectedRows } = Table.useSelectedRow({ rowKey: 'id' });
+    const { selectedRowKeys, selectedRows, setSelectedRowKeys, clearSelectedRows } = useSelectedRow({ rowKey: 'id' });
     const dataRef = useRef([]);
 
     const { folder, labelId } = parseCurrentKey(current);
@@ -195,6 +195,9 @@ const Mailbox = createWithRemoteLoader({
         }}
         selectedRows={selectedRows}
         batchActions={batchActions}
+        buttonGroup={{
+          list: [{ icon: <ReloadOutlined />, title: formatMessage({ id: 'Refresh' }), onClick: reloadAll }]
+        }}
         columns={getMailColumns(columnOptions)}
         {...createCardRenders(getMailCardItem(columnOptions))}
       />

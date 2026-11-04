@@ -9,6 +9,8 @@ import Actions from '../Actions';
 import Menu from '../Menu';
 import PublishMessage from '../PublishMessage';
 import { buildListParams } from '../utils';
+import { getMessageCardItem } from '../cardItems';
+import { createCardRenders } from '../../MailGateway/CardList';
 
 const MessageList = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:Filter', 'components-core:Enum']
@@ -91,6 +93,7 @@ const MessageList = createWithRemoteLoader({
             }
           }
         ]}
+        {...createCardRenders(getMessageCardItem({ formatMessage }))}
         buttonGroup={{
           list: [
             {
