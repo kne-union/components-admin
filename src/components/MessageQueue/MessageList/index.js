@@ -5,7 +5,7 @@ import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 
 import getColumns from '../getColumns';
-import Actions from '../Actions';
+import buildActionList from '../Actions/buildActionList';
 import Menu from '../Menu';
 import PublishMessage from '../PublishMessage';
 import { buildListParams } from '../utils';
@@ -75,22 +75,19 @@ const MessageList = createWithRemoteLoader({
             title: formatMessage({ id: 'Action' }),
             renderType: 'options',
             fixed: 'right',
-            getValueOf: item => {
-              return {
-                children: (
-                  <Actions
-                    data={item}
-                    type="link"
-                    onTrace={() => {
-                      navigate(`${baseUrl}/traces?messageId=${encodeURIComponent(item.messageId || item.id)}`);
-                    }}
-                    onSuccess={() => {
-                      ref.current?.reload?.();
-                    }}
-                  />
-                )
-              };
-            }
+            // options 渲染器只认动作数组（或 { list }）：返回 { children: <Actions/> } 会被整列丢弃
+            getValueOf: item =>
+              buildActionList({
+                formatMessage,
+                data: item,
+                type: 'link',
+                onTrace: () => {
+                  navigate(`${baseUrl}/traces?messageId=${encodeURIComponent(item.messageId || item.id)}`);
+                },
+                onSuccess: () => {
+                  ref.current?.reload?.();
+                }
+              })
           }
         ]}
         {...createCardRenders(getMessageCardItem({ formatMessage }))}

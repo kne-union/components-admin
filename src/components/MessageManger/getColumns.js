@@ -2,7 +2,7 @@ import { Tag, Typography } from 'antd';
 import withLocale from './withLocale';
 import { useIntl } from '@kne/react-intl';
 import { MESSAGE_TYPE_COLORS } from './enums';
-import Actions from './Actions';
+import buildActionList from './Actions/buildActionList';
 import { formatDateTime } from '@components/MailGateway/CardList';
 
 const renderEnumTag = ({ formatMessage, value, moduleName }) => {
@@ -73,7 +73,7 @@ const getTemplateColumns = ({ formatMessage, onSuccess, onPreview }) => [
     renderType: 'options',
     fixed: 'right',
     getValueOf: item => ({
-      children: <Actions type="link" detailType="template" data={item} onSuccess={onSuccess} />
+      list: buildActionList({ formatMessage, type: 'link', detailType: 'template', data: item, onSuccess })
     })
   }
 ];
@@ -111,7 +111,7 @@ const getRecordColumns = ({ formatMessage, onSuccess, onDetail }) => [
     renderType: 'options',
     fixed: 'right',
     getValueOf: item => ({
-      children: <Actions type="link" detailType="record" data={item} onSuccess={onSuccess} />
+      list: buildActionList({ formatMessage, type: 'link', detailType: 'record', data: item, onSuccess })
     })
   }
 ];

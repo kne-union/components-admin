@@ -1,32 +1,15 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
-import MessageDetail from './MessageDetail';
+import buildActionList from './buildActionList';
 
 const ActionsInner = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
 })(({ remoteModules, children, data, onSuccess, onTrace, moreType = 'link', itemClassName, ...props }) => {
   const [ButtonGroup] = remoteModules;
   const { formatMessage } = useIntl();
-  const list = [];
 
-  if (data) {
-    list.push({
-      ...props,
-      buttonComponent: MessageDetail,
-      data,
-      children: formatMessage({ id: 'ViewDetail' }),
-      onSuccess
-    });
-  }
-
-  if (data?.traceId && typeof onTrace === 'function') {
-    list.push({
-      ...props,
-      children: formatMessage({ id: 'ViewTrace' }),
-      onClick: () => onTrace(data)
-    });
-  }
+  const list = buildActionList({ formatMessage, data, onSuccess, onTrace, ...props });
 
   if (typeof children === 'function') {
     return children({ list });
@@ -37,3 +20,4 @@ const ActionsInner = createWithRemoteLoader({
 
 const Actions = withLocale(ActionsInner);
 export default Actions;
+export { buildActionList };

@@ -3,7 +3,7 @@ import merge from 'lodash/merge';
 import { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import { Flex, Button } from 'antd';
 import { useSearchParams } from 'react-router-dom';
-import Actions from './Actions';
+import buildActionList from './Actions/buildActionList';
 import Create from './Actions/Create';
 import SendMessage from './Actions/SendMessage';
 import UserMobileList from './UserMobileList';
@@ -309,20 +309,14 @@ const UserList = createWithRemoteLoader({
               title: formatMessage({ id: 'Action' }),
               renderType: 'options',
               fixed: 'right',
+              // options 渲染器只认动作数组（或 { list }）：返回 { children: <Actions/> } 会被整列丢弃。
+              // getActions 是插件扩展点，返回 JSX 时无法放进动作数组，此时退回内置动作。
               getValueOf: item => {
+                const list = buildActionList({ formatMessage, data: item, apis, onSuccess: reloadTable });
+                const extended = typeof getActions === 'function' ? getActions({ list, data: item }) : null;
                 return {
-                  children: (
-                    <Actions
-                      itemClassName="btn-no-padding"
-                      moreType="link"
-                      showLength={showLength}
-                      data={item}
-                      apis={apis}
-                      onSuccess={reloadTable}
-                    >
-                      {getActions}
-                    </Actions>
-                  )
+                  list: Array.isArray(extended) ? extended : list,
+                  ...(Number.isInteger(showLength) ? { showLength } : {})
                 };
               }
             },

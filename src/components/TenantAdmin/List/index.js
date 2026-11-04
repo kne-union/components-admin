@@ -5,7 +5,7 @@ import withLocale from '../withLocale';
 import getColumns from './getColumns';
 import { useRef } from 'react';
 import Create from '../Actions/Create';
-import Actions from '../Actions';
+import buildActionList from '../Actions/buildActionList';
 import TenantCardList from './TenantCardList';
 
 const ListInner = createWithRemoteLoader({
@@ -73,11 +73,11 @@ const ListInner = createWithRemoteLoader({
             title: formatMessage({ id: 'Action' }),
             renderType: 'options',
             fixed: 'right',
-            getValueOf: item => {
-              return {
-                children: <Actions data={item} showLength={showLength} onSuccess={() => ref.current?.reload()} />
-              };
-            }
+            // options 渲染器只认动作数组（或 { list }）：返回 { children: <Actions/> } 会被整列丢弃
+            getValueOf: item => ({
+              list: buildActionList({ formatMessage, data: item, onSuccess: () => ref.current?.reload() }),
+              ...(Number.isInteger(showLength) ? { showLength } : {})
+            })
           },
           optionsColumn
         )

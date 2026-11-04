@@ -6,7 +6,7 @@ import { useIntl } from '@kne/react-intl';
 
 import getColumns from '../getColumns';
 import Menu from '../Menu';
-import Actions from '../Actions';
+import buildActionList from '../Actions/buildActionList';
 import { createTaskMapFilterValue } from '../filterUtils';
 
 const MyTask = createWithRemoteLoader({
@@ -130,20 +130,17 @@ const MyTask = createWithRemoteLoader({
             title: formatMessage({ id: 'Action' }),
             renderType: 'options',
             fixed: 'right',
-            getValueOf: item => {
-              return {
-                children: (
-                  <Actions
-                    getManualTaskAction={getManualTaskAction}
-                    data={item}
-                    type="link"
-                    onSuccess={() => {
-                      ref.current?.reload?.({}, true);
-                    }}
-                  />
-                )
-              };
-            }
+            // options 渲染器只认动作数组（或 { list }）：返回 { children: <Actions/> } 会被整列丢弃
+            getValueOf: item =>
+              buildActionList({
+                formatMessage,
+                getManualTaskAction,
+                data: item,
+                type: 'link',
+                onSuccess: () => {
+                  ref.current?.reload?.({}, true);
+                }
+              })
           }
         ]}
         rowSelection={{
