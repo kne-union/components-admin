@@ -5,7 +5,7 @@ import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 
 import getDeadLetterColumns from '../getDeadLetterColumns';
-import DeadLetterActions from '../Actions/DeadLetterActions';
+import buildDeadLetterActionList from '../Actions/buildDeadLetterActionList';
 import Menu from '../Menu';
 import { buildListParams } from '../utils';
 import { getDeadLetterCardItem } from '../cardItems';
@@ -108,19 +108,16 @@ const DeadLetterList = createWithRemoteLoader({
             title: formatMessage({ id: 'Action' }),
             renderType: 'options',
             fixed: 'right',
-            getValueOf: item => {
-              return {
-                children: (
-                  <DeadLetterActions
-                    data={item}
-                    type="link"
-                    onSuccess={() => {
-                      ref.current?.reload?.();
-                    }}
-                  />
-                )
-              };
-            }
+            // options 渲染器只认动作数组（或 { list }）：返回 { children: <组件/> } 会被整列丢弃
+            getValueOf: item =>
+              buildDeadLetterActionList({
+                formatMessage,
+                data: item,
+                type: 'link',
+                onSuccess: () => {
+                  ref.current?.reload?.();
+                }
+              })
           }
         ]}
         {...createCardRenders(getDeadLetterCardItem({ formatMessage }))}

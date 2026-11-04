@@ -7,54 +7,15 @@ import Resend from './Resend';
 import Preview, { openTemplatePreview } from './Preview';
 import Copy from './Copy';
 import TenantOpen from './TenantOpen';
+import buildActionList from './buildActionList';
 
 const ActionsInner = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
 })(({ remoteModules, children, data, detailType, onSuccess, moreType = 'link', itemClassName, ...props }) => {
   const [ButtonGroup] = remoteModules;
   const { formatMessage } = useIntl();
-  const list = [];
 
-  list.push({
-    ...props,
-    buttonComponent: Detail,
-    data,
-    detailType,
-    children: formatMessage({ id: 'Detail' }),
-    onSuccess
-  });
-
-  if (detailType !== 'record') {
-    list.push({
-      ...props,
-      buttonComponent: Preview,
-      data,
-      detailType,
-      children: formatMessage({ id: 'Preview' })
-    });
-  }
-
-  if (detailType !== 'record' && Number(data.status) === 0) {
-    list.push({
-      ...props,
-      buttonComponent: SendMessage,
-      data,
-      detailType,
-      children: formatMessage({ id: 'SendMessage' }),
-      onSuccess
-    });
-  }
-
-  if (detailType === 'record') {
-    list.push({
-      ...props,
-      buttonComponent: Resend,
-      data,
-      detailType,
-      children: formatMessage({ id: 'Resend' }),
-      onSuccess
-    });
-  }
+  const list = buildActionList({ formatMessage, data, detailType, onSuccess, ...props });
 
   if (typeof children === 'function') {
     return children({ list });
@@ -65,5 +26,5 @@ const ActionsInner = createWithRemoteLoader({
 
 const Actions = withLocale(ActionsInner);
 
-export { Detail, SendMessage, Resend, Preview, Copy, TenantOpen, openTemplatePreview, openDetail };
+export { Detail, SendMessage, Resend, Preview, Copy, TenantOpen, openTemplatePreview, openDetail, buildActionList };
 export default Actions;

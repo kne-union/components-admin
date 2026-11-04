@@ -85,11 +85,16 @@ const TraceList = createWithRemoteLoader({
             title: formatMessage({ id: 'Action' }),
             renderType: 'options',
             fixed: 'right',
-            getValueOf: item => {
-              return {
-                children: <MessageDetail data={item} type="link" title={formatMessage({ id: 'Detail' })}>{formatMessage({ id: 'ViewDetail' })}</MessageDetail>
-              };
-            }
+            // options 渲染器只认动作数组（或 { list }）：返回 { children: <组件/> } 会被整列丢弃
+            getValueOf: item => [
+              {
+                buttonComponent: MessageDetail,
+                data: item,
+                type: 'link',
+                title: formatMessage({ id: 'Detail' }),
+                children: formatMessage({ id: 'ViewDetail' })
+              }
+            ]
           }
         ]}
         {...createCardRenders(getTraceCardItem({ formatMessage }))}

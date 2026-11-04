@@ -1,35 +1,15 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
-import DeadLetterReplay from './DeadLetterReplay';
-import MessageDetail from './MessageDetail';
+import buildDeadLetterActionList from './buildDeadLetterActionList';
 
 const DeadLetterActionsInner = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
 })(({ remoteModules, children, data, onSuccess, moreType = 'link', itemClassName, ...props }) => {
   const [ButtonGroup] = remoteModules;
   const { formatMessage } = useIntl();
-  const list = [];
 
-    if (data && !data.replayed) {
-    list.push({
-      ...props,
-      buttonComponent: DeadLetterReplay,
-      data,
-      children: formatMessage({ id: 'Replay' }),
-      onSuccess
-    });
-  }
-
-    if (data) {
-      list.push({
-        ...props,
-        buttonComponent: MessageDetail,
-        data,
-        title: formatMessage({ id: 'DeadLetterList' }),
-        children: formatMessage({ id: 'ViewDetail' })
-      });
-    }
+  const list = buildDeadLetterActionList({ formatMessage, data, onSuccess, ...props });
 
   if (typeof children === 'function') {
     return children({ list });
@@ -40,3 +20,4 @@ const DeadLetterActionsInner = createWithRemoteLoader({
 
 const DeadLetterActions = withLocale(DeadLetterActionsInner);
 export default DeadLetterActions;
+export { buildDeadLetterActionList };
