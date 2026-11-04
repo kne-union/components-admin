@@ -23,6 +23,24 @@
         ]
       }
     },
+    "demo-mfa": {
+      "uid": "demo-mfa",
+      "prompt": { "name": "mfa", "reasons": ["mfa_required"], "details": {} },
+      "params": { "clientId": "hr-portal", "scope": "openid profile offline_access api", "resource": "https://hr.example.com/api" },
+      "client": { "clientId": "hr-portal", "clientName": "人力资源门户" },
+      "user": { "id": "1001", "nickname": "张三", "email": "zhangsan@example.com", "phone": "13812345678" },
+      "tenants": null,
+      "mfa": { "method": "sms", "tenantId": "tenant-1", "maxAge": 86400, "phoneMissing": false, "phoneMasked": "138****5678", "resendAfter": 0 }
+    },
+    "demo-mfa-no-phone": {
+      "uid": "demo-mfa-no-phone",
+      "prompt": { "name": "mfa", "reasons": ["mfa_required"], "details": {} },
+      "params": { "clientId": "hr-portal", "scope": "openid profile offline_access api", "resource": "https://hr.example.com/api" },
+      "client": { "clientId": "hr-portal", "clientName": "人力资源门户" },
+      "user": { "id": "1002", "nickname": "李四", "email": "lisi@example.com" },
+      "tenants": null,
+      "mfa": { "method": "sms", "tenantId": "tenant-1", "maxAge": 86400, "phoneMissing": true, "phoneMasked": null, "resendAfter": 0 }
+    },
     "demo-consent": {
       "uid": "demo-consent",
       "prompt": { "name": "consent", "reasons": ["op_scopes_missing"], "details": { "missingOIDCScope": ["openid", "profile"] } },

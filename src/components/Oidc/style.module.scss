@@ -73,6 +73,106 @@
   color: var(--primary-color, #4f46e5);
 }
 
+.mfa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.mfa-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  font-size: 32px;
+  color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
+.mfa-icon-warning {
+  color: var(--color-warning, #faad14);
+  background: color-mix(in srgb, var(--color-warning, #faad14) 12%, transparent);
+}
+
+.mfa-title {
+  margin-bottom: 8px;
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.mfa-desc {
+  margin: 0 0 32px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--font-color-grey, #666);
+  text-align: center;
+}
+
+.mfa-otp {
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 24px;
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  :global {
+    .ant-otp-input {
+      width: 48px !important;
+      height: 56px !important;
+      font-size: 22px !important;
+    }
+  }
+}
+
+.mfa-resend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 32px;
+  font-size: 14px;
+  color: var(--font-color-grey-1, #999);
+}
+
+.mfa-resend-btn {
+  padding: 0;
+  height: auto;
+  font-weight: 500;
+}
+
+.mfa-resend-countdown {
+  font-weight: 500;
+}
+
+.mfa-submit {
+  height: 52px !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  box-shadow: 0 4px 12px var(--primary-color-1);
+
+  :global {
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
 .full-loading {
   display: flex;
   align-items: center;
@@ -134,5 +234,10 @@
 
   .tenant-card {
     padding: 10px 12px;
+  }
+
+  .mfa-otp :global(.ant-otp-input) {
+    width: 42px !important;
+    height: 50px !important;
   }
 }

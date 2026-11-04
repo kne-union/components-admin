@@ -132,6 +132,22 @@
 
 `apis.*.mailSetting` 包含：`smtpDetail`、`smtpSave`、`smtpRemove`、`smtpTest`、`templateList`、`templateDetail`、`templateCustomize`、`templateSave`、`templateSetStatus`、`templateReset`、`templatePreview`，对应 `@kne/fastify-tenant` 的 `/mail-setting/*` 与 `/admin/mail-setting/*` 接口；管理端（`apis.tenantAdmin.mailSetting`）另有 `templateSetTenantOpen`，模版列表据此显示「租户端管理」列与「开放给租户 / 关闭租户管理」操作，只对当前租户生效。
 
+### MfaSetting MFA 设置
+
+租户统一登录（OIDC）的短信 MFA 配置：是否开启、验证有效期。开启后成员经统一登录进入本租户需完成短信验证，未绑定手机号的账号无法进入。租户端在 `Setting` 中使用（路由 `mfa`，菜单权限 `setting:mfa-setting`，查看 / 编辑需 `setting:mfa-setting:view` / `setting:mfa-setting:edit`），管理端在 `TenantAdmin` 详情「设置 → MFA 设置」中使用。
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| apis | MFA 设置接口：租户端 `apis.tenant.mfaSetting`，管理端 `apis.tenantAdmin.mfaSetting` | object | - |
+| tenantId | 管理端操作的租户 id，传入后所有请求带上 `tenantId` | string | - |
+| hasEdit | 是否可编辑；为 `false` 时只能查看 | boolean | true |
+| renderFooter | 自定义编辑表单操作按钮（保存、取消）的容器 | (actions: ReactNode) => ReactNode | - |
+
+- 验证有效期：表单以分钟填写，提交时换算为秒（`maxAge`）；同一登录会话内，验证通过后在有效期内再次进入本租户无需重复验证，`0` 表示每次进入都需验证；默认 1 天
+- 验证方式目前固定为短信（`methods: ['sms']`）
+
+`apis.*.mfaSetting` 包含：`detail`、`save`，对应 `@kne/fastify-tenant` 的 `/mfa-setting/*` 与 `/admin/mfa-setting/*` 接口。
+
 ### TenantUserSelect 按组织选择租户用户
 
 参考 `UserSelect`，用于在表单中先选组织、再选租户成员。左侧为组织树，右侧为成员列表（支持滚动加载），成员列表按所选组织及其子组织过滤（`filter.tenantOrgId`）。

@@ -250,6 +250,7 @@ const locale = {
   // Setting
   CompanyInfoPage: '公司信息',
   MailSettingPage: '消息设置',
+  MfaSettingPage: 'MFA 设置',
   CompanyInfoSaveSuccess: '公司信息保存成功',
   OrgStructure: '组织架构',
   PermissionManagement: '权限管理',
@@ -352,7 +353,7 @@ const locale = {
   SendMessageFailed: '发送失败',
   Send: '发送',
   SelectedCount: '已选 {count} 项',
-  DeselectAll: '取消',
+  DeselectAll: '取消'
 };
 
 export default locale;

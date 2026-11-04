@@ -9,13 +9,15 @@ import Args from './Args';
 import CustomComponents from './CustomComponents';
 import Language from './Language';
 import MailSetting from './MailSetting';
+import MfaSetting from './MfaSetting';
 import style from './style.module.scss';
 
 const builtinContentMap = {
   args: Args,
   customComponents: CustomComponents,
   language: Language,
-  mailSetting: MailSetting
+  mailSetting: MailSetting,
+  mfaSetting: MfaSetting
 };
 
 const Setting = createWithRemoteLoader({
@@ -36,21 +38,12 @@ const Setting = createWithRemoteLoader({
       const { formatMessage } = useIntl();
 
       const showLanguageSetting =
-        showLanguageSettingProp !== void 0
-          ? showLanguageSettingProp
-          : !!get(plugins, 'admin.tenant.showLanguageSetting', false);
-      const languageOptionsApi =
-        languageOptionsApiProp !== void 0
-          ? languageOptionsApiProp
-          : get(plugins, 'admin.tenant.languageOptionsApi');
+        showLanguageSettingProp !== void 0 ? showLanguageSettingProp : !!get(plugins, 'admin.tenant.showLanguageSetting', false);
+      const languageOptionsApi = languageOptionsApiProp !== void 0 ? languageOptionsApiProp : get(plugins, 'admin.tenant.languageOptionsApi');
       const showBuiltinLanguageOptions =
-        showBuiltinLanguageOptionsProp !== void 0
-          ? showBuiltinLanguageOptionsProp
-          : !!get(plugins, 'admin.tenant.showBuiltinLanguageOptions', false);
+        showBuiltinLanguageOptionsProp !== void 0 ? showBuiltinLanguageOptionsProp : !!get(plugins, 'admin.tenant.showBuiltinLanguageOptions', false);
       const appendSettingMenus =
-        appendSettingMenusProp !== void 0
-          ? appendSettingMenusProp
-          : get(plugins, 'admin.tenant.appendSettingMenus', []) || [];
+        appendSettingMenusProp !== void 0 ? appendSettingMenusProp : get(plugins, 'admin.tenant.appendSettingMenus', []) || [];
 
       const managed = isManagedTenant(tenant);
       const { menuItems, contentMap } = useMemo(() => {
@@ -66,6 +59,10 @@ const Setting = createWithRemoteLoader({
           {
             key: 'mailSetting',
             label: formatMessage({ id: 'MailSetting' })
+          },
+          {
+            key: 'mfaSetting',
+            label: formatMessage({ id: 'MfaSetting' })
           }
         ];
         // 托管租户的语言由宿主同步，本地不可改

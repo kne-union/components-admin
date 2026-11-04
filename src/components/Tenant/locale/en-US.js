@@ -116,7 +116,8 @@ const locale = {
   LoginOtherAccount: 'Login with another account',
   SwitchOtherTenant: 'Switch to another tenant',
   NoTenantIdentity: 'No tenant identity available',
-  NoTenantIdentityDescription: 'This account has not joined any tenant that has this application enabled. Please ask a tenant administrator to enable it or invite you',
+  NoTenantIdentityDescription:
+    'This account has not joined any tenant that has this application enabled. Please ask a tenant administrator to enable it or invite you',
   SelectTenantToEnter: 'Select a tenant to enter',
   SwitchAccount: 'Switch account',
   ImportantNotice: 'Important Notice',
@@ -196,21 +197,20 @@ const locale = {
   ImportColPhone: 'Phone',
   ImportTenantIdMissing: 'Tenant information is missing, import aborted',
   ImportDragText: 'Click or drag .xlsx / .xls file here',
-  ImportOrgUsersSuccess: 'Import finished: {createdOrgs} org(s) created, {createdUsers} user(s) created, {reusedUsers} user(s) reused, {rowCount} row(s)',
+  ImportOrgUsersSuccess:
+    'Import finished: {createdOrgs} org(s) created, {createdUsers} user(s) created, {reusedUsers} user(s) reused, {rowCount} row(s)',
   DownloadImportTemplate: 'Download sample Excel template',
   RoleName: 'Role Name',
   RoleCode: 'Role Code',
   RoleDescription: 'Role Description',
   SharedGroupName: 'Shared Group Name',
   SharedGroupModulesLabel: 'Shared modules',
-  SharedGroupModulesHint:
-    'Only modules with data scope enabled in permission config are listed; modules without data scope are not shown.',
+  SharedGroupModulesHint: 'Only modules with data scope enabled in permission config are listed; modules without data scope are not shown.',
   SharedGroupDataSources: 'Data sources',
   SharedGroupDataSourcesDesc: 'Select multiple tenant users whose data is included in this shared group (matches backend data-source links).',
   SharedGroupMembers: 'Members',
   SharedGroupMembersDesc: 'Tenant users who participate in this shared group.',
-  SharedGroupModulesEmpty:
-    'No modules with data scope enabled. Enable data scope on the corresponding modules in permission config.',
+  SharedGroupModulesEmpty: 'No modules with data scope enabled. Enable data scope on the corresponding modules in permission config.',
   SharedGroupAccessRead: 'Read-only',
   SharedGroupAccessWrite: 'Read/Write',
   SharedGroupDataScopeRange: 'Data scope',
@@ -254,6 +254,7 @@ const locale = {
   // Setting
   CompanyInfoPage: 'Company Information',
   MailSettingPage: 'Message Settings',
+  MfaSettingPage: 'MFA Settings',
   CompanyInfoSaveSuccess: 'Company information saved successfully',
   OrgStructure: 'Organization',
   PermissionManagement: 'Roles & Permissions',
@@ -263,7 +264,8 @@ const locale = {
 
   // OrgLink
   OrgLinkTitle: 'Organization Sync',
-  OrgLinkHint: 'Sync organization data from WeCom or DingTalk. Synced organizations cannot be edited or deleted; only department managers can be updated.',
+  OrgLinkHint:
+    'Sync organization data from WeCom or DingTalk. Synced organizations cannot be edited or deleted; only department managers can be updated.',
   OrgLinkEnable: 'Enable Sync',
   OrgLinkSource: 'Source',
   SourceWecom: 'WeCom',
@@ -342,7 +344,7 @@ const locale = {
   ThirdLoginAllBound: 'All available login channels are already bound',
   ThirdLoginUnbindSelectHint: 'Select a channel to unbind (source channel cannot be unbound)',
   MessageSentToCount: 'Successfully sent to {count} people',
-  SelectedCount: '{count} selected',
+  SelectedCount: '{count} selected'
 };
 
 export default locale;

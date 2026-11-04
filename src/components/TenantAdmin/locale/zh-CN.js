@@ -53,6 +53,7 @@ const locale = {
   // Language
   LanguageSetting: '语言设置',
   MailSetting: '消息设置',
+  MfaSetting: 'MFA 设置',
   SystemLanguage: '系统语言',
   DefaultTag: '默认',
   SetDefault: '设为默认',
@@ -100,7 +101,7 @@ const locale = {
   EditOrgLeader: '修改负责人',
   TenantSource: '来源',
   ManagedByHost: '宿主同步',
-  LocalTenant: '本地',
+  LocalTenant: '本地'
 };
 
 export default locale;

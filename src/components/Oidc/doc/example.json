@@ -24,6 +24,18 @@
       ]
     },
     {
+      "title": "登录交互页：短信验证（MFA）",
+      "description": "租户开启短信 MFA 后，选定租户时 prompt 为 mfa：进入时自动发送验证码，6 位 OTP 填满即自动验证，倒计时结束可重新发送；账号未绑定手机号时提示并返回应用（以 access_denied 结束）。",
+      "code": "./interaction-mfa.js",
+      "isFull": true,
+      "scope": [
+        { "name": "_Oidc", "packageName": "@components/Oidc" },
+        { "name": "_mockPreset", "packageName": "@root/mockPreset" },
+        { "name": "remoteLoader", "packageName": "@kne/remote-loader" },
+        { "name": "antd", "packageName": "antd" }
+      ]
+    },
+    {
       "title": "登录交互页：授权确认",
       "description": "第三方应用首次请求授权时，prompt 为 consent，展示应用名称与申请的 scope，用户可同意或拒绝。",
       "code": "./interaction-consent.js",

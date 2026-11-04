@@ -24,6 +24,7 @@ import messageMangerData from './message-manger-data.json';
 import oidcData from './oidc-data.json';
 import mailGatewayMock, { mailGatewayData } from './mail-gateway';
 import createMailSettingMock from './mail-setting';
+import createMfaSettingMock from './mfa-setting';
 import { buildTaskStatisticsOverview } from './task-statistics';
 import { enums as mailGatewayEnums } from '@components/MailGateway';
 
@@ -690,6 +691,7 @@ const apis = merge({}, getApis(), {
       loader: () => ({ code: 0 })
     },
     mailSetting: createMailSettingMock(),
+    mfaSetting: createMfaSettingMock(),
     thirdLoginConfig: {
       loader: thirdLoginConfigMock
     },
@@ -994,6 +996,7 @@ const apis = merge({}, getApis(), {
       loader: () => ({ code: 0 })
     },
     mailSetting: createMailSettingMock(),
+    mfaSetting: createMfaSettingMock(),
     thirdLoginConfig: {
       loader: thirdLoginConfigMock
     },
@@ -1485,6 +1488,12 @@ const apis = merge({}, getApis(), {
         loader: () => ({})
       },
       tenant: {
+        loader: () => ({})
+      },
+      mfaSend: {
+        loader: () => ({ phoneMasked: '138****5678', expiresIn: 300, resendAfter: 60 })
+      },
+      mfaVerify: {
         loader: () => ({})
       },
       confirm: {
