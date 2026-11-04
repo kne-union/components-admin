@@ -1,144 +1,33 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useIntl } from '@kne/react-intl';
 import withLocale from '../withLocale';
-import Edit from './Edit';
-import SetStatus from './SetStatus';
-import Remove from './Remove';
+import buildActionList from './buildActionList';
 
 const Actions = createWithRemoteLoader({
   modules: ['components-core:ButtonGroup']
 })(
-  withLocale(
-    ({
-      remoteModules,
-      moreType,
-      children,
-      itemClassName,
-      className,
-      place,
-      showLength,
-      getActionList,
-      getFormInner,
-      data,
-      apis,
-      onSuccess,
-      options,
-      fetchOptions,
-      ...otherProps
-    }) => {
-      const { formatMessage } = useIntl();
-      const [ButtonGroup] = remoteModules;
-      const actionList = [];
+  withLocale(({ remoteModules, moreType, children, itemClassName, className, place, showLength, ...props }) => {
+    const { formatMessage } = useIntl();
+    const [ButtonGroup] = remoteModules;
+    // className 须同时落到每个按钮上：styles 选择器是 .options-column .options-btn.ant-btn，
+    // 只挂 ButtonGroup 容器无效。ButtonGroup 仍保留 className（卡片 place/布局用）。
+    const actionList = buildActionList({ ...props, ...(className ? { className } : {}), formatMessage });
 
-      options = Object.assign(
-        {},
-        {
-          editButtonProps: {
-            children: formatMessage({ id: 'Edit' })
-          },
-          removeButtonProps: {
-            children: formatMessage({ id: 'Delete' })
-          },
-          openButtonProps: {
-            children: formatMessage({ id: 'Open' })
-          },
-          closeButtonProps: {
-            children: formatMessage({ id: 'Close' })
-          }
-        },
-        options
-      );
-
-      // className 须同时落到每个按钮上：isNext options 会 cloneElement 传入 options-btn，
-      // 样式选择器是 .options-column .options-btn.ant-btn；只挂 ButtonGroup 容器无效。
-      // ButtonGroup 仍保留 className（卡片 place/布局用）。对齐 UserList/Actions。
-      const props = {
-        ...otherProps,
-        ...(className ? { className } : {}),
-        fetchOptions,
-        data,
-        apis,
-        onSuccess,
-        options,
-        getFormInner
-      };
-
-      const buttonOtherPropsMap = {
-        save: {
-          ...props,
-          name: 'save',
-          type: 'link',
-          buttonComponent: Edit
-        },
-        setStatusOpen: {
-          ...props,
-          name: 'setStatusOpen',
-          type: 'link',
-          buttonComponent: SetStatus,
-          hidden: props.data?.status === (props.options?.openStatus ?? 'open')
-        },
-        setStatusClose: {
-          ...props,
-          name: 'setStatusClose',
-          type: 'link',
-          buttonComponent: SetStatus,
-          hidden: props.data?.status === (props.options?.closedStatus ?? 'closed'),
-          confirmMessage: props.options?.closeMessage || formatMessage({ id: 'ConfirmClose' }, { bizName: props.options?.bizName }),
-          isDelete: false
-        },
-        remove: {
-          ...props,
-          name: 'remove',
-          type: 'link',
-          buttonComponent: Remove,
-          confirmMessage: props.options?.removeMessage || formatMessage({ id: 'ConfirmDelete' }, { bizName: props.options?.bizName })
-        }
-      };
-
-      const otherActionList = typeof getActionList === 'function' ? getActionList(props) : [];
-
-      if (props.apis.save) {
-        actionList.push(buttonOtherPropsMap.save);
-      }
-
-      if (props.apis.setStatus) {
-        actionList.push(buttonOtherPropsMap.setStatusOpen, buttonOtherPropsMap.setStatusClose);
-      }
-
-      if (props.apis.remove) {
-        actionList.push(buttonOtherPropsMap.remove);
-      }
-
-      if (Array.isArray(otherActionList) && otherActionList.length > 0) {
-        otherActionList.reverse().forEach(({ index, ...item }) => {
-          if (item.name) {
-            const existItem = actionList.find(target => target.name === item.name);
-            if (item.name === 'setStatusOpen') {
-            }
-            if (existItem) {
-              Object.assign(existItem, typeof item.reset === 'function' ? item.reset(existItem) : item);
-              return;
-            }
-          }
-          // index 已从 item 解构出，必须用局部变量；item.index 恒为 undefined
-          actionList.splice(index ?? 0, 0, Object.assign({ type: 'link' }, buttonOtherPropsMap[item.name], item));
-        });
-      }
-
-      if (typeof children === 'function') {
-        return children({
-          className,
-          itemClassName,
-          moreType,
-          place,
-          showLength,
-          list: actionList
-        });
-      }
-
-      return <ButtonGroup className={className} place={place} itemClassName={itemClassName} list={actionList} moreType={moreType} showLength={showLength} />;
+    if (typeof children === 'function') {
+      return children({
+        className,
+        itemClassName,
+        moreType,
+        place,
+        showLength,
+        list: actionList
+      });
     }
-  )
+
+    return (
+      <ButtonGroup className={className} place={place} itemClassName={itemClassName} list={actionList} moreType={moreType} showLength={showLength} />
+    );
+  })
 );
 
 export default Actions;
