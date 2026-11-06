@@ -87,6 +87,14 @@ $radius: 12px;
   margin-top: 12px;
 }
 
+// 邮件正文含固定宽表格/图片时，由容器提供横向滚动条，避免宽元素被裁切
+.html-preview {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .mail-text {
   margin: 0;
   padding: 16px 20px;

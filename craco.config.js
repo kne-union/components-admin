@@ -13,6 +13,7 @@ module.exports = {
             return webpackConfig;
         }
     }, plugins: [{
-        plugin: CracoRemoteComponentsPlugin
+        plugin: CracoRemoteComponentsPlugin,
+        options: { reactCompiler: true }
     }]
 };

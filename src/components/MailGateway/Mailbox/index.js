@@ -12,7 +12,7 @@ import getMailColumns, { getMailCardItem } from './getMailColumns';
 import { createCardRenders } from '../CardList';
 import { useOpenCompose } from './Compose';
 import { useAccountList } from '../fields';
-import { getDefaultAccountId, parseCurrentKey, toFilterObject } from '../utils';
+import { getDefaultAccountId, getRefreshSyncAccountIds, parseCurrentKey, toFilterObject } from '../utils';
 import { usePageRender } from '../PageLayout';
 import style from '../style.module.scss';
 
@@ -43,6 +43,7 @@ const Mailbox = createWithRemoteLoader({
     const { data: stats, reload: reloadStats } = useFetch(Object.assign({}, apis.mailGateway.mail.stats, { params: { accountId } }));
     const { selectedRowKeys, selectedRows, setSelectedRowKeys, clearSelectedRows } = useSelectedRow({ rowKey: 'id' });
     const dataRef = useRef([]);
+    const syncingRef = useRef(false);
 
     const { folder, labelId } = parseCurrentKey(current);
     const listKey = `${accountId || 'all'}-${current}`;
@@ -53,6 +54,38 @@ const Mailbox = createWithRemoteLoader({
       ref.current?.reload?.();
       reloadStats();
     }, [reloadStats]);
+
+    /** 点击刷新时先从邮箱服务器收取新邮件，等同步结束再刷新列表；单个账号同步失败不阻断其它账号与刷新 */
+    const handleRefresh = useCallback(async () => {
+      if (folder !== 'inbox') {
+        reloadAll();
+        return;
+      }
+      if (syncingRef.current) {
+        return;
+      }
+      const syncApi = apis.mailGateway?.account?.sync;
+      const accountIds = syncApi ? getRefreshSyncAccountIds({ accountId, accounts }) : [];
+      if (accountIds.length === 0) {
+        reloadAll();
+        return;
+      }
+      syncingRef.current = true;
+      try {
+        await Promise.all(
+          accountIds.map(async id => {
+            try {
+              await ajax(Object.assign({}, syncApi, { urlParams: { id } }));
+            } catch (e) {
+              console.error(e);
+            }
+          })
+        );
+      } finally {
+        syncingRef.current = false;
+        reloadAll();
+      }
+    }, [ajax, apis, accountId, accounts, folder, reloadAll]);
 
     const runBatch = async (api, data) => {
       const { data: resData } = await ajax(Object.assign({}, api, { data }));
@@ -196,7 +229,7 @@ const Mailbox = createWithRemoteLoader({
         selectedRows={selectedRows}
         batchActions={batchActions}
         buttonGroup={{
-          list: [{ icon: <ReloadOutlined />, title: formatMessage({ id: 'Refresh' }), onClick: reloadAll }]
+          list: [{ icon: <ReloadOutlined />, title: formatMessage({ id: 'Refresh' }), onClick: handleRefresh }]
         }}
         columns={getMailColumns(columnOptions)}
         {...createCardRenders(getMailCardItem(columnOptions))}

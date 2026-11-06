@@ -60,3 +60,13 @@ export const toFilterObject = value =>
     }
     return result;
   }, {});
+
+/** 刷新前需要收取新邮件的账号：选中单个账号时只同步该账号，全部账号时同步所有启用邮箱 */
+export const getRefreshSyncAccountIds = ({ accountId, accounts = [] } = {}) => {
+  if (accountId) {
+    return [accountId];
+  }
+  return (Array.isArray(accounts) ? accounts : [])
+    .filter(item => item?.status === 'enabled' && item.id !== undefined && item.id !== null)
+    .map(item => item.id);
+};

@@ -229,9 +229,19 @@
 }
 
 .mail-detail-attachments {
+  min-width: 0;
+  max-width: 100%;
   padding: 8px 12px;
   border-radius: 6px;
   background: var(--bg-color-grey-1, #fafafa);
+
+  // 附件名过长时换行，避免把详情容器撑破
+  :global(.ant-btn) {
+    max-width: 100%;
+    white-space: normal;
+    word-break: break-all;
+    text-align: left;
+  }
 }
 
 .mail-detail-divider {
