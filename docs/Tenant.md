@@ -276,8 +276,8 @@ render(<LoginTenantExample />);
 
 ```
 
-- 第三方登录
-- ThirdLogin 组件用于第三方登录页，路由 path 为 third-login；根据 platform（wecom / dingtalk）展示对应平台 logo 与标题
+- 单点登录（SSO）
+- ThirdLogin 组件用于单点登录（SSO）页，路由 path 为 third-login；根据 platform（wecom / dingtalk）展示对应平台 logo 与标题
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom),antd(antd)
 
 ```jsx
@@ -354,8 +354,8 @@ render(<ThirdLoginExample />);
 
 ```
 
-- 第三方登录结果
-- ThirdLoginResult 组件用于第三方登录结果页，路由 path 为 third-login-result；企业微信需 platform/tenantId/code，钉钉另需 corpId/clientId
+- 单点登录（SSO）结果
+- ThirdLoginResult 组件用于单点登录（SSO）结果页，路由 path 为 third-login-result；企业微信需 platform/tenantId/code，钉钉另需 corpId/clientId
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom),antd(antd),icons(@ant-design/icons)
 
 ```jsx
@@ -1007,8 +1007,8 @@ render(<TenantUserSelectInputModalExample />);
 
 ```
 
-- 按组织选择成员（SelectInput.Field）
-- TenantUserSelect.Input.Field 纯控件，不依赖 Form，value/onChange 受控
+- 按组织选择成员（SelectInput.Field + disabledIds）
+- TenantUserSelect.Input.Field 纯控件示例；演示 disabledIds 禁用指定成员（张伟 user-1 置灰不可选）
 - _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),antd(antd)
 
 ```jsx
@@ -1023,20 +1023,26 @@ const TenantUserSelectInputFieldExample = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [PureGlobal] = remoteModules;
   const [value, setValue] = useState(null);
+  // 三个一级组织各禁用一人，点任意一级组织都能看到置灰项：
+  // 技术研发中心→张伟；产品设计中心→刘芳；运营中心→周洋
+  const disabledIds = ['user-1', 'user-4', 'user-7'];
 
   return (
     <PureGlobal preset={mockPreset}>
-      <Flex vertical gap={12} style={{ maxWidth: 480 }}>
+      <Flex vertical gap={12} style={{ maxWidth: 520 }}>
         <Typography.Text type="secondary">
-          TenantUserSelect.Input.Field 为纯控件，不依赖 Form，通过 value / onChange 受控
+          请先在左侧组织树点击「技术研发中心」（不要点灰色的公司根节点）。成员列表中「张伟」应置灰不可选；也可点「产品设计中心」看「刘芳」、「运营中心」看「周洋」。
         </Typography.Text>
         <TenantUserSelect.Input.Field
           value={value}
           onChange={setValue}
-          isPopup
+          isPopup={false}
           single
           companyName="科技创新有限公司"
           placeholder="请选择成员"
+          disabledIds={disabledIds}
+          height={420}
+          overlayWidth={760}
         />
         <Typography.Paragraph>
           <Typography.Text strong>当前值：</Typography.Text>
@@ -1112,6 +1118,54 @@ render(<SettingExample />);
 
 ```
 
+- 宿主同步租户只读(全屏)
+- 当前租户 options.managedBy 标记为宿主同步时，组织架构、用户管理、角色均只读并提示到宿主修改，角色「查看权限」以只读权限树打开；公司信息与共享组仍可编辑。
+- _Tenant(@components/Tenant),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom)
+
+```jsx
+const { Setting } = _Tenant;
+const { default: mockPreset } = _mockPreset;
+const { createWithRemoteLoader } = remoteLoader;
+const { Route, Routes, Navigate } = reactRouterDom;
+
+const baseUrl = '/TenantManaged';
+const settingBaseUrl = &#96;${baseUrl}/setting&#96;;
+const pageProps = { menuFixed: false };
+
+const { userInfo } = mockPreset.global;
+const managedPreset = Object.assign({}, mockPreset, {
+  global: Object.assign({}, mockPreset.global, {
+    userInfo: Object.assign({}, userInfo, {
+      tenant: Object.assign({}, userInfo.tenant, {
+        name: '华南物流集团（宿主）',
+        options: {
+          managedBy: { issuer: 'https://hr.example.com/oidc', hostTenantId: 'host-tenant-88', syncedAt: '2026-10-22T10:00:00.000Z' }
+        }
+      })
+    })
+  })
+});
+
+const ManagedSettingExample = createWithRemoteLoader({
+  modules: ['components-core:Global@PureGlobal', 'components-core:Layout']
+})(({ remoteModules }) => {
+  const [PureGlobal, Layout] = remoteModules;
+  return (
+    <PureGlobal preset={managedPreset}>
+      <Layout navigation={{ isFixed: false }}>
+        <Routes>
+          <Route path={&#96;${settingBaseUrl}/*&#96;} element={<Setting pageProps={pageProps} baseUrl={baseUrl} />} />
+          <Route path="*" element={<Navigate to={&#96;${settingBaseUrl}/org&#96;} replace />} />
+        </Routes>
+      </Layout>
+    </PureGlobal>
+  );
+});
+
+render(<ManagedSettingExample />);
+
+```
+
 ### API
 
 ## Tenant 组件
@@ -1162,6 +1216,7 @@ render(<SettingExample />);
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | apis | API 配置 | object | - |
+| readOnly | 只读：「管理权限」变为「查看权限」并以只读方式打开权限树；增删改按钮由是否传入对应 `apis` 决定 | boolean | false |
 
 角色列表 `apis.list` 支持 `params.filter`：
 
@@ -1176,14 +1231,34 @@ render(<SettingExample />);
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | apis | API 配置 | object | - |
+| readOnly | 只读：租户权限树不可勾选，角色只保留列表与查看权限（共享组不受影响） | boolean | false |
 | children | 自定义渲染 | function | - |
+
+### PermissionPanel 权限树
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| settings | 权限树 `{ modules }` | object | - |
+| value / defaultValue / onChange | 已选权限 code（受控 / 非受控） | string[] | - |
+| disabled | 只读：禁用勾选并隐藏「全选」 | boolean | false |
+
+### 宿主同步的托管租户
+
+子应用以 fastify-oidc `independent` 模式接入宿主时，宿主同步过来的租户在 `tenant.options.managedBy.hostTenantId` 上有标记，其基本信息、成员、角色、权限与组织架构均以宿主为准，后端拒绝本地修改。前端相应只读：
+
+- `isManagedTenant(tenant)`：判断是否托管租户
+- `Setting` 的组织架构、用户管理、权限管理（角色）页隐藏新建 / 编辑 / 删除 / 导入 / 组织关联，顶部提示「该租户由宿主系统同步管理，请在宿主中修改」；公司信息与共享组仍可编辑
+- 当前租户取自 `useGlobalContext('userInfo').global.tenant`
 
 ### LoginTenant 租户登录
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | tenantPath | 登录成功跳转路径 | string | - |
-| children | 自定义渲染 | function | - |
+| embedded | 嵌入宿主 Page（如 `@kne/system-layout`）的样式：标题、说明与租户列表居中成一块，点击租户直接进入 | boolean | false |
+| children | 自定义渲染，参数为 `{ children, backgroundColor }` | function | - |
+
+preset 中存在 `oidc`（`components-admin:Oidc` 的 `createOidcClient`）时：当前租户取令牌中的租户；点击卡片仅选中，点「进入租户」时若与当前租户不同，调用 `oidc.switchTenant` 重新签发令牌后进入 `tenantPath`（`embedded` 时点击即进入）。没有 `oidc` 时沿用切换默认租户接口。
 
 ### JoinInvitation 邀请加入
 
@@ -1213,6 +1288,7 @@ render(<SettingExample />);
 | placeholder | 成员选择占位文本 | string | - |
 | single | 是否单选 | boolean | true |
 | disabled | 是否禁用 | boolean | false |
+| disabledIds | 不可选中的成员 id 列表（仍展示，置灰不可点选） | array | - |
 | showSelectedFooter | 是否在底部展示已选成员，支持点击标签移除 | boolean | true |
 | allowSelectAll | 多选时是否展示全选 | boolean | true |
 | userStatus | 成员状态筛选：`open` / `closed`（兼容 `active` → `open`、`inactive` → `closed`） | string | - |
