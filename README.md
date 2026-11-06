@@ -23,8 +23,11 @@ npm run start
 | [IntlAdmin](docs/IntlAdmin.md) | 国际化语言包管理：语言类型 CRUD；语言库 treeList 词条（namespace+code 分组），支持增删改查与筛选。 |
 | [Language](docs/Language.md) | 切换系统语言 |
 | [LoginIllustration](docs/LoginIllustration.md) | 用来实现精美的登录插图，含 Lottie 动画与随 locale 切换的 workforce 人才能力主题插图。 |
-| [MessageManger](docs/MessageManger.md) | `MessageManger` 是基于 `fastify-message`… |
+| [MailGateway](docs/MailGateway.md) | `@kne/fastify-mail-gateway` 邮件网关的管理后台。在一个页面里托管多个企业邮箱，收件、发件、草稿统一管理，并通过可视化的收发规则让邮件自动打标签、自动回复、转发或触发系统里的其它功能。 **核心特性** -… |
+| [MessageManger](docs/MessageManger.md) | `MessageManger` 是基于 `fastify-message` 的消息管理组件，提供消息模板管理和发送记录列表。模板使用 Liquid 语法（`{{ 变量 }}`、`{% if… |
 | [MessageQueue](docs/MessageQueue.md) | MessageQueue 是面向 `fastify-mq` 的消息队列管理端组件，提供队列运行概览、消息发布与查询、死信处理、轨迹追踪和队列维护工具。 组件直接对齐 `fastify-mq`… |
+| [Oidc](docs/Oidc.md) | 配合 `@kne/fastify-oidc` 使用的前端 OIDC 登录组件集，让多个业务项目共用一个登录中心：用户只登录一次，就能在各个项目之间免登录跳转，并按租户切换身份。 **核心特性** -… |
+| [OidcAdmin](docs/OidcAdmin.md) | `@kne/fastify-oidc` 登录中心的管理后台，管理员可以在这里登记接入的应用、声明受保护的接口、轮换签名密钥，以及查看和结束用户的登录会话。 **核心特性** -… |
 | [Signature](docs/Signature.md) | 签名密钥管理组件，提供签名密钥的创建、验证、启用/禁用和删除功能，支持密钥列表展示和用户关联管理。 |
 | [Task](docs/Task.md) | 任务管理组件，用于展示和管理系统中的异步任务。支持查看我的任务和全部任务，提供任务筛选、排序、批量操作等功能。包含任务取消、重试、查看错误详情和结果详情等操作。 |
 | [Tenant](docs/Tenant.md) | 租户管理系统组件，提供公司信息管理、组织架构管理、用户管理、角色权限管理等完整的租户管理功能。子组件 `TenantUserSelect` 支持按组织树筛选并选择租户成员；默认双栏面板，另提供… |
