@@ -29,7 +29,7 @@ import useGroupTreeSync from './useGroupTreeSync';
 import style from './style.module.scss';
 
 /** 与 GroupSelect 相同：默认 Form 字段，.Field 为非表单受控 */
-const createComponent = (callback = item => item) =>
+const createComponent = (callback = item => item, { loadOnOpen = false } = {}) =>
   createWithRemoteLoader({
     modules: ['components-core:Global@usePreset', 'components-core:Global@useGlobalValue', 'components-core:FormInfo']
   })(
@@ -89,10 +89,7 @@ const createComponent = (callback = item => item) =>
 
         const openGroupForm = useCallback(
           ({ editingGroup = null, treeData = [], reload, afterClose } = {}) => {
-            const parentNode =
-              showParent && editingGroup?.parentId != null
-                ? findGroupInTree(treeData, editingGroup.parentId, valueKey)
-                : null;
+            const parentNode = showParent && editingGroup?.parentId != null ? findGroupInTree(treeData, editingGroup.parentId, valueKey) : null;
 
             const formData = editingGroup
               ? {
@@ -141,7 +138,10 @@ const createComponent = (callback = item => item) =>
                       }
                     : undefined,
                 onSubmit: async values => {
-                  let payload = applyGroupLangToPayload(Object.assign({}, values, { type, language }), { lang, existingOptions: editingGroup?.options });
+                  let payload = applyGroupLangToPayload(Object.assign({}, values, { type, language }), {
+                    lang,
+                    existingOptions: editingGroup?.options
+                  });
                   if (showParent) {
                     payload.parentId = resolveGroupParentIdForSave(values.parentId, treeData, valueKey);
                   }
@@ -214,63 +214,63 @@ const createComponent = (callback = item => item) =>
           return <div className={style['loading-wrapper']}>{formatMessage({ id: 'GroupSelectLoading' })}</div>;
         }
 
-        return (
-          <Fetch
-            key={treeSyncKey}
-            {...groupListApi}
-            render={({ data, loading, reload }) => {
-              const treeData = loading ? [] : resolveGroupTreeData(data);
-              const options = flattenGroupTree(treeData, null, valueKey);
-              const colorProps = showColor
-                ? {
-                    prefix: ({ value }) => {
-                      const selected = Array.isArray(value) ? value[0] : value;
-                      return (
-                        <FolderFilled
-                          className={style['group-folder-toolbar-color-icon']}
-                          style={{ color: getGroupIconColor(selected, { valueKey }) }}
-                        />
-                      );
-                    },
-                    renderItemContent: createGroupItemContentRender({ valueKey, labelKey, locale })
-                  }
-                : null;
-              return (
-                <Component
-                  {...props}
-                  {...colorProps}
-                  open={open}
-                  onOpenChange={setOpen}
-                  single={single}
-                  valueKey={valueKey}
-                  labelKey={labelKey}
-                  parentKey="parentId"
-                  options={options}
-                  footer={
-                    showAdd
-                      ? ({ close }) => (
-                          <Button
-                            type="link"
-                            onClick={() => {
-                              close?.();
-                              openGroupForm({ treeData, reload, afterClose: () => setOpen(true) });
-                            }}
-                          >
-                            {formatMessage({ id: 'GroupSelectAdd' }, { name: groupName })}
-                          </Button>
-                        )
-                      : props.footer
-                  }
-                />
-              );
-            }}
-          />
-        );
+        const renderField = ({ data, loading, reload } = {}) => {
+          const treeData = loading || !data ? [] : resolveGroupTreeData(data);
+          const options = flattenGroupTree(treeData, null, valueKey);
+          const colorProps = showColor
+            ? {
+                prefix: ({ value }) => {
+                  const selected = Array.isArray(value) ? value[0] : value;
+                  return (
+                    <FolderFilled className={style['group-folder-toolbar-color-icon']} style={{ color: getGroupIconColor(selected, { valueKey }) }} />
+                  );
+                },
+                renderItemContent: createGroupItemContentRender({ valueKey, labelKey, locale })
+              }
+            : null;
+          return (
+            <Component
+              {...props}
+              {...colorProps}
+              open={open}
+              onOpenChange={setOpen}
+              single={single}
+              valueKey={valueKey}
+              labelKey={labelKey}
+              parentKey="parentId"
+              options={options}
+              footer={
+                showAdd
+                  ? ({ close }) => (
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          close?.();
+                          openGroupForm({ treeData, reload, afterClose: () => setOpen(true) });
+                        }}
+                      >
+                        {formatMessage({ id: 'GroupSelectAdd' }, { name: groupName })}
+                      </Button>
+                    )
+                  : props.footer
+              }
+            />
+          );
+        };
+
+        // 筛选项未展开时不需要分组树选项（已选值靠 value 自带的 label 回显）：不挂载 Fetch，
+        // 避免首屏为每个维度各发一次 group-list，也让 react-filter 隐藏测量行的实例不再产生无效请求。
+        if (loadOnOpen && !open) {
+          return renderField({ data: null });
+        }
+
+        return <Fetch key={treeSyncKey} {...groupListApi} render={renderField} />;
       }
     )
   );
 
 const GroupFolderField = createComponent();
-GroupFolderField.Field = createComponent(item => item.Field);
+// 表单字段保持即时加载；筛选项（.Field）改为展开时才加载
+GroupFolderField.Field = createComponent(item => item.Field, { loadOnOpen: true });
 
 export default GroupFolderField;

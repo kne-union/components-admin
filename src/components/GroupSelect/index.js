@@ -33,7 +33,7 @@ import {
 import useGroupTreeSync from './useGroupTreeSync';
 import style from './style.module.scss';
 
-const createComponent = (callback = item => item) => {
+const createComponent = (callback = item => item, { loadOnOpen = false } = {}) => {
   return createWithRemoteLoader({
     modules: [
       'components-core:FormInfo',
@@ -115,8 +115,7 @@ const createComponent = (callback = item => item) => {
 
         const openGroupForm = ({ editingGroup = null, treeData = [], reload, afterClose } = {}) => {
           const allLabel = formatMessage({ id: 'GroupSelectAll' });
-          const parentNode =
-            showParent && editingGroup?.parentId != null ? findGroupInTree(treeData, editingGroup.parentId, valueKey) : null;
+          const parentNode = showParent && editingGroup?.parentId != null ? findGroupInTree(treeData, editingGroup.parentId, valueKey) : null;
 
           const formData = editingGroup
             ? {
@@ -153,7 +152,10 @@ const createComponent = (callback = item => item) => {
               lang,
               rules: buildFormRules(editingGroup),
               onSubmit: async formDataValues => {
-                let payload = applyGroupLangToPayload(Object.assign({}, formDataValues, { type, language }), { lang, existingOptions: editingGroup?.options });
+                let payload = applyGroupLangToPayload(Object.assign({}, formDataValues, { type, language }), {
+                  lang,
+                  existingOptions: editingGroup?.options
+                });
                 if (showParent) {
                   payload.parentId = resolveGroupParentIdForSave(formDataValues.parentId, treeData, valueKey);
                 }
@@ -237,19 +239,14 @@ const createComponent = (callback = item => item) => {
         };
 
         const columns = [
-          ...(allowCustomCode
-            ? [{ title: formatMessage({ id: 'GroupSelectCode' }), name: 'code' }]
-            : []),
+          ...(allowCustomCode ? [{ title: formatMessage({ id: 'GroupSelectCode' }), name: 'code' }] : []),
           showColor
             ? {
                 title: formatMessage({ id: 'GroupSelectName' }),
                 name: 'name',
                 getValueOf: item => (
                   <Flex align="center" gap={8}>
-                    <FolderFilled
-                      className={style['group-folder-toolbar-color-icon']}
-                      style={{ color: getGroupIconColor(item, { valueKey }) }}
-                    />
+                    <FolderFilled className={style['group-folder-toolbar-color-icon']} style={{ color: getGroupIconColor(item, { valueKey }) }} />
                     <span>{getGroupLabel(item, { labelKey, locale })}</span>
                   </Flex>
                 )
@@ -304,68 +301,69 @@ const createComponent = (callback = item => item) => {
         if (!groupListApi?.url && !groupListApi?.loader && !groupListApi?.data) {
           return <div className={style['group-list']}>{formatMessage({ id: 'GroupSelectLoading' })}</div>;
         }
-        return (
-          <Fetch
-            key={treeSyncKey}
-            {...groupListApi}
-            render={({ data, reload }) => {
-              const treeData = resolveGroupTreeData(data);
-              return (
-                <Component
-                  className={style['group-list']}
-                  name={name}
-                  label={label}
-                  rule={rule}
-                  placeholder={placeholder}
-                  disabled={disabled}
-                  single={single}
-                  valueKey={valueKey}
-                  labelKey={labelKey}
-                  isPopup={false}
-                  {...props}
-                  open={open}
-                  onOpenChange={setOpen}
-                  dataType="tree"
-                  defaultExpandedKeys
-                  options={treeData}
-                  getSearchCallback={({ searchText }, item) => {
-                    if (!searchText) {
-                      return true;
-                    }
-                    const keyword = String(searchText).toLowerCase();
-                    return [item.code, item.name, item.description].filter(Boolean).join(' ').toLowerCase().includes(keyword);
-                  }}
-                  columns={columns.map(col => {
-                    if (col.name !== 'options') {
-                      return col;
-                    }
-                    return Object.assign({}, col, {
-                      getValueOf: (item, { context }) =>
-                        col.getValueOf(item, {
-                          context: Object.assign({}, context, { reload, treeData })
-                        })
-                    });
-                  })}
-                  footer={
-                    showAdd
-                      ? ({ close }) => (
-                          <Button
-                            type="link"
-                            onClick={() => {
-                              close?.();
-                              openGroupForm({ treeData, reload, afterClose: () => setOpen(true) });
-                            }}
-                          >
-                            {formatMessage({ id: 'GroupSelectAdd' }, { name: groupName })}
-                          </Button>
-                        )
-                      : null
-                  }
-                />
-              );
-            }}
-          />
-        );
+        const renderField = ({ data, reload } = {}) => {
+          const treeData = resolveGroupTreeData(data);
+          return (
+            <Component
+              className={style['group-list']}
+              name={name}
+              label={label}
+              rule={rule}
+              placeholder={placeholder}
+              disabled={disabled}
+              single={single}
+              valueKey={valueKey}
+              labelKey={labelKey}
+              isPopup={false}
+              {...props}
+              open={open}
+              onOpenChange={setOpen}
+              dataType="tree"
+              defaultExpandedKeys
+              options={treeData}
+              getSearchCallback={({ searchText }, item) => {
+                if (!searchText) {
+                  return true;
+                }
+                const keyword = String(searchText).toLowerCase();
+                return [item.code, item.name, item.description].filter(Boolean).join(' ').toLowerCase().includes(keyword);
+              }}
+              columns={columns.map(col => {
+                if (col.name !== 'options') {
+                  return col;
+                }
+                return Object.assign({}, col, {
+                  getValueOf: (item, { context }) =>
+                    col.getValueOf(item, {
+                      context: Object.assign({}, context, { reload, treeData })
+                    })
+                });
+              })}
+              footer={
+                showAdd
+                  ? ({ close }) => (
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          close?.();
+                          openGroupForm({ treeData, reload, afterClose: () => setOpen(true) });
+                        }}
+                      >
+                        {formatMessage({ id: 'GroupSelectAdd' }, { name: groupName })}
+                      </Button>
+                    )
+                  : null
+              }
+            />
+          );
+        };
+
+        // 筛选项未展开时不挂载 Fetch，避免首屏为每个维度各发一次 group-list
+        if (loadOnOpen && !open) {
+          return renderField({ data: null });
+        }
+
+        return <Fetch key={treeSyncKey} {...groupListApi} render={renderField} />;
       }
     )
   );
@@ -373,7 +371,8 @@ const createComponent = (callback = item => item) => {
 
 const GroupSelect = createComponent();
 
-GroupSelect.Field = createComponent(item => item.Field);
+// 表单字段保持即时加载；筛选项（.Field）改为展开时才加载
+GroupSelect.Field = createComponent(item => item.Field, { loadOnOpen: true });
 const GroupSelectFilterItem = createGroupSelectFilterItem(GroupSelect.Field);
 GroupSelect.FilterItem = GroupSelectFilterItem;
 GroupSelect.GroupFolder = GroupFolder;
