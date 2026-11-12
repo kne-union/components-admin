@@ -18,7 +18,7 @@ const locale = {
   SmtpHost: 'SMTP host',
   SmtpPort: 'Port',
   SmtpUser: 'Username',
-  SmtpPass: 'Password / App password',
+  SmtpPass: 'Password',
   SmtpPassTips: 'Some providers require an app password',
   SmtpPassEditTips: 'Leave empty to keep the current password',
   SmtpPassSaved: 'Saved',

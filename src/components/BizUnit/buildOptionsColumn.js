@@ -31,10 +31,16 @@ const buildOptionsColumn = ({ formatMessage, apis, options, getActionList, getFo
       // 于是所有 BizUnit 列表的操作列整列空白。
       getValueOf: (item, ctx) => {
         const { context, place, className } = ctx || {};
-        const list = normalizeActionType(buildActionList({ ...actionListProps, ...(className ? { className } : {}), data: item, fetchOptions: context, formatMessage }));
+        const list = normalizeActionType(
+          buildActionList({ ...actionListProps, ...(className ? { className } : {}), data: item, fetchOptions: context, formatMessage })
+        );
         return Object.assign(
           { list },
-          Number.isInteger(options.showLength) ? { showLength: options.showLength } : {},
+          // 默认只保留三点「更多」图标，全部动作收进下拉。
+          // 不传 showLength 时 ButtonGroup 会走自动测量：测量完成前先外显 1 个按钮，
+          // 48px 列宽下把「更多」挤出并被 overflow:hidden 裁掉；同时受控模式也不会再
+          // 因容器宽度变化而在行内露出部分文字按钮。业务可用 options.showLength 覆盖。
+          { showLength: Number.isInteger(options.showLength) ? options.showLength : 0 },
           place ? { place } : {},
           className ? { className } : {}
         );
