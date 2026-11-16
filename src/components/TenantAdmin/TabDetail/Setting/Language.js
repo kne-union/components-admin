@@ -166,20 +166,20 @@ const LanguageContent = ({ languageOptions, tenant, reload, FormInfo, InfoPage, 
 const Language = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:FormInfo', 'components-core:InfoPage']
 })(
-  withLocale(({ remoteModules, tenant, reload, languageOptionsApi, showBuiltinLanguageOptions = false }) => {
+  withLocale(({ remoteModules, tenant, reload, languageOptionsApi, showBuiltinLanguageOptions = true }) => {
     const [usePreset, FormInfo, InfoPage] = remoteModules;
-    const { apis } = usePreset();
     const { formatMessage } = useIntl();
 
-    const optionsApi = useMemo(() => {
-      return languageOptionsApi || apis?.intlAdmin?.langType?.list || null;
-    }, [languageOptionsApi, apis?.intlAdmin?.langType?.list]);
-
+    // 未显式配置 languageOptionsApi 时不请求 intl-admin（业务未必接入语言模块），只用内置中英文
+    const optionsApi = languageOptionsApi || null;
+    const builtinOptions = useMemo(
+      () => normalizeLanguageOptions([], { showBuiltinLanguageOptions }),
+      [showBuiltinLanguageOptions]
+    );
     const contentProps = { tenant, reload, FormInfo, InfoPage, usePreset, formatMessage };
 
     if (!optionsApi) {
-      const languageOptions = normalizeLanguageOptions([], { showBuiltinLanguageOptions });
-      return <LanguageContent {...contentProps} languageOptions={languageOptions} />;
+      return <LanguageContent {...contentProps} languageOptions={builtinOptions} />;
     }
 
     const isGet = !optionsApi.method || String(optionsApi.method).toUpperCase() === 'GET';
@@ -194,9 +194,15 @@ const Language = createWithRemoteLoader({
             ? { params: Object.assign({}, requestParams, optionsApi.params) }
             : { data: Object.assign({}, requestParams, optionsApi.data) }
         )}
+        error={() => <LanguageContent {...contentProps} languageOptions={builtinOptions} />}
         render={({ data }) => {
           const languageOptions = normalizeLanguageOptions(data, { showBuiltinLanguageOptions });
-          return <LanguageContent {...contentProps} languageOptions={languageOptions} />;
+          return (
+            <LanguageContent
+              {...contentProps}
+              languageOptions={languageOptions.length ? languageOptions : builtinOptions}
+            />
+          );
         }}
       />
     );

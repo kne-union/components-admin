@@ -1,5 +1,4 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import merge from 'lodash/merge';
 import { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import { Flex, Button } from 'antd';
 import { useSearchParams } from 'react-router-dom';
@@ -10,10 +9,11 @@ import UserMobileList from './UserMobileList';
 import withLocale from '../withLocale';
 import { useIntl } from '@kne/react-intl';
 import useRefCallback from '@kne/use-ref-callback';
+import BizUnit from '@components/BizUnit';
+import TablePageRender from '@components/BizUnit/TablePageRender';
 
 import useFilterList from './useFilterList';
 import useColumns from './useColumns';
-import get from 'lodash/get';
 
 /**
  * 将 URL 中的 userId 别名（filterUserId / id）归一到 userId，供 searchParamsValue 直接对齐筛选项 name。
@@ -31,7 +31,7 @@ const normalizeUserSearchParams = (searchParams, { allowQueryIdForUserFilter } =
 };
 
 const UserList = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:TablePage@useSelectedRow', 'components-core:Filter', 'components-core:Global@usePreset']
+  modules: ['components-core:TablePage@useSelectedRow', 'components-core:Filter', 'components-core:Global@usePreset']
 })(
   withLocale(
     ({
@@ -48,8 +48,7 @@ const UserList = createWithRemoteLoader({
       showLength,
       optionsColumn
     }) => {
-      const [TablePage, useSelectedRow, Filter, usePreset] = remoteModules;
-      const tableRef = useRef();
+      const [useSelectedRow, Filter, usePreset] = remoteModules;
       const mobileListRef = useRef([]);
       const { formatMessage } = useIntl();
       const {
@@ -71,7 +70,6 @@ const UserList = createWithRemoteLoader({
         setSelectedRows([]);
       }, [setSelectedRows]);
 
-      // TableView 需要 onChange；用 ref 取当前页数据，避免闭包过期
       const rowSelection = useMemo(
         () => ({
           type,
@@ -91,7 +89,6 @@ const UserList = createWithRemoteLoader({
           tenantOrgId: 'single',
           synced: 'single'
         });
-        // 接口仍使用 filter.id；返回 { filter } 由 TablePage reload 合并进 params，勿在外层再抬升 params.filter
         return (filterValue, getFv) => {
           const value = mapper(filterValue, getFv || getFilterValue);
           if (value.userId != null && value.userId !== '') {
@@ -116,7 +113,6 @@ const UserList = createWithRemoteLoader({
 
       const stripUserListUrlParams = useCallback(
         (_next, opts) => {
-          // 基于当前 window search 清理，避免闭包绑死旧 searchParams 导致回调引用抖动
           const real = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
           ['userId', 'filterUserId', 'userName', 'tenantOrgId', 'tenantOrgName'].forEach(key => {
             real.delete(key);
@@ -138,7 +134,6 @@ const UserList = createWithRemoteLoader({
         [seedSearchParams, stripUserListUrlParams, searchParamsFields]
       );
 
-      // 仅解析首屏展示用；URL 清理交给 TablePage filter.searchParamsValue
       const fromUrl = useSearchParamsValue({
         searchParams: seedSearchParams,
         fields: searchParamsFields
@@ -200,151 +195,146 @@ const UserList = createWithRemoteLoader({
 
       const hasExternalSelected = selectedRows.some(row => row.syncSource);
 
-      const reloadTable = useCallback(() => {
-        // 与 BizUnit / Admin User 一致：isNext 卡片操作后用 refresh 回第一页，避免页码滞留导致列表空白
-        tableRef.current?.refresh({
-          params: {
-            currentPage: 1
-          }
-        });
-      }, []);
-
-      const buttonGroupList = [];
-      if (apis.create) {
-        buttonGroupList.push({
-          buttonComponent: Create,
-          type: 'primary',
-          size: topOptionsSize,
-          apis,
-          onSuccess: () => reloadTable(),
-          children: formatMessage({ id: 'Add' })
-        });
-      }
-      if (apis.sendOrgMessage && hasExternalSelected) {
-        buttonGroupList.push({
-          buttonComponent: SendMessage,
-          size: topOptionsSize,
-          apis,
-          selectedRows,
-          onSuccess: () => {
-            clearSelection();
-            reloadTable();
-          }
-        });
-      }
-      if (selectedRowKeys.length > 0) {
-        buttonGroupList.push(({ key, className }) => (
-          <Flex key={key} align="center" className={className} style={{ fontSize: 14, color: '#666', whiteSpace: 'nowrap' }}>
-            {formatMessage({ id: 'SelectedCount' }, { count: selectedRowKeys.length })}
-            <Button type="link" size="small" onClick={clearSelection}>
-              {formatMessage({ id: 'DeselectAll' })}
-            </Button>
-          </Flex>
-        ));
-      }
-
-      const renderMobile = useCallback(
-        ({ dataSource } = {}) => (
-          <UserMobileList
-            dataSource={dataSource ?? mobileListRef.current}
-            rowSelection={rowSelection}
-            apis={apis}
-            getActions={getActions}
-            onSuccess={reloadTable}
-            showLength={showLength}
-          />
-        ),
-        [apis, getActions, reloadTable, rowSelection, showLength]
+      const renderCardsFactory = useCallback(
+        (layout, reload) =>
+          ({ dataSource } = {}) => (
+            <UserMobileList
+              layout={layout === 'card' ? 'card' : undefined}
+              dataSource={dataSource ?? mobileListRef.current}
+              rowSelection={rowSelection}
+              apis={apis}
+              getActions={getActions}
+              onSuccess={reload}
+              showLength={showLength}
+            />
+          ),
+        [apis, getActions, rowSelection, showLength]
       );
 
-      const renderCard = useCallback(
-        ({ dataSource } = {}) => (
-          <UserMobileList
-            layout="card"
-            dataSource={dataSource ?? mobileListRef.current}
-            rowSelection={rowSelection}
-            apis={apis}
-            getActions={getActions}
-            onSuccess={reloadTable}
-            showLength={showLength}
-          />
-        ),
-        [apis, getActions, reloadTable, rowSelection, showLength]
-      );
-
-      // 对齐 BizUnit 演示：筛选走 TablePage 内部 reload + mapFilterValue，不要把 filter 抬升进 list.params
-      const tableOptions = {
-        isNext: true,
-        ...merge({}, apis.list),
-        dataFormat: data => {
-          const format = typeof apis.list?.dataFormat === 'function' ? apis.list.dataFormat : null;
-          const formatted = format
-            ? format(data)
-            : {
-                list: data.pageData,
-                total: data.totalCount ?? data.total,
-                data
-              };
-          mobileListRef.current = formatted?.list || [];
-          return formatted;
-        },
-        ref: tableRef,
-        search: {
-          name: 'keyword',
-          label: formatMessage({ id: 'Keyword' })
-        },
-        filter: {
-          value: filter,
-          onChange: handleFilterChange,
-          list: filterList,
-          mapFilterValue,
-          // TablePage 新 API：首包 merge + 清理 URL；字段名与筛选项对齐（userId / tenantOrgId）
-          searchParamsValue
-        },
-        columns: [
-          ...columns,
-          Object.assign(
-            {
-              name: 'options',
-              title: formatMessage({ id: 'Action' }),
-              renderType: 'options',
-              fixed: 'right',
-              // options 渲染器只认动作数组（或 { list }）：返回 { children: <Actions/> } 会被整列丢弃。
-              // getActions 是插件扩展点，返回 JSX 时无法放进动作数组，此时退回内置动作。
-              getValueOf: item => {
-                const list = buildActionList({ formatMessage, data: item, apis, onSuccess: reloadTable });
-                const extended = typeof getActions === 'function' ? getActions({ list, data: item }) : null;
-                return {
-                  list: Array.isArray(extended) ? extended : list,
-                  ...(Number.isInteger(showLength) ? { showLength } : {})
-                };
+      const buildButtonGroupList = useCallback(
+        reload => {
+          const list = [];
+          if (apis.create) {
+            list.push({
+              buttonComponent: Create,
+              type: 'primary',
+              size: topOptionsSize,
+              apis,
+              onSuccess: reload,
+              children: formatMessage({ id: 'Add' })
+            });
+          }
+          if (apis.sendOrgMessage && hasExternalSelected) {
+            list.push({
+              buttonComponent: SendMessage,
+              size: topOptionsSize,
+              apis,
+              selectedRows,
+              onSuccess: () => {
+                clearSelection();
+                reload();
               }
-            },
-            optionsColumn
-          )
-        ],
-        name: 'tenant-user-list',
-        pagination: { paramsType: 'params' },
-        rowSelection,
-        renderMobile,
-        renderCard,
-        ...(buttonGroupList.length > 0 ? { buttonGroup: { list: buttonGroupList } } : {})
-      };
+            });
+          }
+          if (selectedRowKeys.length > 0) {
+            list.push(({ key, className }) => (
+              <Flex key={key} align="center" className={className} style={{ fontSize: 14, color: '#666', whiteSpace: 'nowrap' }}>
+                {formatMessage({ id: 'SelectedCount' }, { count: selectedRowKeys.length })}
+                <Button type="link" size="small" onClick={clearSelection}>
+                  {formatMessage({ id: 'DeselectAll' })}
+                </Button>
+              </Flex>
+            ));
+          }
+          return list;
+        },
+        [
+          apis,
+          hasExternalSelected,
+          selectedRows,
+          selectedRowKeys.length,
+          topOptionsSize,
+          clearSelection,
+          formatMessage
+        ]
+      );
 
       const handlerMount = useRefCallback(() => {
-        onMount?.({ filter: { value: filter, onChange: handleFilterChange }, filterList, tableOptions });
+        onMount?.({ filter: { value: filter, onChange: handleFilterChange }, filterList });
       });
 
-      // 仅挂载与勾选变化时通知；不要在每次筛选 onChange 时回调，避免外层连带重渲
       useEffect(() => {
         handlerMount();
       }, [handlerMount, selectedRowKeys]);
 
-      if (typeof children === 'function') {
-        return children({ filter: { value: filter, onChange: handleFilterChange }, filterList, tableOptions });
-      }
+      const enhanceTableOptions = useCallback(
+        tableOptions => {
+          const reload = () =>
+            tableOptions.ref?.current?.refresh?.({
+              params: { currentPage: 1 }
+            });
+          const buttonList = buildButtonGroupList(reload);
+          return Object.assign({}, tableOptions, {
+            renderMobile: renderCardsFactory('mobile', reload),
+            renderCard: renderCardsFactory('card', reload),
+            ...(buttonList.length > 0 ? { buttonGroup: { list: buttonList } } : { buttonGroup: null })
+          });
+        },
+        [renderCardsFactory, buildButtonGroupList]
+      );
 
-      return <TablePage {...tableOptions} />;
+      return (
+        <BizUnit
+          name="tenant-user-list"
+          apis={{ list: apis.list }}
+          searchParamsValue={searchParamsValue}
+          filter={{
+            value: filter,
+            onChange: handleFilterChange,
+            list: filterList
+          }}
+          getColumns={() => columns}
+          getActionList={({ data, className, ...props }) => {
+            const list = buildActionList({ formatMessage, data, apis, className, ...props });
+            const extended = typeof getActions === 'function' ? getActions({ list, data }) : null;
+            return Array.isArray(extended) ? extended : list;
+          }}
+          options={{
+            mapFilterValue,
+            ...(Number.isInteger(showLength) ? { showLength } : {}),
+            ...(optionsColumn ? { optionsColumn } : {}),
+            tableProps: {
+              pagination: { paramsType: 'params' },
+              rowSelection,
+              dataFormat: data => {
+                const format = typeof apis.list?.dataFormat === 'function' ? apis.list.dataFormat : null;
+                const formatted = format
+                  ? format(data)
+                  : {
+                      list: data.pageData,
+                      total: data.totalCount ?? data.total,
+                      data
+                    };
+                mobileListRef.current = formatted?.list || [];
+                return formatted;
+              }
+            }
+          }}
+        >
+          {({ tableOptions, ...rest }) => {
+            const nextOptions = enhanceTableOptions(tableOptions);
+            if (typeof children === 'function') {
+              return children({
+                ...rest,
+                tableOptions: nextOptions,
+                filter: { value: filter, onChange: handleFilterChange },
+                filterList
+              });
+            }
+            return <TablePageRender tableOptions={nextOptions} />;
+          }}
+        </BizUnit>
+      );
     }
   )
 );

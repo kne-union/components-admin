@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
 import { App, Result, Button, Flex } from 'antd';
@@ -9,6 +9,35 @@ import { withPublicUrl } from '../../utils/publicUrl';
 import { useIntl } from '@kne/react-intl';
 
 const getTenantName = item => item?.tenant?.tenantCompany?.name || item?.tenant?.name || item?.tenantId;
+
+/**
+ * 服务期告警：固定 key 更新同一条通知，避免重渲染叠多条；
+ * locale 变化时用当前语言文案覆盖（英文系统弹英文）。
+ */
+const ServicePeriodNotice = ({ tenantId, serviceStartTime, serviceEndTime }) => {
+  const { notification } = App.useApp();
+  const { formatMessage, locale } = useIntl();
+
+  useEffect(() => {
+    const inService = dayjs().isAfter(dayjs(serviceStartTime)) && dayjs().isBefore(dayjs(serviceEndTime).endOf('day'));
+    if (inService) {
+      return;
+    }
+    notification.warning({
+      key: `tenant-service-period:${tenantId || 'unknown'}`,
+      message: formatMessage({ id: 'ImportantNotice' }),
+      description: formatMessage(
+        { id: 'ServicePeriodWarning' },
+        {
+          startDate: dayjs(serviceStartTime).format('YYYY-MM-DD'),
+          endDate: dayjs(serviceEndTime).format('YYYY-MM-DD')
+        }
+      )
+    });
+  }, [tenantId, serviceStartTime, serviceEndTime, notification, formatMessage, locale]);
+
+  return null;
+};
 
 /**
  * 读取租户身份失败时按可用租户分流：没有可用租户给出说明与切换账号；有则直接选择进入；可用租户也取不到时回到通用错误页。
@@ -107,8 +136,6 @@ const TenantUserInfo = createWithRemoteLoader({
 })(({ remoteModules, children }) => {
   const [SetGlobal, usePreset] = remoteModules;
   const { apis } = usePreset();
-  const { notification } = App.useApp();
-  const { formatMessage } = useIntl();
   return (
     <Fetch
       cache="tenant-user-info"
@@ -116,17 +143,9 @@ const TenantUserInfo = createWithRemoteLoader({
       error={error => <TenantUnavailable error={error} />}
       render={({ data, reload }) => {
         const { serviceStartTime, serviceEndTime } = data.tenant;
-        if (!(dayjs().isAfter(dayjs(serviceStartTime)) && dayjs().isBefore(dayjs(serviceEndTime).endOf('day')))) {
-          notification.warning({
-            message: formatMessage({ id: 'ImportantNotice' }),
-            description: formatMessage({ id: 'ServicePeriodWarning' }, {
-              startDate: dayjs(serviceStartTime).format('YYYY-MM-DD'),
-              endDate: dayjs(serviceEndTime).format('YYYY-MM-DD')
-            })
-          });
-        }
         return (
           <>
+            <ServicePeriodNotice tenantId={data.tenant?.id} serviceStartTime={serviceStartTime} serviceEndTime={serviceEndTime} />
             <SetGlobal globalKey="themeToken" value={{ colorPrimary: data.tenant.themeColor }} />
             <SetGlobal globalKey="permissions" value={data.tenantUserInfo?.permissions} needReady>
               <SetGlobal
