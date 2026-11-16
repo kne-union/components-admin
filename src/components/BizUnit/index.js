@@ -98,7 +98,8 @@ const BizUnit = createWithRemoteLoader({
       filterList,
       getActionList,
       allowKeywordSearch = true,
-      isNext = false,
+      // 默认走 next；legacy 仅文档/兼容显式传 isNext={false}
+      isNext = true,
       page,
       options,
       onFilterChange: outerOnFilterChange,

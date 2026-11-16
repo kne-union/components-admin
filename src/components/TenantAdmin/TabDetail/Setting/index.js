@@ -37,17 +37,28 @@ const Setting = createWithRemoteLoader({
       const { plugins } = usePreset();
       const { formatMessage } = useIntl();
 
+      // 默认开启语言设置，并带中英文内置选项（与 telent-coach 等业务用法一致）；可用 props / plugins 关闭
       const showLanguageSetting =
-        showLanguageSettingProp !== void 0 ? showLanguageSettingProp : !!get(plugins, 'admin.tenant.showLanguageSetting', false);
+        showLanguageSettingProp !== void 0 ? showLanguageSettingProp : get(plugins, 'admin.tenant.showLanguageSetting', true) !== false;
       const languageOptionsApi = languageOptionsApiProp !== void 0 ? languageOptionsApiProp : get(plugins, 'admin.tenant.languageOptionsApi');
       const showBuiltinLanguageOptions =
-        showBuiltinLanguageOptionsProp !== void 0 ? showBuiltinLanguageOptionsProp : !!get(plugins, 'admin.tenant.showBuiltinLanguageOptions', false);
+        showBuiltinLanguageOptionsProp !== void 0
+          ? showBuiltinLanguageOptionsProp
+          : get(plugins, 'admin.tenant.showBuiltinLanguageOptions', true) !== false;
       const appendSettingMenus =
         appendSettingMenusProp !== void 0 ? appendSettingMenusProp : get(plugins, 'admin.tenant.appendSettingMenus', []) || [];
 
       const managed = isManagedTenant(tenant);
       const { menuItems, contentMap } = useMemo(() => {
-        const items = [
+        const items = [];
+        // 托管租户的语言由宿主同步，本地不可改；语言设置放在环境变量上方
+        if (showLanguageSetting && !managed) {
+          items.push({
+            key: 'language',
+            label: formatMessage({ id: 'LanguageSetting' })
+          });
+        }
+        items.push(
           {
             key: 'args',
             label: formatMessage({ id: 'EnvironmentVariables' })
@@ -64,14 +75,7 @@ const Setting = createWithRemoteLoader({
             key: 'mfaSetting',
             label: formatMessage({ id: 'MfaSetting' })
           }
-        ];
-        // 托管租户的语言由宿主同步，本地不可改
-        if (showLanguageSetting && !managed) {
-          items.push({
-            key: 'language',
-            label: formatMessage({ id: 'LanguageSetting' })
-          });
-        }
+        );
         const map = Object.assign({}, builtinContentMap);
         (Array.isArray(appendSettingMenus) ? appendSettingMenus : []).forEach(item => {
           if (!item || !item.key || !item.component) {
@@ -91,8 +95,9 @@ const Setting = createWithRemoteLoader({
         return { menuItems: items, contentMap: map };
       }, [formatMessage, showLanguageSetting, managed, appendSettingMenus]);
 
-      const [activeKey, setActiveKey] = useState('args');
-      const resolvedActiveKey = menuItems.some(item => item.key === activeKey) ? activeKey : 'args';
+      const defaultMenuKey = menuItems[0]?.key || 'args';
+      const [activeKey, setActiveKey] = useState(defaultMenuKey);
+      const resolvedActiveKey = menuItems.some(item => item.key === activeKey) ? activeKey : defaultMenuKey;
       const Content = contentMap[resolvedActiveKey] || Args;
 
       return (

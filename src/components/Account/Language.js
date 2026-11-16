@@ -82,10 +82,15 @@ const LanguageInner = ({
 
   const initLocale = useRefCallback(() => {
     const cachedLocale = localStorage.getItem('X-User-Locale');
-    let targetLocale = cachedLocale;
+    let targetLocale;
 
-    if (!targetLocale || allowedValues.indexOf(targetLocale) === -1) {
+    // 仅一种语言时强制走默认语言（忽略缓存），保证租户默认语言生效
+    if (allowedValues.length <= 1) {
       targetLocale = allowedValues.indexOf(defaultLocale) > -1 ? defaultLocale : allowedValues[0];
+    } else if (!cachedLocale || allowedValues.indexOf(cachedLocale) === -1) {
+      targetLocale = allowedValues.indexOf(defaultLocale) > -1 ? defaultLocale : allowedValues[0];
+    } else {
+      targetLocale = cachedLocale;
     }
 
     if (targetLocale && targetLocale !== locale) {
@@ -99,6 +104,11 @@ const LanguageInner = ({
   useEffect(() => {
     initLocale();
   }, [initLocale, allowedValues.join(','), defaultLocale]);
+
+  // 超过一种语言才展示切换；单语言只应用默认，不渲染控件
+  if (list.length <= 1) {
+    return null;
+  }
 
   return (
     <LanguageField
@@ -115,8 +125,8 @@ const LanguageInner = ({
 };
 
 /**
- * Admin 默认仅中/英，不从 tenant 读取。
- * Client 等场景需传 supportLanguage / list / defaultLanguage。
+ * 未传 supportLanguage / list 时默认中/英。
+ * 租户场景传 supportLanguage / defaultLanguage：多于一种显示切换，仅一种则强制默认语言。
  */
 const Language = createWithRemoteLoader({
   modules: ['components-core:Global@useGlobalValue', 'components-core:Global@useGlobalContext']

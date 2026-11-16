@@ -14,7 +14,8 @@ const buildActionList = ({ formatMessage, data, ...props }) => {
 
   return [
     {
-      type: 'primary',
+      // 操作列走 table-view options：会加 btn-no-padding；勿写 primary，否则实心按钮被压成 0 8px 看起来挤
+      type: 'link',
       ...actionProps,
       buttonComponent: Save,
       children: formatMessage({ id: 'Edit' }),
