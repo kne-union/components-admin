@@ -84,6 +84,7 @@ const TabDetailInner = createWithRemoteLoader({
                 buttonOptions={
                   <Actions
                     data={data}
+                    editButtonType="primary"
                     onSuccess={() => {
                       reload();
                     }}

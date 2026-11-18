@@ -2806,6 +2806,7 @@ const LegacyExamples = createWithRemoteLoader({
             label: '基础用法',
             children: (
               <BizUnit
+                isNext={false}
                 name="role-list-legacy"
                 apis={roleApis}
                 getColumns={roleColumns}
@@ -2819,6 +2820,7 @@ const LegacyExamples = createWithRemoteLoader({
             label: '自定义操作',
             children: (
               <BizUnit
+                isNext={false}
                 name="role-list-custom-actions"
                 apis={customActionApis}
                 getColumns={customActionColumns}
@@ -2833,6 +2835,7 @@ const LegacyExamples = createWithRemoteLoader({
             label: '带筛选',
             children: (
               <BizUnit
+                isNext={false}
                 name="dept-list-legacy"
                 apis={deptApis}
                 getColumns={deptColumns}
@@ -2847,6 +2850,7 @@ const LegacyExamples = createWithRemoteLoader({
             label: '状态控制',
             children: (
               <BizUnit
+                isNext={false}
                 name="project-list-legacy"
                 apis={projectApis}
                 getColumns={projectColumns}

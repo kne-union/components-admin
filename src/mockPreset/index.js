@@ -27,6 +27,9 @@ import createMailSettingMock from './mail-setting';
 import createMfaSettingMock from './mfa-setting';
 import { buildTaskStatisticsOverview } from './task-statistics';
 import { enums as mailGatewayEnums } from '@components/MailGateway';
+import fileManagerMock from './file-manager';
+import fileList from './file-list.json';
+import { createPlatformLinkAjax } from './withPlatformLinkAjax';
 
 export {
   taskList,
@@ -42,7 +45,8 @@ export {
   deadLetterList,
   traceList,
   messageMangerData,
-  mailGatewayData
+  mailGatewayData,
+  fileList
 };
 
 const messageTemplates = () => messageMangerData.templates.pageData;
@@ -205,6 +209,7 @@ const loadFilteredRoleList = ({ params } = {}) =>
   });
 
 const apis = merge({}, getApis(), {
+  fileManager: fileManagerMock,
   task: {
     list: {
       loader: loadFilteredTaskList
@@ -514,7 +519,8 @@ const apis = merge({}, getApis(), {
       }
     },
     initSuperAdmin: {
-      loader: () => ({ code: 0 })
+      // 示例里稍作延迟，便于看到初始化中的 UI
+      loader: () => new Promise(resolve => setTimeout(() => resolve({}), 1200))
     }
   },
   user: {
@@ -1663,13 +1669,22 @@ const enums = Object.assign({}, taskEnums, intlAdminEnums, mailGatewayEnums, {
   ]
 });
 
+const handlePlatformLinkAjax = createPlatformLinkAjax();
+
 const preset = {
   ajax: async ({ loader, ...props }) => {
     if (!loader && props.url) {
+      const mocked = await handlePlatformLinkAjax({ loader, ...props });
+      if (mocked) {
+        return mocked;
+      }
       const { ajax } = await globalInit();
       return ajax({ loader, ...props });
     }
-    return Promise.resolve({ data: loader ? { code: 0, data: loader(props) } : { code: 0, data: {} } });
+    if (loader) {
+      return { data: { code: 0, data: await loader(props) } };
+    }
+    return { data: { code: 0, data: {} } };
   },
   locale: localStorage.getItem('X-User-Locale') || 'zh-CN',
   apis,

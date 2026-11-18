@@ -65,8 +65,27 @@ const locale = {
 
   // InitAdmin
   InitSystem: '初始化系统',
-  InitSystemDesc: '当前用户将被初始化为系统的超级管理员，本操作只能执行一次，执行完成后由该用户来执行其他的管理操作。',
-  InitSuccess: '初始化管理员成功！'
+  InitSystemDesc: '首次进入管理后台时，需要把当前登录用户设为超级管理员，之后才能进行用户、权限等管理操作。',
+  InitSystemHintOnce: '本操作只能执行一次，请确认当前账号正确',
+  InitSystemHintUser: '完成后，当前用户将成为系统超级管理员',
+  InitSystemHintNext: '初始化成功后将自动进入管理后台',
+  InitSystemPending: '正在初始化超级管理员…',
+  InitSystemFailed: '初始化失败，请稍后重试',
+  InitSystemRetry: '重新初始化',
+  InitSuccess: '初始化管理员成功！',
+
+  // AdminLayout 内置导航
+  NavUserManagement: '用户管理',
+  NavFileManagement: '文件管理',
+  NavMessageManagement: '消息管理',
+  NavPlatformManagement: '平台管理',
+  NavAuthManagement: '认证管理',
+  NavPlatformLink: '平台关联',
+  NavOidcClients: '应用管理',
+  NavOidcResourceServers: '资源服务',
+  NavOidcKeys: '签名密钥',
+  NavOidcSessions: '登录会话',
+  NavOidcApps: '应用中心'
 };
 
 export default locale;

@@ -17,6 +17,8 @@ const locale = {
   DeleteSuccess: '删除成功',
   AddSuccess: '添加成功',
   SaveSuccess: '保存成功',
+  PermissionUnsavedTip: '权限有改动尚未保存',
+  PermissionUnsavedDesc: '保存后相关用户需要重新登录',
   EditOrgNode: '编辑组织节点',
   Tree: '组织树',
   Graph: '架构图',

@@ -7,14 +7,18 @@ import Language from '@components/Account/Language';
 import { Flex, Button } from 'antd';
 
 export const MainLayout = createWithRemoteLoader({
-  modules: ['components-core:Layout']
+  modules: ['components-core:Layout', 'components-core:Global@useGlobalContext']
 })(({ remoteModules, navigation, title, children }) => {
-  const [Layout] = remoteModules;
+  const [Layout, useGlobalContext] = remoteModules;
+  const { global } = useGlobalContext('userInfo');
+  const setting = Object.assign({}, global?.setting);
+  const rawList = navigation?.list;
+  const list = Array.isArray(rawList) ? rawList.filter(item => !item?.setting || !!setting[item.setting]) : rawList;
   return (
     <Layout
       navigation={{
         defaultTitle: title,
-        ...Object.assign({}, navigation)
+        ...Object.assign({}, navigation, list !== undefined ? { list } : null)
       }}>
       {children}
     </Layout>
