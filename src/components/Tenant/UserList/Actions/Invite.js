@@ -29,6 +29,10 @@ const InviteInner = createWithRemoteLoader({
     <LoadingButton
       {...props}
       onClick={async () => {
+        // apis.inviteToken 为 false / null 时 merge 后没有 url，会请求当前页面地址
+        if (!apis.inviteToken) {
+          return;
+        }
         const { data: resData } = await ajax(
           merge({}, apis.inviteToken, {
             params: { id: data.id }

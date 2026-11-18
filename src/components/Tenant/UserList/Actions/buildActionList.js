@@ -31,7 +31,8 @@ const buildActionList = ({ formatMessage, apis, data, className, ...props }) => 
       ...itemProps,
       children: formatMessage({ id: 'InviteUser' }),
       buttonComponent: Invite,
-      hidden: data?.userId
+      // 无邀请接口（无权限 / 托管租户）时不展示，避免点击后请求空地址
+      hidden: data?.userId || !apis.inviteToken
     },
     {
       ...itemProps,
