@@ -65,8 +65,27 @@ const locale = {
 
   // InitAdmin
   InitSystem: 'Initialize System',
-  InitSystemDesc: 'The current user will be initialized as the super administrator of the system. This operation can only be performed once. After completion, the user will perform other management operations.',
-  InitSuccess: 'Initialized administrator successfully!'
+  InitSystemDesc: 'On first access to the admin console, the current signed-in user must be set as the super administrator before managing users and permissions.',
+  InitSystemHintOnce: 'This can only be done once — make sure you are using the right account',
+  InitSystemHintUser: 'After this, the current user becomes the system super administrator',
+  InitSystemHintNext: 'You will be redirected to the admin console when it succeeds',
+  InitSystemPending: 'Initializing super administrator…',
+  InitSystemFailed: 'Initialization failed. Please try again.',
+  InitSystemRetry: 'Retry',
+  InitSuccess: 'Initialized administrator successfully!',
+
+  // AdminLayout built-in navigation
+  NavUserManagement: 'User Management',
+  NavFileManagement: 'File Management',
+  NavMessageManagement: 'Message Management',
+  NavPlatformManagement: 'Platform',
+  NavAuthManagement: 'Authentication',
+  NavPlatformLink: 'Platform Link',
+  NavOidcClients: 'Clients',
+  NavOidcResourceServers: 'Resource Servers',
+  NavOidcKeys: 'Signing Keys',
+  NavOidcSessions: 'Sessions',
+  NavOidcApps: 'App Center'
 };
 
 export default locale;

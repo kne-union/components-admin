@@ -4,23 +4,27 @@ import { Spin, Empty, message } from 'antd';
 import createAjax from '@kne/axios-fetch';
 import { preset as remoteLoaderPreset } from '@kne/remote-loader';
 import localStorage from '@kne/local-storage';
+import { wrapAjaxWithPlatformLink } from './mockPreset/withPlatformLinkAjax';
 
 window.PUBLIC_URL = window.runtimePublicUrl || process.env.PUBLIC_URL;
 
 export const globalInit = async () => {
-  const ajax = createAjax({
-    errorHandler: errorMessage => message.error(errorMessage || '请求发生错误'),
-    showResponseError: response => {
-      if (response.config.showError === false) {
-        return false;
+  // PlatformLink 的 TablePage 走全局 ajax，需在此拦截 /app-ops/link/*（含访问记录）
+  const ajax = wrapAjaxWithPlatformLink(
+    createAjax({
+      errorHandler: errorMessage => message.error(errorMessage || '请求发生错误'),
+      showResponseError: response => {
+        if (response.config.showError === false) {
+          return false;
+        }
+        return response.status !== 200;
+      },
+      getResponseError: response => response?.data?.msg,
+      validateStatus: function () {
+        return true;
       }
-      return response.status !== 200;
-    },
-    getResponseError: response => response?.data?.msg,
-    validateStatus: function () {
-      return true;
-    }
-  });
+    })
+  );
   fetchPreset({
     ajax,
     loading: (
@@ -68,6 +72,18 @@ export const globalInit = async () => {
         ...registry,
         remote: 'components-iconfont',
         defaultVersion: '0.3.0'
+      },
+      'components-file-manager': {
+        ...registry,
+        remote: 'components-file-manager',
+        defaultVersion: '0.1.13'
+      },
+      'components-app-manager': {
+        ...registry,
+        //url: 'http://localhost:3012',
+        //tpl: '{{url}}',
+        remote: 'components-app-manager',
+        defaultVersion: '0.1.6'
       },
       'components-thirdparty': {
         ...registry,

@@ -17,6 +17,8 @@ const locale = {
   DeleteSuccess: 'Deleted successfully',
   AddSuccess: 'Added successfully',
   SaveSuccess: 'Saved successfully',
+  PermissionUnsavedTip: 'You have unsaved permission changes',
+  PermissionUnsavedDesc: 'Affected users will need to sign in again after saving',
   EditOrgNode: 'Edit Organization Node',
   Tree: 'Org tree',
   Graph: 'Chart',

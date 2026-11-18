@@ -7,15 +7,15 @@ import Remove from './Remove';
  * 生成租户操作列的动作数组（纯函数，不做渲染）
  * table-view 的 options 渲染器只接受动作数组 / { list }，列配置必须返回数组
  */
-const buildActionList = ({ formatMessage, data, ...props }) => {
+const buildActionList = ({ formatMessage, data, editButtonType = 'link', ...props }) => {
   // 宿主同步的租户：基本信息、状态与删除以宿主为准
   const managed = isManagedTenant(data);
   const actionProps = { ...props, data };
 
   return [
     {
-      // 操作列走 table-view options：会加 btn-no-padding；勿写 primary，否则实心按钮被压成 0 8px 看起来挤
-      type: 'link',
+      // 列表操作列默认 link（table-view options 会加 btn-no-padding，primary 会被压扁）；详情头用 primary
+      type: editButtonType,
       ...actionProps,
       buttonComponent: Save,
       children: formatMessage({ id: 'Edit' }),

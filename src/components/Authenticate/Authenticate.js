@@ -57,7 +57,10 @@ export const SuperAdminInfo = createWithRemoteLoader({
       {...Object.assign({}, apis.admin.getSuperAdminInfo)}
       render={({ data, reload }) => {
         return (
-          <SetGlobal globalKey="userInfo" value={{ value: data.userInfo, reload }} needReady>
+          <SetGlobal
+            globalKey="userInfo"
+            value={{ value: data.userInfo, setting: Object.assign({}, data.setting), reload }}
+            needReady>
             {children}
           </SetGlobal>
         );

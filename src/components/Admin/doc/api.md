@@ -1,6 +1,6 @@
 ## Admin 组件
 
-管理后台组件，提供用户管理和系统初始化功能。包含路由管理和上下文管理。
+管理后台组件，提供用户管理和系统初始化功能。包含路由管理和上下文管理。另提供 `AdminLayout`：封装各应用共用的超管导航与路由，业务只追加自定义模块。
 
 ### 主组件属性
 
@@ -10,6 +10,52 @@
 | ...props | 其他属性会通过 Context 传递给子组件 | object | - |
 
 ### 子组件
+
+#### AdminLayout 统一超管壳
+
+`components-admin:Admin@AdminLayout`。内置导航与路由（追加在自定义项之后）：
+
+| key | 说明 | 远程模块 / 实现 | 显隐 |
+| --- | --- | --- | --- |
+| user | 用户管理 | 本包 `Admin.User` | 始终 |
+| file | 文件管理 | `components-file-manager:FileListPage` | 始终 |
+| message | 消息管理 | `components-admin:MessageManger` | 始终 |
+| platform | 平台管理 | 本包 `PlatformManagement`（左栏：认证管理 / 平台关联） | 始终；其中「平台关联」左菜单受 `userInfo.setting.appOpsEnabled` 控制 |
+
+平台管理路由：`{baseUrl}/platform/oidc/*`（原 OidcAdmin 子页）、`{baseUrl}/platform/link/*`（`components-app-manager:PlatformLink`）。认证管理下的原 Oidc 菜单项为二级。
+
+依赖：`getSuperAdminInfo` 返回 `{ userInfo, setting }`（`@kne/fastify-account` ≥ 2.0.13 + 宿主 `getAdminSetting`）。
+
+| 属性名 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| baseUrl | 管理后台基础路径 | string | `/admin` |
+| defaultTitle | 顶栏默认标题 | string | - |
+| indexPath | 访问 `baseUrl` 时重定向的相对路径 | string | `user` |
+| navigation | 传给布局的 navigation；`list` 仅为**业务自定义**项，内置项自动追加 | object | - |
+| list | 业务自定义路由（`AppChildrenRouter` 的 list），内置路由自动追加 | array | `[]` |
+| pageProps | 传给用户管理等内置页的 pageProps | object | - |
+| children | 可选 catch-all | ReactNode | - |
+
+```jsx
+<RemoteLoader
+  module="components-admin:Admin@AdminLayout"
+  baseUrl="/admin"
+  defaultTitle="AI Onboarding"
+  indexPath="tenant"
+  navigation={{
+    list: [
+      { key: 'task', title: '任务管理', path: '/admin/task' },
+      { key: 'tenant', title: '租户管理', path: '/admin/tenant' }
+    ]
+  }}
+  list={[
+    { path: 'task/*', element: <RemoteLoader module="components-admin:Task" baseUrl="/admin" /> },
+    { path: 'tenant/*', element: <RemoteLoader module="components-admin:TenantAdmin" baseUrl="/admin" /> }
+  ]}
+/>
+```
+
+外层仍由业务包 `OidcAuthenticate` / 登录守卫；不必再手写用户/文件/消息/平台管理的导航与路由。
 
 #### User 用户管理组件
 

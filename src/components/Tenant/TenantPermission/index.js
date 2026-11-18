@@ -3,10 +3,11 @@ import useControlValue from '@kne/use-control-value';
 import Fetch from '@kne/react-fetch';
 import { App, Menu, Checkbox, Flex, Divider, Empty, Button } from 'antd';
 import flattenPermissions from './flattenPermissions';
-import { useState } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
 import { useIntl } from '@kne/react-intl';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 import withLocale from '../withLocale';
 import style from './style.module.scss';
 
@@ -163,34 +164,68 @@ const TenantPermissionEditor = ({ ajax, apis, permissions, codes, disabled, relo
   const [value, setValue] = useState(codes);
   const [saving, setSaving] = useState(false);
   const dirty = !isSameCodes(value, codes);
+  const showFooter = !disabled && dirty;
+  const editorRef = useRef(null);
+  const [footerRect, setFooterRect] = useState(null);
+
+  // 布局里 sticky 绑定的祖先不滚动，只能 fixed，并跟随编辑区的水平位置
+  useLayoutEffect(() => {
+    if (!showFooter || !editorRef.current) {
+      return;
+    }
+    const target = editorRef.current;
+    const update = () => {
+      const { left, width } = target.getBoundingClientRect();
+      setFooterRect({ left, width });
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(target);
+    window.addEventListener('resize', update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, [showFooter]);
+
   return (
-    <Flex vertical gap={8}>
+    <Flex vertical className={style['editor']} ref={editorRef}>
       <PermissionPanel settings={permissions} value={value} disabled={disabled || saving} onChange={setValue} />
-      {!disabled && dirty && (
-        <Flex justify="flex-end" gap={8} className={style['footer']}>
-          <Button disabled={saving} onClick={() => setValue(codes)}>
-            {formatMessage({ id: 'Cancel' })}
-          </Button>
-          <Button
-            type="primary"
-            loading={saving}
-            onClick={async () => {
-              setSaving(true);
-              try {
-                const { data: resData } = await ajax(merge({}, apis.save, { data: { permissions: [...new Set(value)] } }));
-                if (resData.code !== 0) {
-                  return;
+      {showFooter && <div className={style['footer-placeholder']} />}
+      {showFooter && (
+        <div className={style['footer']} style={footerRect ? { left: footerRect.left, width: footerRect.width } : undefined}>
+          <Flex align="flex-start" gap={8} className={style['footer-tip']}>
+            <ExclamationCircleFilled className={style['footer-tip-icon']} />
+            <div className={style['footer-tip-text']}>
+              <span className={style['footer-tip-title']}>{formatMessage({ id: 'PermissionUnsavedTip' })}</span>
+              <span className={style['footer-tip-desc']}>{formatMessage({ id: 'PermissionUnsavedDesc' })}</span>
+            </div>
+          </Flex>
+          <Flex gap={12} className={style['footer-actions']}>
+            <Button disabled={saving} onClick={() => setValue(codes)}>
+              {formatMessage({ id: 'Cancel' })}
+            </Button>
+            <Button
+              type="primary"
+              loading={saving}
+              onClick={async () => {
+                setSaving(true);
+                try {
+                  const { data: resData } = await ajax(merge({}, apis.save, { data: { permissions: [...new Set(value)] } }));
+                  if (resData.code !== 0) {
+                    return;
+                  }
+                  message.success(formatMessage({ id: 'SaveSuccess' }));
+                  reload();
+                } finally {
+                  setSaving(false);
                 }
-                message.success(formatMessage({ id: 'SaveSuccess' }));
-                reload();
-              } finally {
-                setSaving(false);
-              }
-            }}
-          >
-            {formatMessage({ id: 'Save' })}
-          </Button>
-        </Flex>
+              }}
+            >
+              {formatMessage({ id: 'Save' })}
+            </Button>
+          </Flex>
+        </div>
       )}
     </Flex>
   );

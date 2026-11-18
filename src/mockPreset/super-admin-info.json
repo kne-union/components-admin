@@ -11,6 +11,9 @@
       "status": 0,
       "isSuperAdmin": true,
       "gender": "M"
+    },
+    "setting": {
+      "appOpsEnabled": true
     }
   }
 }

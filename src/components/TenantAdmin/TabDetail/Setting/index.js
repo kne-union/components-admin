@@ -11,6 +11,7 @@ import Language from './Language';
 import MailSetting from './MailSetting';
 import MfaSetting from './MfaSetting';
 import style from './style.module.scss';
+import '@kne/super-select/dist/index.css';
 
 const builtinContentMap = {
   args: Args,
@@ -21,7 +22,7 @@ const builtinContentMap = {
 };
 
 const Setting = createWithRemoteLoader({
-  modules: ['components-core:Menu', 'components-core:Global@usePreset']
+  modules: ['components-core:Menu', 'components-core:FormInfo', 'components-core:Global@usePreset']
 })(
   withLocale(
     ({
@@ -33,7 +34,8 @@ const Setting = createWithRemoteLoader({
       showBuiltinLanguageOptions: showBuiltinLanguageOptionsProp,
       appendSettingMenus: appendSettingMenusProp
     }) => {
-      const [Menu, usePreset] = remoteModules;
+      const [Menu, FormInfo, usePreset] = remoteModules;
+      const SuperSelectField = FormInfo.fields.SuperSelect.Field || FormInfo.fields.SuperSelect;
       const { plugins } = usePreset();
       const { formatMessage } = useIntl();
 
@@ -99,11 +101,33 @@ const Setting = createWithRemoteLoader({
       const [activeKey, setActiveKey] = useState(defaultMenuKey);
       const resolvedActiveKey = menuItems.some(item => item.key === activeKey) ? activeKey : defaultMenuKey;
       const Content = contentMap[resolvedActiveKey] || Args;
+      const selectOptions = useMemo(
+        () => menuItems.map(item => ({ value: item.key, label: item.label })),
+        [menuItems]
+      );
+      const selectValue = useMemo(
+        () => selectOptions.find(item => item.value === resolvedActiveKey) || { value: resolvedActiveKey, label: resolvedActiveKey },
+        [selectOptions, resolvedActiveKey]
+      );
 
       return (
         <Flex className={style['setting']} gap={0}>
           <div className={style['setting-menu']}>
             <Menu currentKey={resolvedActiveKey} onChange={setActiveKey} items={menuItems} />
+          </div>
+          <div className={style['setting-select']}>
+            <SuperSelectField
+              single
+              allowClear={false}
+              value={selectValue}
+              options={selectOptions}
+              onChange={next => {
+                const key = next && typeof next === 'object' ? next.value : next;
+                if (key) {
+                  setActiveKey(key);
+                }
+              }}
+            />
           </div>
           <div className={style['setting-content']}>
             <Content

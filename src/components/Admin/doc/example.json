@@ -2,6 +2,37 @@
   "isFull": true,
   "list": [
     {
+      "title": "通用后台布局",
+      "description": "任务、租户用本包 Task / TenantAdmin 挂上；用户、文件、消息、平台管理由布局内置。点「平台管理」可见左栏「认证管理」（二级 OIDC）与「平台关联」（需 setting.appOpsEnabled）",
+      "code": "./admin-layout.js",
+      "scope": [
+        {
+          "name": "_Admin",
+          "packageName": "@components/Admin"
+        },
+        {
+          "name": "_Task",
+          "packageName": "@components/Task"
+        },
+        {
+          "name": "_TenantAdmin",
+          "packageName": "@components/TenantAdmin"
+        },
+        {
+          "name": "_mockPreset",
+          "packageName": "@root/mockPreset"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        }
+      ]
+    },
+    {
       "title": "基础用法",
       "description": "Admin 组件的完整功能展示，包含用户管理子路由和路由导航功能",
       "code": "./base.js",
