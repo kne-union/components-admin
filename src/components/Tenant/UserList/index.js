@@ -2,7 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import { Flex, Button } from 'antd';
 import { useSearchParams } from 'react-router-dom';
-import buildActionList from './Actions/buildActionList';
+import createGetActionList from './Actions/createGetActionList';
 import Create from './Actions/Create';
 import SendMessage from './Actions/SendMessage';
 import UserMobileList from './UserMobileList';
@@ -294,11 +294,7 @@ const UserList = createWithRemoteLoader({
             list: filterList
           }}
           getColumns={() => columns}
-          getActionList={({ data, className, ...props }) => {
-            const list = buildActionList({ formatMessage, data, apis, className, ...props });
-            const extended = typeof getActions === 'function' ? getActions({ list, data }) : null;
-            return Array.isArray(extended) ? extended : list;
-          }}
+          getActionList={createGetActionList({ formatMessage, apis, getActions })}
           options={{
             mapFilterValue,
             ...(Number.isInteger(showLength) ? { showLength } : {}),
