@@ -5,6 +5,7 @@ import { registerOidcClient } from '../../utils/accountLogout';
 
 const SILENT_LOGIN_ERRORS = ['login_required', 'interaction_required', 'consent_required', 'account_selection_required'];
 const RELOGIN_GUARD_MS = 10 * 1000;
+const AUTH_FLOW_PATHS = ['/oidc-callback', '/oidc-interaction'];
 
 const readJson = (storage, key) => {
   try {
@@ -264,12 +265,26 @@ const createOidcClient = options => {
     return { Authorization: `Bearer ${accessToken}` };
   };
 
+  // 页面即将跳转，同一页面后续并发的 401 不再重复处理
+  let unauthorizedHandled = false;
+
+  /**
+   * 401 统一跳转登录页，不把 JSON 报错留给用户：
+   * - 首次：清令牌并重新发起登录（IdP 会话有效则静默换新令牌）
+   * - 短时间内再次 401：说明换来的令牌仍无效，退出 IdP 会话后回到登录页，由用户重新登录
+   * - 登录流程页（回调 / 交互）自身的 401 不处理，避免打断正在进行的登录，仅屏蔽报错
+   */
   const relogin = () => {
-    const last = Number(window.sessionStorage.getItem(reloginKey) || 0);
-    if (Date.now() - last < RELOGIN_GUARD_MS) {
-      return false;
+    if (unauthorizedHandled || AUTH_FLOW_PATHS.some(path => window.location.pathname.endsWith(path))) {
+      return true;
     }
+    unauthorizedHandled = true;
+    const last = Number(window.sessionStorage.getItem(reloginKey) || 0);
     window.sessionStorage.setItem(reloginKey, String(Date.now()));
+    if (Date.now() - last < RELOGIN_GUARD_MS) {
+      logout();
+      return true;
+    }
     setTokenSet(null);
     login();
     return true;
