@@ -216,10 +216,45 @@ describe('createOidcClient', () => {
     await flush();
     expect(assign).toHaveBeenCalledTimes(1);
 
+    // 同一页面并发的 401 不重复处理，也不展示 JSON 报错
     const second = handlers.response({ status: 401, data: {} });
-    expect(second.showError).toBeUndefined();
+    expect(second.showError).toBe(false);
     await flush();
     expect(assign).toHaveBeenCalledTimes(1);
+  });
+
+  const registerUnauthorizedHandler = () => {
+    window.localStorage.setItem(
+      'kne-oidc:hr-portal:token',
+      JSON.stringify({ accessToken: 'at-1', tokenType: 'bearer', idToken: 'id-1', refreshToken: 'rt-1', expiresAt: Date.now() + 600000 })
+    );
+    const client = createClient();
+    const handlers = {};
+    client.registerInterceptors({
+      request: { use: fn => (handlers.request = fn) },
+      response: { use: fn => (handlers.response = fn) }
+    });
+    return handlers.response;
+  };
+
+  test('401 right after a re-login logs out to the login page instead of showing the error', async () => {
+    window.sessionStorage.setItem('kne-oidc:hr-portal:relogin-at', String(Date.now()));
+    const onResponse = registerUnauthorizedHandler();
+    const response = onResponse({ status: 401, data: {} });
+    expect(response.showError).toBe(false);
+    await flush();
+    expect(assign).toHaveBeenCalledTimes(1);
+    expect(new URL(assign.mock.calls[0][0]).pathname).toBe('/oidc/session/end');
+    expect(window.localStorage.getItem('kne-oidc:hr-portal:token')).toBeNull();
+  });
+
+  test('401 on the oidc callback page neither re-logins nor shows the error', async () => {
+    setLocation('https://app.test/oidc-callback?code=abc');
+    const onResponse = registerUnauthorizedHandler();
+    const response = onResponse({ status: 401, data: {} });
+    expect(response.showError).toBe(false);
+    await flush();
+    expect(assign).not.toHaveBeenCalled();
   });
 
   test('logout clears tokens and redirects to end_session', async () => {
