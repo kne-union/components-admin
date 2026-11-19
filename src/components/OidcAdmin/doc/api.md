@@ -111,6 +111,7 @@ plugins: {
 | key | list | GET | `/admin/key/list` |
 | key | rotate | POST | `/admin/key/rotate` |
 | session | list | GET | `/admin/session/list?userId=` |
+| session | activeUsers | GET | `/admin/session/active-users`（活跃用户：有未过期登录会话的用户，需 `@kne/fastify-oidc` ≥ 0.1.18） |
 | session | revoke / revokeUser | POST | `/admin/session/revoke`、`/admin/session/revoke-user` |
 | app | list / detail | GET | `/admin/app/list`、`/admin/app/detail` |
 | app | setStatus / remove | POST | `/admin/app/set-status`、`/admin/app/remove` |

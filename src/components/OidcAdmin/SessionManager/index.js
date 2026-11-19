@@ -72,40 +72,109 @@ const RevokeSessionButton = createWithRemoteLoader({
   })
 );
 
-/** 左栏：搜索 + 滚动到底自动加载下一页 */
-const UserList = ({ ajax, api, activeId, onSelect, onLoad, formatMessage }) => {
+/**
+ * 左栏：活跃用户数 + 搜索 + 滚动到底自动加载下一页
+ * - 不搜索：活跃用户置顶，先分页加载完活跃用户，再接普通用户（按 id 去重）
+ * - 搜索：先按关键字查用户，再判断这一页用户是否活跃并标记（页内活跃用户靠前），不扫描全部活跃用户
+ */
+const UserList = ({ ajax, api, activeApi, activeId, refreshKey, onSelect, onLoad, formatMessage }) => {
   const [keyword, setKeyword] = useState('');
-  const [state, setState] = useState({ list: [], page: 0, total: 0, loading: false });
+  const [view, setView] = useState({ users: [], activeIds: new Set(), hasMore: false, loading: false });
+  const [activeCount, setActiveCount] = useState(0);
+  const dataRef = useRef(null);
   const loadingRef = useRef(false);
+  const tokenRef = useRef(0);
+  const listRef = useRef(null);
 
-  const load = useCallback(
-    async (page, searchText) => {
+  // 顶部活跃用户数：不受搜索影响
+  useEffect(() => {
+    let cancelled = false;
+    ajax(Object.assign({}, activeApi, { params: { currentPage: 1, perPage: 1 } }))
+      .then(({ data: resData }) => {
+        if (!cancelled) {
+          setActiveCount(resData.data?.activeCount ?? resData.data?.totalCount ?? 0);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [ajax, activeApi, refreshKey]);
+
+  const loadNext = useCallback(
+    async (searchText, reset) => {
+      if (loadingRef.current && !reset) {
+        return;
+      }
+      const token = ++tokenRef.current;
       loadingRef.current = true;
-      setState(prev => Object.assign({}, prev, { loading: true }));
-      const { data: resData } = await ajax(
-        Object.assign({}, api, {
-          params: { currentPage: page, perPage: PAGE_SIZE, filter: searchText ? { keyword: searchText } : {} }
-        })
-      );
-      const pageData = resData.data?.pageData || [];
-      onLoad && onLoad(pageData);
-      setState(prev => ({
-        list: page === 1 ? pageData : prev.list.concat(pageData),
-        page,
-        total: resData.data?.totalCount ?? pageData.length,
-        loading: false
-      }));
+      if (reset || !dataRef.current) {
+        dataRef.current = { active: { list: [], page: 0, total: 0 }, normal: { list: [], page: 0, total: 0 }, searchActiveIds: new Set() };
+      }
+      const data = dataRef.current;
+      setView(prev => Object.assign({}, prev, { loading: true }));
+      const phase = !searchText && (data.active.page === 0 || data.active.list.length < data.active.total) ? 'active' : 'normal';
+      const target = data[phase];
+      try {
+        const { data: resData } = await ajax(
+          Object.assign({}, phase === 'active' ? activeApi : api, {
+            params: { currentPage: target.page + 1, perPage: PAGE_SIZE, filter: searchText ? { keyword: searchText } : {} }
+          })
+        );
+        if (token !== tokenRef.current) {
+          return;
+        }
+        let pageData = resData.data?.pageData || [];
+        if (phase === 'normal' && searchText && pageData.length) {
+          // 搜索结果：只判断这一页用户是否活跃
+          const { data: activeRes } = await ajax(
+            Object.assign({}, activeApi, { params: { userIds: pageData.map(user => user.id).join(','), currentPage: 1, perPage: pageData.length } })
+          ).catch(() => ({ data: {} }));
+          if (token !== tokenRef.current) {
+            return;
+          }
+          (activeRes.data?.pageData || []).forEach(user => data.searchActiveIds.add(String(user.id)));
+          pageData = pageData
+            .filter(user => data.searchActiveIds.has(String(user.id)))
+            .concat(pageData.filter(user => !data.searchActiveIds.has(String(user.id))));
+        }
+        onLoad && onLoad(pageData);
+        data[phase] = { list: target.list.concat(pageData), page: target.page + 1, total: resData.data?.totalCount ?? pageData.length };
+      } catch (e) {
+        if (token !== tokenRef.current) {
+          return;
+        }
+        // 活跃用户接口不可用时降级为普通用户列表；普通用户接口失败则停止继续加载
+        data[phase] = { list: target.list, page: target.page + 1, total: target.list.length };
+      }
       loadingRef.current = false;
+      const activeIds = searchText ? data.searchActiveIds : new Set(data.active.list.map(user => String(user.id)));
+      setView({
+        users: data.active.list.concat(data.normal.list.filter(user => searchText || !activeIds.has(String(user.id)))),
+        activeIds,
+        hasMore: data.active.list.length < data.active.total || data.normal.page === 0 || data.normal.list.length < data.normal.total,
+        loading: false
+      });
     },
-    [ajax, api, onLoad]
+    [ajax, api, activeApi, onLoad]
   );
 
+  // 关键字变化 / 结束会话后重新从第一页加载
   useEffect(() => {
-    const timer = setTimeout(() => load(1, keyword.trim()), 300);
+    const timer = setTimeout(() => loadNext(keyword.trim(), true), 300);
     return () => clearTimeout(timer);
-  }, [keyword, load]);
+  }, [keyword, loadNext, refreshKey]);
 
-  const hasMore = state.list.length < state.total;
+  // 内容没撑满滚动容器时（如活跃用户很少）继续加载，否则无法触发滚动加载
+  useEffect(() => {
+    const el = listRef.current;
+    if (view.hasMore && !view.loading && el && el.scrollHeight <= el.clientHeight) {
+      loadNext(keyword.trim());
+    }
+  }, [view, keyword, loadNext]);
+
+  const text = keyword.trim();
+  const { users, activeIds } = view;
 
   return (
     <div className={style['user-panel']}>
@@ -117,43 +186,65 @@ const UserList = ({ ajax, api, activeId, onSelect, onLoad, formatMessage }) => {
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
         />
+        <div className={style['active-summary']}>
+          <span className={style['active-dot']} />
+          <span>{formatMessage({ id: 'ActiveUsersCount' })}</span>
+          <span className={style['active-count']}>{activeCount}</span>
+        </div>
       </div>
       <div
+        ref={listRef}
         className={style['user-list']}
         onScroll={e => {
           const el = e.currentTarget;
-          if (hasMore && !loadingRef.current && el.scrollHeight - el.scrollTop - el.clientHeight < 48) {
-            load(state.page + 1, keyword.trim());
+          if (view.hasMore && !loadingRef.current && el.scrollHeight - el.scrollTop - el.clientHeight < 48) {
+            loadNext(text);
           }
         }}>
-        {state.list.map(user => (
-          <button
-            type="button"
-            key={user.id}
-            className={classnames(style['user-item'], { [style['is-active']]: String(user.id) === String(activeId) })}
-            onClick={() => onSelect(user)}>
-            <Avatar src={user.avatar} size={36}>
-              {getUserName(user).slice(0, 1)}
-            </Avatar>
-            <span className={style['user-item-text']}>
-              <span className={style['user-item-name']}>{getUserName(user)}</span>
-              <span className={style['user-item-sub']}>{user.email || user.phone || '-'}</span>
-            </span>
-          </button>
-        ))}
-        {state.loading ? (
+        {users.map(user => {
+          const isOnline = activeIds.has(String(user.id));
+          return (
+            <button
+              type="button"
+              key={user.id}
+              className={classnames(style['user-item'], {
+                [style['is-active']]: String(user.id) === String(activeId),
+                [style['is-online']]: isOnline
+              })}
+              onClick={() => onSelect(user)}>
+              <span className={style['avatar-wrap']}>
+                <Avatar src={user.avatar} size={36}>
+                  {getUserName(user).slice(0, 1)}
+                </Avatar>
+                {isOnline ? <span className={style['online-dot']} /> : null}
+              </span>
+              <span className={style['user-item-text']}>
+                <span className={style['user-item-title']}>
+                  <span className={style['user-item-name']}>{getUserName(user)}</span>
+                  {isOnline ? (
+                    <Tag color="success" bordered={false} className={style['online-tag']}>
+                      {formatMessage({ id: 'ActiveUserTag' })}
+                    </Tag>
+                  ) : null}
+                </span>
+                <span className={style['user-item-sub']}>{user.email || user.phone || '-'}</span>
+              </span>
+            </button>
+          );
+        })}
+        {view.loading ? (
           <div className={style['user-list-footer']}>
             <Spin size="small" />
           </div>
         ) : null}
-        {!state.loading && !state.list.length ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={formatMessage({ id: 'NoUserFound' })} /> : null}
+        {!view.loading && !users.length ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={formatMessage({ id: 'NoUserFound' })} /> : null}
       </div>
     </div>
   );
 };
 
 /** 右栏：用户信息 + 会话卡片 */
-const UserSessions = ({ ajax, api, user, onBack, formatMessage, locale }) => {
+const UserSessions = ({ ajax, api, user, onBack, onChange, formatMessage, locale }) => {
   const [sessions, setSessions] = useState({ list: [], loading: true });
 
   const reload = useCallback(async () => {
@@ -165,6 +256,12 @@ const UserSessions = ({ ajax, api, user, onBack, formatMessage, locale }) => {
   useEffect(() => {
     reload();
   }, [reload]);
+
+  // 结束会话 / 撤销令牌后，会话列表与左栏活跃用户都要刷新
+  const handleChange = useCallback(async () => {
+    await reload();
+    onChange && onChange();
+  }, [reload, onChange]);
 
   return (
     <div className={style['detail']}>
@@ -195,7 +292,7 @@ const UserSessions = ({ ajax, api, user, onBack, formatMessage, locale }) => {
             logout={false}
             formatMessage={formatMessage}
             confirmMessage={formatMessage({ id: 'RevokeTokensConfirm' })}
-            onSuccess={reload}>
+            onSuccess={handleChange}>
             {formatMessage({ id: 'RevokeTokens' })}
           </RevokeUserButton>
           <RevokeUserButton
@@ -205,7 +302,7 @@ const UserSessions = ({ ajax, api, user, onBack, formatMessage, locale }) => {
             logout
             formatMessage={formatMessage}
             confirmMessage={formatMessage({ id: 'ForceLogoutConfirm' })}
-            onSuccess={reload}>
+            onSuccess={handleChange}>
             {formatMessage({ id: 'ForceLogout' })}
           </RevokeUserButton>
         </Space>
@@ -232,7 +329,7 @@ const UserSessions = ({ ajax, api, user, onBack, formatMessage, locale }) => {
                     </Tag>
                   ))}
                 </div>
-                <RevokeSessionButton uid={session.uid} onSuccess={reload} />
+                <RevokeSessionButton uid={session.uid} onSuccess={handleChange} />
               </div>
               <div className={style['session-meta']}>
                 <div className={style['meta-item']}>
@@ -270,12 +367,23 @@ const SessionManager = createWithRemoteLoader({
     const { formatMessage, locale } = useIntl();
     const isMobile = useIsMobile();
     const [user, setUser] = useState(() => (defaultUserId ? { id: defaultUserId, nickname: String(defaultUserId), placeholder: true } : null));
+    const [refreshKey, setRefreshKey] = useState(0);
+    const handleSessionsChange = useCallback(() => setRefreshKey(key => key + 1), []);
     const handleListLoad = useCallback(list => {
       setUser(prev => (prev?.placeholder ? list.find(item => String(item.id) === String(prev.id)) || prev : prev));
     }, []);
 
     const listNode = (
-      <UserList ajax={ajax} api={apis.admin.getUserList} activeId={user?.id} onSelect={setUser} onLoad={handleListLoad} formatMessage={formatMessage} />
+      <UserList
+        ajax={ajax}
+        api={apis.admin.getUserList}
+        activeApi={apis.oidc.session.activeUsers}
+        activeId={user?.id}
+        refreshKey={refreshKey}
+        onSelect={setUser}
+        onLoad={handleListLoad}
+        formatMessage={formatMessage}
+      />
     );
     const detailNode = user ? (
       <UserSessions
@@ -284,6 +392,7 @@ const SessionManager = createWithRemoteLoader({
         api={apis.oidc.session.list}
         user={user}
         onBack={isMobile ? () => setUser(null) : null}
+        onChange={handleSessionsChange}
         formatMessage={formatMessage}
         locale={locale}
       />
