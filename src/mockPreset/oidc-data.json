@@ -194,6 +194,32 @@
       "createdAt": "2026-08-01T00:00:00.000Z"
     }
   ],
+  "activeUsers": {
+    "totalCount": 2,
+    "activeCount": 2,
+    "pageData": [
+      {
+        "id": "2",
+        "nickname": "李四",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=lisi",
+        "email": "lisi@example.com",
+        "phone": "+86 138001380002",
+        "isSuperAdmin": false,
+        "sessionCount": 2,
+        "lastLoginAt": "2026-10-09T06:45:00.000Z"
+      },
+      {
+        "id": "1",
+        "nickname": "张三",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangsan",
+        "email": "zhangsan@example.com",
+        "phone": "+86 138001380001",
+        "isSuperAdmin": true,
+        "sessionCount": 1,
+        "lastLoginAt": "2026-10-08T01:20:00.000Z"
+      }
+    ]
+  },
   "sessionList": [
     {
       "uid": "kJ8sQ2mN4pR6tV1xZ3bC5",

@@ -78,6 +78,8 @@ const locale = {
   ActiveSessions: '活跃会话',
   NoActiveSession: '该用户当前没有登录会话',
   NoUserFound: '没有找到用户',
+  ActiveUsersCount: '当前活跃用户',
+  ActiveUserTag: '活跃',
   BackToUsers: '用户列表',
   SuperAdmin: '超级管理员',
   RevokeSelectedSessions: '结束所选会话',

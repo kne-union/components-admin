@@ -1025,6 +1025,10 @@ const getApis = options => {
           url: `${oidcPrefix}/admin/session/list`,
           method: 'GET'
         },
+        activeUsers: {
+          url: `${oidcPrefix}/admin/session/active-users`,
+          method: 'GET'
+        },
         revoke: {
           url: `${oidcPrefix}/admin/session/revoke`,
           method: 'POST'

@@ -3,6 +3,7 @@
 $border: rgba(0, 0, 0, 0.06);
 $text: rgba(0, 0, 0, 0.88);
 $text-2: rgba(0, 0, 0, 0.45);
+$online: #52c41a;
 
 .split {
   display: grid;
@@ -44,6 +45,30 @@ $text-2: rgba(0, 0, 0, 0.45);
   border-bottom: 1px solid $border;
 }
 
+.active-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: $text-2;
+  font-size: 12px;
+}
+
+.active-dot,
+.online-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $online;
+}
+
+.active-count {
+  color: $online;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 .user-list {
   flex: 1;
   min-height: 0;
@@ -73,6 +98,15 @@ $text-2: rgba(0, 0, 0, 0.45);
     outline-offset: -2px;
   }
 
+  &.is-online {
+    box-shadow: inset 3px 0 0 $online;
+    background: rgba(82, 196, 26, 0.06);
+
+    &:hover {
+      background: rgba(82, 196, 26, 0.12);
+    }
+  }
+
   &.is-active {
     background: rgba(65, 131, 240, 0.1);
 
@@ -80,6 +114,34 @@ $text-2: rgba(0, 0, 0, 0.45);
       color: var(--ant-color-primary, #4183f0);
     }
   }
+}
+
+.avatar-wrap {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+}
+
+.online-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  box-sizing: content-box;
+  border: 2px solid #fff;
+}
+
+.user-item-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 6px;
+}
+
+.online-tag {
+  flex: none;
+  margin: 0;
+  padding: 0 6px;
+  line-height: 18px;
 }
 
 .user-item-text {

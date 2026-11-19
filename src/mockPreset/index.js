@@ -1568,6 +1568,9 @@ const apis = merge({}, getApis(), {
       list: {
         loader: () => oidcData.sessionList
       },
+      activeUsers: {
+        loader: () => oidcData.activeUsers
+      },
       revoke: {
         loader: () => ({})
       },
