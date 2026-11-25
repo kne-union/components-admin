@@ -21,6 +21,16 @@ const getColumns = ({ formatMessage }) => {
       renderType: 'description'
     },
     {
+      name: 'scopes',
+      title: formatMessage({ id: 'Scopes' }),
+      getValueOf: ({ scopes }) => {
+        if (!scopes || !scopes.length) {
+          return formatMessage({ id: 'ScopesAll' });
+        }
+        return formatMessage({ id: 'ScopesCount' }, { count: scopes.length });
+      }
+    },
+    {
       name: 'lastVisitedAt',
       title: formatMessage({ id: 'LastVisitedAt' }),
       format: 'datetime'
