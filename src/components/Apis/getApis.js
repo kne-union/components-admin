@@ -120,6 +120,10 @@ const getApis = options => {
       verify: {
         method: 'POST',
         url: `${prefix}/signature/verify`
+      },
+      openApiDoc: {
+        method: 'GET',
+        url: '/open-api.json'
       }
     },
     webhook: {
