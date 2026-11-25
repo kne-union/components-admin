@@ -1,6 +1,6 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { App, Avatar, Button, Empty, Input, Space, Spin, Tag, Typography } from 'antd';
+import { App, Avatar, Button, Empty, Input, Spin, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { useIsMobile } from '@kne/responsive-utils';
@@ -9,12 +9,24 @@ import withLocale from '../withLocale';
 import Menu from '../Menu';
 import style from './style.module.scss';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const PAGE_SIZE = 20;
 
 const getUserName = user => user.nickname || user.name || user.email || user.phone || String(user.id);
 
-const formatDateTime = value => (value ? new Date(value).toLocaleString() : '-');
+const formatDateTime = (value, locale) => {
+  if (!value) {
+    return '-';
+  }
+  return new Intl.DateTimeFormat(locale || 'zh-CN', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(new Date(value));
+};
 
 const formatRelative = (value, locale) => {
   const diffSec = Math.round((new Date(value).getTime() - Date.now()) / 1000);
@@ -65,7 +77,8 @@ const RevokeSessionButton = createWithRemoteLoader({
           await ajax(Object.assign({}, apis.oidc.session.revoke, { data: { uid } }));
           message.success(formatMessage({ id: 'SessionRevoked' }));
           onSuccess && onSuccess();
-        }}>
+        }}
+      >
         {formatMessage({ id: 'RevokeSession' })}
       </ConfirmButton>
     );
@@ -175,22 +188,46 @@ const UserList = ({ ajax, api, activeApi, activeId, refreshKey, onSelect, onLoad
 
   const text = keyword.trim();
   const { users, activeIds } = view;
+  // 活跃用户总在前面（不搜索时分页置顶，搜索时页内靠前），据此切成两组
+  const onlineCount = users.findIndex(user => !activeIds.has(String(user.id)));
+  const splitAt = onlineCount === -1 ? users.length : onlineCount;
+  const onlineUsers = users.slice(0, splitAt);
+  const otherUsers = users.slice(splitAt);
+
+  const renderUser = (user, isOnline) => {
+    const selected = String(user.id) === String(activeId);
+    return (
+      <button
+        type="button"
+        key={user.id}
+        aria-pressed={selected}
+        className={classnames(style['user-item'], { [style['is-active']]: selected })}
+        onClick={() => onSelect(user)}
+      >
+        <span className={style['avatar-wrap']}>
+          <Avatar src={user.avatar} size={32}>
+            {getUserName(user).slice(0, 1)}
+          </Avatar>
+          {isOnline ? <span className={style['online-dot']} title={formatMessage({ id: 'ActiveUserTag' })} /> : null}
+        </span>
+        <span className={style['user-item-text']}>
+          <span className={style['user-item-name']}>{getUserName(user)}</span>
+          <span className={style['user-item-sub']}>{user.email || user.phone || '-'}</span>
+        </span>
+      </button>
+    );
+  };
 
   return (
     <div className={style['user-panel']}>
       <div className={style['user-search']}>
         <Input
           allowClear
-          prefix={<SearchOutlined />}
+          prefix={<SearchOutlined className={style['search-icon']} />}
           placeholder={formatMessage({ id: 'SelectUserPlaceholder' })}
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
         />
-        <div className={style['active-summary']}>
-          <span className={style['active-dot']} />
-          <span>{formatMessage({ id: 'ActiveUsersCount' })}</span>
-          <span className={style['active-count']}>{activeCount}</span>
-        </div>
       </div>
       <div
         ref={listRef}
@@ -200,38 +237,28 @@ const UserList = ({ ajax, api, activeApi, activeId, refreshKey, onSelect, onLoad
           if (view.hasMore && !loadingRef.current && el.scrollHeight - el.scrollTop - el.clientHeight < 48) {
             loadNext(text);
           }
-        }}>
-        {users.map(user => {
-          const isOnline = activeIds.has(String(user.id));
-          return (
-            <button
-              type="button"
-              key={user.id}
-              className={classnames(style['user-item'], {
-                [style['is-active']]: String(user.id) === String(activeId),
-                [style['is-online']]: isOnline
-              })}
-              onClick={() => onSelect(user)}>
-              <span className={style['avatar-wrap']}>
-                <Avatar src={user.avatar} size={36}>
-                  {getUserName(user).slice(0, 1)}
-                </Avatar>
-                {isOnline ? <span className={style['online-dot']} /> : null}
-              </span>
-              <span className={style['user-item-text']}>
-                <span className={style['user-item-title']}>
-                  <span className={style['user-item-name']}>{getUserName(user)}</span>
-                  {isOnline ? (
-                    <Tag color="success" bordered={false} className={style['online-tag']}>
-                      {formatMessage({ id: 'ActiveUserTag' })}
-                    </Tag>
-                  ) : null}
-                </span>
-                <span className={style['user-item-sub']}>{user.email || user.phone || '-'}</span>
-              </span>
-            </button>
-          );
-        })}
+        }}
+      >
+        {onlineUsers.length ? (
+          <div className={style['group']}>
+            <div className={style['group-head']}>
+              <span className={style['active-dot']} />
+              <span>{formatMessage({ id: 'ActiveUsersCount' })}</span>
+              <span className={style['group-count']}>{text ? onlineUsers.length : activeCount || onlineUsers.length}</span>
+            </div>
+            {onlineUsers.map(user => renderUser(user, true))}
+          </div>
+        ) : null}
+        {otherUsers.length ? (
+          <div className={style['group']}>
+            {onlineUsers.length ? (
+              <div className={style['group-head']}>
+                <span>{formatMessage({ id: 'OtherUsers' })}</span>
+              </div>
+            ) : null}
+            {otherUsers.map(user => renderUser(user, false))}
+          </div>
+        ) : null}
         {view.loading ? (
           <div className={style['user-list-footer']}>
             <Spin size="small" />
@@ -263,89 +290,112 @@ const UserSessions = ({ ajax, api, user, onBack, onChange, formatMessage, locale
     onChange && onChange();
   }, [reload, onChange]);
 
+  const contact = [user.email, user.phone].filter(Boolean).join(' · ') || '-';
+
   return (
     <div className={style['detail']}>
       {onBack ? (
-        <Button type="text" icon={<ArrowLeftOutlined />} className={style['back']} onClick={onBack}>
+        <Button type="text" size="small" icon={<ArrowLeftOutlined />} className={style['back']} onClick={onBack}>
           {formatMessage({ id: 'BackToUsers' })}
         </Button>
       ) : null}
 
       <div className={style['profile']}>
-        <Avatar src={user.avatar} size={56}>
+        <Avatar src={user.avatar} size={36}>
           {getUserName(user).slice(0, 1)}
         </Avatar>
         <div className={style['profile-text']}>
-          <Space size={8} wrap>
-            <Title level={5} className={style['profile-name']}>
-              {getUserName(user)}
-            </Title>
-            {user.isSuperAdmin ? <Tag color="gold">{formatMessage({ id: 'SuperAdmin' })}</Tag> : null}
-          </Space>
-          <Text type="secondary" className={style['profile-sub']}>
-            {[user.email, user.phone].filter(Boolean).join(' · ') || '-'}
+          <div className={style['profile-title']}>
+            <span className={style['profile-name']}>{getUserName(user)}</span>
+            {user.isSuperAdmin ? (
+              <Tag color="gold" bordered={false} className={style['profile-badge']}>
+                {formatMessage({ id: 'SuperAdmin' })}
+              </Tag>
+            ) : null}
+          </div>
+          <Text type="secondary" className={style['profile-sub']} title={contact}>
+            {contact}
           </Text>
         </div>
-        <Space size={8} wrap className={style['profile-actions']}>
+        <div className={style['profile-actions']}>
           <RevokeUserButton
+            size="small"
             userId={user.id}
             logout={false}
             formatMessage={formatMessage}
             confirmMessage={formatMessage({ id: 'RevokeTokensConfirm' })}
-            onSuccess={handleChange}>
+            onSuccess={handleChange}
+          >
             {formatMessage({ id: 'RevokeTokens' })}
           </RevokeUserButton>
           <RevokeUserButton
+            size="small"
             danger
             type="primary"
             userId={user.id}
             logout
             formatMessage={formatMessage}
             confirmMessage={formatMessage({ id: 'ForceLogoutConfirm' })}
-            onSuccess={handleChange}>
+            onSuccess={handleChange}
+          >
             {formatMessage({ id: 'ForceLogout' })}
           </RevokeUserButton>
-        </Space>
+        </div>
       </div>
 
       <div className={style['section-head']}>
         <span className={style['section-title']}>{formatMessage({ id: 'ActiveSessions' })}</span>
-        <span className={style['section-count']}>{sessions.list.length}</span>
+        <span className={style['section-count']}>{sessions.loading ? '…' : sessions.list.length}</span>
       </div>
 
       {sessions.loading ? (
         <div className={style['detail-loading']}>
-          <Spin />
+          <Spin size="small" />
         </div>
       ) : sessions.list.length ? (
         <div className={style['session-list']}>
           {sessions.list.map(session => (
-            <div key={session.uid} className={style['session-card']}>
-              <div className={style['session-card-head']}>
+            <div key={session.uid} className={style['session-row']}>
+              <div className={style['session-row-main']}>
                 <div className={style['session-clients']}>
-                  {(session.clients || []).map(client => (
-                    <Tag key={`${client.clientId}-${client.sid}`} color="blue">
-                      {client.clientId}
-                    </Tag>
-                  ))}
+                  {(session.clients || []).length ? (
+                    (session.clients || []).map(client => (
+                      <Tag key={`${client.clientId}-${client.sid}`} className={style['client-tag']}>
+                        {client.clientId}
+                      </Tag>
+                    ))
+                  ) : (
+                    <span className={style['session-clients-empty']}>-</span>
+                  )}
                 </div>
                 <RevokeSessionButton uid={session.uid} onSuccess={handleChange} />
               </div>
               <div className={style['session-meta']}>
-                <div className={style['meta-item']}>
+                <span className={style['meta-chunk']}>
                   <span className={style['meta-label']}>{formatMessage({ id: 'LoginAt' })}</span>
-                  <span className={style['meta-value']}>{formatDateTime(session.loginAt)}</span>
-                  <span className={style['meta-sub']}>{formatRelative(session.loginAt, locale)}</span>
-                </div>
-                <div className={style['meta-item']}>
+                  <span className={style['meta-value']} title={formatDateTime(session.loginAt, locale)}>
+                    {formatRelative(session.loginAt, locale)}
+                  </span>
+                </span>
+                <span className={style['meta-sep']} aria-hidden>
+                  ·
+                </span>
+                <span className={style['meta-chunk']}>
                   <span className={style['meta-label']}>{formatMessage({ id: 'ExpiresAt' })}</span>
-                  <span className={style['meta-value']}>{formatDateTime(session.expiresAt)}</span>
-                  <span className={style['meta-sub']}>{formatRelative(session.expiresAt, locale)}</span>
-                </div>
+                  <span className={style['meta-value']} title={formatDateTime(session.expiresAt, locale)}>
+                    {formatRelative(session.expiresAt, locale)}
+                  </span>
+                </span>
+                <span className={style['meta-sep']} aria-hidden>
+                  ·
+                </span>
+                <span className={classnames(style['meta-chunk'], style['session-uid-chunk'])}>
+                  <span className={style['meta-label']}>{formatMessage({ id: 'SessionUid' })}</span>
+                  <Text className={style['session-uid']} ellipsis={{ tooltip: session.uid }} copyable={{ text: session.uid }}>
+                    {session.uid}
+                  </Text>
+                </span>
               </div>
-              <Text className={style['session-uid']} copyable={{ text: session.uid }}>
-                {formatMessage({ id: 'SessionUid' })}：{session.uid}
-              </Text>
             </div>
           ))}
         </div>
@@ -368,9 +418,30 @@ const SessionManager = createWithRemoteLoader({
     const isMobile = useIsMobile();
     const [user, setUser] = useState(() => (defaultUserId ? { id: defaultUserId, nickname: String(defaultUserId), placeholder: true } : null));
     const [refreshKey, setRefreshKey] = useState(0);
+    // 只在首次有数据时自动选中；手机点「用户列表」清空后不再抢回选中
+    const didInitSelectRef = useRef(false);
     const handleSessionsChange = useCallback(() => setRefreshKey(key => key + 1), []);
     const handleListLoad = useCallback(list => {
-      setUser(prev => (prev?.placeholder ? list.find(item => String(item.id) === String(prev.id)) || prev : prev));
+      if (!Array.isArray(list) || !list.length) {
+        return;
+      }
+      setUser(prev => {
+        if (prev?.placeholder) {
+          const matched = list.find(item => String(item.id) === String(prev.id));
+          if (matched) {
+            didInitSelectRef.current = true;
+            return matched;
+          }
+        }
+        if (prev && !prev.placeholder) {
+          return prev;
+        }
+        if (didInitSelectRef.current) {
+          return prev;
+        }
+        didInitSelectRef.current = true;
+        return list[0];
+      });
     }, []);
 
     const listNode = (

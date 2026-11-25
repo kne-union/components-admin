@@ -80,6 +80,7 @@ const locale = {
   NoUserFound: 'No users found',
   ActiveUsersCount: 'Active users now',
   ActiveUserTag: 'Active',
+  OtherUsers: 'Other users',
   BackToUsers: 'Users',
   SuperAdmin: 'Super Admin',
   RevokeSelectedSessions: 'End Selected Sessions',

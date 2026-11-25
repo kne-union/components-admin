@@ -208,8 +208,87 @@ const loadFilteredRoleList = ({ params } = {}) =>
     return { pageData, totalCount: pageData.length };
   });
 
+const mcpCatalogMock = [
+  {
+    operationId: 'clientProjectList',
+    method: 'GET',
+    path: '/api/v1/client/project/list',
+    summary: '项目列表',
+    tags: ['client'],
+    enabled: true,
+    scenarios: ['项目'],
+    confirm: false
+  },
+  {
+    operationId: 'clientProjectCreate',
+    method: 'POST',
+    path: '/api/v1/client/project/create',
+    summary: '创建项目',
+    tags: ['client'],
+    enabled: false,
+    scenarios: [],
+    confirm: true
+  },
+  {
+    operationId: 'clientPing',
+    method: 'GET',
+    path: '/api/v1/client/ping',
+    summary: '健康检查',
+    tags: ['client'],
+    enabled: true,
+    scenarios: ['系统'],
+    confirm: false
+  }
+];
+
 const apis = merge({}, getApis(), {
   fileManager: fileManagerMock,
+  mcp: {
+    catalog: {
+      operations: {
+        loader: () => ({ pageData: mcpCatalogMock, totalCount: mcpCatalogMock.length })
+      }
+    },
+    allowlist: {
+      create: {
+        loader: ({ data } = {}) => {
+          const hit = mcpCatalogMock.find(item => item.method === data?.method && item.path === data?.path);
+          if (hit) {
+            Object.assign(hit, {
+              enabled: data.enabled !== false,
+              scenarios: Array.isArray(data.scenarios) ? data.scenarios : hit.scenarios,
+              confirm: data.confirm !== undefined ? !!data.confirm : hit.confirm
+            });
+          }
+          return { ...(hit || data), id: hit?.path || 'mock' };
+        }
+      },
+      sync: {
+        loader: () => ({ orphanCount: 0, activeCount: mcpCatalogMock.filter(i => i.enabled).length })
+      }
+    },
+    keys: {
+      list: {
+        loader: () => ({
+          pageData: [
+            { id: 'mcp_key_demo_1', name: 'Cursor', secret: 'sk_••••••••••••', createdAt: '2026-11-20T08:00:00.000Z' },
+            { id: 'mcp_key_demo_2', name: 'Claude Code', secret: 'sk_••••••••••••', createdAt: '2026-11-18T10:30:00.000Z' }
+          ],
+          totalCount: 2
+        })
+      },
+      create: {
+        loader: ({ data } = {}) => ({
+          id: `mcp_key_${Date.now()}`,
+          name: data?.name || 'MCP Key',
+          secret: `sk_live_${Math.random().toString(36).slice(2, 14)}`
+        })
+      },
+      remove: {
+        loader: () => ({ success: true })
+      }
+    }
+  },
   task: {
     list: {
       loader: loadFilteredTaskList

@@ -1,9 +1,11 @@
 const getApis = options => {
-  const { prefix, oidcPrefix } = Object.assign(
+  const { prefix, oidcPrefix, mcpAdminPrefix } = Object.assign(
     {},
     {
       prefix: `/api/v1`,
-      oidcPrefix: `/api/oidc`
+      oidcPrefix: `/api/oidc`,
+      // 对齐 @kne/fastify-mcp 默认 adminPrefix
+      mcpAdminPrefix: `/api/v1/admin/mcp`
     },
     options
   );
@@ -1140,6 +1142,61 @@ const getApis = options => {
         create: { url: `${prefix}/mail-gateway/contacts`, method: 'POST' },
         save: { url: `${prefix}/mail-gateway/contacts/{id}`, method: 'PUT' },
         remove: { url: `${prefix}/mail-gateway/contacts/{id}`, method: 'DELETE' }
+      }
+    },
+    // @kne/fastify-mcp：admin catalog/allowlist + 超管 keys（宿主 getAdminSetting.mcpEnabled 为真时才展示菜单）
+    mcp: {
+      catalog: {
+        operations: {
+          url: `${mcpAdminPrefix}/mcp-catalog/operations`,
+          method: 'GET'
+        }
+      },
+      allowlist: {
+        list: {
+          url: `${mcpAdminPrefix}/mcp-allowlist`,
+          method: 'GET'
+        },
+        detail: {
+          url: `${mcpAdminPrefix}/mcp-allowlist/{id}`,
+          method: 'GET'
+        },
+        create: {
+          url: `${mcpAdminPrefix}/mcp-allowlist`,
+          method: 'POST'
+        },
+        patch: {
+          url: `${mcpAdminPrefix}/mcp-allowlist/{id}`,
+          method: 'PATCH'
+        },
+        remove: {
+          url: `${mcpAdminPrefix}/mcp-allowlist/{id}`,
+          method: 'DELETE'
+        },
+        batch: {
+          url: `${mcpAdminPrefix}/mcp-allowlist/batch`,
+          method: 'PUT'
+        },
+        sync: {
+          url: `${mcpAdminPrefix}/mcp-allowlist/sync`,
+          method: 'POST'
+        }
+      },
+      // 超管密钥：宿主实现 `{mcpAdminPrefix}/mcp-keys`，可为任意用户签发、列表默认全部用户；
+      // 客户端自助用插件自带 `{prefix}/mcp-keys`（只能管自己）
+      keys: {
+        list: {
+          url: `${mcpAdminPrefix}/mcp-keys`,
+          method: 'GET'
+        },
+        create: {
+          url: `${mcpAdminPrefix}/mcp-keys`,
+          method: 'POST'
+        },
+        remove: {
+          url: `${mcpAdminPrefix}/mcp-keys/{id}`,
+          method: 'DELETE'
+        }
       }
     }
   };
