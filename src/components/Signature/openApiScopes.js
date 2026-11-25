@@ -14,6 +14,17 @@ const isOpenApiPath = path => typeof path === 'string' && (path.includes('/open-
 
 export const getMethodTagColor = method => METHOD_TAG_COLOR[String(method || '').toUpperCase()] || 'default';
 
+/** 作用域选项本地搜索：匹配 method / path / summary / label / value */
+export const matchOpenApiScopeOption = (item, searchText) => {
+  if (!searchText) {
+    return true;
+  }
+  const keyword = String(searchText).toLowerCase();
+  return [item?.method, item?.path, item?.description, item?.label, item?.value]
+    .filter(Boolean)
+    .some(text => String(text).toLowerCase().includes(keyword));
+};
+
 /** 从 swagger（GET /open-api.json）过滤 open-api / open-data 路径，生成 SuperSelect 选项 */
 export const buildOpenApiScopeOptions = swaggerDoc => {
   const paths = swaggerDoc?.paths || {};

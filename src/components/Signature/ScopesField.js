@@ -21,7 +21,9 @@ export const renderScopeItemContent = ({ item }) => {
   );
 };
 
-/** 表单内作用域 SuperSelect 字段（多选，未选=不限制） */
+/** 表单内作用域 SuperSelect 字段（多选，未选=不限制）
+ * api 模式下须用 getSearchProps 才会渲染搜索框（getSearchCallback 仅对 options 生效）
+ */
 const ScopesField = withLocale(({ SuperSelect, api, ...props }) => {
   const { formatMessage } = useIntl();
   return (
@@ -30,18 +32,11 @@ const ScopesField = withLocale(({ SuperSelect, api, ...props }) => {
       label={formatMessage({ id: 'Scopes' })}
       tips={formatMessage({ id: 'ScopesTips' })}
       placeholder={formatMessage({ id: 'ScopesPlaceholder' })}
+      searchPlaceholder={formatMessage({ id: 'ScopesPlaceholder' })}
       api={api}
       isPopup
       renderItemContent={renderScopeItemContent}
-      getSearchCallback={({ searchText }, item) => {
-        if (!searchText) {
-          return true;
-        }
-        const keyword = String(searchText).toLowerCase();
-        return [item.method, item.path, item.description, item.label, item.value]
-          .filter(Boolean)
-          .some(text => String(text).toLowerCase().includes(keyword));
-      }}
+      getSearchProps={({ searchText }) => (searchText ? { searchText } : {})}
       {...props}
     />
   );

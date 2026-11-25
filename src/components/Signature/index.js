@@ -7,14 +7,16 @@ import { useIntl } from '@kne/react-intl';
 import BizUnit from '@components/BizUnit';
 import { useRef } from 'react';
 import TablePageRender from '../BizUnit/TablePageRender';
-import { buildOpenApiScopeOptions, formValueToScopes, scopesToFormValue } from './openApiScopes';
+import { buildOpenApiScopeOptions, formValueToScopes, matchOpenApiScopeOption, scopesToFormValue } from './openApiScopes';
 import ScopesField from './ScopesField';
 
 const useOpenApiScopeApi = (ajax, apis) => ({
-  loader: async () => {
-    const { data } = await ajax(Object.assign({}, apis.signature.openApiDoc));
-    const swagger = data?.paths ? data : data?.data?.paths ? data.data : data;
-    return { pageData: buildOpenApiScopeOptions(swagger) };
+  // getSearchProps 把 searchText 合并进 data；在此做本地过滤（open-api.json 全量一次拉取）
+  loader: async ({ data } = {}) => {
+    const { data: resData } = await ajax(Object.assign({}, apis.signature.openApiDoc));
+    const swagger = resData?.paths ? resData : resData?.data?.paths ? resData.data : resData;
+    const pageData = buildOpenApiScopeOptions(swagger).filter(item => matchOpenApiScopeOption(item, data?.searchText));
+    return { pageData, totalCount: pageData.length };
   }
 });
 
