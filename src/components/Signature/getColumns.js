@@ -1,3 +1,5 @@
+import ViewScopes from './ViewScopes';
+
 const getColumns = ({ formatMessage }) => {
   return [
     {
@@ -23,12 +25,7 @@ const getColumns = ({ formatMessage }) => {
     {
       name: 'scopes',
       title: formatMessage({ id: 'Scopes' }),
-      getValueOf: ({ scopes }) => {
-        if (!scopes || !scopes.length) {
-          return formatMessage({ id: 'ScopesAll' });
-        }
-        return formatMessage({ id: 'ScopesCount' }, { count: scopes.length });
-      }
+      getValueOf: ({ scopes }) => <ViewScopes scopes={scopes} />
     },
     {
       name: 'lastVisitedAt',

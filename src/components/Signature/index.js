@@ -8,6 +8,7 @@ import BizUnit from '@components/BizUnit';
 import { useRef } from 'react';
 import TablePageRender from '../BizUnit/TablePageRender';
 import { buildOpenApiScopeOptions, formValueToScopes, scopesToFormValue } from './openApiScopes';
+import ScopesField from './ScopesField';
 
 const useOpenApiScopeApi = (ajax, apis) => ({
   loader: async () => {
@@ -159,14 +160,7 @@ const CreateButton = createWithRemoteLoader({
                 list={[
                   <UserSelect name="userId" label={formatMessage({ id: 'BelongUser' })} single interceptor="object-output-value" />,
                   <TextArea name="description" label={formatMessage({ id: 'Description' })} maxLength={100} />,
-                  <SuperSelect
-                    name="scopes"
-                    label={formatMessage({ id: 'Scopes' })}
-                    tips={formatMessage({ id: 'ScopesTips' })}
-                    placeholder={formatMessage({ id: 'ScopesPlaceholder' })}
-                    api={openApiScopeApi}
-                    isPopup
-                  />
+                  <ScopesField SuperSelect={SuperSelect} api={openApiScopeApi} />
                 ]}
               />
             )
@@ -180,69 +174,64 @@ const CreateButton = createWithRemoteLoader({
 
 const EditAction = createWithRemoteLoader({
   modules: ['components-core:FormInfo', 'components-core:FormInfo@useFormModal', 'components-core:Global@usePreset']
-})(({ remoteModules, data, children, onSuccess, ...props }) => {
-  const [FormInfo, useFormModal, usePreset] = remoteModules;
-  const { formatMessage } = useIntl();
-  const { ajax, apis } = usePreset();
-  const { TextArea, SuperSelect } = FormInfo.fields;
-  const formModal = useFormModal();
-  const { message } = App.useApp();
-  const openApiScopeApi = useOpenApiScopeApi(ajax, apis);
+})(
+  withLocale(({ remoteModules, data, children, onSuccess, ...props }) => {
+    const [FormInfo, useFormModal, usePreset] = remoteModules;
+    const { formatMessage } = useIntl();
+    const { ajax, apis } = usePreset();
+    const { TextArea, SuperSelect } = FormInfo.fields;
+    const formModal = useFormModal();
+    const { message } = App.useApp();
+    const openApiScopeApi = useOpenApiScopeApi(ajax, apis);
 
-  return (
-    <Button
-      type="link"
-      {...props}
-      onClick={() => {
-        const formModalApi = formModal({
-          title: formatMessage({ id: 'EditSecretKey' }),
-          size: 'small',
-          formProps: {
-            data: {
-              description: data.description,
-              scopes: scopesToFormValue(data.scopes)
-            },
-            onSubmit: async formData => {
-              const { data: resData } = await ajax(
-                Object.assign({}, apis.signature.update, {
-                  data: {
-                    appId: String(data.appId || data.id),
-                    description: formData.description,
-                    scopes: formValueToScopes(formData.scopes)
-                  }
-                })
-              );
-              if (resData.code !== 0) {
-                return false;
+    return (
+      <Button
+        type="link"
+        {...props}
+        onClick={() => {
+          const formModalApi = formModal({
+            title: formatMessage({ id: 'EditSecretKey' }),
+            size: 'small',
+            formProps: {
+              data: {
+                description: data.description,
+                scopes: scopesToFormValue(data.scopes)
+              },
+              onSubmit: async formData => {
+                const { data: resData } = await ajax(
+                  Object.assign({}, apis.signature.update, {
+                    data: {
+                      appId: String(data.appId || data.id),
+                      description: formData.description,
+                      scopes: formValueToScopes(formData.scopes)
+                    }
+                  })
+                );
+                if (resData.code !== 0) {
+                  return false;
+                }
+                message.success(formatMessage({ id: 'OperationSuccess' }));
+                onSuccess && onSuccess();
+                formModalApi.close();
               }
-              message.success(formatMessage({ id: 'OperationSuccess' }));
-              onSuccess && onSuccess();
-              formModalApi.close();
-            }
-          },
-          children: (
-            <FormInfo
-              column={1}
-              list={[
-                <TextArea name="description" label={formatMessage({ id: 'Description' })} maxLength={100} />,
-                <SuperSelect
-                  name="scopes"
-                  label={formatMessage({ id: 'Scopes' })}
-                  tips={formatMessage({ id: 'ScopesTips' })}
-                  placeholder={formatMessage({ id: 'ScopesPlaceholder' })}
-                  api={openApiScopeApi}
-                  isPopup
-                />
-              ]}
-            />
-          )
-        });
-      }}
-    >
-      {children ?? formatMessage({ id: 'EditSecretKey' })}
-    </Button>
-  );
-});
+            },
+            children: (
+              <FormInfo
+                column={1}
+                list={[
+                  <TextArea name="description" label={formatMessage({ id: 'Description' })} maxLength={100} />,
+                  <ScopesField SuperSelect={SuperSelect} api={openApiScopeApi} />
+                ]}
+              />
+            )
+          });
+        }}
+      >
+        {children ?? formatMessage({ id: 'EditSecretKey' })}
+      </Button>
+    );
+  })
+);
 
 const Signature = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:Filter']

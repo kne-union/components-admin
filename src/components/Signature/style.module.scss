@@ -1,0 +1,40 @@
+.scope-item {
+  min-width: 0;
+  width: 100%;
+}
+
+.scope-item-main {
+  min-width: 0;
+}
+
+.scope-method-tag {
+  margin: 0;
+  flex-shrink: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 600;
+}
+
+.scope-path {
+  min-width: 0;
+  word-break: break-all;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.scope-summary {
+  padding-left: 0;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.scopes-view-loading {
+  display: block;
+  margin: 40px auto;
+}
+
+.scopes-openapi {
+  min-height: 480px;
+}
