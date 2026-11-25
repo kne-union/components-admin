@@ -10,7 +10,8 @@ import withLocale from './withLocale';
 
 /**
  * 各应用通用的超管后台壳：内置用户 / 文件 / 消息 / 平台管理
- * （平台管理左栏含认证管理 + 平台关联；平台关联受 setting.appOpsEnabled 控制），
+ * （平台管理左栏含认证管理 + 平台关联 + MCP；
+ * 平台关联受 setting.appOpsEnabled、MCP 受 setting.mcpEnabled 控制），
  * 业务通过 navigation.list 与 list 追加自定义模块。
  */
 export const getBuiltinAdminNav = (baseUrl, formatMessage) => [

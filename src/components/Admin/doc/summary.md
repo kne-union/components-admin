@@ -2,7 +2,7 @@
 
 **核心特性**
 
-- **AdminLayout 统一壳**：顶栏内置用户 / 文件 / 消息 / 平台管理；平台管理左栏是「认证管理」（原 OIDC 菜单作二级）和「平台关联」（需开启 `appOpsEnabled`）
+- **AdminLayout 统一壳**：顶栏内置用户 / 文件 / 消息 / 平台管理；平台管理左栏是「认证管理」（原 OIDC 菜单作二级）、「平台关联」（需 `appOpsEnabled`）和「MCP」（需 `mcpEnabled`：开放能力 allowlist + 当前用户密钥）
 - **业务只追加自己的模块**：任务、租户等用 `navigation.list` + `list` 挂上即可，不必再手写公共导航和路由
 - **系统初始化 InitAdmin**：首次部署时引导创建超级管理员，完成后自动进入后台
 - **用户管理**：列表、加用户、改资料与密码、设超管、启停账号，走统一账号接口
@@ -15,5 +15,5 @@
 
 **技术亮点**
 
-- 导航项可按 `getSuperAdminInfo` 下发的 `setting` 显隐（例如平台关联依赖 `appOpsEnabled`）
+- 导航项可按 `getSuperAdminInfo` 下发的 `setting` 显隐（平台关联 `appOpsEnabled`、MCP `mcpEnabled`）
 - 与 `AfterAdminUserLoginLayout` 配套：登录态、顶栏、业务页一层布局，避免再套一层 Layout

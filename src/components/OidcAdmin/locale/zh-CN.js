@@ -80,6 +80,7 @@ const locale = {
   NoUserFound: '没有找到用户',
   ActiveUsersCount: '当前活跃用户',
   ActiveUserTag: '活跃',
+  OtherUsers: '其他用户',
   BackToUsers: '用户列表',
   SuperAdmin: '超级管理员',
   RevokeSelectedSessions: '结束所选会话',

@@ -20,11 +20,18 @@
 | user | 用户管理 | 本包 `Admin.User` | 始终 |
 | file | 文件管理 | `components-file-manager:FileListPage` | 始终 |
 | message | 消息管理 | `components-admin:MessageManger` | 始终 |
-| platform | 平台管理 | 本包 `PlatformManagement`（左栏：认证管理 / 平台关联） | 始终；其中「平台关联」左菜单受 `userInfo.setting.appOpsEnabled` 控制 |
+| platform | 平台管理 | 本包 `PlatformManagement`（左栏：认证管理 / 平台关联 / MCP） | 始终；「平台关联」受 `setting.appOpsEnabled`；「MCP」受 `setting.mcpEnabled` |
 
-平台管理路由：`{baseUrl}/platform/oidc/*`（原 OidcAdmin 子页）、`{baseUrl}/platform/link/*`（`components-app-manager:PlatformLink`）。认证管理下的原 Oidc 菜单项为二级。
+平台管理路由：`{baseUrl}/platform/oidc/*`（原 OidcAdmin 子页）、`{baseUrl}/platform/link/*`（`components-app-manager:PlatformLink`）、`{baseUrl}/platform/mcp`（开放能力 / allowlist）、`{baseUrl}/platform/mcp/keys`（当前用户 MCP 密钥，可被业务客户端复用）。认证管理、MCP 下的子项为二级。`PlatformManagement` 可传 `mcpServerName`（默认 `mcp`）用于安装配置里的 server 名。
 
-依赖：`getSuperAdminInfo` 返回 `{ userInfo, setting }`（`@kne/fastify-account` ≥ 2.0.13 + 宿主 `getAdminSetting`）。
+依赖：`getSuperAdminInfo` 返回 `{ userInfo, setting }`（`@kne/fastify-account` ≥ 2.0.13 + 宿主 `getAdminSetting` / `adminSetting`）。宿主示例：
+
+```js
+getAdminSetting: ({ fastify }) => ({
+  appOpsEnabled: !!fastify.config.APP_OPS_ENABLED,
+  mcpEnabled: !!fastify.mcp // 已注册 @kne/fastify-mcp（默认 name=mcp）
+})
+```
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |

@@ -3,7 +3,7 @@
   "list": [
     {
       "title": "通用后台布局",
-      "description": "任务、租户用本包 Task / TenantAdmin 挂上；用户、文件、消息、平台管理由布局内置。点「平台管理」可见左栏「认证管理」（二级 OIDC）与「平台关联」（需 setting.appOpsEnabled）",
+      "description": "任务、租户用本包 Task / TenantAdmin 挂上；用户、文件、消息、平台管理由布局内置。点「平台管理」可见左栏「认证管理」（二级 OIDC）、「平台关联」（需 appOpsEnabled）与「MCP」（开放能力 / 密钥，需 mcpEnabled）",
       "code": "./admin-layout.js",
       "scope": [
         {

@@ -13,7 +13,8 @@
       "gender": "M"
     },
     "setting": {
-      "appOpsEnabled": true
+      "appOpsEnabled": true,
+      "mcpEnabled": true
     }
   }
 }

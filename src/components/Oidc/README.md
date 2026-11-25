@@ -232,7 +232,7 @@ render(<BaseExample />);
 | refresh | - | `Promise<tokenSet>` | 使用 refresh token 刷新，多标签页串行执行 |
 | getAccessToken | - | `Promise<string \| null>` | 获取有效 access token，临近过期自动刷新 |
 | getAuthHeaders | `{ method, url }` | `Promise<object>` | 生成请求头：`Authorization: Bearer …`，DPoP 令牌额外带 `DPoP` proof |
-| registerInterceptors | `interceptors, { onUnauthorized? }` | void | 传给 `@kne/axios-fetch` 的 `registerInterceptors`；请求自动带令牌，401 默认清除令牌并重新登录（10 秒内只触发一次） |
+| registerInterceptors | `interceptors, { onUnauthorized? }` | void | 传给 `@kne/axios-fetch` 的 `registerInterceptors`；请求自动带令牌，401 默认清除令牌并重新登录；10 秒内再次 401 则退出 IdP 会话回到登录页，不展示 JSON 报错；回调 / 交互页自身的 401 不处理 |
 | switchTenant | `tenantId, { returnTo? }` | Promise | 以 `prompt=none` + `tenant_id` 静默切换租户 |
 | logout | `{ returnTo? }` | Promise | 清除本地令牌（及 DPoP 密钥），跳转 IdP `end_session` 退出 |
 | isAuthenticated | - | boolean | 本地是否有可用（或可刷新）的令牌 |

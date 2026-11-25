@@ -78,7 +78,7 @@ const BaseExample = createWithRemoteLoader({
   return (
     <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
-        <SessionManager defaultUserId="1" pageProps={{ menuFixed: false }} />
+        <SessionManager pageProps={{ menuFixed: false }} />
       </Layout>
     </PureGlobal>
   );
@@ -181,7 +181,7 @@ OIDC 管理后台入口，内部使用 `AppChildrenRouter` 组织五个子页面
 
 ### KeyManager
 
-签名密钥列表与轮换。
+基于 `BizUnit`（isNext）的签名密钥列表与轮换：只读列表 + 工具栏一键轮换，无行内增删改。
 
 #### 属性说明
 
@@ -200,7 +200,7 @@ OIDC 管理后台入口，内部使用 `AppChildrenRouter` 组织五个子页面
 |--------|------|------|--------|------|
 | baseUrl | string | 否 | - | 菜单根路径 |
 | pageProps | object | 否 | {} | 页面配置 |
-| defaultUserId | string | 否 | - | 默认查看的用户 ID |
+| defaultUserId | string | 否 | - | 优先选中的用户 ID；不传则列表加载后默认选中第一个用户 |
 
 ### AppManager
 
@@ -258,6 +258,7 @@ plugins: {
 | key | list | GET | `/admin/key/list` |
 | key | rotate | POST | `/admin/key/rotate` |
 | session | list | GET | `/admin/session/list?userId=` |
+| session | activeUsers | GET | `/admin/session/active-users`（活跃用户：有未过期登录会话的用户，需 `@kne/fastify-oidc` ≥ 0.1.18） |
 | session | revoke / revokeUser | POST | `/admin/session/revoke`、`/admin/session/revoke-user` |
 | app | list / detail | GET | `/admin/app/list`、`/admin/app/detail` |
 | app | setStatus / remove | POST | `/admin/app/set-status`、`/admin/app/remove` |

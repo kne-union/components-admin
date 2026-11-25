@@ -6,7 +6,7 @@
 
 **核心特性**
 
-- **AdminLayout 统一壳**：顶栏内置用户 / 文件 / 消息 / 平台管理；平台管理左栏是「认证管理」（原 OIDC 菜单作二级）和「平台关联」（需开启 `appOpsEnabled`）
+- **AdminLayout 统一壳**：顶栏内置用户 / 文件 / 消息 / 平台管理；平台管理左栏是「认证管理」（原 OIDC 菜单作二级）、「平台关联」（需 `appOpsEnabled`）和「MCP」（需 `mcpEnabled`：开放能力 allowlist + 当前用户密钥）
 - **业务只追加自己的模块**：任务、租户等用 `navigation.list` + `list` 挂上即可，不必再手写公共导航和路由
 - **系统初始化 InitAdmin**：首次部署时引导创建超级管理员，完成后自动进入后台
 - **用户管理**：列表、加用户、改资料与密码、设超管、启停账号，走统一账号接口
@@ -19,7 +19,7 @@
 
 **技术亮点**
 
-- 导航项可按 `getSuperAdminInfo` 下发的 `setting` 显隐（例如平台关联依赖 `appOpsEnabled`）
+- 导航项可按 `getSuperAdminInfo` 下发的 `setting` 显隐（平台关联 `appOpsEnabled`、MCP `mcpEnabled`）
 - 与 `AfterAdminUserLoginLayout` 配套：登录态、顶栏、业务页一层布局，避免再套一层 Layout
 
 
@@ -28,7 +28,7 @@
 #### 示例代码
 
 - 通用后台布局
-- 任务、租户用本包 Task / TenantAdmin 挂上；用户、文件、消息、平台管理由布局内置。点「平台管理」可见左栏「认证管理」（二级 OIDC）与「平台关联」（需 setting.appOpsEnabled）
+- 任务、租户用本包 Task / TenantAdmin 挂上；用户、文件、消息、平台管理由布局内置。点「平台管理」可见左栏「认证管理」（二级 OIDC）、「平台关联」（需 appOpsEnabled）与「MCP」（开放能力 / 密钥，需 mcpEnabled）
 - _Admin(@components/Admin),_Task(@components/Task),_TenantAdmin(@components/TenantAdmin),_mockPreset(@root/mockPreset),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom)
 
 ```jsx
@@ -215,11 +215,18 @@ render(<InitAdminExample />);
 | user | 用户管理 | 本包 `Admin.User` | 始终 |
 | file | 文件管理 | `components-file-manager:FileListPage` | 始终 |
 | message | 消息管理 | `components-admin:MessageManger` | 始终 |
-| platform | 平台管理 | 本包 `PlatformManagement`（左栏：认证管理 / 平台关联） | 始终；其中「平台关联」左菜单受 `userInfo.setting.appOpsEnabled` 控制 |
+| platform | 平台管理 | 本包 `PlatformManagement`（左栏：认证管理 / 平台关联 / MCP） | 始终；「平台关联」受 `setting.appOpsEnabled`；「MCP」受 `setting.mcpEnabled` |
 
-平台管理路由：`{baseUrl}/platform/oidc/*`（原 OidcAdmin 子页）、`{baseUrl}/platform/link/*`（`components-app-manager:PlatformLink`）。认证管理下的原 Oidc 菜单项为二级。
+平台管理路由：`{baseUrl}/platform/oidc/*`（原 OidcAdmin 子页）、`{baseUrl}/platform/link/*`（`components-app-manager:PlatformLink`）、`{baseUrl}/platform/mcp`（开放能力 / allowlist）、`{baseUrl}/platform/mcp/keys`（当前用户 MCP 密钥，可被业务客户端复用）。认证管理、MCP 下的子项为二级。`PlatformManagement` 可传 `mcpServerName`（默认 `mcp`）用于安装配置里的 server 名。
 
-依赖：`getSuperAdminInfo` 返回 `{ userInfo, setting }`（`@kne/fastify-account` ≥ 2.0.13 + 宿主 `getAdminSetting`）。
+依赖：`getSuperAdminInfo` 返回 `{ userInfo, setting }`（`@kne/fastify-account` ≥ 2.0.13 + 宿主 `getAdminSetting` / `adminSetting`）。宿主示例：
+
+```js
+getAdminSetting: ({ fastify }) => ({
+  appOpsEnabled: !!fastify.config.APP_OPS_ENABLED,
+  mcpEnabled: !!fastify.mcp // 已注册 @kne/fastify-mcp（默认 name=mcp）
+})
+```
 
 | 属性名 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |

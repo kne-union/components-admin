@@ -9,7 +9,7 @@ const BaseExample = createWithRemoteLoader({
   return (
     <PureGlobal preset={mockPreset}>
       <Layout navigation={{ isFixed: false }}>
-        <SessionManager defaultUserId="1" pageProps={{ menuFixed: false }} />
+        <SessionManager pageProps={{ menuFixed: false }} />
       </Layout>
     </PureGlobal>
   );

@@ -1,0 +1,311 @@
+@use '~@kne/responsive-utils/scss' as resp;
+
+$ink: #1c2024;
+$text: #60646c;
+$muted: #80838d;
+$line: #e8e8ec;
+$soft: #f7f7f8;
+$success: #10b981;
+$code-bg: #15181c;
+$code-ink: #e6e8eb;
+$code-muted: #8b9199;
+
+.install {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: $ink;
+  @include resp.responsive-container;
+}
+
+.intro {
+  margin: 0 0 16px;
+  color: $text;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: 14px;
+  padding-bottom: 24px;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 32px;
+    bottom: 6px;
+    left: 13.5px;
+    width: 1px;
+    background: $line;
+  }
+}
+
+.dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid $line;
+  border-radius: 50%;
+  background: #fff;
+  color: $text;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.2s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
+}
+
+.dotActive {
+  border-color: var(--ant-color-primary, #1677ff);
+  background: var(--ant-color-primary, #1677ff);
+  color: #fff;
+}
+
+.dotDone {
+  border-color: $success;
+  background: $success;
+  color: #fff;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding-top: 3px;
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.desc {
+  margin: -6px 0 0;
+  color: $muted;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ownerRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.ownerField {
+  flex: 1;
+  min-width: 0;
+}
+
+.token {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.tokenHead {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  color: $text;
+  font-size: 13px;
+}
+
+.tokenValue {
+  margin: 0;
+  color: $ink;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+.tokenOwner {
+  color: $ink;
+  font-weight: 600;
+}
+
+.clients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.client {
+  padding: 4px 12px;
+  border: 1px solid $line;
+  border-radius: 999px;
+  background: #fff;
+  color: $text;
+  font-size: 13px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: border-color 0.15s ease-out, color 0.15s ease-out, background-color 0.15s ease-out;
+
+  &:hover {
+    border-color: var(--ant-color-primary, #1677ff);
+    color: var(--ant-color-primary, #1677ff);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ant-color-primary, #1677ff);
+    outline-offset: 2px;
+  }
+}
+
+.clientActive {
+  border-color: var(--ant-color-primary, #1677ff);
+  background: var(--ant-color-primary-bg, #e6f4ff);
+  color: var(--ant-color-primary, #1677ff);
+  font-weight: 500;
+}
+
+.code {
+  overflow: hidden;
+  border-radius: 8px;
+  background: $code-bg;
+}
+
+.codeHead {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 10px 12px 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.codePath {
+  min-width: 0;
+  color: $code-muted;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-line;
+  word-break: break-all;
+
+  strong {
+    color: $code-ink;
+    font-weight: 500;
+  }
+}
+
+.copyBtn {
+  flex: none;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 2px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  background: transparent;
+  color: $code-ink;
+  font-size: 12px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: background-color 0.15s ease-out;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ant-color-primary, #1677ff);
+    outline-offset: 2px;
+  }
+}
+
+.codeBody {
+  max-height: 280px;
+  margin: 0;
+  padding: 12px 14px;
+  overflow: auto;
+  color: $code-ink;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre;
+
+  &::selection,
+  *::selection {
+    background: rgba(22, 119, 255, 0.45);
+  }
+}
+
+.placeholder {
+  color: #fbbf24;
+}
+
+.hint {
+  margin: 0;
+  color: $muted;
+  font-size: 12px;
+}
+
+.prompt {
+  position: relative;
+  padding: 12px 44px 12px 14px;
+  border: 1px solid $line;
+  border-radius: 8px;
+  background: $soft;
+  color: $text;
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.promptCopy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.securityAlert {
+  margin-bottom: 20px;
+}
+
+.securityList {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: $text;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+@include resp.mobile-container {
+  .ownerRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .step {
+    grid-template-columns: 24px minmax(0, 1fr);
+    column-gap: 10px;
+
+    &:not(:last-child)::before {
+      left: 11.5px;
+      top: 28px;
+    }
+  }
+
+  .dot {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+}
