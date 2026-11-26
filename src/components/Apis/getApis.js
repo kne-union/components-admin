@@ -1176,10 +1176,6 @@ const getApis = options => {
         batch: {
           url: `${mcpAdminPrefix}/mcp-allowlist/batch`,
           method: 'PUT'
-        },
-        sync: {
-          url: `${mcpAdminPrefix}/mcp-allowlist/sync`,
-          method: 'POST'
         }
       },
       // 超管密钥：宿主实现 `{mcpAdminPrefix}/mcp-keys`，可为任意用户签发、列表默认全部用户；

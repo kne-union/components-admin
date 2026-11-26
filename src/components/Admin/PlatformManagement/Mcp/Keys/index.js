@@ -105,6 +105,12 @@ const Keys = createWithRemoteLoader({
         options={{
           bizName: formatMessage({ id: 'NavMcpKeys' }),
           tableProps: {
+            pagination: {
+              open: true,
+              paramsType: 'params',
+              showSizeChanger: true,
+              showQuickJumper: true
+            },
             buttonGroup: {
               list: [
                 {
