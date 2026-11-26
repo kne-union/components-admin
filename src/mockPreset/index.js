@@ -262,9 +262,6 @@ const apis = merge({}, getApis(), {
           }
           return { ...(hit || data), id: hit?.path || 'mock' };
         }
-      },
-      sync: {
-        loader: () => ({ orphanCount: 0, activeCount: mcpCatalogMock.filter(i => i.enabled).length })
       }
     },
     keys: {
