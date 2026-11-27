@@ -32,17 +32,19 @@ const AttachmentItem = createWithRemoteLoader({
   const [useFileModal, usePreset] = remoteModules;
   const { ajax, apis } = usePreset();
   const { formatMessage } = useIntl();
+  const fileModal = useFileModal();
   const [downloading, setDownloading] = useState(false);
   const [previewPending, setPreviewPending] = useState(false);
   const ready = !!(attachment.id || attachment.url);
-  const openPreview = useFileModal({ id: attachment.id, src: attachment.url, filename: attachment.filename, openDownload: true });
+  const openPreview = () =>
+    fileModal({ id: attachment.id, src: attachment.url, filename: attachment.filename, openDownload: true });
 
   useEffect(() => {
     if (previewPending && ready) {
       setPreviewPending(false);
-      openPreview();
+      fileModal({ id: attachment.id, src: attachment.url, filename: attachment.filename, openDownload: true });
     }
-  }, [previewPending, ready, openPreview]);
+  }, [previewPending, ready, attachment.id, attachment.url, attachment.filename, fileModal]);
 
   const handleClick = async () => {
     if (ready) {
